@@ -1,0 +1,272 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guruhlar</title>
+    <style>
+        * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: sans-serif;
+        background-color: #111;
+        color: #ccc;
+    }
+
+    .headerr {
+        background-color: #2c5d77;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #fff;
+    }
+    .headerr h1 {
+        font-size: 20px;
+    }
+    .headerr nav a {
+        color: #9cd;
+        text-decoration: none;
+        margin: 0 5px;
+    }
+    .containerr {
+        display: flex;
+        height: calc(100vh - 50px);
+    }
+    .asidee {
+        width: 300px;
+        background-color: #1e1e1e;
+        padding: 15px;
+        border-right: 1px solid #333;
+    }
+    .menuu h3 {
+        color: #aef;
+        font-size: 12px;
+        margin: 10px 0 5px;
+    }
+    .itemm {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2px 0;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+    .itemm:hover {
+        background-color: #333;
+    }
+    .itemm a {
+        text-decoration: none;
+        display: block;
+        padding: 10px 12px;
+    }
+    .itemm .linkk {
+        color: #eee;
+        flex: 1;
+    }
+    .itemm .addd {
+        color: #7f7;
+        font-weight: bold;
+    }
+    .itemm .linkk:hover {
+        color: #fff;
+    }
+    .itemm .addd:hover {
+        color: #9f9;
+    }
+    .main-main {
+        width: 100%;
+        padding: 20px 20px;
+        font-size: 12px;
+    }
+    .sarlavha {
+      font-size: 24px;
+      margin-bottom: 25px;
+    }
+
+    .qator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .yorliq {
+      width: 150px;
+      font-weight: bold;
+    }
+
+    .kiritish, select {
+      flex: 1;
+      padding: 10px;
+      background-color: #222;
+      color: white;
+      border: 1px solid #444;
+      border-radius: 4px;
+    }
+
+    .kiritish-qisqa {
+      width: 80px;
+    }
+
+    .iconlar {
+      font-size: 18px;
+      cursor: pointer;
+      color: #4caf50;
+      display: flex;
+      gap: 5px;
+    }
+
+    .tugmalar {
+      margin-top: 30px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tugma {
+      padding: 10px 16px;
+      background-color: #19576d;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .tugma:hover {
+      opacity: 0.9;
+    }
+    </style>
+</head>
+<body>
+    <div class="headerr">
+        <h1>Admin</h1>
+        <nav>
+            <a href="{% url 'admin:index' %}">ADMIN</a> /
+            <a href="{% url 'admin_password' %}">Parolni almashtirish</a> /
+            <a href="{% url 'login' %}">Chiqish</a>
+        </nav>
+    </div>
+
+    <div class="containerr">
+        <div class="asidee">
+            <div class="menuu">
+                <h3>MENU</h3>
+                <div class="itemm">
+                    <a href="{% url 'all_groups_admin' %}" class="linkk">Guruhlar</a>
+                    <a href="{% url 'create_group_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'students_list_admin' %}" class="linkk">O'quvchilar</a>
+                    <a href="{% url 'add_student' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'teachers_list_admin' %}" class="linkk">O'qituvchilar</a>
+                    <a href="{% url 'add_teacher' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'admin_assignment_list' %}" class="linkk">Topshiriqlar</a>
+                    <a href="{% url 'add_topshiriq' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'all_group_schedules' %}" class="linkk">Dars rejasi</a>
+                    <a href="{% url 'all_groups_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'quiz_list' %}" class="linkk">Testlar</a>
+                    <a href="{% url 'add_quiz' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'question_list' %}" class="linkk">Savollar</a>
+                    <a href="{% url 'add_test_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+                <div class="itemm">
+                    <a href="{% url 'group_payment_list' %}" class="linkk">Guruh to'lov</a>
+                </div>
+                <div class="itemm">
+                    <a href="{% url 'student_list' %}" class="linkk">Barcha to'lov</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-main">
+            <form method="post" onsubmit="return validateForm();">
+                {% csrf_token %}
+                <div class="sarlavha">Test qo‘shing</div>
+
+              <!-- Viktorina nomi -->
+              <div class="qator">
+                <div class="yorliq">Test nomi:</div>
+                <input type="text" class="kiritish" id="title" name="title">
+              </div>
+
+              <!-- Guruh tanlash -->
+              <div class="qator">
+                <div class="yorliq">Guruh:</div>
+                <select class="kiritish" name="group" id="group">
+                  <option value="">Guruhni tanlang</option>
+                        {% for group in groups %}
+                            <option value="{{ group.id }}">{{ group.name }}</option>
+                        {% endfor %}
+                </select>
+              </div>
+
+              <!-- O‘qituvchi tanlash -->
+              <div class="qator">
+                <div class="yorliq">O‘qituvchi:</div>
+                <select class="kiritish" name="teacher" id="teacher">
+                  <option value="">O‘qituvchini tanlang</option>
+                        {% for teacher in teachers %}
+                            <option value="{{ teacher.id }}">{{ teacher.get_full_name }}</option>
+                        {% endfor %}
+                </select>
+              </div>
+
+              <!-- Vaqt cheklovi -->
+              <div class="qator">
+                <div class="yorliq">Vaqt chegarasi:</div>
+                <input type="number" class="kiritish-qisqa kiritish" id="time_limit" name="time_limit" placeholder="daqiqalarda" min="1">
+              </div>
+
+              <!-- Maksimal to‘p -->
+              <div class="qator">
+                <div class="yorliq">Maksimal ball:</div>
+                <input type="number" class="kiritish-qisqa kiritish" id="max_score" name="max_score" value="100" min="1">
+              </div>
+
+              <!-- Tugmalar -->
+              <div class="tugmalar">
+                    <button type="submit" class="tugma">SAQLASH</button>
+                    <a href="{% url 'quiz_list' %}" class="tugma">Chiqish</a>
+              </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function validateForm() {
+            const title = document.getElementById('title').value.trim();
+            const group = document.getElementById('group').value;
+            const teacher = document.getElementById('teacher').value;
+            const timeLimit = document.getElementById('time_limit').value;
+            const maxScore = document.getElementById('max_score').value;
+
+            if (!title || !group || !teacher || !timeLimit || !maxScore) {
+                alert("Iltimos, barcha maydonlarni to‘ldiring.");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>

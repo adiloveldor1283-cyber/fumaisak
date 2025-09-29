@@ -1,0 +1,370 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guruh qo'shish</title>
+    <style>
+        * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: sans-serif;
+        background-color: #111;
+        color: #ccc;
+    }
+
+    .headerr {
+        background-color: #2c5d77;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #fff;
+    }
+
+    .headerr h1 {
+        font-size: 20px;
+    }
+
+    .headerr nav a {
+        color: #9cd;
+        text-decoration: none;
+        margin: 0 5px;
+    }
+
+    .containerr {
+        display: flex;
+        height: calc(100vh - 50px);
+    }
+
+    .asidee {
+        width: 300px;
+        background-color: #1e1e1e;
+        padding: 15px;
+        border-right: 1px solid #333;
+    }
+
+    .menuu h3 {
+        color: #aef;
+        font-size: 12px;
+        margin: 10px 0 5px;
+    }
+
+    .itemm {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2px 0;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+
+    .itemm:hover {
+        background-color: #333;
+    }
+
+    .itemm a {
+        text-decoration: none;
+        display: block;
+        padding: 10px 12px;
+    }
+
+    /* Chap tarafdagi link */
+    .itemm .linkk {
+        color: #eee;
+        flex: 1;
+    }
+
+    /* O'ng tarafdagi + qo‘shish */
+    .itemm .addd {
+        color: #7f7;
+        font-weight: bold;
+    }
+
+    /* Hoverdagi o‘zgarishlar (ixtiyoriy) */
+    .itemm .linkk:hover {
+        color: #fff;
+    }
+
+    .itemm .addd:hover {
+        color: #9f9;
+    }
+    .main-main {
+        font-family: sans-serif;
+        padding: 20px;
+    }
+    .form-main input, select, button {
+        font-size: 12px;
+        padding: 5px 20px;
+        background-color: #111;
+        border: 1px solid white;
+        color: white;
+        margin-top: 8px;
+    }
+    .form-main label {
+        font-size: 12px;
+    }
+    .dual-list-container-1 {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        gap: 5px;
+        margin-top: 20px;
+    }
+    .dual-list-container-2 {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        gap: 5px;
+        margin-top: 20px;
+    }
+    .list-box {
+        width: 39vw;
+    }
+    .list-box h3 {
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+    .list-box p {
+        font-size: 12px;
+    }
+    .list-box select {
+        padding: 8px;
+        width: 100%;
+        height: 20vh;
+        background-color: #222;
+        color: #fff;
+        border: 1px solid #444;
+        overflow-y: auto;
+        font-size: 12px;
+    }
+    .controls {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 10px;
+    }
+    .controls button {
+        background-color: #555;
+        color: white;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 2px;
+    }
+    .controls button:hover {
+        background-color: #777;
+    }
+    .time-container {
+        margin-top: 10px;
+    }
+    .time-container input {
+        padding: 5px;
+        margin-top: 3px;
+        background-color: white;
+        color: #333;
+    }
+    button[type="submit"] {
+        background-color: #555;
+        color: white;
+        border: none;
+        padding: 5px 15px;
+        font-size: 12px;
+        cursor: pointer;
+        border-radius: 2px;
+    }
+    button[type="submit"]:hover {
+        background-color: #777;
+    }
+    .title-text-p {
+    background-color: #2c5d77;
+    color: white;
+    padding: 8px;
+    width: 100%;
+    font-size: 14px;
+    display: inline-block;
+}
+    </style>
+</head>
+<body>
+    <div class="headerr">
+        <h1>Admin</h1>
+        <nav>
+            <a href="{% url 'admin:index' %}">ADMIN</a> /
+            <a href="{% url 'admin_password' %}">Parolni almashtirish</a> /
+            <a href="{% url 'login' %}">Chiqish</a>
+        </nav>
+    </div>
+
+    <div class="containerr">
+        <div class="asidee">
+            <div class="menuu">
+                <h3>MENU</h3>
+                <div class="itemm">
+                    <a href="{% url 'all_groups_admin' %}" class="linkk">Guruhlar</a>
+                    <a href="{% url 'create_group_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'students_list_admin' %}" class="linkk">O'quvchilar</a>
+                    <a href="{% url 'add_student' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'teachers_list_admin' %}" class="linkk">O'qituvchilar</a>
+                    <a href="{% url 'add_teacher' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'admin_assignment_list' %}" class="linkk">Topshiriqlar</a>
+                    <a href="{% url 'add_topshiriq' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'all_group_schedules' %}" class="linkk">Dars rejasi</a>
+                    <a href="{% url 'all_groups_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'quiz_list' %}" class="linkk">Testlar</a>
+                    <a href="{% url 'add_quiz' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'question_list' %}" class="linkk">Savollar</a>
+                    <a href="{% url 'add_test_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+                <div class="itemm">
+                    <a href="{% url 'group_payment_list' %}" class="linkk">Guruh to'lov</a>
+                </div>
+                <div class="itemm">
+                    <a href="{% url 'student_list' %}" class="linkk">Barcha to'lov</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-main">
+            <h2 style="font-size: 18px;">Guruh yaratish</h2>
+            <form class="form-main" method="POST">
+            {% csrf_token %}
+
+            <label for="group-name">Guruh nomini kiritish:</label>
+            <input type="text" id="group-name" name="group-name" required><br><br>
+
+            <!-- O'qituvchilar -->
+            <div class="dual-list-container-1">
+                <div class="list-box">
+                    <h3 class="title-text-p">Mavjud o‘qituvchilar</h3>
+                    <p>Qidiruv: <input type="text" class="search-box" data-target="available-teachers" placeholder="Qidiruv..."></p>
+                    <select id="available-teachers" multiple>
+                        {% for teacher in all_teachers %}
+                            <option value="{{ teacher.id }}">  {{ teacher.last_name }} {{ teacher.first_name }} (o'qituvchi)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="controls">
+                    <button type="button" onclick="moveSelected('available-teachers', 'selected-teachers')">▶</button>
+                    <button type="button" onclick="moveSelected('selected-teachers', 'available-teachers')">◀</button>
+                </div>
+
+                <div class="list-box">
+                    <h3 class="title-text-p">Tanlangan o‘qituvchilar</h3>
+                    <p>Qidiruv: <input type="text" class="search-box" data-target="selected-teachers" placeholder="Qidiruv..."></p>
+                    <select id="selected-teachers" name="selected_teachers" multiple></select>
+                </div>
+            </div>
+
+            <!-- Talabalar -->
+            <div class="dual-list-container-2">
+                <div class="list-box">
+                    <h3 class="title-text-p">Mavjud o‘quvchilar</h3>
+                    <p>Qidiruv: <input type="text" class="search-box" data-target="available-students" placeholder="Qidiruv..."></p>
+                    <select id="available-students" multiple>
+                        {% for student in all_students %}
+                            <option value="{{ student.id }}">{{ student.last_name }} {{ student.first_name }} (o'quvchi)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="controls">
+                    <button type="button" onclick="moveSelected('available-students', 'selected-students')">▶</button>
+                    <button type="button" onclick="moveSelected('selected-students', 'available-students')">◀</button>
+                </div>
+
+                <div class="list-box">
+                    <h3 class="title-text-p">Tanlangan o‘quvchilar</h3>
+                    <p>Qidiruv: <input type="text" class="search-box" data-target="selected-students" placeholder="Qidiruv..."></p>
+                    <select id="selected-students" name="selected_students" multiple></select>
+                </div>
+            </div>
+
+            <!-- Sana -->
+            <div class="time-container">
+                <label for="date">Guruh ochilgan vaqti:</label>
+                <input type="date" id="date" name="date" value="{{ timezone.now|date:'Y-m-d' }}">
+                <input type="time" id="time" name="time" value="{{ timezone.now|time:'H:i:s' }}">
+            </div>
+
+            <br>
+            <button type="submit" class="form-main-button-1">SAQLASH</button>
+        </form>
+        </div>
+    </div>
+    <script>
+// Familiya bosh harfiga qarab qidiruv qilish
+    function filterOptions(searchInput, targetSelectId) {
+        const searchTerm = searchInput.value.toLowerCase();
+        const targetSelect = document.getElementById(targetSelectId);
+        const options = targetSelect.options;
+
+        for (let i = 0; i < options.length; i++) {
+            const option = options[i];
+            const text = option.text.toLowerCase();
+
+            // Familiya deb birinchi so‘zni olamiz
+            const words = text.split(/\s+/);
+            const lastName = words[0];
+
+            // Faqat familiya boshlanishi mos bo‘lsa ko‘rsatamiz
+            option.hidden = !lastName.startsWith(searchTerm);
+        }
+    }
+
+    // Qidiruv inputlarining hodisasini ulash
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.search-box').forEach(input => {
+            const targetId = input.dataset.target;
+            input.addEventListener('input', function () {
+                filterOptions(input, targetId);
+            });
+        });
+
+        // Form yuborilganda barcha tanlangan optionlarni selected qilamiz
+        document.querySelector('form').addEventListener('submit', function () {
+            document.querySelectorAll('#selected-teachers option, #selected-students option').forEach(option => {
+                option.selected = true;
+            });
+        });
+    });
+
+    // O‘qituvchi yoki talabani chapdan o‘ngga o‘tkazish
+    function moveSelected(fromId, toId) {
+        const from = document.getElementById(fromId);
+        const to = document.getElementById(toId);
+        const selected = Array.from(from.options).filter(option => option.selected);
+
+        selected.forEach(option => {
+            from.removeChild(option);
+            option.selected = true;
+            option.hidden = false; // yangi selectda ko‘rinsin
+            to.appendChild(option);
+        });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,808 @@
+{% load custom_filters %}
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard teacher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            background-color: #1e1e2f;
+            color: white;
+            width: 250px;
+            transition: width 0.2s;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        .sidebar .toggle-container {
+            position: relative;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            border-bottom: 2px solid #333;
+        }
+        .sidebar .toggle-container img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        .toggle-btn {
+            margin-left: 30px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 2;
+        }
+        .brand {
+            font-size: 20px;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        .sidebar.collapsed .brand {
+            display: none;
+        }
+        .sidebar.collapsed .toggle-btn {
+            display: none;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 2px solid #333;
+            gap: 10px;
+            transition: opacity 0.2s;
+            line-height: 1.6;
+        }
+        .toggle-main {
+            margin-left: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .toggle-main {
+            display: none;
+        }
+        .sidebar.collapsed ~ .main .toggle-main {
+            display: inline-block;
+        }
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            max-width: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .user-info span {
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .span {
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        .sidebar.collapsed .user-info span {
+            display: none;
+        }
+        .sidebar ul {
+            margin-top: 10px;
+            list-style: none;
+            padding: 5px;
+            flex-grow: 1;
+        }
+        .sidebar ul li {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .sidebar ul li:hover {
+            background-color: #333;
+        }
+        .sidebar ul li a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            width: 100%;
+            height: 100%;
+        }
+        .sidebar ul li a:hover {
+            background-color: #333;
+        }
+        .sidebar ul li a i {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .sidebar ul li a span {
+            margin-left: 15px;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+        .sidebar.collapsed ul li a span {
+            display: none;
+        }
+        .main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header {
+            color: white;
+            background-color: #1f283e;
+            height: 69px;
+            min-height: 69px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+        }
+        .search-form {
+            display: flex;
+            position: relative;
+        }
+        .search-input {
+            padding: 8px 12px;
+            font-size: 12px;
+            border: 2px solid #333;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+            width: 25vw;
+            background-color: #1a2035;
+            color: white;
+            margin-left: 20px;
+            border-right: none;
+        }
+        .search-btn {
+            background-color: #1a2035;
+            border: 2px solid #333;
+            border-left: none;
+            padding: 8px 12px;
+            color: white;
+            font-size: 12px;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-btn:hover {
+            background-color: #1c57b7;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-left: auto;
+            justify-content: flex-end;
+            position: relative;
+        }
+        .user-profile i {
+            color: white;
+            font-size: 20px;
+        }
+        .user_profile_img {
+            margin-right: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .dropdown-panel {
+            position: absolute;
+            top: 50px;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 5px;
+            width: 300px;
+            padding: 12px;
+            display: none;
+            z-index: 100;
+            color: #1f283e;
+            margin-right: 15px;
+        }
+        .dropdown-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .dropdown-item i {
+            color: #1f283e;
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+
+        .dropdown-panel.active {
+            display: block;
+        }
+        .dropdown-panel::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            border-width: 0 20px 25px 20px;
+            border-style: solid;
+            border-color: transparent transparent white transparent;
+        }
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 70px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 4px;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 1;
+            text-align: center;
+        }
+        #bell-panel {
+            right: 36px;
+        }
+        #bell-panel::before {
+            right: 15px;
+        }
+        #profile-panel {
+            right: 0;
+        }
+        #profile-panel::before {
+            right: 0;
+        }
+        .dropdown-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        .konteyner {
+            background-color: #1a2035;
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .konteyner::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .konteyner::-webkit-scrollbar-track {
+            background: #1a2035;
+        }
+
+        .konteyner::-webkit-scrollbar-thumb {
+            background: linear-gradient(#333, #0d3967);
+
+        }
+        .konteyner table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .konteyner th, .konteyner td {
+            padding: 15px 20px;
+            text-align: left;
+            color: white;
+        }
+        .konteyner th {
+            background-color: #1f283e;
+            color: #1c57b7;
+        }
+        .konteyner tr:nth-child(even) {
+            background-color: #1f283e;
+        }
+        .konteyner tr:nth-child(odd) {
+          background-color: #1a2035;
+        }
+        .konteyner tr:hover {
+          background-color: #334155;
+        }
+
+
+       .sarlavha {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: white;
+           margin-left: 10px;
+        }
+
+
+
+        /* Modal orqa fon (qoraygan) */
+.modal {
+    display: none; /* Bosilmaguncha ko‘rinmaydi */
+    position: fixed;
+    z-index: 1000;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal oynasi */
+.modal-content {
+    background: #1f283e;
+    border-radius: 6px;
+    padding: 25px 30px;
+    width: 500px;
+    max-width: 90%;
+    position: relative;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.modal.show .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Animatsiya */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Modal sarlavha */
+#modalTitle {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Fayl input */
+.modal-content input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #1a2035;
+    border: none;
+    color: white;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+/* Submit tugmasi */
+.modal-content button[type="submit"] {
+    margin-top: 20px;
+    padding: 10px;
+    width: 100%;
+    background-color: #003366;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+.modal-content button[type="submit"]:hover {
+    background-color: #1c57b7;
+}
+
+/* Yopish tugmasi (X) */
+        .close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #bbb;
+            cursor: pointer;
+
+        }
+        .close:hover {
+            color: #fff;
+        }
+        .open-modal {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #1c57b7; /* Ko‘k */
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+            border: none;
+        }
+        a.download-link {
+            text-decoration: none;
+            color: #3498db;
+            transition: all 0.2s ease;
+        }
+
+        a.download-link:hover {
+            text-decoration: underline;
+            color: #007bff;
+        }
+        @media (max-width: 768px) {
+        .sidebar {
+            position: absolute;
+            height: 100%;
+            transform: translateX(-100%);
+            z-index: 999;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+
+        .sidebar.collapsed {
+            width: 250px;
+        }
+
+        .main .toggle-main {
+            display: inline-block;
+        }
+        .sidebar.collapsed.show .brand,
+        .sidebar.collapsed.show .toggle-btn,
+        .sidebar.collapsed.show .user-info span,
+        .sidebar.collapsed.show ul li a span {
+            display: inline !important;
+        }
+        .dropdown-panel {
+            top: 50px;
+            border-radius: 5px;
+            width: 200px;
+            padding: 1px 10px;
+            margin-right: 15px;
+        }
+        .main {
+            max-width: 100%;
+        }
+
+        .search-form {
+            margin-right: 20px;
+        }
+        .search-input {
+            width: 100%;
+        }
+        .konteyner {
+            padding: 10px;
+        }
+        .jadval-container {
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .jadval-container table {
+            min-width: 950px; /* yoki kerakli miqdor */
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+
+        .jadval-container::-webkit-scrollbar {
+            height: 2px;
+        }
+        .jadval-container::-webkit-scrollbar-track {
+            background: #1a2035;
+        }
+
+        .jadval-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(#333, #0d3967);
+
+        }
+        .konteyner th, .konteyner td {
+            padding: 10px 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+    }
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+    <div class="sidebar collapsed" id="sidebar">
+        <div class="toggle-container">
+            <img src="{{ global_image }}" alt="Logatip photo">
+            <div class="brand">FUMAISAK</div>
+            <button class="toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        </div>
+
+        <div class="user-info">
+            {% if user.profile_image %}
+                <img src="{{ student.profile_image.url }}" alt="User Photo">
+            {% else %}
+                <img src="{{ default_profile_image }}" alt="User Photo">
+            {% endif %}
+            <div style="display: flex; flex-direction: column;">
+                <span class="span">
+                    {% if user.role == "teacher" %}
+                        O'qituvchi
+                    {% elif user.role == "student" %}
+                        O'quvchi
+                    {% else %}
+                        {{ user.role }}
+                    {% endif %}
+                </span>
+                <span>{{ student.first_name }} {{ student.last_name }}</span>
+            </div>
+        </div>
+
+        <ul>
+            <li><a href="{% url 'student_home' %}"><i class="fas fa-home"></i><span> Dashboard</span></a></li>
+            <li><a href="{% url 'student_groups_view' %}"><i class="fas fa-list"></i><span>Guruhlarim</span></a></li>
+            <li><a href="{% url 'student_schedule' %}"><i class="fas fa-calendar-alt"></i><span>Dars jadval</span></a></li>
+            <li><a href="{% url 'student_quiz_list' %}"><i class="fas fa-clipboard-check"></i><span>Onlayn test</span></a></li>
+            <li><a href="{% url 'student_assignments' %}"><i class="fas fa-clipboard-list"></i><span> Topshiriqlarim</span></a></li>
+            <li><a href="{% url 'student_payment_view' %}"><i class="fa-solid fa-money-check-dollar"></i><span> To'lovlarim</span></a></li>
+        </ul>
+
+    </div>
+
+    <div class="main">
+        <div class="header">
+            <button class="toggle-main" id="mainToggle"><i class="fas fa-bars"></i></button>
+            <form class="search-form" onsubmit="handleSearch(event)">
+                <label>
+                    <input type="text" class="search-input" id="top-search" placeholder="Qidiruv...">
+                </label>
+                <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+            </form>
+            <div class="user-profile">
+                <a href="javascript:void(0);" id="bell-btn">
+                    <i class="fa fa-bell"></i>
+                    {% if total_notification_count  > 0 %}
+                    <span class="notification-badge">{{ total_notification_count }}</span>
+                    {% endif %}
+                </a>
+                <div class="dropdown-panel" id="bell-panel">
+                    {% if student_notification_list or quiz_notification_list %}
+                        {% for note in student_notification_list %}
+                            <div class="dropdown-item">
+                                <strong>Guruh:</strong> {{ note.group }}<br>
+                                <strong>Topshiriq nomi:</strong> {{ note.title }}<br>
+                                <strong>Qolgan vaqt:</strong> {{ note.remaining }}
+                            </div>
+                        {% endfor %}
+                        {% for quiz in quiz_notification_list %}
+                            <div class="dropdown-item">
+                                <strong>Guruh:</strong> {{ quiz.group.name }}<br>
+                                <strong>Test nomi:</strong> {{ quiz.title }}<br>
+                                <strong>Holat:</strong> Hali bajarilmagan
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="dropdown-item">Bildirishnoma yo‘q</div>
+                    {% endif %}
+                </div>
+
+                <a href="javascript:void(0);" id="profile-btn">
+                    {% if user.profile_image %}
+                    <img src="{{ student.profile_image.url }}" alt="User profile" class="user_profile_img">
+                    {% else %}
+                    <img src="{{ default_profile_image }}" alt="User profile" class="user_profile_img">
+                    {% endif %}
+                </a>
+                <div class="dropdown-panel" id="profile-panel">
+                    <a href="{% url 'student_profile' %}" class="dropdown-item"><i class="fas fa-user"></i> Profilim</a>
+                    <a href="{% url 'login' %}" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="konteyner">
+
+            <h2 class="sarlavha">Topshiriqlarim</h2>
+            <div class="jadval-container">
+                <table id="top-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nomi</th>
+                            <th>Guruh</th>
+                            <th>O'qituvchi</th>
+                            <th>Muddati</th>
+                            <th>Fayli</th>
+                            <th>Holati</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assignment in assignments %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ assignment.title }}</td>
+                                <td>{{ assignment.group.name }}</td>
+                                <td>{{ assignment.teacher.get_full_name }}</td>
+                                <td>{{ assignment.deadline|date:"Y-m-d H:i" }}</td>
+                                <td><a href="{{ assignment.file.url }}" target="_blank" class="download-link">Yuklab olish</a></td>
+                                <td>
+                                  {% with submission=submissions|get_item:assignment.id %}
+                                    {% if assignment.id in expired_ids %}
+                                      <span style="color: red;"><strong>Muddati o‘tgan</strong></span>
+                                    {% else %}
+                                      {% if submission %}
+                                        {% if submission.grade != None %}
+                                          <span style="color: white;"><strong>Ball:</strong> {{ submission.grade }}</span>
+                                        {% else %}
+                                          <button class="open-modal"
+                                                  data-assignment-id="{{ assignment.id }}"
+                                                  data-title="{{ assignment.title }}"
+                                                  data-file-url="{{ submission.file.url }}">
+                                            Qayta yuklash
+                                          </button>
+                                        {% endif %}
+                                      {% else %}
+                                        <button class="open-modal"
+                                                data-assignment-id="{{ assignment.id }}"
+                                                data-title="{{ assignment.title }}">
+                                          Yuklash
+                                        </button>
+                                      {% endif %}
+                                    {% endif %}
+                                  {% endwith %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="8">Sizda topshiriq mavjud emas.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+          <!-- ✅ Modal -->
+            <div class="modal" id="uploadModal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3 id="modalTitle">Topshiriqni yuklash</h3>
+
+                    <!-- Yuklangan fayl ko‘rinadigan joy -->
+                    <div id="uploadedFileSection" style="margin-bottom: 10px; display: none; color: white">
+              <p>Yuklangan fayl: <a href="#" id="uploadedFileLink" target="_blank">Faylni ko‘rish</a></p>
+            </div>
+
+
+        <form id="uploadForm" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="file" required>
+            <button type="submit">Yuklash</button>
+        </form>
+    </div>
+</div>
+        </div>
+    </div>
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mainToggle = document.getElementById('mainToggle');
+
+        function toggleSidebar() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('show');
+            } else {
+                sidebar.classList.toggle('collapsed');
+            }
+        }
+
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        mainToggle.addEventListener('click', toggleSidebar);
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('show');
+            }
+        });
+
+        function togglePanel(idToShow) {
+        const panels = document.querySelectorAll('.dropdown-panel');
+        panels.forEach(panel => {
+            if (panel.id !== idToShow) {
+                panel.classList.remove('active');
+            }
+            });
+
+            const panel = document.getElementById(idToShow);
+            panel.classList.toggle('active');
+        }
+
+        document.getElementById('bell-btn').addEventListener('click', () => togglePanel('bell-panel'));
+        document.getElementById('profile-btn').addEventListener('click', () => togglePanel('profile-panel'));
+
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.user-profile')) {
+            document.querySelectorAll('.dropdown-panel').forEach(p => p.classList.remove('active'));
+            }
+        });
+
+        const modal = document.getElementById("uploadModal");
+        const closeBtn = document.querySelector(".close");
+        const form = document.getElementById("uploadForm");
+        const titleEl = document.getElementById("modalTitle");
+
+        const uploadedFileSection = document.getElementById("uploadedFileSection");
+        const uploadedFileLink = document.getElementById("uploadedFileLink");
+
+        document.querySelectorAll(".open-modal").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const assignmentId = btn.getAttribute("data-assignment-id");
+            const title = btn.getAttribute("data-title");
+            const fileUrl = btn.getAttribute("data-file-url"); // Yangi qator
+
+            form.action = `/student/assignments/${assignmentId}/submit/`;
+            titleEl.textContent = `Topshiriqni yuklash: ${title}`;
+
+            // Fayl yuklangan bo‘lsa, linkni ko‘rsatamiz
+            if (fileUrl) {
+              uploadedFileLink.href = fileUrl;
+              uploadedFileLink.textContent = fileUrl.split('/').pop(); // Fayl nomini ko‘rsatadi
+              uploadedFileSection.style.display = "block";
+            } else {
+              uploadedFileSection.style.display = "none";
+            }
+
+            modal.classList.add("show");
+            modal.style.display = "flex";
+          });
+        });
+
+        closeBtn.addEventListener("click", () => {
+          modal.classList.remove("show");
+          setTimeout(() => {
+            modal.style.display = "none";
+          }, 300);
+        });
+
+        window.onclick = (e) => {
+          if (e.target === modal) {
+            modal.classList.remove("show");
+            setTimeout(() => {
+              modal.style.display = "none";
+            }, 300);
+          }
+        };
+
+        document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("top-search");
+        const table = document.getElementById("top-table");
+        const rows = table.querySelectorAll("tbody tr");
+
+        searchInput.addEventListener("input", function () {
+          const searchTerm = this.value.toLowerCase();
+
+          rows.forEach(row => {
+            const secondColumn = row.querySelectorAll("td")[1];
+            const text = secondColumn ? secondColumn.textContent.toLowerCase() : "";
+            row.style.display = text.includes(searchTerm) ? "" : "none";
+          });
+        });
+      });
+
+    </script>
+</body>
+</html>
+

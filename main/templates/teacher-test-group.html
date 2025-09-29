@@ -1,0 +1,902 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard teacher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            background-color: #1e1e2f;
+            color: white;
+            width: 250px;
+            transition: width 0.2s;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        .sidebar .toggle-container {
+            position: relative;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            border-bottom: 2px solid #333;
+        }
+        .sidebar .toggle-container img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        .toggle-btn {
+            margin-left: 30px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 2;
+        }
+        .brand {
+            font-size: 20px;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        .sidebar.collapsed .brand {
+            display: none;
+        }
+        .sidebar.collapsed .toggle-btn {
+            display: none;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 2px solid #333;
+            gap: 10px;
+            transition: opacity 0.2s;
+            line-height: 1.6;
+        }
+        .toggle-main {
+            margin-left: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .toggle-main {
+            display: none;
+        }
+        .sidebar.collapsed ~ .main .toggle-main {
+            display: inline-block;
+        }
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            max-width: 40px;
+            min-width: 40px;
+            border-radius: 50%;
+        }
+        .user-info span {
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .span {
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        .sidebar.collapsed .user-info span {
+            display: none;
+        }
+        .sidebar ul {
+            margin-top: 10px;
+            list-style: none;
+            padding: 5px;
+            flex-grow: 1;
+        }
+        .sidebar ul li {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .sidebar ul li:hover {
+            background-color: #333;
+        }
+        .sidebar ul li a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            width: 100%;
+            height: 100%;
+        }
+        .sidebar ul li a:hover {
+            background-color: #333;
+        }
+        .sidebar ul li a i {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .sidebar ul li a span {
+            margin-left: 15px;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+        .sidebar.collapsed ul li a span {
+            display: none;
+        }
+        .main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header {
+            color: white;
+            background-color: #1f283e;
+            height: 69px;
+            min-height: 69px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+        }
+        .search-form {
+            display: flex;
+            position: relative;
+        }
+        .search-input {
+            padding: 8px 12px;
+            font-size: 12px;
+            border: 2px solid #333;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+            width: 25vw;
+            background-color: #1a2035;
+            color: white;
+            margin-left: 20px;
+            border-right: none;
+        }
+        .search-btn {
+            background-color: #1a2035;
+            border: 2px solid #333;
+            border-left: none;
+            padding: 8px 12px;
+            color: white;
+            font-size: 12px;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-btn:hover {
+            background-color: #1c57b7;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-left: auto;
+            justify-content: flex-end;
+            position: relative;
+        }
+        .user-profile i {
+            color: white;
+            font-size: 20px;
+        }
+        .user_profile_img {
+            margin-right: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .dropdown-panel {
+            position: absolute;
+            top: 50px;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 5px;
+            width: 300px;
+            padding: 12px;
+            display: none;
+            z-index: 100;
+            color: #1f283e;
+            margin-right: 15px;
+        }
+        .dropdown-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .dropdown-item i {
+            color: #1f283e;
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+
+        .dropdown-panel.active {
+            display: block;
+        }
+        .dropdown-panel::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            border-width: 0 20px 25px 20px;
+            border-style: solid;
+            border-color: transparent transparent white transparent;
+        }
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 70px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 4px;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 1;
+            text-align: center;
+        }
+        #bell-panel {
+            right: 36px;
+        }
+        #bell-panel::before {
+            right: 15px;
+        }
+        #profile-panel {
+            right: 0;
+        }
+        #profile-panel::before {
+            right: 0;
+        }
+        .dropdown-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        .content {
+            background-color: #1a2035;
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .content::-webkit-scrollbar-track {
+            background: #1a2035;
+        }
+
+        .content::-webkit-scrollbar-thumb {
+            background: linear-gradient(#333, #0d3967);
+
+        }
+        fieldset {
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            background-color: #1a2035;
+        }
+        legend {
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+        }
+
+        .question-block {
+            margin-bottom: 20px;
+        }
+
+        .question-block label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .question-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            border: 1px solid #1f283e;
+            background-color: #1f283e;
+            color: white;
+        }
+
+        .answer-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .answer-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .answer-option input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            font-size: 15px;
+            border: 1px solid #1f283e;
+            background-color: #1f283e;
+            color: white;
+        }
+        .button-test {
+            padding: 8px 20px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .button-test:hover {
+            background-color: #1c57b7;
+        }
+        .quiz-title {
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            font-weight: bold;
+        }
+
+        .quiz-title label {
+            font-size: 16px;
+            margin-bottom: 6px;
+            color: white;
+            margin-left: 15px;
+        }
+
+        .quiz-title input[type="text"] {
+            padding: 10px 15px;
+            font-size: 14px;
+            border: 1px solid #1f283e;
+            outline: none;
+            background-color: #1f283e;
+            color: white;
+        }
+        .quiz-time {
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        .quiz-time label {
+            font-size: 16px;
+            margin-bottom: 6px;
+            color: white;
+            margin-left: 15px;
+        }
+        .quiz-time input[type="number"] {
+            padding: 10px 15px;
+            font-size: 14px;
+            border: 1px solid #1f283e;
+            outline: none;
+            background-color: #1f283e;
+            color: white;
+        }
+        .remove-btn {
+            padding: 5px 15px;
+            border: none;
+            color: crimson;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 10px;
+            background-color: #003366;
+        }
+        .remove-btn.small {
+            padding: 9px 15px;
+            border: none;
+            color: crimson;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 4px;
+            background-color: #003366;
+        }
+
+        .add-btn {
+            border: none;
+            margin-top: 6px;
+            background-color: #1f283e;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #686464;
+        }
+        .add-variant-wrapper {
+            margin-top: 6px;
+            margin-left: 20px;
+        }
+
+        @media (max-width: 768px) {
+        .sidebar {
+            position: absolute;
+            height: 100%;
+            transform: translateX(-100%);
+            z-index: 999;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+
+        .sidebar.collapsed {
+            width: 250px;
+        }
+
+        .main .toggle-main {
+            display: inline-block;
+        }
+        .sidebar.collapsed.show .brand,
+        .sidebar.collapsed.show .toggle-btn,
+        .sidebar.collapsed.show .user-info span,
+        .sidebar.collapsed.show ul li a span {
+            display: inline !important;
+        }
+        .dropdown-panel {
+            top: 50px;
+            border-radius: 5px;
+            width: 200px;
+            padding: 1px 10px;
+            margin-right: 15px;
+        }
+        .main {
+            max-width: 100%;
+        }
+
+        .search-form {
+            margin-right: 20px;
+        }
+        .search-input {
+            width: 100%;
+        }
+        .content {
+            padding: 10px;
+        }
+        .content::-webkit-scrollbar {
+            width: 3px;
+        }
+        .quiz-title {
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+
+        .quiz-title label {
+            font-size: 16px;
+            margin-bottom: 2px;
+            margin-left: 10px;
+        }
+
+        .quiz-title input[type="text"] {
+            padding: 8px 10px;
+            font-size: 14px;
+        }
+        .quiz-time {
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+        .quiz-time label {
+            font-size: 16px;
+            margin-bottom: 2px;
+            margin-left: 10px;
+        }
+        .quiz-time input[type="number"] {
+            padding: 8px 10px;
+            font-size: 14px;
+        }
+        .remove-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+            margin-left: 10px;
+            border-radius: 5px;
+        }
+        .remove-btn.small {
+            padding: 8px 10px;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+        .answer-option .remove-btn.small {
+            font-size: 14px;
+        }
+        .question-block {
+            margin-bottom: 8px;
+        }
+
+        .button-test {
+            margin-bottom: 10px;
+            font-size: 14px;
+            width: 100%;
+            padding: 8px 20px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        a.button-test {
+            display: block;     /* Inline elementni blokga aylantirish */
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+        }
+
+    }
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+    <div class="sidebar collapsed" id="sidebar">
+        <div class="toggle-container">
+            <img src="{{ global_image }}" alt="Logatip photo">
+            <div class="brand">FUMAISAK</div>
+            <button class="toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        </div>
+
+        <div class="user-info">
+            {% if user.profile_image %}
+                <img src="{{ teacher.profile_image.url }}" alt="User Photo">
+            {% else %}
+                <img src="{{ default_profile_image }}" alt="User Photo">
+            {% endif %}
+            <div style="display: flex; flex-direction: column;">
+                <span class="span">
+                    {% if user.role == "teacher" %}
+                        O'qituvchi
+                    {% elif user.role == "student" %}
+                        O‘quvchi
+                    {% else %}
+                        {{ user.role }}
+                    {% endif %}
+                </span>
+                <span>{{ teacher.first_name }} {{ teacher.last_name }}</span>
+            </div>
+        </div>
+
+        <ul>
+            <li><a href="{% url 'teacher_home' %}"><i class="fas fa-home"></i><span> Dashboard</span></a></li>
+            <li><a href="{% url 'teacher_students_list' %}"><i class="fas fa-user-graduate"></i><span> O'quvchilarim</span></a></li>
+            <li><a href="{% url 'teacher_group_list' %}"><i class="fas fa-list"></i><span>Guruhlarim</span></a></li>
+            <li><a href="{% url 'teacher_schedule' %}"><i class="fas fa-calendar-alt"></i><span>Dars jadval</span></a></li>
+            <li><a href="{% url 'create_quiz' %}"><i class="fas fa-clipboard-check"></i><span>Onlayn test</span></a></li>
+            <li><a href="{% url 'teacher_deadline' %}"><i class="fas fa-clipboard-list"></i><span> Topshiriqlarim</span></a></li>
+        </ul>
+
+    </div>
+
+    <div class="main">
+        <div class="header">
+            <button class="toggle-main" id="mainToggle"><i class="fas fa-bars"></i></button>
+            <form class="search-form" onsubmit="handleSearch(event)">
+                <label>
+                    <input type="text" class="search-input" placeholder="Qidiruv..." id="search-question-block">
+                </label>
+                <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+            </form>
+            <div class="user-profile">
+                <a href="javascript:void(0);" id="bell-btn">
+                    <i class="fa fa-bell"></i>
+                    {% if teacher_notif_count > 0 %}
+                    <span class="notification-badge">{{ teacher_notif_count }}</span>
+                    {% endif %}
+                </a>
+                <div class="dropdown-panel" id="bell-panel">
+                    {% if teacher_notifications %}
+                        {% for note in teacher_notifications %}
+                            <div class="dropdown-item">
+                                <strong>Guruh:</strong> {{ note.group }}<br>
+                                <strong>Topshiriq nomi:</strong> {{ note.title }}<br>
+                                <em style="color: #b00;">{{ note.message }}</em>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="dropdown-item">Bildirishnoma yo‘q</div>
+                    {% endif %}
+                </div>
+
+                <a href="javascript:void(0);" id="profile-btn">
+                    {% if user.profile_image %}
+                    <img src="{{ teacher.profile_image.url }}" alt="User profile" class="user_profile_img">
+                    {% else %}
+                    <img src="{{ default_profile_image }}" alt="User profile" class="user_profile_img">
+                    {% endif %}
+                </a>
+                <div class="dropdown-panel" id="profile-panel">
+                    <a href="{% url 'teacher_profile' %}" class="dropdown-item"><i class="fas fa-user"></i> Profilim</a>
+                    <a href="{% url 'login' %}" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <form method="post" id="quiz-form">
+                {% csrf_token %}
+                <div class="quiz-title">
+                    <label for="quiz-title">{{ group.name }} guruhi uchun test nomi:</label>
+                    <input type="text" id="quiz-title" name="title" placeholder="Test nomini kiriting:" required>
+                </div>
+
+                <div class="quiz-time">
+                    <label for="quiz-time">Test uchun vaqt (daqiqada):</label>
+                    <input type="number" id="quiz-time" name="time_limit" placeholder="Daqiqalarda" min="1" required>
+                </div>
+
+                <div class="quiz-time">
+                    <label for="quiz-score">Test uchun eng yuqori ball:</label>
+                    <input type="number" id="quiz-score" name="max_score" placeholder="Joriy test uchun" min="1" required>
+                </div>
+
+                <input type="hidden" name="total_questions" id="total_questions" value="1">
+
+                <div id="questions-container">
+                    <!-- SAVOL 1 -->
+                    <fieldset class="question-item" id="question_1_block">
+                        <legend>
+                            1-savol
+                            <button type="button" onclick="removeQuestion('question_1_block')" class="remove-btn">Savolni bekor qilish</button>
+                        </legend>
+
+                        <div class="question-block">
+                            <label>Savol matni:</label>
+                            <input type="text" class="question-input" name="question_1" placeholder="Savol matnini kiriting">
+                        </div>
+
+                        <div class="answers" id="answers_1">
+                            <div class="answer-option">
+                                <input type="radio" name="question_1_correct" value="1">
+                                <input type="text" name="question_1_answer_1" placeholder="Javob 1">
+                                <button type="button" onclick="this.parentElement.remove()" class="remove-btn small">X</button>
+                            </div>
+                            <div class="answer-option">
+                                <input type="radio" name="question_1_correct" value="2">
+                                <input type="text" name="question_1_answer_2" placeholder="Javob 2">
+                                <button type="button" onclick="this.parentElement.remove()" class="remove-btn small">X</button>
+                            </div>
+                        </div>
+
+                        <div class="add-variant-wrapper">
+                            <button type="button" onclick="addAnswerOption(1)" class="button-test">Variant qo‘shish</button>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <br>
+                <a href="{% url 'create_quiz' %}" class="button-test" style="text-decoration: none;">Chiqish</a>
+                <button class="button-test" type="button" onclick="addNewQuestion()">Yangi savol qo‘shish</button>
+                <button class="button-test" type="submit">Testni saqlash</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mainToggle = document.getElementById('mainToggle');
+
+        function toggleSidebar() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('show');
+            } else {
+                sidebar.classList.toggle('collapsed');
+            }
+        }
+
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        mainToggle.addEventListener('click', toggleSidebar);
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('show');
+            }
+        });
+
+        function togglePanel(idToShow) {
+        const panels = document.querySelectorAll('.dropdown-panel');
+        panels.forEach(panel => {
+            if (panel.id !== idToShow) {
+                panel.classList.remove('active');
+            }
+            });
+
+            const panel = document.getElementById(idToShow);
+            panel.classList.toggle('active');
+        }
+
+        document.getElementById('bell-btn').addEventListener('click', () => togglePanel('bell-panel'));
+        document.getElementById('profile-btn').addEventListener('click', () => togglePanel('profile-panel'));
+
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.user-profile')) {
+            document.querySelectorAll('.dropdown-panel').forEach(p => p.classList.remove('active'));
+            }
+        });
+
+        let questionCount = 1;
+let answerCounts = { 1: 2 }; // Dastlab 2 ta variant
+
+// ✅ Savolni o‘chirish
+function removeQuestion(id) {
+    document.getElementById(id).remove();
+}
+
+// ✅ Variant qo‘shish
+function addAnswerOption(qNumber) {
+    answerCounts[qNumber] = (answerCounts[qNumber] || 0) + 1;
+    const i = answerCounts[qNumber];
+
+    const answerDiv = document.createElement("div");
+    answerDiv.className = "answer-option";
+    answerDiv.innerHTML = `
+        <input type="radio" name="question_${qNumber}_correct" value="${i}">
+        <input type="text" name="question_${qNumber}_answer_${i}" placeholder="Javob ${i}">
+        <button type="button" onclick="this.parentElement.remove()" class="remove-btn small">X</button>
+    `;
+    document.querySelector(`#answers_${qNumber}`).appendChild(answerDiv);
+}
+
+// ✅ Yangi savol qo‘shish
+function addNewQuestion() {
+    // 🧠 Eng oxirgi mavjud savol raqamini topamiz
+    const allQuestions = document.querySelectorAll(".question-item");
+    if (allQuestions.length > 0) {
+        const lastQuestion = allQuestions[allQuestions.length - 1];
+        const lastIdMatch = lastQuestion.id.match(/question_(\d+)_block/);
+        if (lastIdMatch) {
+            questionCount = parseInt(lastIdMatch[1]);
+        }
+    }
+
+    // ✅ Oxirgi savolni tekshiramiz
+    const qText = document.querySelector(`input[name="question_${questionCount}"]`);
+    const answers = document.querySelectorAll(`#answers_${questionCount} input[type="text"]`);
+    const correctSelected = document.querySelector(`input[name="question_${questionCount}_correct"]:checked`);
+
+    if (!qText || qText.value.trim() === "") {
+        alert(`${questionCount}-savol matni to‘ldirilmagan.`);
+        return;
+    }
+
+    if (answers.length < 2) {
+        alert(`${questionCount}-savolda kamida 2 ta variant bo‘lishi kerak.`);
+        return;
+    }
+
+    for (let i = 0; i < answers.length; i++) {
+        if (!answers[i].value.trim()) {
+            alert(`${questionCount}-savolda ${i + 1}-variant to‘ldirilmagan.`);
+            return;
+        }
+    }
+
+    if (!correctSelected) {
+        alert(`${questionCount}-savolda to‘g‘ri javob tanlanmagan.`);
+        return;
+    }
+
+    // ✅ Yangi savol yaratamiz
+    questionCount++;  // Endi haqiqiy navbatdagi raqam
+    answerCounts[questionCount] = 2;
+
+    const container = document.getElementById("questions-container");
+    const fieldset = document.createElement("fieldset");
+    fieldset.className = "question-item";
+    fieldset.id = `question_${questionCount}_block`;
+
+    fieldset.innerHTML = `
+        <legend>
+            ${questionCount}-savol
+            <button type="button" onclick="removeQuestion('question_${questionCount}_block')" class="remove-btn">Savolni bekor qilish</button>
+        </legend>
+
+        <div class="question-block">
+            <label>Savol matni:</label>
+            <input type="text" class="question-input" name="question_${questionCount}" placeholder="Savol matnini kiriting">
+        </div>
+
+        <div class="answers" id="answers_${questionCount}">
+            ${[1, 2].map(i => `
+                <div class="answer-option">
+                    <input type="radio" name="question_${questionCount}_correct" value="${i}">
+                    <input type="text" name="question_${questionCount}_answer_${i}" placeholder="Javob ${i}">
+                    <button type="button" onclick="this.parentElement.remove()" class="remove-btn small">X</button>
+                </div>
+            `).join('')}
+        </div>
+
+        <div class="add-variant-wrapper">
+            <button type="button" onclick="addAnswerOption(${questionCount})" class="button-test">Variant qo‘shish</button>
+        </div>
+    `;
+
+    container.appendChild(fieldset);
+    document.getElementById("total_questions").value = document.querySelectorAll(".question-item").length;
+}
+
+
+// ✅ Formani jo‘natishdan oldin barcha savollarni tekshir
+document.getElementById("quiz-form").addEventListener("submit", function (e) {
+    for (let q = 1; q <= questionCount; q++) {
+        const qBlock = document.getElementById(`question_${q}_block`);
+        if (!qBlock) continue; // Savol o‘chirilgan bo‘lishi mumkin
+
+        const qText = document.querySelector(`input[name="question_${q}"]`);
+        const answers = document.querySelectorAll(`#answers_${q} input[type="text"]`);
+        const correctSelected = document.querySelector(`input[name="question_${q}_correct"]:checked`);
+
+        if (!qText || qText.value.trim() === "") {
+            alert(`${q}-savol matni kiritilmagan.`);
+            e.preventDefault();
+            return;
+        }
+
+        if (answers.length < 2) {
+            alert(`${q}-savolda kamida 2 ta javob bo‘lishi kerak.`);
+            e.preventDefault();
+            return;
+        }
+
+        for (let i = 0; i < answers.length; i++) {
+            if (!answers[i].value.trim()) {
+                alert(`${q}-savolda ${i + 1}-variant bo‘sh.`);
+                e.preventDefault();
+                return;
+            }
+        }
+
+        if (!correctSelected) {
+            alert(`${q}-savolda to‘g‘ri javob tanlanmagan.`);
+            e.preventDefault();
+            return;
+        }
+    }
+});
+
+document.getElementById('search-question-block').addEventListener('keyup', function () {
+    const inputText = this.value.toLowerCase();
+    const allQuestionBlocks = document.querySelectorAll('.question-item');
+
+    allQuestionBlocks.forEach(block => {
+        const titleText = block.querySelector('legend')?.textContent.toLowerCase() || '';
+        if (titleText.includes(inputText)) {
+            block.style.display = '';
+        } else {
+            block.style.display = 'none';
+        }
+    });
+});
+
+    </script>
+</body>
+</html>

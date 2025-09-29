@@ -1,0 +1,343 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guruhlar</title>
+    <style>
+        * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: sans-serif;
+        background-color: #111;
+        color: #ccc;
+    }
+
+    .headerr {
+        background-color: #2c5d77;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #fff;
+    }
+    .headerr h1 {
+        font-size: 20px;
+    }
+    .headerr nav a {
+        color: #9cd;
+        text-decoration: none;
+        margin: 0 5px;
+    }
+    .containerr {
+        display: flex;
+        height: calc(100vh - 50px);
+    }
+    .asidee {
+        width: 300px;
+        background-color: #1e1e1e;
+        padding: 15px;
+        border-right: 1px solid #333;
+    }
+    .menuu h3 {
+        color: #aef;
+        font-size: 12px;
+        margin: 10px 0 5px;
+    }
+    .itemm {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2px 0;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+    .itemm:hover {
+        background-color: #333;
+    }
+    .itemm a {
+        text-decoration: none;
+        display: block;
+        padding: 10px 12px;
+    }
+    .itemm .linkk {
+        color: #eee;
+        flex: 1;
+    }
+    .itemm .addd {
+        color: #7f7;
+        font-weight: bold;
+    }
+    .itemm .linkk:hover {
+        color: #fff;
+    }
+    .itemm .addd:hover {
+        color: #9f9;
+    }
+    .main-main {
+        width: 100%;
+        padding: 20px 20px;
+        font-size: 12px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h2 {
+      font-size: 20px;
+      color: #fff;
+    }
+
+    .add-btn {
+      background-color: #333;
+      color: #9cd;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .add-btn:hover {
+      background-color: #444;
+    }
+
+    .search-bar {
+      margin: 20px 0 10px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-input {
+      padding: 8px;
+      width: 300px;
+      background-color: #222;
+      border: 1px solid #444;
+      color: #ccc;
+    }
+
+    .search-btn {
+      padding: 8px 16px;
+      background-color: #333;
+      border: none;
+      color: #ccc;
+      cursor: pointer;
+    }
+
+    .actions select {
+        background-color: #111;
+        border: 1px solid white;
+        padding: 5px;
+        color: white;
+    }
+    .table-wrapper {
+        max-height: 55vh;
+        overflow-y: auto;
+    }
+    .table-wrapper::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background-color: #3e3c3c;
+        border-radius: 3px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .group-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .group-table th, .group-table td {
+      padding: 10px;
+      border-bottom: 1px solid #333;
+      text-align: left;
+    }
+
+    .group-table th {
+      background-color: #1c1c1c;
+      text-transform: uppercase;
+      font-size: 13px;
+    }
+
+    .group-table a {
+      color: #6cf;
+      text-decoration: none;
+    }
+
+    .group-table a:hover {
+      text-decoration: underline;
+    }
+
+    .footer-info {
+      margin-top: 10px;
+      font-style: italic;
+      color: #888;
+    }
+
+    .messages {
+        margin: 10px;
+    }
+    .alert_alert {
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 5px;
+        background-color: #777;
+        color: white;
+    }
+    </style>
+</head>
+{% block content %}
+<body>
+    <div class="headerr">
+        <h1>Admin</h1>
+        <nav>
+            <a href="{% url 'admin:index' %}">ADMIN</a> /
+            <a href="{% url 'admin_password' %}">Parolni almashtirish</a> /
+            <a href="{% url 'login' %}">Chiqish</a>
+        </nav>
+    </div>
+
+    <div class="containerr">
+        <div class="asidee">
+            <div class="menuu">
+                <h3>MENU</h3>
+                <div class="itemm">
+                    <a href="{% url 'all_groups_admin' %}" class="linkk">Guruhlar</a>
+                    <a href="{% url 'create_group_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'students_list_admin' %}" class="linkk">O'quvchilar</a>
+                    <a href="{% url 'add_student' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'teachers_list_admin' %}" class="linkk">O'qituvchilar</a>
+                    <a href="{% url 'add_teacher' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'admin_assignment_list' %}" class="linkk">Topshiriqlar</a>
+                    <a href="{% url 'add_topshiriq' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'all_group_schedules' %}" class="linkk">Dars rejasi</a>
+                    <a href="{% url 'all_groups_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'quiz_list' %}" class="linkk">Testlar</a>
+                    <a href="{% url 'add_quiz' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'question_list' %}" class="linkk">Savollar</a>
+                    <a href="{% url 'add_test_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+                <div class="itemm">
+                    <a href="{% url 'group_payment_list' %}" class="linkk">Guruh to'lov</a>
+                </div>
+                <div class="itemm">
+                    <a href="{% url 'student_list' %}" class="linkk">Barcha to'lov</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-main">
+            <div class="header">
+                <h2>Testlar ro'yhati</h2>
+            </div>
+
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Guruhlarni qidirsh...">
+            </div>
+            <div class="table-wrapper">
+                <table class="group-table">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Test nomi</th>
+                            <th>Guruh</th>
+                            <th>O‘qituvchi</th>
+                            <th>Yaratilgan vaqt</th>
+                            <th>Tahrirlash</th>
+                            <th>O'chirish</th>
+                        </tr>
+                    </thead>
+                    <tbody id="group-body">
+                        {% for quiz in quizzes %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ quiz.title }}</td>
+                                <td>{{ quiz.group.name }}</td>
+                                <td>{{ quiz.teacher.first_name }} {{ quiz.teacher.last_name }}</td>
+                                <td>{{ quiz.created_at|date:"H:i | Y-m-d" }}</td>
+                                <td>
+                                    <a href="{% url 'edit_quiz' quiz.id %}">Tahrirlash</a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'delete_quiz' quiz.id %}" onclick="return confirm('Haqiqatan ham o‘chirishni xohlaysizmi?')">O‘chirish</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="center">Hech qanday test topilmadi.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        {% if 'yangi_guruh' in message.tags or 'edit_group' in message.tags %}
+                            <div class="alert_alert">{{ message }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.querySelector('.search-input');
+        const rows = document.querySelectorAll('#group-body tr');
+
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            rows.forEach(row => {
+                const name = row.children[1].textContent.toLowerCase();
+                row.style.display = name.includes(query) ? '' : 'none';
+            });
+        });
+
+        const allCheck = document.getElementById('check-all');
+        const rowChecks = document.querySelectorAll('.row-check');
+        const selectedCount = document.getElementById('selected-count');
+
+        function updateSelectedCount() {
+            const selected = Array.from(rowChecks).filter(c => c.checked).length;
+            selectedCount.textContent = `${selected} tadan ${selected} ta tanlandi`;
+        }
+
+        allCheck.addEventListener('change', () => {
+            rowChecks.forEach(cb => cb.checked = allCheck.checked);
+            updateSelectedCount();
+        });
+
+        rowChecks.forEach(cb => {
+            cb.addEventListener('change', updateSelectedCount);
+        });
+    </script>
+</body>
+{% endblock %}
+</html>

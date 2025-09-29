@@ -1,0 +1,924 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard teacher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            background-color: #1e1e2f;
+            color: white;
+            width: 250px;
+            transition: width 0.2s;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        .sidebar .toggle-container {
+            position: relative;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            border-bottom: 2px solid #333;
+        }
+        .sidebar .toggle-container img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        .toggle-btn {
+            margin-left: 30px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 2;
+        }
+        .brand {
+            font-size: 20px;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        .sidebar.collapsed .brand {
+            display: none;
+        }
+        .sidebar.collapsed .toggle-btn {
+            display: none;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 2px solid #333;
+            gap: 10px;
+            transition: opacity 0.2s;
+            line-height: 1.6;
+        }
+        .toggle-main {
+            margin-left: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .toggle-main {
+            display: none;
+        }
+        .sidebar.collapsed ~ .main .toggle-main {
+            display: inline-block;
+        }
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            max-width: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .user-info span {
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .span {
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        .sidebar.collapsed .user-info span {
+            display: none;
+        }
+        .sidebar ul {
+            margin-top: 10px;
+            list-style: none;
+            padding: 5px;
+            flex-grow: 1;
+        }
+        .sidebar ul li {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .sidebar ul li:hover {
+            background-color: #333;
+        }
+        .sidebar ul li a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            width: 100%;
+            height: 100%;
+        }
+        .sidebar ul li a:hover {
+            background-color: #333;
+        }
+        .sidebar ul li a i {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .sidebar ul li a span {
+            margin-left: 15px;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+        .sidebar.collapsed ul li a span {
+            display: none;
+        }
+        .main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            color: white;
+            background-color: #1f283e;
+            height: 69px;
+            min-height: 69px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+        }
+        .search-form {
+            display: flex;
+            position: relative;
+        }
+        .search-input {
+            padding: 8px 12px;
+            font-size: 12px;
+            border: 2px solid #333;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+            width: 25vw;
+            background-color: #1a2035;
+            color: white;
+            margin-left: 20px;
+            border-right: none;
+        }
+        .search-input-user {
+            padding: 8px 12px;
+            font-size: 12px;
+            border: 1px solid #333;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+            width: 125px;
+            background-color: #1a2035;
+            color: white;
+            margin-left: 5px;
+        }
+        .search-btn {
+            background-color: #1a2035;
+            border: 2px solid #333;
+            border-left: none;
+            padding: 8px 12px;
+            color: white;
+            font-size: 12px;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-btn:hover {
+            background-color: #1c57b7;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-left: auto;
+            justify-content: flex-end;
+            position: relative;
+        }
+        .user-profile i {
+            color: white;
+            font-size: 20px;
+        }
+        .user_profile_img {
+            margin-right: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .dropdown-panel {
+            position: absolute;
+            top: 50px;
+            border: 1px solid #ccc;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 5px;
+            width: 300px;
+            padding: 12px;
+            display: none;
+            z-index: 100;
+            color: #1f283e;
+            margin-right: 15px;
+            background-color: white;
+        }
+        .dropdown-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .dropdown-item i {
+            color: #1f283e;
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+
+        .dropdown-panel.active {
+            display: block;
+        }
+        .dropdown-panel::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            border-width: 0 20px 25px 20px;
+            border-style: solid;
+            border-color: transparent transparent white transparent;
+        }
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 70px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 4px;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 1;
+            text-align: center;
+        }
+        #bell-panel {
+            right: 36px;
+        }
+        #bell-panel::before {
+            right: 15px;
+        }
+        #profile-panel {
+            right: 0;
+        }
+        #profile-panel::before {
+            right: 0;
+        }
+        .dropdown-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        .content {
+            background-color: #1a2035;
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .content::-webkit-scrollbar-track {
+            background: #1a2035;
+        }
+
+        .content::-webkit-scrollbar-thumb {
+            background: linear-gradient(#333, #0d3967);
+
+        }
+        .kartalar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .karta {
+            flex: 1;
+            min-width: 250px;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .karta:nth-child(1) {
+            background-color: #1f283e;
+        }
+        .karta:nth-child(2) {
+            background-color: #1f283e;
+        }
+        .karta:nth-child(3) {
+            background-color: #1f283e;
+        }
+        .karta:nth-child(4) {
+            background-color: #1f283e;
+        }
+
+        .karta .matn {
+            font-size: 14px;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .karta .pul {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .karta .ikonka {
+            width: 50px;
+            height: 50px;
+            background-color: #1c57b7;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .karta:nth-child(2) .ikonka {
+            background-color: #1c57b7;
+        }
+
+        .karta:nth-child(3) .ikonka {
+            background-color: #1c57b7;
+        }
+
+        .karta:nth-child(4) .ikonka {
+            background-color: #1c57b7;
+        }
+
+        .left_right_panel {
+            display: flex;
+            height: 70vh;
+            background-color: #1a2035;
+            margin-top: 20px;
+            gap: 20px;
+            color: white;
+        }
+
+        /* Chap tomon (bo'sh panel) */
+        .left-panel {
+            flex: 1;
+            background-color: #1f283e;
+            border-radius: 6px;
+            padding: 20px;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .left-panel::-webkit-scrollbar {
+            width: 2px;
+        }
+
+        .left-panel::-webkit-scrollbar-track {
+            background: #1a2035;
+        }
+
+        .left-panel::-webkit-scrollbar-thumb {
+            background: linear-gradient(#333, #0d3967);
+
+        }
+        .skill-title-panel {
+            margin-bottom: 38px;
+        }
+        .skill-title {
+            margin-top: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .skill-name {
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            background-color: #ccc;
+            border-radius: 25px;
+            height: 20px;
+            width: 100%;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress {
+            background-color: #1c57b7;
+            height: 100%;
+            border-radius: 25px;
+            position: relative;
+            transition: width 0.7s ease-in-out;
+            display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+        }
+
+        .progress span {
+            color: white;
+  font-size: 14px;
+  z-index: 2;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+        }
+        /* O'ng panel (jadval + filter) */
+        .right-panel {
+            width: 400px;
+            height: 70vh;
+            background-color: #1f283e;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+        }
+
+        /* Filter qismi */
+        .filter-box {
+            margin-bottom: 12px;
+        }
+
+        .filter-box h3 {
+            font-size: 16px;
+            margin-left: 15px;
+        }
+
+
+
+        /* Jadval qismi */
+        .table-container {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .table-container::-webkit-scrollbar {
+            width: 3px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #1a2035;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(#333, #0d3967);
+
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+            color: white;
+        }
+        td {
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+            color: #aaa1a1;
+        }
+
+        th {
+            background-color: #1c57b7;
+        }
+
+        tr:nth-child(even) {
+            background-color: #1a2035;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #243045;
+        }
+
+        tr:hover {
+            background-color: #334155;
+        }
+        @media (max-width: 768px) {
+        .sidebar {
+            position: absolute;
+            height: 100%;
+            transform: translateX(-100%);
+            z-index: 999;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+
+        .sidebar.collapsed {
+            width: 250px;
+        }
+
+        .main .toggle-main {
+            display: inline-block;
+        }
+        .sidebar.collapsed.show .brand,
+        .sidebar.collapsed.show .toggle-btn,
+        .sidebar.collapsed.show .user-info span,
+        .sidebar.collapsed.show ul li a span {
+            display: inline !important;
+        }
+        .dropdown-panel {
+            top: 50px;
+            border-radius: 5px;
+            width: 200px;
+            padding: 1px 10px;
+            margin-right: 15px;
+        }
+        .content {
+            padding: 10px;
+        }
+        table th, td {
+            font-size: 12px;
+        }
+    }
+        @media (max-width: 768px) {
+        .content::-webkit-scrollbar {
+            width: 2px; /* kichikroq scrollbar */
+        }
+        .left_right_panel {
+            flex-direction: column;
+        }
+
+        .right-panel {
+            order: 2;
+            width: 100%;
+        }
+
+        .left-panel {
+            order: 1;
+            width: 100%;
+            overflow-y: visible !important;
+        }
+        .search-input-user {
+            width: 100%;
+            margin-top: 10px;
+            margin-left: 0;
+        }
+    }
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+    <div class="sidebar collapsed" id="sidebar">
+        <div class="toggle-container">
+            <img src="{{ global_image }}" alt="Logatip photo">
+            <div class="brand">FUMAISAK</div>
+            <button class="toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        </div>
+
+        <div class="user-info">
+            {% if user.profile_image %}
+                <img src="{{ student.profile_image.url }}" alt="User Photo">
+            {% else %}
+                <img src="{{ default_profile_image }}" alt="User Photo">
+            {% endif %}
+            <div style="display: flex; flex-direction: column;">
+                <span class="span">
+                    {% if user.role == "teacher" %}
+                        O'qituvchi
+                    {% elif user.role == "student" %}
+                        O'quvchi
+                    {% else %}
+                        {{ user.role }}
+                    {% endif %}
+                </span>
+                <span>{{ student.first_name }} {{ student.last_name }}</span>
+            </div>
+        </div>
+
+        <ul>
+            <li><a href="{% url 'student_home' %}"><i class="fas fa-home"></i><span> Dashboard</span></a></li>
+            <li><a href="{% url 'student_groups_view' %}"><i class="fas fa-list"></i><span>Guruhlarim</span></a></li>
+            <li><a href="{% url 'student_schedule' %}"><i class="fas fa-calendar-alt"></i><span>Dars jadval</span></a></li>
+            <li><a href="{% url 'student_quiz_list' %}"><i class="fas fa-clipboard-check"></i><span>Onlayn test</span></a></li>
+            <li><a href="{% url 'student_assignments' %}"><i class="fas fa-clipboard-list"></i><span> Topshiriqlarim</span></a></li>
+            <li><a href="{% url 'student_payment_view' %}"><i class="fa-solid fa-money-check-dollar"></i><span> To'lovlarim</span></a></li>
+        </ul>
+
+    </div>
+
+    <div class="main">
+        <div class="header">
+            <button class="toggle-main" id="mainToggle"><i class="fas fa-bars"></i></button>
+
+            <div class="user-profile">
+                <a href="javascript:void(0);" id="bell-btn">
+                    <i class="fa fa-bell"></i>
+                    {% if total_notification_count  > 0 %}
+                    <span class="notification-badge">{{ total_notification_count }}</span>
+                    {% endif %}
+                </a>
+                <div class="dropdown-panel" id="bell-panel">
+                    {% if student_notification_list or quiz_notification_list %}
+                        {% for note in student_notification_list %}
+                            <div class="dropdown-item">
+                                <strong>Guruh:</strong> {{ note.group }}<br>
+                                <strong>Topshiriq nomi:</strong> {{ note.title }}<br>
+                                <strong>Qolgan vaqt:</strong> {{ note.remaining }}
+                            </div>
+                        {% endfor %}
+                        <hr style="width: 100px; border: 1px solid #333">
+                        {% for quiz in quiz_notification_list %}
+                            <div class="dropdown-item">
+                                <strong>Guruh:</strong> {{ quiz.group.name }}<br>
+                                <strong>Test nomi:</strong> {{ quiz.title }}<br>
+                                <strong>Holat:</strong> Hali bajarilmagan
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="dropdown-item">Bildirishnoma yo‘q</div>
+                    {% endif %}
+                </div>
+
+
+                <a href="javascript:void(0);" id="profile-btn">
+                    {% if user.profile_image %}
+                    <img src="{{ student.profile_image.url }}" alt="User profile" class="user_profile_img">
+                    {% else %}
+                    <img src="{{ default_profile_image }}" alt="User profile" class="user_profile_img">
+                    {% endif %}
+                </a>
+                <div class="dropdown-panel" id="profile-panel">
+                    <a href="{% url 'student_profile' %}" class="dropdown-item"><i class="fas fa-user"></i> Profilim</a>
+                    <a href="{% url 'login' %}" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="kartalar">
+                <div class="karta">
+                    <div>
+                        <div class="matn">Barcha o'quvchilar</div>
+                        <div class="pul">{{ level_total }}</div>
+                    </div><div class="ikonka"><i class="fas fa-user-graduate" style="font-size: 20px"></i></div>
+                </div>
+                <div class="karta">
+                    <div>
+                        <div class="matn">Yaxshi o‘zlashtirgan o‘quvchilar</div>
+                        <div class="pul">{{ level_good }}</div>
+                    </div>
+                    <div class="ikonka"><i class="fas fa-user-graduate" style="font-size: 20px"></i></div>
+                </div>
+                <div class="karta">
+                    <div>
+                        <div class="matn">O‘rtacha o‘zlashtirgan o‘quvchilar</div>
+                        <div class="pul">{{ level_average }}</div>
+                    </div>
+                    <div class="ikonka"><i class="fas fa-user-graduate" style="font-size: 20px"></i></div>
+                </div>
+                <div class="karta">
+                    <div>
+                        <div class="matn">Faollikni oshirayotgan o‘quvchilar</div>
+                        <div class="pul">{{ level_weak }}</div>
+                    </div>
+                    <div class="ikonka"><i class="fas fa-user-graduate" style="font-size: 20px"></i></div>
+                </div>
+            </div>
+            <div class="left_right_panel">
+                <div class="left-panel">
+                    {% if has_assignments %}
+                        <div class="skill-title-panel">
+                            <div class="skill-title">Bajarilgan topshiriqlar</div>
+                            <div class="skill-name">Ushbu foiz ko‘rsatkichida o‘zingizning muvaffaqiyatli bajargan topshiriqlaringiz aks ettirilgan.</div>
+                            <div class="progress-bar">
+                                <div class="progress" data-value="{{ assignment_completion_percent }}">
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="skill-title-panel">
+                            <div class="skill-title">Bajarilmagan topshiriqlar</div>
+                            <div class="skill-name">Ushbu foiz ko‘rsatkichida o‘quvchilarning hali bajarmagan topshiriqlari aks ettirilgan.</div>
+                            <div class="progress-bar">
+                                <div class="progress" data-value="{{ assignment_missing_percent }}">
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="skill-title-panel">
+                            <div class="skill-title">Topshiriqlar mavjud emas</div>
+                            <div class="skill-name">Amaldagi topshiriqlar mavjud emas.</div>
+                        </div>
+                    {% endif %}
+
+                    {% if has_quizzes %}
+                        <div class="skill-title-panel">
+                            <div class="skill-title">Topshirilgan testlar</div>
+                            <div class="skill-name">Ushbu foiz ko‘rsatkichda o‘quvchi tomonidan muvaffaqiyatli topshirilgan testlar aks ettirilgan.</div>
+                            <div class="progress-bar">
+                                <div class="progress" data-value="{{ quiz_completion_percent }}">
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="skill-title-panel">
+                            <div class="skill-title">Topshirilmagan testlar</div>
+                            <div class="skill-name">Ushbu foiz ko‘rsatkichda hali bajarilmagan yoki yakunlanmagan testlar ko‘rsatilmoqda.</div>
+                            <div class="progress-bar">
+                                <div class="progress" data-value="{{ quiz_missing_percent }}">
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="skill-title-panel">
+                            <div class="skill-title">Testlar mavjud emas</div>
+                            <div class="skill-name">Testlar hozircha tizimga kiritilmagan.</div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="right-panel">
+                    <div class="filter-box">
+                        <h3>Top 10 o‘quvchilar reytingi:</h3>
+
+                    </div>
+                    <div class="table-container">
+                        <table id="studentTable">
+                            <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Familiya</th>
+                                <th>Ism</th>
+                                <th>Foiz</th>
+                            </tr>
+                        </thead>
+                            <tbody id="jadval-qatorlari">
+                                {% if top_students %}
+                                    {% for item in top_students %}
+                                        <tr {% if item.student == student %}style="background-color: #0e2f50;"{% endif %}>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ item.student.last_name }}</td>
+                                            <td>{{ item.student.first_name }}</td>
+                                            <td>{{ item.score_percent }}%</td>
+                                        </tr>
+                                    {% endfor %}
+
+                                    {% if student_place and student_place.rank > 10 %}
+                                        <tr style="background-color: #0e2f50;">
+                                            <td>{{ student_place.rank }}</td>
+                                            <td>{{ student_place.student.last_name }}</td>
+                                            <td>{{ student_place.student.first_name }}</td>
+                                            <td>{{ student_place.score_percent }}%</td>
+                                        </tr>
+                                    {% endif %}
+                                {% else %}
+                                    <tr><td colspan="4">Reyting ma'lumotlari mavjud emas.</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mainToggle = document.getElementById('mainToggle');
+
+        function toggleSidebar() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('show');
+            } else {
+                sidebar.classList.toggle('collapsed');
+            }
+        }
+
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        mainToggle.addEventListener('click', toggleSidebar);
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('show');
+            }
+        });
+
+        function togglePanel(idToShow) {
+        const panels = document.querySelectorAll('.dropdown-panel');
+        panels.forEach(panel => {
+            if (panel.id !== idToShow) {
+                panel.classList.remove('active');
+            }
+            });
+
+            const panel = document.getElementById(idToShow);
+            panel.classList.toggle('active');
+        }
+
+        document.getElementById('bell-btn').addEventListener('click', () => togglePanel('bell-panel'));
+        document.getElementById('profile-btn').addEventListener('click', () => togglePanel('profile-panel'));
+
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.user-profile')) {
+            document.querySelectorAll('.dropdown-panel').forEach(p => p.classList.remove('active'));
+            }
+        });
+
+        function filterByDaraja() {
+          const value = document.getElementById("darajaFilter").value;
+          const rows = document.querySelectorAll("#studentTable tbody tr");
+
+          rows.forEach(row => {
+            const daraja = row.getAttribute("data-daraja");
+            if (value === "Barchasi" || daraja === value) {
+              row.style.display = "";
+            } else {
+              row.style.display = "none";
+            }
+          });
+        }
+
+        const searchInputs = document.querySelectorAll(".search-input, .search-input-user");
+        const tableRows = document.querySelectorAll("#jadval-qatorlari tr");
+
+        searchInputs.forEach((input) => {
+          input.addEventListener("input", function () {
+            const filter = input.value.trim().toLowerCase();
+
+            tableRows.forEach((row) => {
+              const familiya = row.cells[0].textContent.trim().toLowerCase();
+              if (familiya.startsWith(filter)) {
+                row.style.display = "";
+              } else {
+                row.style.display = "none";
+              }
+            });
+          });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+        const progresses = document.querySelectorAll(".progress");
+
+        progresses.forEach(progress => {
+            const value = parseFloat(progress.dataset.value);  // foizni olamiz
+            progress.style.width = value + "%";                // progress bar to‘ldirish
+            progress.querySelector("span").textContent = value + "%"; // raqamni ko‘rsatish
+        });
+    });
+
+        document.addEventListener("DOMContentLoaded", function () {
+        const progressBars = document.querySelectorAll(".progress");
+
+        progressBars.forEach(bar => {
+          const value = bar.getAttribute("data-value");
+          bar.style.width = value + "%";
+
+          const span = bar.querySelector("span");
+          span.textContent = value + "%";
+
+          // Agar progress 15% dan kichik bo‘lsa, matnni tashqariga chiqaramiz
+          if (parseInt(value) < 10) {
+            span.style.position = "absolute";
+            span.style.left = "100%";
+            span.style.marginLeft = "8px";
+            span.style.color = "#1c57b7"; // progress rangi
+          }
+        });
+      });
+
+
+    </script>
+</body>
+</html>

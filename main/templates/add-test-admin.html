@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foydalanuvchi qo'shish</title>
+    <style>
+        * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+body {
+    font-family: sans-serif;
+    background-color: #111;
+    color: #ccc;
+}
+
+.headerr {
+    background-color: #2c5d77;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+}
+
+.headerr h1 {
+    font-size: 20px;
+}
+
+.headerr nav a {
+    color: #9cd;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.containerr {
+    display: flex;
+    height: calc(100vh - 50px);
+}
+
+/* ==== Sidebar (chap panel) ==== */
+.asidee {
+    width: 300px;
+    background-color: #1e1e1e;
+    padding: 15px;
+    border-right: 1px solid #333;
+}
+
+.menuu h3 {
+    color: #aef;
+    font-size: 12px;
+    margin: 10px 0 5px;
+}
+
+/* ==== Menu itemlar ==== */
+.itemm {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 0;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.itemm:hover {
+    background-color: #333; /* Hover bo‘lganda fon */
+}
+
+.itemm a {
+    text-decoration: none;     /* 🔥 tagidan chiziq yo‘q */
+    display: block;
+    padding: 10px 12px;
+}
+
+/* Chap tarafdagi link */
+.itemm .linkk {
+    color: #eee;
+    flex: 1;
+}
+
+/* O'ng tarafdagi + qo‘shish */
+.itemm .addd {
+    color: #7f7;
+    font-weight: bold;
+}
+
+/* Hoverdagi o‘zgarishlar (ixtiyoriy) */
+.itemm .linkk:hover {
+    color: #fff;
+}
+
+.itemm .addd:hover {
+    color: #9f9;
+}
+.main-main {
+    width: 100%;
+    padding: 20px 20px;
+    font-size: 12px;
+    overflow-y: auto;
+}
+
+.sarlavha {
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+        .qator {                       /* forma satrlari */
+            margin-bottom: 20px;
+        }
+        .yorliq {
+            display: block;
+            margin-bottom: 6px;
+        }
+        .kiritish, textarea, select {
+            width: 100%;
+            padding: 10px;
+            background-color: #222;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        /* === Jadval (javoblar ro‘yxati) === */
+        .jadval {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .jadval thead {
+            background-color: #287ca5; /* moviy sarlavha */
+        }
+        .jadval th, .jadval td {
+            padding: 10px;
+            border: 1px solid #333;
+            text-align: left;
+        }
+        .quti {                        /* checkboxlar */
+            width: 18px;
+            height: 18px;
+        }
+        /* === Tugmalar === */
+        .tugmalar {
+            margin-top: 25px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .tugma {
+            padding: 10px 16px;
+            background-color: #19576d;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .tugma-qizil {                 /* “O‘chirish” turiga mos rang */
+            background-color: #b13232;
+        }
+        .javob-ochirish {
+      cursor: pointer;
+      color: #ff5555;
+      font-size: 18px;
+    }
+
+    .qoshish-btn {
+      margin-top: 12px;
+      padding: 8px 14px;
+      background-color: #1d7e3e;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+    }
+
+    </style>
+</head>
+<body>
+    <div class="headerr">
+        <h1>Admin</h1>
+        <nav>
+            <a href="{% url 'admin:index' %}">ADMIN</a> /
+            <a href="{% url 'admin_password' %}">Parolni almashtirish</a> /
+            <a href="{% url 'login' %}">Chiqish</a>
+        </nav>
+    </div>
+
+    <div class="containerr">
+        <div class="asidee">
+            <div class="menuu">
+                <h3>MENU</h3>
+                <div class="itemm">
+                    <a href="{% url 'all_groups_admin' %}" class="linkk">Guruhlar</a>
+                    <a href="{% url 'create_group_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'students_list_admin' %}" class="linkk">O'quvchilar</a>
+                    <a href="{% url 'add_student' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'teachers_list_admin' %}" class="linkk">O'qituvchilar</a>
+                    <a href="{% url 'add_teacher' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'admin_assignment_list' %}" class="linkk">Topshiriqlar</a>
+                    <a href="{% url 'add_topshiriq' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'all_group_schedules' %}" class="linkk">Dars rejasi</a>
+                    <a href="{% url 'all_groups_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'quiz_list' %}" class="linkk">Testlar</a>
+                    <a href="{% url 'add_quiz' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'question_list' %}" class="linkk">Savollar</a>
+                    <a href="{% url 'add_test_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+                <div class="itemm">
+                    <a href="{% url 'group_payment_list' %}" class="linkk">Guruh to'lov</a>
+                </div>
+                <div class="itemm">
+                    <a href="{% url 'student_list' %}" class="linkk">Barcha to'lov</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-main">
+            <form method="post">
+            {% csrf_token %}
+                <div class="sarlavha">Savol qo‘shish</div>
+
+                <div class="qator">
+                  <label class="yorliq">Tegishli test:</label>
+                  <select class="kiritish" name="quiz" required>
+                    <option value="">Testlarni tanlang</option>
+                    {% for quiz in quizzes %}
+                      <option value="{{ quiz.id }}">{{ quiz.title }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="qator">
+                  <label class="yorliq">Savol matni:</label>
+                  <textarea rows="6" class="kiritish" name="question_text" required></textarea>
+                </div>
+
+                <table class="jadval">
+                  <thead>
+                    <tr>
+                      <th>Javob matni</th>
+                      <th>To‘g‘ri javobmi?</th>
+                      <th>O‘chirilsinmi?</th>
+                    </tr>
+                  </thead>
+                  <tbody id="javoblar-tana">
+                    <!-- Dinamik javoblar shu yerga qo‘shiladi -->
+                  </tbody>
+                </table>
+
+                <button type="button" class="qoshish-btn" id="javob-qoshish-btn">+ Boshqa javob qo‘shing</button>
+
+                <div class="tugmalar">
+                    <a href="{% url 'question_list' %}" class="tugma">Chiqish</a>
+                  <button type="submit" class="tugma">SAQLASH</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+    <script>
+        setTimeout(() => {
+        const alert = document.querySelector('.alert_alert');
+        if (alert) {
+          alert.style.display = 'none';
+        }
+      }, 5000);
+
+        document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form");
+        form.addEventListener("submit", function (e) {
+            const requiredFields = ['title', 'group', 'teacher', 'deadline', 'created_at', 'max_score', 'file'];
+            let isValid = true;
+
+            requiredFields.forEach(fieldId => {
+                const input = document.getElementById(fieldId);
+                if (!input || !input.value) {
+                    isValid = false;
+                    input.style.border = '2px solid red';
+                } else {
+                    input.style.border = '';
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                alert("Hamma maydonlarni to‘ldiring!");
+            }
+        });
+    });
+
+    let javobIndex = 0;
+
+function createAnswerRow(index) {
+  return `
+    <tr>
+      <td><input type="text" class="kiritish" name="answer_text_${index}" placeholder="Javobni kiriting" required></td>
+      <td><input type="checkbox" class="quti" name="is_correct_${index}"></td>
+      <td><span class="javob-ochirish">✖</span></td>
+    </tr>
+  `;
+}
+
+const jadvalTana = document.getElementById('javoblar-tana');
+const qoshishBtn = document.getElementById('javob-qoshish-btn');
+
+// Boshlang‘ich 2 ta javob
+jadvalTana.innerHTML = createAnswerRow(javobIndex++) + createAnswerRow(javobIndex++);
+
+qoshishBtn.addEventListener('click', function () {
+  jadvalTana.insertAdjacentHTML('beforeend', createAnswerRow(javobIndex++));
+});
+
+jadvalTana.addEventListener('click', function (e) {
+  if (e.target.classList.contains('javob-ochirish')) {
+    const qator = e.target.closest('tr');
+    jadvalTana.removeChild(qator);
+  }
+});
+    </script>
+</body>
+</html>

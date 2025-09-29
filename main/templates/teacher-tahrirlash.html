@@ -1,0 +1,305 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foydalanuvchi qo'shish</title>
+    <style>
+        * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+body {
+    font-family: sans-serif;
+    background-color: #111;
+    color: #ccc;
+}
+
+.headerr {
+    background-color: #2c5d77;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+}
+
+.headerr h1 {
+    font-size: 20px;
+}
+
+.headerr nav a {
+    color: #9cd;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.containerr {
+    display: flex;
+    height: calc(100vh - 50px);
+}
+
+/* ==== Sidebar (chap panel) ==== */
+.asidee {
+    width: 300px;
+    background-color: #1e1e1e;
+    padding: 15px;
+    border-right: 1px solid #333;
+}
+
+.menuu h3 {
+    color: #aef;
+    font-size: 12px;
+    margin: 10px 0 5px;
+}
+
+/* ==== Menu itemlar ==== */
+.itemm {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 0;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.itemm:hover {
+    background-color: #333; /* Hover bo‘lganda fon */
+}
+
+.itemm a {
+    text-decoration: none;     /* 🔥 tagidan chiziq yo‘q */
+    display: block;
+    padding: 10px 12px;
+}
+
+/* Chap tarafdagi link */
+.itemm .linkk {
+    color: #eee;
+    flex: 1;
+}
+
+/* O'ng tarafdagi + qo‘shish */
+.itemm .addd {
+    color: #7f7;
+    font-weight: bold;
+}
+
+/* Hoverdagi o‘zgarishlar (ixtiyoriy) */
+.itemm .linkk:hover {
+    color: #fff;
+}
+
+.itemm .addd:hover {
+    color: #9f9;
+}
+.main-main {
+    width: 100%;
+    padding: 8px 20px;
+    font-size: 12px;
+}
+.sariq-form {
+        padding: 20px;
+
+    }
+.sariq-form p {
+    font-size: 14px;
+    margin-top: 15px;
+    font-weight: bold;
+}
+.title-text-p {
+    background-color: #2c5d77;
+    color: white;
+    padding: 8px;
+    width: 100%;
+    font-size: 14px;
+    display: inline-block;
+}
+.parol-saqlash {
+    background-color: #2b2b2b;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    text-decoration: none;
+}
+.parol-saqlash:hover {
+    background-color: #444;
+}
+    .sariq-form h2 {
+        margin-bottom: 8px;
+    }
+    .sariq-form label {
+        display: block;
+        margin-top: 20px;
+        margin-bottom: 5px;
+    }
+
+    .sariq-form input[type="text"] {
+        width: 400px;
+        padding: 5px 10px;
+
+    }
+    .sariq-form input[type="password"] {
+        width: 200px;
+        padding: 5px;
+    }
+    .sariq-form select {
+        width: 100px;
+        padding: 5px;
+    }
+    .sariq-form input[type="file"] {
+        width: 300px;
+        padding: 5px;
+    }
+    .sariq-form input[type="text"],
+    .sariq-form input[type="password"],
+    .sariq-form select,
+    .sariq-form input[type="file"] {
+        background-color: #2b2b2b;
+        border: 1px solid #444;
+        border-radius: 4px;
+        color: white;
+    }
+    .sariq-form .radio-konteyner {
+        display: flex;
+        gap: 20px;
+    }
+    .sariq-form .radio-konteyner label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .sariq-form .info {
+      font-size: 10px;
+      color: #aaa;
+      margin-top: 5px;
+    }
+    .saqlash-tugmasi {
+        background-color: #2b2b2b;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        font-size: 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+    .saqlash-tugmasi:hover {
+        background-color: #444;
+    }
+    hr {
+        border: none;
+        border-top: 1px solid #444; /* chiziq rangi */
+        margin: 10px 0;
+    }
+    </style>
+</head>
+<body>
+    <div class="headerr">
+        <h1>Admin</h1>
+        <nav>
+            <a href="{% url 'admin:index' %}">ADMIN</a> /
+            <a href="{% url 'admin_password' %}">Parolni almashtirish</a> /
+            <a href="{% url 'login' %}">Chiqish</a>
+        </nav>
+    </div>
+
+    <div class="containerr">
+        <div class="asidee">
+            <div class="menuu">
+                <h3>MENU</h3>
+                <div class="itemm">
+                    <a href="{% url 'all_groups_admin' %}" class="linkk">Guruhlar</a>
+                    <a href="{% url 'create_group_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'students_list_admin' %}" class="linkk">O'quvchilar</a>
+                    <a href="{% url 'add_student' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'teachers_list_admin' %}" class="linkk">O'qituvchilar</a>
+                    <a href="{% url 'add_teacher' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'admin_assignment_list' %}" class="linkk">Topshiriqlar</a>
+                    <a href="{% url 'add_topshiriq' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'all_group_schedules' %}" class="linkk">Dars rejasi</a>
+                    <a href="{% url 'all_groups_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'quiz_list' %}" class="linkk">Testlar</a>
+                    <a href="{% url 'add_quiz' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'question_list' %}" class="linkk">Savollar</a>
+                    <a href="{% url 'add_test_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+                <div class="itemm">
+                    <a href="{% url 'group_payment_list' %}" class="linkk">Guruh to'lov</a>
+                </div>
+                <div class="itemm">
+                    <a href="{% url 'student_list' %}" class="linkk">Barcha to'lov</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-main">
+            <form class="sariq-form" method="POST">
+                {% csrf_token %}
+                <h2>O'qituvchini tahrirlash</h2>
+                <p>{{ teacher.last_name }} {{ teacher.first_name }} ({{ teacher.get_role_display }})</p>
+                <hr>
+
+                <label for="kirit-nomi" style="font-size: 14px;">O'qituvchi logini: </label>
+                <input type="text" id="kirit-nomi" name="teacher_username" value="{{ teacher.username }}">
+
+                <label style="font-size: 14px;">
+                    Parolni tiklash:
+                    <a href="{% url 'teacher_password' teacher.id %}" class="parol-saqlash">Password</a>
+                </label>
+
+                <p class="title-text-p">Shaxsiy malumotlari</p>
+                <label for="last_name" style="font-size: 14px;">O'qituvchi familiyasi: </label>
+                <input type="text" id="last_name" name="last_name" value="{{ teacher.last_name }}">
+
+                <label for="first_name" style="font-size: 14px;">O'qituvchi ismi: </label>
+                <input type="text" id="first_name" name="first_name" value="{{ teacher.first_name }}">
+
+                <label for="phone_number" style="font-size: 14px;">O'qituvchining telefon raqami: </label>
+                <input type="text" id="phone_number" name="phone_number" value="{{ teacher.phone_number }}">
+
+                <p class="title-text-p">Qo'shimcha ma'lumotlar</p>
+                <p>O'qituvchining aktivligini boshqarish</p>
+                <div class="radio-konteyner">
+                    <select name="is_active">
+                      <option value="true" {% if teacher.is_active %}selected{% endif %}>Faol</option>
+                      <option value="false" {% if not teacher.is_active %}selected{% endif %}>Bloklangan</option>
+                    </select>
+                </div>
+
+                <label for="profil-rasmi" style="font-size: 14px;">Profil rasmi: </label>
+                <input type="file" id="profil-rasmi" name="profile_image">
+
+                <button type="submit" class="saqlash-tugmasi">Saqlash</button>
+            </form>
+
+        </div>
+    </div>
+    <script>
+
+    </script>
+</body>
+</html>

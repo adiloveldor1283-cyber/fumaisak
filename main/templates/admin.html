@@ -1,0 +1,142 @@
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Foydalanuvchilar ro‘yxati</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background-color: #f7f7f7;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .filters input,
+        .filters select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            flex: 1;
+        }
+
+        .user-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .user-card h2 {
+            margin: 0 0 10px;
+        }
+
+        .user-info {
+            margin-bottom: 10px;
+        }
+
+        .group-details {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .group-details strong {
+            display: block;
+            margin-top: 8px;
+            color: #333;
+        }
+
+        .student-name,
+        .teacher-name {
+            margin-left: 10px;
+            color: #555;
+        }
+
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1>Foydalanuvchilar Ro‘yxati</h1>
+
+<div class="filters">
+    <input type="text" id="searchInput" placeholder="Ism, login bo‘yicha qidiring...">
+    <select id="roleFilter">
+        <option value="all">Barchasi</option>
+        <option value="teacher">Ustoz</option>
+        <option value="student">O‘quvchi</option>
+    </select>
+</div>
+
+<div id="usersContainer">
+    {% for user in users %}
+        <div class="user-card" data-name="{{ user.first_name|lower }} {{ user.last_name|lower }}" data-role="{{ user.role }}">
+            <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+            <div class="user-info"><strong>Login:</strong> {{ user.username }}</div>
+            <div class="user-info"><strong>Rol:</strong>
+                {% if user.role == 'teacher' %} Ustoz
+                {% elif user.role == 'student' %} O‘quvchi
+                {% else %} Noma’lum {% endif %}
+            </div>
+            <div class="user-info"><strong>Guruhlar soni:</strong> {{ user.group_count }}</div>
+            {% if user.role == 'student' %}
+                <div class="user-info"><strong>O‘qituvchilar soni:</strong> {{ user.related_teachers_count }}</div>
+            {% endif %}
+
+            <div class="group-details">
+                <strong>Guruh tafsilotlari:</strong>
+                {{ user.group_details|safe }}
+            </div>
+        </div>
+    {% empty %}
+        <p>Hech qanday foydalanuvchi topilmadi.</p>
+    {% endfor %}
+</div>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const roleFilter = document.getElementById('roleFilter');
+    const userCards = document.querySelectorAll('.user-card');
+
+    function filterUsers() {
+        const searchText = searchInput.value.toLowerCase();
+        const selectedRole = roleFilter.value;
+
+        userCards.forEach(card => {
+            const name = card.dataset.name;
+            const role = card.dataset.role;
+
+            const matchesName = name.includes(searchText);
+            const matchesRole = (selectedRole === 'all' || role === selectedRole);
+
+            if (matchesName && matchesRole) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    searchInput.addEventListener('input', filterUsers);
+    roleFilter.addEventListener('change', filterUsers);
+</script>
+
+</body>
+</html>

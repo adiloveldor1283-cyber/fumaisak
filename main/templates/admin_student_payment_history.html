@@ -1,0 +1,261 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guruhlar</title>
+    <style>
+        * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: sans-serif;
+        background-color: #111;
+        color: #ccc;
+    }
+
+    .headerr {
+        background-color: #2c5d77;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #fff;
+    }
+    .headerr h1 {
+        font-size: 20px;
+    }
+    .headerr nav a {
+        color: #9cd;
+        text-decoration: none;
+        margin: 0 5px;
+    }
+    .containerr {
+        display: flex;
+        height: calc(100vh - 50px);
+    }
+    .asidee {
+        width: 300px;
+        background-color: #1e1e1e;
+        padding: 15px;
+        border-right: 1px solid #333;
+    }
+    .menuu h3 {
+        color: #aef;
+        font-size: 12px;
+        margin: 10px 0 5px;
+    }
+    .itemm {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2px 0;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+    .itemm:hover {
+        background-color: #333;
+    }
+    .itemm a {
+        text-decoration: none;
+        display: block;
+        padding: 10px 12px;
+    }
+    .itemm .linkk {
+        color: #eee;
+        flex: 1;
+    }
+    .itemm .addd {
+        color: #7f7;
+        font-weight: bold;
+    }
+    .itemm .linkk:hover {
+        color: #fff;
+    }
+    .itemm .addd:hover {
+        color: #9f9;
+    }
+    .main-main {
+        width: 100%;
+        padding: 20px 20px;
+        font-size: 12px;
+        overflow-y: auto;
+    }
+    .main-main::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .main-main::-webkit-scrollbar-thumb {
+        background-color: #3e3c3c;
+        border-radius: 3px;
+    }
+
+    .main-main::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    h2 {
+        text-align: center;
+    }
+        h3 {
+            margin-top: 25px;
+            color: white;
+            margin-bottom: 10px;
+            margin-left: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+              border-bottom: 1px solid #333;
+              text-align: left;
+        }
+        th {
+            background-color: #1c1c1c;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+        tr:hover {
+            background: #7777;
+        }
+        .no-data {
+            text-align: center;
+            padding: 15px;
+            color: #777;
+        }
+        .table-wrapper {
+            max-height: 33vh;
+            overflow-y: auto;
+            border: 1px solid #444;
+        }
+        .table-wrapper table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .table-wrapper thead th {
+            position: sticky;
+            top: 0;
+            background-color: #1c1c1c; /* sarlavha rangini saqlab qolish */
+            z-index: 2;
+        }
+    .table-wrapper::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background-color: #3e3c3c;
+        border-radius: 3px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    </style>
+</head>
+{% block content %}
+<body>
+    <div class="headerr">
+        <h1>Admin</h1>
+        <nav>
+            <a href="{% url 'admin:index' %}">ADMIN</a> /
+            <a href="{% url 'admin_password' %}">Parolni almashtirish</a> /
+            <a href="{% url 'login' %}">Chiqish</a>
+        </nav>
+    </div>
+
+    <div class="containerr">
+        <div class="asidee">
+            <div class="menuu">
+                <h3>MENU</h3>
+                <div class="itemm">
+                    <a href="{% url 'all_groups_admin' %}" class="linkk">Guruhlar</a>
+                    <a href="{% url 'create_group_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'students_list_admin' %}" class="linkk">O'quvchilar</a>
+                    <a href="{% url 'add_student' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'teachers_list_admin' %}" class="linkk">O'qituvchilar</a>
+                    <a href="{% url 'add_teacher' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'admin_assignment_list' %}" class="linkk">Topshiriqlar</a>
+                    <a href="{% url 'add_topshiriq' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'all_group_schedules' %}" class="linkk">Dars rejasi</a>
+                    <a href="{% url 'all_groups_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'quiz_list' %}" class="linkk">Testlar</a>
+                    <a href="{% url 'add_quiz' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'question_list' %}" class="linkk">Savollar</a>
+                    <a href="{% url 'add_test_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+                <div class="itemm">
+                    <a href="{% url 'group_payment_list' %}" class="linkk">Guruh to'lov</a>
+                </div>
+                <div class="itemm">
+                    <a href="{% url 'student_list' %}" class="linkk">Barcha to'lov</a>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="main-main">
+            <h2>{{ student.first_name }} {{ student.last_name }} to'lov tarixi</h2>
+
+            {% if grouped_payments %}
+                {% for item in grouped_payments %}
+                    <h3>{{ item.group.name }}</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Oy</th>
+                                    <th>Kurs davomiyligi</th>
+                                    <th>To‘lash kerak</th>
+                                    <th>To‘langan summa</th>
+                                    <th>To‘langan vaqti</th>
+                                </tr>
+                            </thead>
+                            <tbody id="group-body">
+                                {% for payment in item.payments %}
+                                    <tr>
+                                        <td>{{ payment.month }}</td>
+                                        <td>{{ item.group.payment_info.course_duration_months }} oy</td>
+                                        <td>{{ item.group.payment_info.monthly_fee }} so'm</td>
+                                        <td>{{ payment.amount_paid }} so'm</td>
+                                        <td>{{ payment.paid_at|date:"Y-m-d H:i" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-data">To‘lov ma'lumotlari yo‘q</p>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <script>
+
+    </script>
+</body>
+{% endblock %}
+</html>

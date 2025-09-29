@@ -1,0 +1,8 @@
+<h2>Testni o‘chirish</h2>
+<p>“{{ quiz.title }}” testini o‘chirmoqchimisiz?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Ha, o‘chir</button>
+    <a href="{% url 'create_quiz' %}">Yo‘q, bekor</a>
+</form>

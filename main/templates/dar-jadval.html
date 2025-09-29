@@ -1,0 +1,307 @@
+{% load custom_filters %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dars jadvali</title>
+    <style>
+        * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: sans-serif;
+        background-color: #111;
+        color: #ccc;
+    }
+
+    .headerr {
+        background-color: #2c5d77;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #fff;
+    }
+    .headerr h1 {
+        font-size: 20px;
+    }
+    .headerr nav a {
+        color: #9cd;
+        text-decoration: none;
+        margin: 0 5px;
+    }
+    .containerr {
+        display: flex;
+        height: calc(100vh - 50px);
+    }
+    .asidee {
+        width: 300px;
+        background-color: #1e1e1e;
+        padding: 15px;
+        border-right: 1px solid #333;
+    }
+    .menuu h3 {
+        color: #aef;
+        font-size: 12px;
+        margin: 10px 0 5px;
+    }
+    .itemm {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2px 0;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+    .itemm:hover {
+        background-color: #333;
+    }
+    .itemm a {
+        text-decoration: none;
+        display: block;
+        padding: 10px 12px;
+    }
+    .itemm .linkk {
+        color: #eee;
+        flex: 1;
+    }
+    .itemm .addd {
+        color: #7f7;
+        font-weight: bold;
+    }
+    .itemm .linkk:hover {
+        color: #fff;
+    }
+    .itemm .addd:hover {
+        color: #9f9;
+    }
+    .main-main {
+        width: 100%;
+        padding: 20px 20px;
+        font-size: 12px;
+    }
+    h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            vertical-align: top;
+        }
+
+        thead {
+            background-color: #444;
+            color: white;
+        }
+
+        .input-wrapper {
+            margin-bottom: 6px;
+            display: flex;
+            gap: 5px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 6px;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+        }
+
+        input[readonly] {
+            background-color: #eaeaea;
+            color: #666;
+        }
+
+        button.add-btn,
+        button.remove-btn {
+            padding: 5px 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button.add-btn {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        button.remove-btn {
+            background-color: #d9534f;
+            color: white;
+        }
+
+        .submit-wrapper {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .submit-wrapper button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .submit-wrapper button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="headerr">
+        <h1>Admin</h1>
+        <nav>
+            <a href="{% url 'admin:index' %}">ADMIN</a> /
+            <a href="{% url 'admin_password' %}">Parolni almashtirish</a> /
+            <a href="{% url 'login' %}">Chiqish</a>
+        </nav>
+    </div>
+
+    <div class="containerr">
+        <div class="asidee">
+            <div class="menuu">
+                <h3>MENU</h3>
+                <div class="itemm">
+                    <a href="{% url 'all_groups_admin' %}" class="linkk">Guruhlar</a>
+                    <a href="{% url 'create_group_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'students_list_admin' %}" class="linkk">O'quvchilar</a>
+                    <a href="{% url 'add_student' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'teachers_list_admin' %}" class="linkk">O'qituvchilar</a>
+                    <a href="{% url 'add_teacher' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'admin_assignment_list' %}" class="linkk">Topshiriqlar</a>
+                    <a href="{% url 'add_topshiriq' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'all_group_schedules' %}" class="linkk">Dars rejasi</a>
+                    <a href="{% url 'all_groups_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'quiz_list' %}" class="linkk">Testlar</a>
+                    <a href="{% url 'add_quiz' %}" class="addd">+ qo'shish</a>
+                </div>
+
+                <div class="itemm">
+                    <a href="{% url 'question_list' %}" class="linkk">Savollar</a>
+                    <a href="{% url 'add_test_admin' %}" class="addd">+ qo'shish</a>
+                </div>
+                <div class="itemm">
+                    <a href="{% url 'group_payment_list' %}" class="linkk">Guruh to'lov</a>
+                </div>
+                <div class="itemm">
+                    <a href="{% url 'student_list' %}" class="linkk">Barcha to'lov</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-main">
+            <h2>{{ group.name }} guruhidagi o'qituvchilar dars jadvali</h2>
+
+            <form method="POST">
+                {% csrf_token %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>O'qituvchi</th>
+                            {% for day_value, day_label in days %}
+                                <th>{{ day_label }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for teacher in teachers %}
+                            <tr>
+                                <td><strong>{{ teacher.first_name }} {{ teacher.last_name }}</strong></td>
+                                {% for day_value, _ in days %}
+                                    <td>
+                                        <div id="cell-{{ teacher.id }}-{{ day_value }}">
+                                            {% for entry in schedule_map|dict_get:teacher.id|dict_get:day_value %}
+                                                <div class="input-wrapper">
+                                                    <input type="text"
+                                                           name="schedule-{{ teacher.id }}-{{ day_value }}"
+                                                           value="{{ entry.time }}{% if entry.readonly %} ({{ entry.group_name }}){% endif %}"
+                                                           {% if entry.readonly %}readonly{% endif %}>
+                                                    {% if not entry.readonly %}
+                                                        <button type="button" class="remove-btn" onclick="removeInput(this)">−</button>
+                                                    {% endif %}
+                                                </div>
+                                            {% endfor %}
+                                            <div class="input-wrapper">
+                                                <input type="text"
+                                                       name="schedule-{{ teacher.id }}-{{ day_value }}"
+                                                       placeholder="HH:MM - HH:MM">
+                                                <button type="button" class="add-btn"
+                                                        onclick="addInput('{{ teacher.id }}', '{{ day_value }}')">+</button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="submit-wrapper">
+                    <button type="submit">Saqlash</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function addInput(teacherId, day) {
+            const container = document.getElementById(`cell-${teacherId}-${day}`);
+            const wrapper = document.createElement('div');
+            wrapper.className = 'input-wrapper';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = `schedule-${teacherId}-${day}`;
+            input.placeholder = 'HH:MM - HH:MM';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.innerText = '−';
+            removeBtn.className = 'remove-btn';
+            removeBtn.onclick = function () {
+                wrapper.remove();
+            };
+
+            wrapper.appendChild(input);
+            wrapper.appendChild(removeBtn);
+            container.appendChild(wrapper);
+        }
+
+        function removeInput(button) {
+            button.closest('.input-wrapper').remove();
+        }
+    </script>
+</body>
+</html>
