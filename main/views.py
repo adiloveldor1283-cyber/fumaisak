@@ -24,4 +24,4 @@ def login_view(request):
         else:
             messages.error(request, "Login yoki parol noto‘g‘ri", extra_tags='login_message')
 
-    return render(request, 'login.html')
+    return render(request, 'main/login.html')
