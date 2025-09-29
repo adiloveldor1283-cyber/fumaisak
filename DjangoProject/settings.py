@@ -57,7 +57,7 @@ ROOT_URLCONF = 'DjangoProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],  # ✅ umumiy templates papkani ulash
+        'DIRS': [BASE_DIR / "main" / "templates"],  # ✅ umumiy templates papkani ulash
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
