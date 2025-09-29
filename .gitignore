@@ -5,3 +5,4 @@ venv/
 .venv/
 /static/
 /media/
+staticfiles/
