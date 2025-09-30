@@ -3,6 +3,8 @@ from django.db import models
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
+from DjangoProject.utils import generate_presigned_url
+
 
 def user_profile_image_path(instance, filename):
     ext = filename.split('.')[-1]
@@ -24,6 +26,14 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.role})"
+
+    @property
+    def profile_image_url(self):
+        """Profil rasmining signed URL'ini qaytaradi."""
+        if self.profile_image:
+            # Fayl nomi 'media/profiles/username_profile.jpg' shaklida
+            return generate_presigned_url(self.profile_image.name)
+        return None
 
 class Group(models.Model):
     name = models.CharField(max_length=200)

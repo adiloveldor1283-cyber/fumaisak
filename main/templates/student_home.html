@@ -669,7 +669,7 @@
 
                 <a href="javascript:void(0);" id="profile-btn">
                     {% if user.profile_image %}
-                    <img src="{{ student.profile_image.url }}" alt="User profile" class="user_profile_img">
+                    <img src="{{ student.profile_image_url }}" alt="User profile" class="user_profile_img">
                     {% else %}
                     <img src="{{ default_profile_image }}" alt="User profile" class="user_profile_img">
                     {% endif %}

@@ -18,15 +18,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Backblaze B2 sozlamalari
 AWS_ACCESS_KEY_ID = os.environ.get('BACKBLAZE_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('BACKBLAZE_APPLICATION_KEY')
-AWS_STORAGE_BUCKET_NAME = 'fuma1sak-media'  # O'z bucket nomingiz
-AWS_S3_ENDPOINT_URL = 'https://s3.us-west-000.backblazeb2.com'
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.us-west-000.backblazeb2.com'
-AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = 'public-read'  # Rasmlar ommaviy ko'rinishi uchun
+AWS_STORAGE_BUCKET_NAME = os.environ.get('B2_BUCKET_NAME')  # O'z bucket nomingiz
+AWS_S3_REGION_NAME = os.environ.get('B2_REGION', 'us-east-005')
+AWS_S3_ENDPOINT_URL = f'https://s3.us-east-005.backblazeb2.com'
+
+AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}  # Cache uchun
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = True # Signed URLs uchun (default True)
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # Media fayllar sozlamalari
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.backblazeb2.com/media/'
+
+# Django 4.2+ uchun
+STORAGES = {
+    'default': {
+        'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+        'OPTIONS': {
+            'default_acl': None,  # Private fayllar
+        },
+    },
+    'staticfiles': {
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+    },
+}
 
 env=environ.Env()
 environ.Env.read_env()
@@ -38,7 +53,7 @@ environ.Env.read_env()
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
