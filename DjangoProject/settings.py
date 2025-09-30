@@ -11,9 +11,23 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 import environ
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+# Backblaze B2 sozlamalari
+AWS_ACCESS_KEY_ID = os.environ.get('BACKBLAZE_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('BACKBLAZE_APPLICATION_KEY')
+AWS_STORAGE_BUCKET_NAME = 'fuma1sak-media'  # O'z bucket nomingiz
+AWS_S3_ENDPOINT_URL = 'https://s3.us-west-000.backblazeb2.com'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.us-west-000.backblazeb2.com'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = 'public-read'  # Rasmlar ommaviy ko'rinishi uchun
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Media fayllar sozlamalari
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+
 env=environ.Env()
 environ.Env.read_env()
 
@@ -24,7 +38,7 @@ environ.Env.read_env()
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -133,7 +147,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'main.CustomUser'
-MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
