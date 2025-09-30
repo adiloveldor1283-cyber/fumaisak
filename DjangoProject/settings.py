@@ -11,37 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import os
 import environ
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-# Backblaze B2 sozlamalari
-AWS_ACCESS_KEY_ID = os.environ.get('BACKBLAZE_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('BACKBLAZE_APPLICATION_KEY')
-AWS_STORAGE_BUCKET_NAME = os.environ.get('B2_BUCKET_NAME')  # O'z bucket nomingiz
-AWS_S3_REGION_NAME = os.environ.get('B2_REGION', 'us-east-005')
-AWS_S3_ENDPOINT_URL = f'https://s3.us-east-005.backblazeb2.com'
-
-AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}  # Cache uchun
-AWS_DEFAULT_ACL = None
-AWS_QUERYSTRING_AUTH = True # Signed URLs uchun (default True)
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
-# Media fayllar sozlamalari
-MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.backblazeb2.com/media/'
-
-# Django 4.2+ uchun
-STORAGES = {
-    'default': {
-        'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
-        'OPTIONS': {
-            'default_acl': None,  # Private fayllar
-        },
-    },
-    'staticfiles': {
-        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
-    },
-}
 
 env=environ.Env()
 environ.Env.read_env()
@@ -163,6 +135,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'main.CustomUser'
+MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
