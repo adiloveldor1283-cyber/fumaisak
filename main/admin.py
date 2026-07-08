@@ -3,22 +3,21 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-
-
+from unfold.admin import ModelAdmin, TabularInline
 
 from .models import CustomUser, Group, Schedule, DAYS_OF_WEEK, Answer, Question, Quiz, Attendance, Assignment, \
     StudentQuizResult, StudentAnswer, AssignmentSubmission, GroupStudentMembership, SiteSetting, ProfileSetting, \
     GroupPaymentInfo, StudentPayment
 from django.utils.timezone import localtime
 
-class StudentGroupMembershipInline(admin.TabularInline):
+class StudentGroupMembershipInline(TabularInline):
     model = GroupStudentMembership
     fk_name = 'student'  # bu muhim
     extra = 1
 
 
 @admin.register(CustomUser)
-class CustomUserAdmin(UserAdmin):
+class CustomUserAdmin(UserAdmin, ModelAdmin):
     model = CustomUser
     inlines = [StudentGroupMembershipInline]
     list_display = ['username', 'first_name', 'last_name', 'role', 'group_count', 'related_teachers_count']
@@ -75,13 +74,13 @@ class CustomUserAdmin(UserAdmin):
 
     group_details.short_description = "Guruh tafsilotlari"
 
-class GroupStudentMembershipInline(admin.TabularInline):
+class GroupStudentMembershipInline(TabularInline):
     model = GroupStudentMembership
     extra = 1  # Qo‘shimcha qatordan boshlansin
 
 
 @admin.register(Group)
-class GroupAdmin(admin.ModelAdmin):
+class GroupAdmin(ModelAdmin):
     list_display = ['name', 'formatted_created_at']
     fields = ('name', 'teachers', 'created_at')
     filter_horizontal = ('teachers',)
@@ -96,26 +95,24 @@ class GroupAdmin(admin.ModelAdmin):
     formatted_created_at.short_description = 'Yaratilgan vaqti'
 
 
-
-
 @admin.register(Schedule)
-class ScheduleAdmin(admin.ModelAdmin):
+class ScheduleAdmin(ModelAdmin):
     list_display = ('group', 'get_day_display', 'start_time', 'end_time')
     list_filter = ('group', 'day')
     search_fields = ('group__name',)
 
-class AnswerInline(admin.TabularInline):
+class AnswerInline(TabularInline):
     model = Answer
     extra = 2
 
 
-class QuestionInline(admin.TabularInline):
+class QuestionInline(TabularInline):
     model = Question
     extra = 1
 
 
 @admin.register(Quiz)
-class QuizAdmin(admin.ModelAdmin):
+class QuizAdmin(ModelAdmin):
     list_display = ('title', 'group', 'teacher', 'created_at')
     list_filter = ('group', 'teacher', 'created_at')
     search_fields = ('title',)
@@ -123,7 +120,7 @@ class QuizAdmin(admin.ModelAdmin):
 
 
 @admin.register(Question)
-class QuestionAdmin(admin.ModelAdmin):
+class QuestionAdmin(ModelAdmin):
     list_display = ('text', 'quiz')
     search_fields = ('text',)
     list_filter = ('quiz',)
@@ -131,19 +128,27 @@ class QuestionAdmin(admin.ModelAdmin):
 
 
 @admin.register(Answer)
-class AnswerAdmin(admin.ModelAdmin):
+class AnswerAdmin(ModelAdmin):
     list_display = ('text', 'question', 'is_correct')
     list_filter = ('is_correct', 'question')
     search_fields = ('text',)
 
 
-# Qolgan modellarning oddiy ro‘yxatga olish (istalgancha sozlash mumkin)
-admin.site.register(StudentQuizResult)
-admin.site.register(StudentAnswer)
-admin.site.register(AssignmentSubmission)
+@admin.register(StudentQuizResult)
+class StudentQuizResultAdmin(ModelAdmin):
+    pass
+
+@admin.register(StudentAnswer)
+class StudentAnswerAdmin(ModelAdmin):
+    pass
+
+@admin.register(AssignmentSubmission)
+class AssignmentSubmissionAdmin(ModelAdmin):
+    pass
+
 
 @admin.register(Attendance)
-class AttendanceAdmin(admin.ModelAdmin):
+class AttendanceAdmin(ModelAdmin):
     list_display = ('student_name', 'teacher_name', 'group', 'date', 'status')
     list_filter = ('group', 'teacher', 'status', 'date')
     search_fields = ('student__first_name', 'student__last_name',
@@ -159,7 +164,7 @@ class AttendanceAdmin(admin.ModelAdmin):
     teacher_name.short_description = "O‘qituvchi"
 
 @admin.register(Assignment)
-class AssignmentAdmin(admin.ModelAdmin):
+class AssignmentAdmin(ModelAdmin):
     list_display = ('title', 'group', 'teacher', 'formatted_deadline', 'created_at')
     list_filter = ('group', 'teacher')
     search_fields = ('title', 'group__name', 'teacher__username')
@@ -173,15 +178,14 @@ class AssignmentAdmin(admin.ModelAdmin):
 
 
 @admin.register(GroupStudentMembership)
-class GroupStudentMembershipAdmin(admin.ModelAdmin):
+class GroupStudentMembershipAdmin(ModelAdmin):
     list_display = ['student', 'group', 'joined_at']
     list_filter = ['group', 'joined_at']
     search_fields = ['student__first_name', 'student__last_name', 'group__name']
 
 
-
 @admin.register(SiteSetting)
-class SiteSettingAdmin(admin.ModelAdmin):
+class SiteSettingAdmin(ModelAdmin):
     def has_add_permission(self, request):
         # Faqat 1 ta obyekt yaratilishiga ruxsat
         if SiteSetting.objects.exists():
@@ -190,7 +194,7 @@ class SiteSettingAdmin(admin.ModelAdmin):
 
 
 @admin.register(ProfileSetting)
-class ProfileSettingAdmin(admin.ModelAdmin):
+class ProfileSettingAdmin(ModelAdmin):
     def has_add_permission(self, request):
         # Faqat 1 ta obyekt yaratilishiga ruxsat
         if ProfileSetting.objects.exists():
@@ -198,13 +202,13 @@ class ProfileSettingAdmin(admin.ModelAdmin):
         return True
 
 @admin.register(GroupPaymentInfo)
-class GroupPaymentInfoAdmin(admin.ModelAdmin):
+class GroupPaymentInfoAdmin(ModelAdmin):
     list_display = ('group', 'course_duration_months', 'monthly_fee', 'total_fee', 'created_at', 'updated_at')
     search_fields = ('group__name',)
     list_filter = ('created_at',)
 
 @admin.register(StudentPayment)
-class StudentPaymentAdmin(admin.ModelAdmin):
+class StudentPaymentAdmin(ModelAdmin):
     list_display = ("student", "group", "month", "amount_paid", "paid_at")
     list_filter = ("group", "month")
     search_fields = ("student__first_name", "student__last_name", "group__name")

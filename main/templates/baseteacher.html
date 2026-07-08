@@ -1,0 +1,399 @@
+{% load static %}
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}O'qituvchi paneli{% endblock %}</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: #070a12;
+            color: #ffffff;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Cyberpunk Orqa Fon Chiziqlari */
+        .cyber-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Cpath d='M0,150 Q200,80 500,200 T1000,80 T1500,250' fill='none' stroke='%2300f2fe' stroke-width='3'/%3E%3C/svg%3E");
+            background-size: cover;
+        }
+
+        /* Sidebar Stillari */
+        .sidebar {
+            background: rgba(11, 15, 25, 0.6);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: white;
+            width: 250px;
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1001;
+        }
+        .sidebar.collapsed { width: 70px; }
+        .sidebar .toggle-container {
+            position: relative;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .sidebar .toggle-container img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 242, 254, 0.2);
+        }
+        .toggle-btn {
+            margin-left: 30px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 2;
+            transition: 0.3s;
+        }
+        .toggle-btn:hover { color: #00f2fe; }
+        .brand {
+            font-size: 20px;
+            font-weight: bold;
+            margin-left: 15px;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .sidebar.collapsed .brand, .sidebar.collapsed .toggle-btn { display: none; }
+        .user-info {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 12px;
+            transition: opacity 0.2s;
+            line-height: 1.6;
+        }
+        /* --- 🤖 FAOL (ACTIVE) MENYU UCHUN MAXSUS NEON STILLAR --- */
+        .sidebar ul li.active {
+            background: rgba(0, 242, 254, 0.05); /* Orqa fonga yengil kiber nur */
+            border-left: 3px solid #00f2fe;     /* Chap tomondan neon chiziq */
+            border-radius: 0 12px 12px 0;        /* Chap tomoni tekis, o'ngi yumaloq */
+        }
+        .sidebar ul li.active a i,
+        .sidebar ul li.active a span {
+            color: #00f2fe !important;           /* Matn va ikonka rangini neon qilish */
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.4); /* Yozuvga nur berish */
+        }
+        .toggle-main {
+            margin-left: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: none;
+        }
+        .toggle-main:hover { color: #00f2fe; }
+        .sidebar.collapsed ~ .main .toggle-main { display: inline-block; }
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            max-width: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .user-info span {
+            font-size: 11px;
+            white-space: nowrap;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .span {
+            text-transform: uppercase;
+            font-size: 14px;
+            font-weight: 700;
+            color: #00f2fe !important;
+        }
+        .sidebar.collapsed .user-info span { display: none; }
+        .sidebar ul { margin-top: 10px; list-style: none; padding: 8px; flex-grow: 1; }
+        .sidebar ul li { display: flex; align-items: center; border-radius: 12px; transition: 0.3s; cursor: pointer; margin-bottom: 4px; }
+        .sidebar ul li:hover { background: rgba(255, 255, 255, 0.03); }
+        .sidebar ul li:hover a i, .sidebar ul li:hover a span { color: #00f2fe; }
+        .sidebar ul li a { display: flex; align-items: center; text-decoration: none; color: rgba(255, 255, 255, 0.6); width: 100%; padding: 14px 16px; font-weight: 600; }
+        .sidebar ul li a i { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; transition: 0.3s; }
+        .sidebar ul li a span { margin-left: 12px; white-space: nowrap; font-size: 14px; transition: 0.3s; }
+        .sidebar.collapsed ul li a span { display: none; }
+
+        /* Main & Header Layout */
+        .main { flex-grow: 1; display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 1; flex: 1; }
+        .header {
+            color: white;
+            background: rgba(11, 15, 25, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            height: 69px;
+            min-height: 69px;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .user-profile { display: flex; align-items: center; gap: 24px; margin-left: auto; justify-content: flex-end; position: relative; padding-right: 20px; }
+        .user-profile i { color: rgba(255, 255, 255, 0.7); font-size: 19px; transition: 0.3s; }
+        .user-profile i:hover { color: #00f2fe; }
+        #bell-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+        .user_profile_img { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255, 255, 255, 0.05); transition: 0.3s; }
+        .user_profile_img:hover { border-color: #00f2fe; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3); }
+
+        /* Dropdown Panellar */
+        .dropdown-panel {
+            position: absolute;
+            top: 55px;
+            background: #0c101d;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            border-radius: 16px;
+            width: 300px;
+            padding: 16px;
+            display: none;
+            z-index: 1002;
+            color: #ffffff;
+        }
+        .dropdown-item { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 13px; text-decoration: none; color: rgba(255,255,255,0.8); display: block; transition: 0.2s; }
+        .dropdown-item:hover { background: rgba(255,255,255,0.02); color: #00f2fe; }
+        .dropdown-item i { color: #4facfe; margin-right: 10px; width: 20px; text-align: center; }
+        .dropdown-panel.active { display: block; }
+        .notification-badge {
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            background: #ff0055;
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 9px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 8px rgba(255, 0, 85, 0.6);
+            z-index: 10;
+        }
+        #bell-panel { right: 45px; }
+        #profile-panel { right: 15px; width: 200px; }
+        .dropdown-item:last-child { border-bottom: none; }
+
+        /* Umumiy Kontenyer (Hamma sahifa uchun bir xil joylashuv) */
+        .konteyner {
+            background-color: transparent;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            height: calc(100vh - 69px);
+            overflow: hidden;
+        }
+
+        /* Sidebar uchun Responsive Base qismi */
+        @media (max-width: 768px) {
+            body { overflow: auto; }
+            .sidebar { position: absolute; height: 100%; transform: translateX(-100%); z-index: 1005; background: rgba(11, 15, 25, 0.96); }
+            .sidebar.show { transform: translateX(0); }
+            .sidebar.collapsed { width: 250px; }
+            .main .toggle-main { display: inline-block; }
+            .sidebar.collapsed.show .brand, .sidebar.collapsed.show .toggle-btn, .sidebar.collapsed.show .user-info span, .sidebar.collapsed.show ul li a span { display: inline !important; }
+            #bell-panel { right: 10px; width: calc(100vw - 20px); max-width: 320px; }
+            #profile-panel { right: 10px; width: 180px; }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="cyber-bg"></div>
+
+    <div class="sidebar collapsed" id="sidebar">
+        <div class="toggle-container">
+            <img src="{{ global_image }}" alt="Logatip photo">
+            <div class="brand">FUMAISAK</div>
+            <button class="toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        </div>
+
+        <div class="user-info">
+            {% if user.profile_image %}
+                <img src="{{ teacher.profile_image.url }}" alt="User Photo">
+            {% else %}
+                <img src="{{ default_profile_image }}" alt="User Photo">
+            {% endif %}
+            <div style="display: flex; flex-direction: column;">
+                <span class="span">
+                    {% if user.role == "teacher" %}
+                        O'qituvchi
+                    {% elif user.role == "student" %}
+                        O'quvchi
+                    {% else %}
+                        {{ user.role }}
+                    {% endif %}
+                </span>
+                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">{{ teacher.first_name }} {{ teacher.last_name }}</span>
+            </div>
+        </div>
+
+        <ul>
+            <li><a href="{% url 'teacher_home' %}"><i class="fas fa-home"></i><span> Dashboard</span></a></li>
+            <li><a href="{% url 'teacher_students_list' %}"><i class="fas fa-user-graduate"></i><span> O'quvchilarim</span></a></li>
+            <li><a href="{% url 'teacher_group_list' %}"><i class="fas fa-list"></i><span>Guruhlarim</span></a></li>
+            <li><a href="{% url 'teacher_schedule' %}"><i class="fas fa-calendar-alt"></i><span>Dars jadval</span></a></li>
+            <li><a href="{% url 'create_quiz' %}"><i class="fas fa-clipboard-check"></i><span>Onlayn test</span></a></li>
+            <li><a href="{% url 'teacher_deadline' %}"><i class="fas fa-clipboard-list"></i><span> Topshiriqlarim</span></a></li>
+        </ul>
+    </div>
+
+    <div class="main">
+        <div class="header">
+            <button class="toggle-main" id="mainToggle"><i class="fas fa-bars"></i></button>
+
+            {% block header_search %}{% endblock %}
+
+            <div class="user-profile">
+                <a href="javascript:void(0);" id="bell-btn">
+                    <i class="fa fa-bell"></i>
+                    {% if teacher_notif_count > 0 %}
+                    <span class="notification-badge">{{ teacher_notif_count }}</span>
+                    {% endif %}
+                </a>
+
+                <div class="dropdown-panel" id="bell-panel">
+                    {% if teacher_notifications %}
+                        {% for note in teacher_notifications %}
+                            <div class="dropdown-item" style="padding: 12px; margin-bottom: 8px; border-radius: 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.02); line-height: 1.6;">
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #00f2fe; font-weight: 700;">Guruh:</strong>
+                                    <span style="color: rgba(255,255,255,0.9); margin-left: 4px;">{{ note.group }}</span>
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    <strong style="color: #00f2fe; font-weight: 700;">Topshiriq:</strong>
+                                    <span style="color: rgba(255,255,255,0.9); margin-left: 4px;">{{ note.title }}</span>
+                                </div>
+                                <div style="margin-top: 6px; font-size: 12px;">
+                                    <strong style="color: #ff0055; font-weight: 700;">Xabar:</strong>
+                                    <span style="color: #ff808b; margin-left: 4px; font-weight: 600;">{{ note.message }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="dropdown-item" style="text-align: center; color: rgba(255,255,255,0.3); padding: 20px 0; font-style: italic; font-size: 13px;">
+                            <i class="far fa-bell-slash" style="display: block; font-size: 20px; margin-bottom: 8px; color: rgba(255,255,255,0.15);"></i>
+                            Bildirishnoma yo‘q
+                        </div>
+                    {% endif %}
+                </div>
+
+                <a href="javascript:void(0);" id="profile-btn">
+                    {% if user.profile_image %}
+                    <img src="{{ teacher.profile_image.url }}" alt="User profile" class="user_profile_img">
+                    {% else %}
+                    <img src="{{ default_profile_image }}" alt="User profile" class="user_profile_img">
+                    {% endif %}
+                </a>
+                <div class="dropdown-panel" id="profile-panel">
+                    <a href="{% url 'teacher_profile' %}" class="dropdown-item"><i class="fas fa-user"></i> Profilim</a>
+                    <a href="{% url 'login' %}" class="dropdown-item" style="color: #ff808b;"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="konteyner">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mainToggle = document.getElementById('mainToggle');
+
+        function toggleSidebar() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('show');
+            } else {
+                sidebar.classList.toggle('collapsed');
+            }
+        }
+
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        mainToggle.addEventListener('click', toggleSidebar);
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('show');
+            }
+        });
+
+        function togglePanel(idToShow) {
+            const panels = document.querySelectorAll('.dropdown-panel');
+            panels.forEach(panel => {
+                if (panel.id !== idToShow) {
+                    panel.classList.remove('active');
+                }
+            });
+            const panel = document.getElementById(idToShow);
+            panel.classList.toggle('active');
+        }
+
+        document.getElementById('bell-btn').addEventListener('click', () => togglePanel('bell-panel'));
+        document.getElementById('profile-btn').addEventListener('click', () => togglePanel('profile-panel'));
+
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.user-profile')) {
+                document.querySelectorAll('.dropdown-panel').forEach(p => p.classList.remove('active'));
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname;
+            const menuLinks = document.querySelectorAll(".sidebar ul li a");
+
+            menuLinks.forEach(link => {
+                const href = link.getAttribute("href");
+                if (currentPath === href || (href !== '/' && currentPath.startsWith(href))) {
+                    link.parentElement.classList.add("active");
+                } else {
+                    link.parentElement.classList.remove("active");
+                }
+            });
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

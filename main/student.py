@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.db.models import Sum
+from DjangoProject.utils import rate_limit
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from main.models import Quiz, Group, StudentQuizResult, Answer, StudentAnswer, Schedule, DAYS_OF_WEEK, Assignment, \
@@ -160,9 +161,6 @@ def get_top_students(current_student):
     student_place = next((s for s in sorted_scores if s['student'] == current_student), None)
 
     return top_10, student_place
-
-
-
 
 
 @login_required
@@ -411,6 +409,7 @@ def start_quiz(request, quiz_id):
 
 
 @login_required
+@rate_limit(limit=10, period=60)
 def submit_quiz(request, quiz_id):
     student = request.user
     quiz = get_object_or_404(Quiz, id=quiz_id)
@@ -489,13 +488,16 @@ def student_assignments_view(request):
     group_join_times = {m.group.id: m.joined_at for m in memberships}
 
     # Har bir guruh uchun, faqat guruhga qo‘shilgandan keyin yaratilgan topshiriqlarni olish
-    q_filter = Q()
-    for group_id, joined_at in group_join_times.items():
-        q_filter |= Q(group_id=group_id, created_at__gte=joined_at)
+    if not group_join_times:
+        assignments = Assignment.objects.none()
+    else:
+        q_filter = Q()
+        for group_id, joined_at in group_join_times.items():
+            q_filter |= Q(group_id=group_id, created_at__gte=joined_at)
 
-    assignments = Assignment.objects.filter(q_filter)\
-        .select_related('group', 'teacher')\
-        .order_by('-created_at')
+        assignments = Assignment.objects.filter(q_filter)\
+            .select_related('group', 'teacher')\
+            .order_by('-created_at')
 
     # Student topshirgan assignmentlar
     submissions_qs = AssignmentSubmission.objects.filter(student=student)
@@ -573,3 +575,436 @@ def student_payment_view(request):
         'group_infos': group_infos
     }
     return render(request, 'student_payment.html', context)
+
+
+import os
+import json
+from django.conf import settings
+from django.http import Http404
+from django.db import transaction
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils.timezone import now
+from main.models import AIQuiz, AIQuestion, AIAnswer, StudentAIAnswer, StudentAIPlan
+
+# 🚀 Yangi Rasmiy Google GenAI SDK drayverlari va Pydantic
+from google import genai
+from google.genai import types
+from pydantic import BaseModel
+from typing import List
+
+
+# --- 📐 1. GEMINI UCHUN QAT'IY PYDANTIC SXEMALARI ---
+
+class QuizOptionSchema(BaseModel):
+    text: str
+    is_correct: bool
+
+
+class QuizQuestionSchema(BaseModel):
+    text: str
+    correct_explanation: str
+    options: List[QuizOptionSchema]
+
+
+class QuizStructureSchema(BaseModel):
+    title: str
+    time_limit: int
+    questions: List[QuizQuestionSchema]
+
+
+class StudentPlanSchema(BaseModel):
+    advice: str
+    plan: str
+
+
+# --- 🤖 2. UNIVERSAL GEMINI SDK CHAQIRUV FUNKSIYASI ---
+
+def call_gemini_sdk(prompt, response_schema=None):
+    """
+    Yangi rasmiy google-genai SDK orqali Gemini modeliga xavfsiz murojaat qilish.
+    Agar response_schema berilsa, qat'iy JSON qaytaradi, aks holda Plain Text/Markdown.
+    """
+    api_key = getattr(settings, "GEMINI_API_KEY", None) or os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("Gemini API key is not configured.")
+
+    # SDK Client tashkil qilish
+    client = genai.Client(api_key=api_key)
+
+    # Eng barqaror va aqlli model (Xohishingizga ko'ra 'gemini-3-flash-preview' ham qo'yishingiz mumkin)
+    model_name = 'gemini-2.5-flash'
+
+    config_args = {
+        'temperature': 1.0,
+        'top_p': 0.95,
+    }
+
+    # Agar Pydantic sxemasi uzatilgan bo'lsa, qat'iy formatlashni yoqamiz
+    if response_schema:
+        config_args['response_mime_type'] = "application/json"
+        config_args['response_schema'] = response_schema
+
+    config = types.GenerateContentConfig(**config_args)
+
+    response = client.models.generate_content(
+        model=model_name,
+        contents=prompt,
+        config=config
+    )
+    return response.text
+
+
+# --- 🛠 3. MOCK (FALLBACK) FUNKSIYALARI ---
+
+def generate_mock_quiz(categories, level, num_questions=5):
+    questions = []
+    for i in range(1, num_questions + 1):
+        questions.append({
+            "text": f"'{categories}' mavzusi bo'yicha {i}-savol ({level} darajasi)?",
+            "correct_explanation": f"{i}-savol uchun to'g'ri javob izohi. Mavzuni o'rganish lozim.",
+            "options": [
+                {"text": f"To'g'ri javob varianti A ({i})", "is_correct": True},
+                {"text": f"Noto'g'ri javob B ({i})", "is_correct": False},
+                {"text": f"Noto'g'ri javob C ({i})", "is_correct": False},
+                {"text": f"Noto'g'ri javob D ({i})", "is_correct": False}
+            ]
+        })
+    return {
+        "title": f"{categories}",
+        "time_limit": num_questions * 2,
+        "questions": questions
+    }
+
+
+def generate_mock_feedback(score, max_score, title, level):
+    percent = round((score / max_score) * 100) if max_score else 0
+    if percent >= 80:
+        return f"Ajoyib natija! Siz '{title}' mavzusini '{level}' darajada juda yaxshi o'zlashtiribsiz ({percent}%). Deyarli barcha savollarga to'g'ri javob berdingiz."
+    elif percent >= 50:
+        return f"Yaxshi harakat! Siz '{title}' mavzusini '{level}' darajada {percent}% natija bilan topshirdingiz."
+    else:
+        return f"Tushkunlikka tushmang! Siz '{title}' mavzusini '{level}' darajada sinab ko'rdingiz ({percent}%)."
+
+
+def generate_mock_plan(student, quizzes_count, average_score):
+    advice = f"Salom, {student.first_name}! Tizim xatoligi tufayli vaqtinchalik reja yuklandi. Harakatdan to'xtamang!"
+    plan = "### Kelgusi 7 darslik reja:\n\n* **1-Kun**: Zaif mavzularda 5 talik test yechish.\n* **2-Kun**: Xatolar ustida ishlash."
+    return advice, plan
+
+
+# --- 🖥 4. DJANGO VIEWS ---
+
+@login_required
+def ai_quiz_dashboard(request):
+    student = request.user
+    if student.role != 'student':
+        return redirect('login')
+
+    quizzes = AIQuiz.objects.filter(student=student).order_by('-created_at')
+
+    completed_quizzes = quizzes.filter(is_completed=True)
+    total_quizzes_count = quizzes.count()
+    completed_quizzes_count = completed_quizzes.count()
+
+    total_score = sum(q.score or 0 for q in completed_quizzes)
+    total_max_score = sum(q.max_score for q in completed_quizzes)
+    average_percent = round((total_score / total_max_score) * 100) if total_max_score > 0 else 0
+
+    best_quiz = None
+    best_percent = 0
+    for q in completed_quizzes:
+        p = round(((q.score or 0) / q.max_score) * 100)
+        if p > best_percent:
+            best_percent = p
+            best_quiz = q
+
+    if request.method == "POST":
+        level = request.POST.get('level', 'beginner').strip().lower()
+        num_questions = int(request.POST.get('num_questions', '5'))
+        custom_category = request.POST.get('custom_category', '').strip()
+
+        if not custom_category:
+            messages.error(request, "Iltimos, test mavzusini kiriting.")
+            return redirect('ai_quiz_dashboard')
+
+        categories_str = custom_category
+
+        if level == 'beginner':
+            level_display = "Boshlang'ich (A1-A2 darajasi)"
+        elif level == 'intermediate':
+            level_display = "O'rta (B1-B2 darajasi)"
+        else:
+            level = 'advanced'
+            level_display = "Yuqori / Murakkab (C1-C2 darajasi)"
+
+        prompt = f"""
+        Tizim o'quvchi uchun mustaqil test savollarini tuzib berishi kerak.
+        O'quvchining darajasi: {level_display}
+        Test mavzusi: {categories_str}
+        Savollar soni: {num_questions} ta.
+
+        Har bir savol uchun o'rtacha 2 daqiqa hisobida 'time_limit' qiymatini belgilang.
+        Savollar va variantlarni tushunarli tilda tuzing. Agar mavzu chet tili (masalan, ingliz tili grammatikasi) bo'lsa, savol matni va uning variantlari o'sha tilda bo'lsin, lekin to'g'ri javob izohi (correct_explanation) HAR DOIM mukammal va batafsil O'ZBEK tilida yozilishi shart.
+        """
+
+        try:
+            # Pydantic sxemasi yordamida SDK orqali 100% toza JSON olamiz
+            api_response = call_gemini_sdk(prompt, response_schema=QuizStructureSchema)
+            quiz_data = json.loads(api_response)
+        except Exception as e:
+            print(f"--- Gemini SDK Quiz Error: {str(e)} ---")
+            quiz_data = generate_mock_quiz(categories_str, level_display, num_questions)
+            messages.warning(request, "AI bilan bog'lanishda xatolik yuz berdi. Namunaviy test yaratildi.")
+
+        try:
+            with transaction.atomic():
+                quiz = AIQuiz.objects.create(
+                    student=student,
+                    title=quiz_data.get('title', categories_str)[:255],
+                    categories=categories_str,
+                    level=level,
+                    max_score=100,
+                    time_limit=quiz_data.get('time_limit', num_questions * 2)
+                )
+                for q_item in quiz_data.get('questions', []):
+                    question = AIQuestion.objects.create(
+                        quiz=quiz,
+                        text=q_item.get('text', 'Savol matni'),
+                        correct_explanation=q_item.get('correct_explanation', '')
+                    )
+                    for opt in q_item.get('options', []):
+                        AIAnswer.objects.create(
+                            question=question,
+                            text=opt.get('text', 'Variant'),
+                            is_correct=opt.get('is_correct', False)
+                        )
+            return redirect('ai_quiz_take', quiz_id=quiz.id)
+
+        except Exception as db_err:
+            print(f"--- Database Save Error: {str(db_err)} ---")
+            messages.error(request, "Testni bazaga saqlashda ichki xatolik yuz berdi.")
+            return redirect('ai_quiz_dashboard')
+
+    context = {
+        'student': student,
+        'quizzes': quizzes,
+        'total_quizzes_count': total_quizzes_count,
+        'completed_quizzes_count': completed_quizzes_count,
+        'average_percent': average_percent,
+        'best_quiz': best_quiz,
+        'best_percent': best_percent,
+    }
+    return render(request, 'student_ai_quiz_dashboard.html', context)
+
+
+@login_required
+def ai_quiz_take(request, quiz_id):
+    student = request.user
+    if student.role != 'student':
+        return redirect('login')
+
+    quiz = get_object_or_404(AIQuiz, id=quiz_id, student=student)
+    if quiz.is_completed:
+        return redirect('ai_quiz_results', quiz_id=quiz.id)
+
+    questions = quiz.questions.all().prefetch_related('answers')
+    return render(request, 'student_ai_quiz_take.html', {
+        'student': student,
+        'quiz': quiz,
+        'questions': questions
+    })
+
+
+@login_required
+@rate_limit(limit=5, period=60)
+def ai_quiz_submit(request, quiz_id):
+    student = request.user
+    if student.role != 'student':
+        return redirect('login')
+
+    quiz = get_object_or_404(AIQuiz, id=quiz_id, student=student)
+    if quiz.is_completed:
+        return redirect('ai_quiz_results', quiz_id=quiz.id)
+
+    if request.method == "POST":
+        correct_count = 0
+        total_questions = quiz.questions.count()
+
+        StudentAIAnswer.objects.filter(quiz=quiz).delete()
+        detailed_results = []
+
+        with transaction.atomic():
+            for question in quiz.questions.all():
+                selected_id = request.POST.get(f'question_{question.id}')
+                selected_answer = None
+                if selected_id:
+                    selected_answer = AIAnswer.objects.filter(id=selected_id, question=question).first()
+
+                StudentAIAnswer.objects.create(
+                    quiz=quiz,
+                    question=question,
+                    selected_answer=selected_answer
+                )
+
+                is_correct = selected_answer.is_correct if selected_answer else False
+                if is_correct:
+                    correct_count += 1
+
+                status_text = "To'g'ri" if is_correct else "Noto'g'ri"
+                detailed_results.append(
+                    f"Savol: {question.text}\n"
+                    f"O'quvchi javobi: {selected_answer.text if selected_answer else 'Javob berilmagan'}\n"
+                    f"Holati: {status_text}\n"
+                    f"To'g'ri izoh: {question.correct_explanation or 'Izoh mavjud emas'}\n"
+                )
+
+            score = round((correct_count / total_questions) * quiz.max_score) if total_questions else 0
+            quiz.score = score
+            quiz.is_completed = True
+            quiz.submitted_at = now()
+            quiz.save()
+
+        score_percent = round((score / quiz.max_score) * 100) if quiz.max_score else 0
+        detailed_results_str = "\n".join(detailed_results)
+
+        # Plain text / Markdown feedback so'raymiz
+        feedback_prompt = f"""
+        Siz barcha fanlar bo'yicha o'quvchiga yordam beruvchi do'stona sun'iy intellekt repetitorsiz.
+        O'quvchi o'zi uchun maxsus tuzilgan mustaqil testni topshirdi.
+
+        Test tafsilotlari:
+        Mavzu: {quiz.title}
+        Tanlangan daraja: {quiz.get_level_display()}
+        Natija: {quiz.score} / {quiz.max_score} (Foizda: {score_percent}%)
+
+        Savollar va o'quvchining tanlagan javoblari:
+        {detailed_results_str}
+
+        Iltimos, o'quvchining natijasini tahlil qilib, o'zbek tilida batafsil tahliliy sharh (feedback) yozib bering.
+        Markdown formatidan foydalaning (ro'yxat, muhim so'zlarni qalinlashtirish).
+        Ohang har doim motivatsiya beruvchi va ijobiy bo'lsin.
+        """
+        try:
+            ai_feedback = call_gemini_sdk(feedback_prompt)
+        except Exception:
+            ai_feedback = generate_mock_feedback(score, quiz.max_score, quiz.title, quiz.get_level_display())
+
+        quiz.ai_feedback = ai_feedback
+        quiz.save()
+        return redirect('ai_quiz_results', quiz_id=quiz.id)
+
+    return redirect('ai_quiz_dashboard')
+
+
+@login_required
+def ai_quiz_results(request, quiz_id):
+    student = request.user
+    if student.role != 'student':
+        return redirect('login')
+
+    quiz = get_object_or_404(AIQuiz, id=quiz_id, student=student)
+    if not quiz.is_completed:
+        return redirect('ai_quiz_take', quiz_id=quiz.id)
+
+    student_answers = StudentAIAnswer.objects.filter(quiz=quiz).select_related('question', 'selected_answer')
+    answers_map = {sa.question_id: sa.selected_answer for sa in student_answers}
+
+    questions_data = []
+    for question in quiz.questions.all().prefetch_related('answers'):
+        selected_answer = answers_map.get(question.id)
+        questions_data.append({
+            'question': question,
+            'answers': question.answers.all(),
+            'selected_answer': selected_answer,
+            'is_correct': selected_answer.is_correct if selected_answer else False
+        })
+
+    score_percent = round(((quiz.score or 0) / quiz.max_score) * 100) if quiz.max_score else 0
+
+    feedback_text = quiz.ai_feedback or ""
+    try:
+        data = json.loads(feedback_text)
+        if isinstance(data, dict) and 'feedback' in data:
+            feedback_text = data['feedback']
+    except (json.JSONDecodeError, TypeError):
+        pass
+
+    return render(request, 'student_ai_quiz_results.html', {
+        'student': student,
+        'quiz': quiz,
+        'questions_data': questions_data,
+        'score_percent': score_percent,
+        'feedback_text': feedback_text
+    })
+
+
+@login_required
+def student_ai_plan(request):
+    student = request.user
+    if student.role != 'student':
+        return redirect('login')
+
+    ai_plan = StudentAIPlan.objects.filter(student=student).first()
+
+    if request.method == "POST":
+        completed_quizzes = AIQuiz.objects.filter(student=student, is_completed=True)
+        total_quizzes = completed_quizzes.count()
+
+        total_score = sum(q.score or 0 for q in completed_quizzes)
+        average_score = round(total_score / total_quizzes) if total_quizzes > 0 else 0
+
+        quiz_history = []
+        for q in completed_quizzes.order_by('-created_at')[:10]:
+            quiz_history.append(f"- Mavzu: {q.title}, Daraja: {q.get_level_display()}, Natija: {q.score}%")
+
+        history_str = "\n".join(quiz_history) if quiz_history else "Hech qanday test topshirilmagan."
+
+        prompt = f"""
+        Siz o'quvchini dangasalikdan qutqarish va uni o'qishga majburlash uchun juda qattiqqo'l, o'ta jiddiy va to'g'ri so'zlovchi sun'iy intellekt repetitorsiz.
+        Maqsadingiz o'quvchining natijalaridan kelib chiqib, unga qattiq tanbeh berish va kelgusi 7 kun uchun aniq reja tuzib berish.
+
+        O'quvchi ma'lumotlari:
+        Ism: {student.first_name} {student.last_name}
+        Topshirgan AI testlari soni: {total_quizzes} ta
+        O'rtacha natijasi: {average_score}%
+        Oxirgi topshirgan testlari:
+        {history_str}
+
+        Qoidalar:
+        1. Agar o'rtacha balli past bo'lsa, dangasaligini qattiq tanqid qiling.
+        2. Agar natijalari yaxshi bo'lsa, bo'shashmaslikni, mukammallikka intilishni ayting.
+        3. Sharh va rejalar aniq o'zbek tilida, Markdown formatida shakllansin.
+        """
+
+        try:
+            # Reja tuzish uchun StudentPlanSchema Pydantic modelidan foydalanamiz
+            api_response = call_gemini_sdk(prompt, response_schema=StudentPlanSchema)
+            plan_data = json.loads(api_response)
+            advice = plan_data.get('advice', '')
+            plan = plan_data.get('plan', '')
+        except Exception as e:
+            print(f"--- Gemini SDK Plan Error: {str(e)} ---")
+            advice_mock, plan_mock = generate_mock_plan(student, total_quizzes, average_score)
+            advice = advice_mock
+            plan = plan_mock
+            messages.warning(request, "AI bilan bog'lanishda muammo yuz berdi. Namunaviy reja yuklandi.")
+
+        if ai_plan:
+            ai_plan.advice = advice
+            ai_plan.plan = plan
+            ai_plan.save()
+        else:
+            ai_plan = StudentAIPlan.objects.create(
+                student=student,
+                advice=advice,
+                plan=plan
+            )
+        messages.success(request, "AI maslahati va 7 kunlik reja muvaffaqiyatli yangilandi!")
+        return redirect('student_ai_plan')
+
+    return render(request, 'student_ai_plan.html', {
+        'student': student,
+        'ai_plan': ai_plan
+    })

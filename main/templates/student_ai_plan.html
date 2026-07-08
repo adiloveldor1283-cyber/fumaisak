@@ -1,0 +1,410 @@
+{% extends 'basestudent.html' %}
+
+{% block title %}AI Maslahatchi & Kelgusi Reja - Student Profili{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- 🧠 AI PLAN VA STRICK MENTOR INTERFEYSI STILLARI --- */
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        gap: 15px;
+    }
+    .content-title {
+        font-size: 24px;
+        font-weight: 800;
+        color: #ffffff;
+        border-left: 4px solid #00f2fe;
+        padding-left: 12px;
+        letter-spacing: -0.5px;
+    }
+    .content-title span {
+        background: linear-gradient(135deg, #ff0055, #ff5e00);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Toast Xabarlar */
+    .toast {
+        background: rgba(0, 255, 170, 0.02);
+        border: 1px solid rgba(0, 255, 170, 0.15);
+        padding: 14px 20px;
+        border-radius: 14px;
+        color: #00ffaa;
+        font-size: 13.5px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        backdrop-filter: blur(10px);
+    }
+    .toast-error {
+        background: rgba(255, 0, 85, 0.02);
+        border: 1px solid rgba(255, 0, 85, 0.15);
+        color: #ff0055;
+    }
+
+    /* Panels Grid Layout */
+    .left_right_panel {
+        display: flex;
+        flex: 1;
+        gap: 25px;
+        min-height: 0;
+    }
+
+    /* Crimson Strict Card (Tanbeh paneli) */
+    .scolding-card {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 0, 85, 0.15);
+        box-shadow: 0 40px 80px rgba(0,0,0,0.2);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        position: relative;
+    }
+    .scolding-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, #ff0055, #ff5e00);
+    }
+    .scolding-card::-webkit-scrollbar, .plan-card::-webkit-scrollbar {
+        width: 4px;
+    }
+    .scolding-card::-webkit-scrollbar-thumb {
+        background: rgba(255, 0, 85, 0.2);
+        border-radius: 4px;
+    }
+
+    .advisor-identity {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 25px;
+        border-bottom: 1px solid rgba(255, 0, 85, 0.1);
+        padding-bottom: 18px;
+    }
+    .advisor-avatar-box {
+        background: rgba(255, 0, 85, 0.1);
+        border: 1px solid rgba(255, 0, 85, 0.3);
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 15px rgba(255, 0, 85, 0.15);
+        flex-shrink: 0;
+    }
+    .advisor-avatar-box i {
+        font-size: 22px;
+        color: #ff0055;
+    }
+    .advisor-meta h3 {
+        font-size: 16px;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 4px;
+    }
+    .advisor-meta span {
+        font-size: 11px;
+        font-weight: 700;
+        color: #ff0055;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+
+    /* Plan Card (Firuza panel - o'ng tomon) */
+    .plan-card {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(0, 242, 254, 0.15);
+        box-shadow: 0 40px 80px rgba(0,0,0,0.2);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        position: relative;
+    }
+    .plan-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, #00f2fe, #4facfe);
+    }
+    .plan-card::-webkit-scrollbar-thumb {
+        background: rgba(0, 242, 254, 0.2);
+        border-radius: 4px;
+    }
+    .plan-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+        border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+        padding-bottom: 18px;
+    }
+    .plan-header i {
+        font-size: 20px;
+        color: #00f2fe;
+    }
+    .plan-header h3 {
+        font-size: 16px;
+        font-weight: 800;
+        color: #ffffff;
+    }
+
+    /* Ichki matn render stillari */
+    .scolding-text, .plan-text {
+        font-size: 14px;
+        line-height: 1.8;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    .scolding-text strong { color: #ff0055; font-weight: 700; }
+    .plan-text strong { color: #00f2fe; font-weight: 700; }
+    .scolding-text p, .plan-text p { margin-bottom: 14px; }
+    .scolding-text ul, .plan-text ul, .scolding-text ol, .plan-text ol { margin-left: 20px; margin-bottom: 14px; }
+    .scolding-text li, .plan-text li { margin-bottom: 6px; }
+    .scolding-text h3 { color: #ff3366; margin-top: 15px; margin-bottom: 10px; font-size: 15px; font-weight: 700; }
+    .plan-text h3 { color: #33d9ff; margin-top: 15px; margin-bottom: 10px; font-size: 15px; font-weight: 700; }
+
+    /* Regenerate Button */
+    .btn-regenerate {
+        background: linear-gradient(135deg, #ff0055, #ff5e00);
+        border: none;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 14px;
+        font-size: 13.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 10px 20px rgba(255, 0, 85, 0.15);
+        white-space: nowrap;
+    }
+    .btn-regenerate:hover {
+        box-shadow: 0 0 25px rgba(255, 0, 85, 0.4);
+        transform: translateY(-1px);
+    }
+
+    /* Empty State */
+    .empty-state-card {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 24px;
+        padding: 60px 30px;
+        text-align: center;
+        max-width: 600px;
+        margin: auto;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 40px 80px rgba(0,0,0,0.2);
+    }
+    .empty-state-card i {
+        font-size: 45px;
+        color: rgba(0, 242, 254, 0.2);
+        margin-bottom: 20px;
+        display: block;
+    }
+    .empty-state-card h3 {
+        font-size: 18px;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 12px;
+    }
+    .empty-state-card p {
+        font-size: 13.5px;
+        color: rgba(255,255,255,0.4);
+        line-height: 1.6;
+        margin-bottom: 25px;
+    }
+
+    /* Loading Screen overlay */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #070a12;
+        z-index: 9999;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(255, 0, 85, 0.1);
+        border-top-color: #ff0055;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        box-shadow: 0 0 20px rgba(255, 0, 85, 0.2);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: #ffffff; font-size: 15px; font-weight: 700; text-align: center; }
+    .loading-subtext { color: rgba(255, 255, 255, 0.4); font-size: 12px; max-width: 320px; text-align: center; line-height: 1.5; }
+
+    /* --- 📱 RESPONSIVE MEDIA QUERIES --- */
+    @media (max-width: 768px) {
+        .content-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .btn-regenerate {
+            width: 100%;
+            justify-content: center;
+        }
+        .left_right_panel {
+            flex-direction: column;
+            height: auto;
+            overflow: visible;
+        }
+        .scolding-card, .plan-card {
+            width: 100%;
+            height: auto;
+            overflow-y: visible !important;
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Yuklanish Oynasi -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">AI natijalaringizni tekshirmoqda...</div>
+        <div class="loading-subtext">AI tahlil qilib, shaxsiy taqvimingiz va tanbehlarni generatsiya qilmoqda. Iltimos kuting.</div>
+    </div>
+
+    <div class="content-header">
+        <h2 class="content-title">AI Maslahatchi & <span>Kelgusi Reja</span></h2>
+        {% if ai_plan %}
+            <form method="post" class="regenerateForm" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="btn-regenerate">
+                    <i class="fas fa-sync-alt"></i> Hisobotni Yangilash
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="toast {% if message.tags == 'error' %}toast-error{% endif %}">
+                <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if ai_plan %}
+        <!-- MULTI-PANEL AREA -->
+        <div class="left_right_panel">
+            <!-- Crimson Tanbeh Card (Chap panel) -->
+            <div class="scolding-card">
+                <div class="advisor-identity">
+                    <div class="advisor-avatar-box">
+                        <i class="fas fa-user-ninja"></i>
+                    </div>
+                    <div class="advisor-meta">
+                        <h3>Strict AI Mentor</h3>
+                        <span>Achchiq Haqiqat Tanbehi</span>
+                    </div>
+                </div>
+                <div id="rawAdviceText" style="display: none;">{{ ai_plan.advice }}</div>
+                <div class="scolding-text" id="renderedAdviceText"></div>
+            </div>
+
+            <!-- Plan Card (O'ng panel) -->
+            <div class="plan-card">
+                <div class="plan-header">
+                    <i class="fas fa-calendar-day"></i>
+                    <h3>7 Kunlik Maxsus Harakat Rejasi</h3>
+                </div>
+                <div id="rawPlanText" style="display: none;">{{ ai_plan.plan }}</div>
+                <div class="plan-text" id="renderedPlanText"></div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty state panel -->
+        <div class="empty-state-card">
+            <i class="fas fa-brain"></i>
+            <h3>Qattiqqo'l AI Repetitordan hisobot oling!</h3>
+            <p>AI barcha darslaringiz, topshiriqlar hamda testlardagi statistikangizni tahlil qilib, dangasalik darajangizga ko'ra xulosa chiqaradi va shaxsiy o'quv rejasini tuzadi.</p>
+            <form method="post" class="regenerateForm" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="btn-regenerate">
+                    <i class="fas fa-magic"></i> AI Tahlilni Ishga Tushirish
+                </button>
+            </form>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<!-- Markdown Parser integration -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // --- 📊 FORM SUBMIT WA OVERLAY TRIGGER ---
+        const regenerateForms = document.querySelectorAll('.regenerateForm');
+        const overlay = document.getElementById('loadingOverlay');
+
+        regenerateForms.forEach(form => {
+            form.addEventListener('submit', function() {
+                if (overlay) overlay.style.display = 'flex';
+            });
+        });
+
+        // --- 📝 MARKDOWN PARSER PROCESSING ---
+        // Render Advice
+        const rawAdviceEl = document.getElementById("rawAdviceText");
+        const renderedAdviceEl = document.getElementById("renderedAdviceText");
+        if (rawAdviceEl && renderedAdviceEl) {
+            const rawText = rawAdviceEl.textContent || "";
+            if (typeof marked !== "undefined" && typeof marked.parse === "function") {
+                renderedAdviceEl.innerHTML = marked.parse(rawText);
+            } else {
+                renderedAdviceEl.innerHTML = rawText.replace(/\n/g, "<br>");
+            }
+        }
+
+        // Render Plan
+        const rawPlanEl = document.getElementById("rawPlanText");
+        const renderedPlanEl = document.getElementById("renderedPlanText");
+        if (rawPlanEl && renderedPlanEl) {
+            const rawText = rawPlanEl.textContent || "";
+            if (typeof marked !== "undefined" && typeof marked.parse === "function") {
+                renderedPlanEl.innerHTML = marked.parse(rawText);
+            } else {
+                renderedPlanEl.innerHTML = rawText.replace(/\n/g, "<br>");
+            }
+        }
+    });
+</script>
+{% endblock %}

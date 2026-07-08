@@ -1,444 +1,159 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O'quvchilar ro'yhati</title>
-    <style>
-        * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+{% extends 'baseadmin.html' %}
+{% load static %}
 
-body {
-    font-family: sans-serif;
-    background-color: #111;
-    color: #ccc;
-}
+{% block title %}O'quvchilar ro'yhati{% endblock %}
 
-.headerr {
-    background-color: #2c5d77;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #fff;
-}
-
-.headerr h1 {
-    font-size: 20px;
-}
-
-.headerr nav a {
-    color: #9cd;
-    text-decoration: none;
-    margin: 0 5px;
-}
-
-.containerr {
-    display: flex;
-    height: calc(100vh - 50px);
-}
-
-/* ==== Sidebar (chap panel) ==== */
-.asidee {
-    width: 300px;
-    background-color: #1e1e1e;
-    padding: 15px;
-    border-right: 1px solid #333;
-}
-
-.menuu h3 {
-    color: #aef;
-    font-size: 12px;
-    margin: 10px 0 5px;
-}
-
-/* ==== Menu itemlar ==== */
-.itemm {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2px 0;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-}
-
-.itemm:hover {
-    background-color: #333; /* Hover bo‘lganda fon */
-}
-
-.itemm a {
-    text-decoration: none;
-    display: block;
-    padding: 10px 12px;
-}
-
-/* Chap tarafdagi link */
-.itemm .linkk {
-    color: #eee;
-    flex: 1;
-}
-
-/* O'ng tarafdagi + qo‘shish */
-.itemm .addd {
-    color: #7f7;
-    font-weight: bold;
-}
-
-/* Hoverdagi o‘zgarishlar (ixtiyoriy) */
-.itemm .linkk:hover {
-    color: #fff;
-}
-
-.itemm .addd:hover {
-    color: #9f9;
-}
-.main-main {
-    width: 100%;
-    padding: 20px 20px;
-    font-size: 12px;
-}
-.header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-    }
-
-    .header h2 {
-      font-size: 20px;
-      color: #fff;
-    }
-
-    .add-btn {
-      background-color: #333;
-      color: #9cd;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-    }
-
-    .add-btn:hover {
-      background-color: #444;
-    }
-
-    .search-bar {
-      margin: 20px 0 10px;
-      display: flex;
-      gap: 10px;
-    }
-
-    .search-input {
-      padding: 8px;
-      width: 300px;
-      background-color: #222;
-      border: 1px solid #444;
-      color: #ccc;
-    }
-
-    .search-btn {
-      padding: 8px 16px;
-      background-color: #333;
-      border: none;
-      color: #ccc;
-      cursor: pointer;
-    }
-
-    .actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-
-    }
-    .actions select {
-        background-color: #111;
-        border: 1px solid white;
-        padding: 5px;
-        color: white;
-    }
-    .table-wrapper {
-        max-height: 55vh;
-        overflow-y: auto;
-
-    }
-    .table-wrapper::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .table-wrapper::-webkit-scrollbar-thumb {
-        background-color: #3e3c3c;
-        border-radius: 3px;
-    }
-
-    .table-wrapper::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    .group-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .group-table thead th {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
-    .group-table th, .group-table td {
-      padding: 10px;
-      border-bottom: 1px solid #333;
-      text-align: left;
-    }
-
-    .group-table th {
-      background-color: #1c1c1c;
-      text-transform: uppercase;
-      font-size: 13px;
-    }
-
-    .group-table a {
-      color: #6cf;
-      text-decoration: none;
-    }
-
-    .group-table a:hover {
-      text-decoration: underline;
-    }
-
-    .footer-info {
-      margin-top: 10px;
-      font-style: italic;
-      color: #888;
-    }
-    .filter-bar {
-        margin-left: 20px;
-    }
-
-    .pdf-modal {
-        position: fixed;
-        z-index: 999;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.6);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-  .pdf-modal-content {
-    background: white;
-    padding: 20px 30px;
-    border-radius: 10px;
-    max-width: 400px;
-    width: 100%;
-    position: relative;
-  }
-
-  .pdf-close-btn {
-    position: absolute;
-    top: 10px;
-    right: 14px;
-    font-size: 24px;
-    cursor: pointer;
-    color: red;
-  }
-
-  .pdf-modal-content h3 {
-    margin-top: 0;
-    color: #1a2035;
-  }
-  .alert_alert {
-        position: fixed;
-        top: 20px;                /* Yuqoridan 10px */
-        left: 50%;                /* Gorizontal markaz */
-        transform: translateX(-50%); /* Haqiqiy markaz */
-        background-color: #4CAF50;  /* Yashil */
-        color: white;
-        padding: 12px 24px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.3);
-        z-index: 9999;
-        transition: opacity 0.5s ease;
-        opacity: 1;
-    }
-
-    /* Yashirib yuborish animatsiyasi */
-    .fade-out.hidden {
-        opacity: 0;
-        pointer-events: none;
-    }
-    </style>
-</head>
-<body>
-    <div class="headerr">
-        <h1>Admin</h1>
-        <nav>
-            O'quvchilarni malumotlarini yuklab olish: <button id="openPdfModal" class="btn btn-outline-primary">PDF Yuklash </button> /
-            <a href="{% url 'admin:index' %}">ADMIN</a> /
-            <a href="{% url 'admin_password' %}">Parolni almashtirish</a> /
-            <a href="{% url 'login' %}">Chiqish</a>
-        </nav>
-    </div>
-
-    <div class="containerr">
-        <div class="asidee">
-            <div class="menuu">
-                <h3>MENU</h3>
-                <div class="itemm">
-                    <a href="{% url 'all_groups_admin' %}" class="linkk">Guruhlar</a>
-                    <a href="{% url 'create_group_admin' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'students_list_admin' %}" class="linkk">O'quvchilar</a>
-                    <a href="{% url 'add_student' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'teachers_list_admin' %}" class="linkk">O'qituvchilar</a>
-                    <a href="{% url 'add_teacher' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'admin_assignment_list' %}" class="linkk">Topshiriqlar</a>
-                    <a href="{% url 'add_topshiriq' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'all_group_schedules' %}" class="linkk">Dars rejasi</a>
-                    <a href="{% url 'all_groups_admin' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'quiz_list' %}" class="linkk">Testlar</a>
-                    <a href="{% url 'add_quiz' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'question_list' %}" class="linkk">Savollar</a>
-                    <a href="{% url 'add_test_admin' %}" class="addd">+ qo'shish</a>
-                </div>
-                <div class="itemm">
-                    <a href="{% url 'group_payment_list' %}" class="linkk">Guruh to'lov</a>
-                </div>
-                <div class="itemm">
-                    <a href="{% url 'student_list' %}" class="linkk">Barcha to'lov</a>
-                </div>
-            </div>
-        </div>
-        <div id="pdfModal" class="pdf-modal" style="display: none;">
-          <div class="pdf-modal-content">
-            <span class="pdf-close-btn" id="closePdfModal">&times;</span>
-            <h3>PDF Yuklash</h3>
-            <form method="GET" action="{% url 'students_pdf' %}" target="_blank">
-              <label for="group_id">Guruhni tanlang:</label>
-              <select name="group_id" id="group_id" required>
+{% block content %}
+<!-- PDF MODAL OYNASI -->
+<div id="pdfModal" class="pdf-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 10, 18, 0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2005;">
+    <div class="pdf-modal-content" style="background: #0c101d; border: 1px solid rgba(0, 242, 254, 0.2); box-shadow: 0 0 30px rgba(0, 242, 254, 0.15); border-radius: 20px; max-width: 440px; width: 90%; padding: 30px; position: relative; line-height: 1.6;">
+        <span class="pdf-close-btn" id="closePdfModal" style="position: absolute; top: 15px; right: 20px; font-size: 20px; cursor: pointer; color: rgba(255, 255, 255, 0.4); transition: 0.2s;">✖</span>
+        <h3 style="font-size: 18px; font-weight: 800; color: #ffffff; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 10px;">PDF Yuklash</h3>
+        <form method="GET" action="{% url 'students_pdf' %}" target="_blank">
+            <label for="group_id" style="display: block; font-size: 12px; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px;">Guruhni tanlang:</label>
+            <select name="group_id" id="group_id" required style="width: 100%; padding: 12px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; margin-bottom: 20px;">
                 <option value="all">Barcha o‘quvchilar</option>
                 {% for group in groups %}
-                  <option value="{{ group.id }}">{{ group.name }}</option>
+                    <option value="{{ group.id }}">{{ group.name }}</option>
                 {% endfor %}
-              </select>
-              <br><br>
-              <button type="submit" class="btn btn-primary">Yuklash</button>
-            </form>
-          </div>
-        </div>
-
-        <form class="main-main" method="POST">
-            {% csrf_token %}
-            <div class="header">
-                <h2>O'quvchilar ro'yhati</h2>
-            </div>
-
-            <div class="search-bar">
-                <input type="text" class="search-input" id="search-lastname" placeholder="O'quvchilarni qidirish...">
-            </div>
-
-            <div class="actions">
-                <label for="action">Tanlash:</label>
-                <select id="action" name="action">
-                    <option value="">---------</option>
-                    <option value="delete">Tanlanganni o'chirish</option>
-                </select>
-                <button type="submit" class="search-btn">O'chirish</button>
-                <span id="selected-count">0 ta tanlandi</span>
-
-                <div class="filter-bar">
-                    <label for="status-filter">Faollik:</label>
-                    <select id="status-filter">
-                        <option value="">Hammasi</option>
-                        <option value="faol">Faol</option>
-                        <option value="bloklangan">Bloklangan</option>
-                    </select>
-                </div>
-
-            </div>
-
-            <div class="table-wrapper">
-                <table class="group-table">
-                    <thead>
-                    <tr>
-                        <th><input type="checkbox" id="check-all"></th>
-                        <th>LOGINI</th>
-                        <th>FAMILIYASI</th>
-                        <th>ISMI</th>
-                        <th>QO'SHILGAN VAQTI</th>
-                        <th>GURUHLARI</th>
-                        <th>FAOLLIGI</th>
-                        <th>O'TISH</th>
-                    </tr>
-                    </thead>
-                    <tbody id="group-body">
-                    {% for student in students %}
-                    <tr>
-                        <td><input type="checkbox" class="row-check" name="selected_users" value="{{ student.id }}"></td>
-                        <td>{{ student.username }}</td>
-                        <td>{{ student.last_name }}</td>
-                        <td>{{ student.first_name }}</td>
-                        <td>{{ student.joined_at|date:"d.m.Y H:i" }}</td>
-                        <td>
-                          {% if student.student_groups.all %}
-                            {% for group in student.student_groups.all %}
-                              {{ group.name }}{% if not forloop.last %}, {% endif %}
-                            {% endfor %}
-                          {% else %}
-                            Yo‘q
-                          {% endif %}
-                        </td>
-                        <td>
-                          {% if student.is_active %}
-                            <span class="status-text" data-status="faol" style="color: green;">Faol</span>
-                          {% else %}
-                            <span class="status-text" data-status="bloklangan" style="color: red;">Bloklangan</span>
-                          {% endif %}
-                        </td>
-                        <td><a href="{% url 'edit_student' student.id %}">O'tish</a></td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <p style="margin-left: 15px; margin-top: 8px">Jami o‘quvchilar soni: {{ total_students }} ta</p>
-            <p style="margin-left: 15px; margin-top: 8px">Faol talabalar soni: {{ active_students }} ta</p>
-            <p style="margin-left: 15px; margin-top: 8px">Bloklangan talabalar soni: {{ inactive_students }} ta</p>
-
-            {% for message in messages %}
-                {% if 'edit_user' in message.tags %}
-                    <div class="alert_alert fade-out">
-                    {{ message }}
-                    </div>
-                {% endif %}
-            {% endfor %}
-
+            </select>
+            <button type="submit" class="btn-pdf-submit" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.3s; text-transform: uppercase;"><i class="fas fa-download"></i> Yuklash</button>
         </form>
+    </div>
+</div>
 
+<form method="POST">
+    {% csrf_token %}
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px;">O'quvchilar ro'yhati</h2>
+        <div class="action-buttons-group" style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <button type="button" id="openPdfModal" class="btn-otish" style="display: inline-block; padding: 10px 20px; background: rgba(0, 255, 170, 0.05); border: 1px solid rgba(0, 255, 170, 0.2); color: #00ffaa; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 700; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-file-pdf"></i> PDF Yuklash</button>
+            <a href="{% url 'add_student' %}" class="btn-otish" style="display: inline-block; padding: 10px 20px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; border: none; font-weight: 800; text-decoration: none; border-radius: 10px; font-size: 13px; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-plus" style="margin-right: 6px;"></i> O'quvchi qo'shish</a>
+        </div>
     </div>
 
-    <script>
-    // 🟢 Hamma kerakli elementlar
+    <div class="actions-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
+        <div class="search-bar" style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+            <input type="text" class="search-input" id="search-lastname" placeholder="Familiya bo'yicha qidirish..." style="flex: 1; min-width: 200px; padding: 12px 18px; font-size: 14px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; background: rgba(255, 255, 255, 0.01); color: #ffffff; outline: none; transition: 0.3s;">
+        </div>
+
+        <div class="actions" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; font-size: 13.5px;">
+            <label for="action" style="font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Tanlash:</label>
+            <select id="action" name="action" style="padding: 10px 16px; font-size: 13.5px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; background: #0c101d; color: #ffffff; outline: none; cursor: pointer; transition: 0.3s;">
+                <option value="">---------</option>
+                <option value="delete">Tanlanganni o'chirish</option>
+            </select>
+            <button type="submit" class="btn-action-submit" style="padding: 10px 20px; background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.3); color: #ff0055; font-weight: 800; border-radius: 10px; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;">Bajarish</button>
+            <span id="selected-count" class="selected-badge" style="background: rgba(0, 242, 254, 0.1); color: #00f2fe; padding: 6px 12px; border-radius: 8px; font-weight: 700; border: 1px solid rgba(0, 242, 254, 0.2);">0 ta tanlandi</span>
+
+            <div class="filter-bar" style="display: flex; align-items: center; gap: 10px; margin-left: auto;">
+                <label for="status-filter" style="font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Faollik:</label>
+                <select id="status-filter" style="padding: 10px 16px; font-size: 13.5px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; background: #0c101d; color: #ffffff; outline: none; cursor: pointer; transition: 0.3s;">
+                    <option value="">Hammasi</option>
+                    <option value="faol">Faol</option>
+                    <option value="bloklangan">Bloklangan</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    {% if students %}
+    <div class="jadval-container" style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 12px; width: 100%; overflow-x: auto;">
+        <table class="group-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;"><input type="checkbox" id="check-all" style="accent-color: #00f2fe; width: 16px; height: 16px; cursor: pointer;"></th>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">LOGINI</th>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FAMILIYASI</th>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">ISMI</th>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">QO'SHILGAN VAQTI</th>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">GURUHLARI</th>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FAOLLIGI</th>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">O'TISH</th>
+                </tr>
+            </thead>
+            <tbody id="group-body">
+                {% for student in students %}
+                <tr>
+                    <td style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><input type="checkbox" class="row-check" name="selected_users" value="{{ student.id }}" style="accent-color: #00f2fe; width: 16px; height: 16px; cursor: pointer;"></td>
+                    <td data-label="LOGINI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: #4facfe;">{{ student.username }}</td>
+                    <td data-label="FAMILIYASI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ student.last_name }}</td>
+                    <td data-label="ISMI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ student.first_name }}</td>
+                    <td data-label="QO'SHILGAN VAQTI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ student.joined_at|date:"d.m.Y H:i" }}</td>
+                    <td data-label="GURUHLARI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                        {% if student.student_groups.all %}
+                            {% for group in student.student_groups.all %}
+                                <span style="background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; font-size: 12px; margin-right: 4px;">{{ group.name }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span style="color: rgba(255,255,255,0.3)">Yo‘q</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="FAOLLIGI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                        {% if student.is_active %}
+                            <span class="status-badge status-active" data-status="faol" style="padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(0, 255, 170, 0.1); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.2);">Faol</span>
+                        {% else %}
+                            <span class="status-badge status-blocked" data-status="bloklangan" style="padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(255, 0, 85, 0.1); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.2);">Bloklangan</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="O'TISH" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><a href="{% url 'edit_student' student.id %}" class="btn-otish" style="display: inline-block; padding: 10px 20px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 700; transition: 0.3s; text-align: center; cursor: pointer;">Tahrirlash</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Statistics Grid -->
+    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 25px;">
+        <div class="stats-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 16px; padding: 20px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: center;">
+            <i class="fas fa-graduation-cap" style="font-size: 24px; margin-bottom: 10px; color: #4facfe;"></i>
+            <h4 style="font-size: 12px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 5px; letter-spacing: 0.5px;">Jami O'quvchilar</h4>
+            <p style="font-size: 22px; font-weight: 800; color: #ffffff;">{{ total_students }} ta</p>
+        </div>
+        <div class="stats-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 16px; padding: 20px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: center;">
+            <i class="fas fa-user-check" style="font-size: 24px; margin-bottom: 10px; color: #00ffaa;"></i>
+            <h4 style="font-size: 12px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 5px; letter-spacing: 0.5px;">Faol O'quvchilar</h4>
+            <p style="font-size: 22px; font-weight: 800; color: #00ffaa;">{{ active_students }} ta</p>
+        </div>
+        <div class="stats-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 16px; padding: 20px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: center;">
+            <i class="fas fa-user-slash" style="font-size: 24px; margin-bottom: 10px; color: #ff0055;"></i>
+            <h4 style="font-size: 12px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 5px; letter-spacing: 0.5px;">Bloklanganlar</h4>
+            <p style="font-size: 22px; font-weight: 800; color: #ff0055;">{{ inactive_students }} ta</p>
+        </div>
+    </div>
+
+    {% else %}
+        <p style="color: rgba(255,255,255,0.4); font-style: italic; padding: 10px;">Hech qanday o‘quvchi topilmadi.</p>
+    {% endif %}
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // PDF Modal Logic
+    const modal = document.getElementById("pdfModal");
+    const openBtn = document.getElementById("openPdfModal");
+    const closeBtn = document.getElementById("closePdfModal");
+
+    if (openBtn) {
+        openBtn.addEventListener("click", () => {
+            modal.style.display = "flex";
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+            modal.style.display = "none";
+        });
+    }
+
+    window.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+
+    // Bulk action selection logic
     const searchInput = document.querySelector('.search-input');
     const statusFilter = document.getElementById('status-filter');
     const allCheck = document.getElementById('check-all');
@@ -446,77 +161,44 @@ body {
     const selectedCount = document.getElementById('selected-count');
     const rows = document.querySelectorAll('#group-body tr');
 
-    // 🔍 Qidiruv funksiyasi
-    searchInput.addEventListener('input', () => {
-        applyFilters();
-    });
-
-    // 🟦 Faollik bo‘yicha filter
-    statusFilter.addEventListener('change', () => {
-        applyFilters();
-    });
-
-    // ✅ Tanlanganlar sonini hisoblash
     function updateSelectedCount() {
         const selected = Array.from(rowChecks).filter(c => c.checked).length;
-        selectedCount.textContent = `${selected} ta tanlandi`;
+        if (selectedCount) selectedCount.textContent = `${selected} ta tanlandi`;
     }
 
-    // 🔘 Hammasini tanlash checkbox
-    allCheck.addEventListener('change', () => {
-        rowChecks.forEach(cb => cb.checked = allCheck.checked);
-        updateSelectedCount();
-    });
+    if (allCheck) {
+        allCheck.addEventListener('change', () => {
+            rowChecks.forEach(cb => {
+                if (cb.closest('tr').style.display !== 'none') {
+                    cb.checked = allCheck.checked;
+                }
+            });
+            updateSelectedCount();
+        });
+    }
 
     rowChecks.forEach(cb => {
         cb.addEventListener('change', updateSelectedCount);
     });
 
-    // 🧠 Bitta universal filter funksiyasi
     function applyFilters() {
-    const query = searchInput.value.toLowerCase();
-    const selectedStatus = statusFilter.value;
+        const query = searchInput.value.toLowerCase().trim();
+        const selectedStatus = statusFilter.value;
 
-    rows.forEach(row => {
-        const lastName = row.children[2].textContent.toLowerCase(); // familiya
-        const statusSpan = row.querySelector('.status-text');
-        const status = statusSpan ? statusSpan.getAttribute('data-status') : '';
+        rows.forEach(row => {
+            const lastName = row.children[2].textContent.toLowerCase(); // Familiya column
+            const statusSpan = row.querySelector('.status-badge');
+            const status = statusSpan ? statusSpan.getAttribute('data-status') : '';
 
-        // Faqat familiya boshidan qidirish
-        const matchesQuery = lastName.startsWith(query);
-        const matchesStatus = !selectedStatus || status === selectedStatus;
+            const matchesQuery = lastName.includes(query);
+            const matchesStatus = !selectedStatus || status === selectedStatus;
 
-        // Faqat mos kelganlar ko‘rsatiladi
-        row.style.display = (matchesQuery && matchesStatus) ? '' : 'none';
-    });
-}
-document.addEventListener("DOMContentLoaded", function () {
-    const openBtn = document.getElementById("openPdfModal");
-    const modal = document.getElementById("pdfModal");
-    const closeBtn = document.getElementById("closePdfModal");
-
-    openBtn.addEventListener("click", () => {
-      modal.style.display = "flex";
-    });
-
-    closeBtn.addEventListener("click", () => {
-      modal.style.display = "none";
-    });
-
-    window.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        modal.style.display = "none";
-      }
-    });
-  });
-    document.addEventListener("DOMContentLoaded", function () {
-        const alerts = document.querySelectorAll(".fade-out");
-        alerts.forEach(function (alert) {
-            setTimeout(function () {
-                alert.classList.add("hidden");
-            }, 3000); // 3 sekund
+            row.style.display = (matchesQuery && matchesStatus) ? '' : 'none';
         });
-    });
+        updateSelectedCount();
+    }
+
+    if (searchInput) searchInput.addEventListener('input', applyFilters);
+    if (statusFilter) statusFilter.addEventListener('change', applyFilters);
 </script>
-</body>
-</html>
+{% endblock %}

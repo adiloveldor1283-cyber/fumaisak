@@ -1,326 +1,103 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guruhlar</title>
-    <style>
-        * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+{% extends 'baseadmin.html' %}
+{% load static %}
 
-    body {
-        font-family: sans-serif;
-        background-color: #111;
-        color: #ccc;
-    }
+{% block title %}Dars jadvali{% endblock %}
 
-    .headerr {
-        background-color: #2c5d77;
-        padding: 10px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: #fff;
-    }
-    .headerr h1 {
-        font-size: 20px;
-    }
-    .headerr nav a {
-        color: #9cd;
-        text-decoration: none;
-        margin: 0 5px;
-    }
-    .containerr {
-        display: flex;
-        height: calc(100vh - 50px);
-    }
-    .asidee {
-        width: 300px;
-        background-color: #1e1e1e;
-        padding: 15px;
-        border-right: 1px solid #333;
-    }
-    .menuu h3 {
-        color: #aef;
-        font-size: 12px;
-        margin: 10px 0 5px;
-    }
-    .itemm {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 2px 0;
-        border-radius: 4px;
-        transition: background-color 0.2s ease;
-    }
-    .itemm:hover {
-        background-color: #333;
-    }
-    .itemm a {
-        text-decoration: none;
-        display: block;
-        padding: 10px 12px;
-    }
-    .itemm .linkk {
-        color: #eee;
-        flex: 1;
-    }
-    .itemm .addd {
-        color: #7f7;
-        font-weight: bold;
-    }
-    .itemm .linkk:hover {
-        color: #fff;
-    }
-    .itemm .addd:hover {
-        color: #9f9;
-    }
-    .main-main {
-        width: 100%;
-        padding: 20px 20px;
-        font-size: 12px;
-        overflow-y: auto;
-    }
-    h2 {
-        color: white;
-        margin-bottom: 10px;
-    }
-    h4 {
-        background-color: #2c5d77;
-        color: white;
-        padding: 10px 15px;
-        margin-top: 20px;
-        font-size: 14px;
-    }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        thead th {
-            background-color: #333;
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #333;
-        }
-        tbody td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #333;
-        }
-        p {
-            text-align: center;
-            color: #777;
-        }
-        /* Modal fon (overlay) */
-        .modal-overlay {
-            display: none;
-              position: fixed;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              background-color: rgba(0, 0, 0, 0.5);
-              z-index: 1000;
-        }
+{% block content %}
+<h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 25px;">Barcha guruhlarning dars jadvali</h2>
 
-        /* Modal oynaning o‘zi */
-        .modal-content {
-          background: white;
-          width: 90%;
-          max-width: 400px;
-          margin: 100px auto;
-          padding: 30px;
-          border-radius: 10px;
-          animation: fadeIn 0.3s ease-in-out;
-        }
-
-        /* Modal tugmalar */
-        .modal-buttons {
-          display: flex;
-          justify-content: space-between;
-          margin-top: 20px;
-        }
-
-        .modal-buttons button {
-          padding: 8px 16px;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-        }
-
-        .modal-buttons .danger {
-          background-color: #dc3545;
-          color: white;
-        }
-
-.modal-buttons button:hover {
-  opacity: 0.9;
-}
-
-/* Chiroyli chiqish animatsiyasi */
-@keyframes fadeIn {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-    </style>
-</head>
-<body>
-    <div class="headerr">
-        <h1>Admin</h1>
-        <nav>
-            <a href="{% url 'admin:index' %}">ADMIN</a> /
-            <a href="{% url 'admin_password' %}">Parolni almashtirish</a> /
-            <a href="{% url 'login' %}">Chiqish</a>
-        </nav>
+{% for group, schedules in group_schedules.items %}
+    <h4 class="guruh-nomi" style="font-size: 15px; font-weight: 800; color: #00f2fe; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-graduation-cap" style="font-size: 14px;"></i> {{ group.name }}</h4>
+    <div class="jadval-container" style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 12px; width: 100%; overflow-x: auto; margin-bottom: 25px;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Hafta kuni</th>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Boshlanish</th>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Tugash</th>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">O'chirish</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sched in schedules %}
+                    <tr data-day="{{ sched.day }}">
+                        <td data-label="Hafta kuni" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ sched.get_day_display }}</td>
+                        <td data-label="Boshlanish" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: #00ffaa;">{{ sched.start_time|time:"H:i" }}</td>
+                        <td data-label="Tugash" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: #ff0055;">{{ sched.end_time|time:"H:i" }}</td>
+                        <td data-label="O'chirish" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                            <button class="btn-delete" onclick="openDeleteModal('{{ group.id }}', '{{ sched.day }}', '{{ sched.get_day_display }}', '{{ sched.start_time|time:"H:i" }}', '{{ sched.end_time|time:"H:i" }}')" style="background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.3); color: #ff0055; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; transition: 0.3s; display: inline-block;">
+                                <i class="fas fa-trash-alt"></i> O'chirish
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+{% empty %}
+    <p style="color: rgba(255,255,255,0.4); font-style: italic; text-align: center; padding: 30px;">Jadval mavjud emas.</p>
+{% endfor %}
 
-    <div class="containerr">
-        <div class="asidee">
-            <div class="menuu">
-                <h3>MENU</h3>
-                <div class="itemm">
-                    <a href="{% url 'all_groups_admin' %}" class="linkk">Guruhlar</a>
-                    <a href="{% url 'create_group_admin' %}" class="addd">+ qo'shish</a>
-                </div>
+<!-- Custom Delete Modal (Dastlab ko‘rinmas) -->
+<div id="customModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 10, 18, 0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2005;">
+    <div class="modal-content" style="background: #0c101d; border: 1px solid rgba(0, 242, 254, 0.2); box-shadow: 0 0 30px rgba(0, 242, 254, 0.15); border-radius: 20px; max-width: 440px; width: 90%; padding: 30px; position: relative; line-height: 1.6;">
+        <h3 style="font-size: 18px; font-weight: 800; color: #ffffff; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 10px;">Dars jadvalini o‘chirmoqchimisiz?</h3>
+        <ul style="list-style: none; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 14px; margin-bottom: 20px; font-size: 13.5px;">
+            <li style="margin-bottom: 8px;"><strong>Hafta kuni:</strong> <span id="modalDayName" style="color: #ffffff; font-weight: 700;"></span></li>
+            <li style="margin-bottom: 8px;"><strong>Boshlanish:</strong> <span id="modalStartTime" style="color: #00ffaa; font-family: monospace; font-weight: 700;"></span></li>
+            <li style="margin-bottom: 8px;"><strong>Tugash:</strong> <span id="modalEndTime" style="color: #ff0055; font-family: monospace; font-weight: 700;"></span></li>
+        </ul>
+        <form method="post" action="{% url 'delete_schedule' %}">
+            {% csrf_token %}
+            <input type="hidden" name="group_id" id="modalGroupId">
+            <input type="hidden" name="day" id="modalDay">
+            <input type="hidden" name="start_time" id="modalStartTimeInput">
 
-                <div class="itemm">
-                    <a href="{% url 'students_list_admin' %}" class="linkk">O'quvchilar</a>
-                    <a href="{% url 'add_student' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'teachers_list_admin' %}" class="linkk">O'qituvchilar</a>
-                    <a href="{% url 'add_teacher' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'admin_assignment_list' %}" class="linkk">Topshiriqlar</a>
-                    <a href="{% url 'add_topshiriq' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'all_group_schedules' %}" class="linkk">Dars rejasi</a>
-                    <a href="{% url 'all_groups_admin' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'quiz_list' %}" class="linkk">Testlar</a>
-                    <a href="{% url 'add_quiz' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'question_list' %}" class="linkk">Savollar</a>
-                    <a href="{% url 'add_test_admin' %}" class="addd">+ qo'shish</a>
-                </div>
-                <div class="itemm">
-                    <a href="{% url 'group_payment_list' %}" class="linkk">Guruh to'lov</a>
-                </div>
-                <div class="itemm">
-                    <a href="{% url 'student_list' %}" class="linkk">Barcha to'lov</a>
-                </div>
+            <div class="modal-buttons" style="display: flex; gap: 12px; justify-content: space-between;">
+                <button type="button" class="btn-modal-cancel" onclick="closeModal()" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ffffff; border-radius: 12px; font-weight: 800; font-size: 13.5px; cursor: pointer; transition: 0.3s;">Bekor qilish</button>
+                <button type="submit" class="btn-modal-delete" style="flex: 1; padding: 12px; background: #ff0055; border: none; color: #ffffff; border-radius: 12px; font-weight: 800; font-size: 13.5px; cursor: pointer; transition: 0.3s;">O'chirish</button>
             </div>
-        </div>
-
-        <div class="main-main">
-            <h2>Barcha guruhlarning dars jadvali</h2>
-
-            {% for group, schedules in group_schedules.items %}
-                <h4>{{ group.name }}</h4>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Hafta kuni</th>
-                            <th>Boshlanish</th>
-                            <th>Tugash</th>
-                            <th>O'chirish</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for sched in schedules %}
-                            <tr data-day="{{ sched.day }}">
-                                <td>{{ sched.get_day_display }}</td>
-                                <td>{{ sched.start_time|time:"H:i" }}</td>
-                                <td>{{ sched.end_time|time:"H:i" }}</td>
-                                <td>
-                                    <button onclick="openDeleteModal('{{ group.id }}', '{{ sched.day }}', '{{ sched.get_day_display }}', '{{ sched.start_time|time:"H:i" }}', '{{ sched.end_time|time:"H:i" }}')">
-                                      O'chirish
-                                    </button>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% empty %}
-                <p>Jadval mavjud emas.</p>
-            {% endfor %}
-
-        </div>
-
-        <!-- Modal (Dastlab ko‘rinmas) -->
-        <div id="customModal" class="modal-overlay">
-            <div class="modal-content">
-                <h3 style="color: #333; margin-bottom: 5px">Quyidagi darsni o‘chirmoqchimisiz?</h3>
-                <ul>
-                    <li style="color: #333; margin-bottom: 5px" ><strong>Hafta kuni:</strong> <span id="modalDayName"></span></li>
-                    <li style="color: #333; margin-bottom: 5px" ><strong>Boshlanish:</strong> <span id="modalStartTime"></span></li>
-                    <li style="color: #333; margin-bottom: 5px" ><strong>Tugash:</strong> <span id="modalEndTime"></span></li>
-                </ul>
-                <form method="post" action="{% url 'delete_schedule' %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="group_id" id="modalGroupId">
-                    <input type="hidden" name="day" id="modalDay">
-                    <input type="hidden" name="start_time" id="modalStartTimeInput">
-
-                    <div class="modal-buttons">
-                      <button type="button" onclick="closeModal()">Bekor qilish</button>
-                      <button type="submit" class="danger">O'chirish</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        </form>
     </div>
-    <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+</div>
+{% endblock %}
 
-    document.querySelectorAll("table").forEach(table => {
-        const tbody = table.querySelector("tbody");
-        const rows = Array.from(tbody.querySelectorAll("tr"));
+{% block extra_js %}
+<script>
+    // Day sorting logic
+    document.addEventListener("DOMContentLoaded", function () {
+        const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
-        rows.sort((a, b) => {
-            const dayA = a.getAttribute("data-day");
-            const dayB = b.getAttribute("data-day");
-            return dayOrder.indexOf(dayA) - dayOrder.indexOf(dayB);
+        document.querySelectorAll("table").forEach(table => {
+            const tbody = table.querySelector("tbody");
+            if (tbody) {
+                const rows = Array.from(tbody.querySelectorAll("tr"));
+
+                rows.sort((a, b) => {
+                    const dayA = a.getAttribute("data-day");
+                    const dayB = b.getAttribute("data-day");
+                    return dayOrder.indexOf(dayA) - dayOrder.indexOf(dayB);
+                });
+
+                rows.forEach(row => tbody.appendChild(row));
+            }
         });
-
-        // Yangi tartiblangan qatorlarni tbody'ga qayta qo'shamiz
-        rows.forEach(row => tbody.appendChild(row));
     });
-});
 
-function openDeleteModal(groupId, day, dayName, startTime, endTime) {
-    document.getElementById('modalGroupId').value = groupId;
-    document.getElementById('modalDay').value = day;
-    document.getElementById('modalStartTimeInput').value = startTime;
+    function openDeleteModal(groupId, day, dayName, startTime, endTime) {
+        document.getElementById('modalGroupId').value = groupId;
+        document.getElementById('modalDay').value = day;
+        document.getElementById('modalStartTimeInput').value = startTime;
 
-    document.getElementById('modalDayName').innerText = dayName;
-    document.getElementById('modalStartTime').innerText = startTime;
-    document.getElementById('modalEndTime').innerText = endTime;
+        document.getElementById('modalDayName').innerText = dayName;
+        document.getElementById('modalStartTime').innerText = startTime;
+        document.getElementById('modalEndTime').innerText = endTime;
 
-    document.getElementById('customModal').style.display = 'block';
-  }
+        document.getElementById('customModal').style.display = 'flex';
+    }
 
-  function closeModal() {
-    document.getElementById('customModal').style.display = 'none';
-  }
+    function closeModal() {
+        document.getElementById('customModal').style.display = 'none';
+    }
 </script>
-
-
-</body>
-</html>
+{% endblock %}

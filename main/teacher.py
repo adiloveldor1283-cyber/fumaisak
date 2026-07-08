@@ -527,7 +527,7 @@ def teacher_deadline(request):
                     'error': "Topshiriq muddati kamida 3 kun keyingi sana bo‘lishi kerak."
                 })
 
-            group = get_object_or_404(Group, id=group_id)
+            group = get_object_or_404(Group, id=group_id, teachers=teacher)
             Assignment.objects.create(
                 title=title,
                 teacher=teacher,
@@ -573,7 +573,7 @@ def edit_assignment(request, assignment_id):
 
     if new_group_id and str(assignment.group.id) != str(new_group_id):
         try:
-            new_group = Group.objects.get(id=new_group_id)
+            new_group = Group.objects.get(id=new_group_id, teachers=teacher)
             assignment.group = new_group
         except Group.DoesNotExist:
             return HttpResponseBadRequest("Guruh topilmadi.")
@@ -611,8 +611,9 @@ def submit_attendance(request, group_id):
     today = timezone.localdate()
     now_time = timezone.localtime().time()
 
-    # Bugungi kun nomi: 'monday', 'tuesday', ...
-    today_day = timezone.localtime().strftime('%A').lower()
+    # Bugungi kun nomi: 'monday', 'tuesday', ... (weekday() orqali locale-independent formatda)
+    days_map = {0: 'monday', 1: 'tuesday', 2: 'wednesday', 3: 'thursday', 4: 'friday', 5: 'saturday', 6: 'sunday'}
+    today_day = days_map[timezone.localtime().weekday()]
 
     # Jadvaldan hozirgi dars vaqtini tekshiramiz
     schedule = Schedule.objects.filter(group=group, day=today_day).first()

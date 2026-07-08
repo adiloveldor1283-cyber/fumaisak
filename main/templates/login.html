@@ -1,186 +1,435 @@
 {% load static %}
-<html lang="en">
+<html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FUMA ISAK</title>
-    <link rel="icon" type="image/png" href="#">
-    <link rel="stylesheet" type="text/css" href="#">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: sans-serif;
-        }
-        .container {
-            width: 100%;
-            height: 100vh;
-            background-image: linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5));
-            background-repeat: no-repeat;
-            background-size: 750px 600px;
-            background-position: 70px;
-            background-color: #e9eff2;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FUMA ISAK — Tizimga kirish</title>
 
-        }
-        .register {
-            width: 350px;
-            height: 480px;
-            background: #153c68fd;
-            color: #fff;
-            position: absolute;
-            top: 50%;
-            left: 80%;
-            transform: translate(-50%, -50%);
-            border-radius: 10px;
-            padding: 55px 35px;
-        }
+  <!-- Google Fonts va FontAwesome Ikonkalar -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-        h1 {
-            text-align: center;
-            padding: 0 0 20px;
-            font-size: 30px;
-            margin-bottom: 50px;
-        }
-        label {
-            font-weight: bold;
-        }
-        .register input {
-            width: 100%;
-            margin-bottom: 30px;
-        }
-        .register input[type="text"],
-        input[type="password"] {
-            border: none;
-            outline: none;
-            background: transparent;
-            border-bottom: 1px solid #fff;
-            color: #fff;
-            height: 30px;
-            font-size: 15px;
-        }
-        .register input[type="submit"] {
-            outline: none;
-            height: 45px;
-            border-radius: 25px;
-            background-color: transparent;
-            border: 2px solid rgb(241, 245, 245);
-            color: #fff;
-            font-size: 20px;
-            transition: .5s;
-        }
-        .register input[type="submit"]:hover {
-            cursor: pointer;
-            background-color: rgb(211, 232, 239);
-            color: black;
-        }
-        .container {
-            background-image: url("{% static 'imgs/images_9.webp' %}");
-        }
-        @media (max-width: 768px){
-            .container {
-                background-image: none;
-                background-color: white;
-            }
-        }
-        @media (max-width: 768px) {
-            html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
+  {% if static_files_exist %}
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+  {% endif %}
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-        .container {
-            height: 100%;
-            width: 100%;
-            background-image: none;
-            background-color: white;
-        }
+    body {
+      background-color: #070a12;
+      color: #ffffff;
+      height: 100vh;
+      overflow: hidden; /* Desktopda umumiy skrol o'chiq turadi */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
 
-        .register {
-            width: 100%;
-            height: 100%;
-            padding: 80px 35px;
-            box-sizing: border-box;
-            position: relative;
-            transform: none;
-            left: 0;
-            top: 0;
-            border-radius: 0;
-        }
+    /* Cyberpunk Orqa Fon Chiziqlari */
+    .cyber-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Cpath d='M0,150 Q200,80 500,200 T1000,80 T1500,250' fill='none' stroke='%2300f2fe' stroke-width='3'/%3E%3C/svg%3E");
+      background-size: cover;
+    }
 
+    /* Fon uchun neon nurlar */
+    .blur-glow {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(0, 242, 254, 0.08) 0%, rgba(79, 172, 254, 0) 70%);
+      top: -10%;
+      left: -10%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .blur-glow.right {
+      top: 60%;
+      left: 70%;
+      background: radial-gradient(circle, rgba(255, 0, 85, 0.05) 0%, rgba(255, 0, 85, 0) 70%);
+    }
 
-            .register input {
-                margin-bottom: 25px;
-            }
-        }
-        .password-container {
-            position: relative;
-            width: 100%;
-        }
-        .password-container input[type="password"],
-        .password-container input[type="text"] {
-            width: 100%;
-            padding-right: 30px;
-        }
-        .toggle-password {
-            position: absolute;
-            right: 10px;
-            top: 24%;
-            transform: translateY(-50%);
-            cursor: pointer;
-        }
-        .custom-alert {
-            text-align: center;
-            font-size: 16px;
-            padding: 10px;
-            margin: 10px auto;
-            font-weight: bold;
-            width: 80%;
-        }
-        .alert-danger {
-            color: #dc3545;
-        }
+    /* Ikki qismli asosiy konteyner */
+    .login-wrapper {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
 
-    </style>
+    /* 🎨 CHAP TOMON — PROFESSIONAL KIBER VIZUAL BLOK */
+    .login-visual {
+      flex: 1.2;
+      background: radial-gradient(circle at 20% 30%, #0d1527 0%, #070a12 100%);
+      border-right: 1px solid rgba(255, 255, 255, 0.03);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px;
+      position: relative;
+    }
+
+    /* Geometrik texnologik to'r foni */
+    .login-visual::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.15;
+      background-image: linear-gradient(rgba(0, 242, 254, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 254, 0.1) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(circle at 40% 50%, black, transparent 70%);
+      -webkit-mask-image: radial-gradient(circle at 40% 50%, black, transparent 70%);
+    }
+
+    .visual-brand {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .visual-title {
+      font-size: 44px;
+      font-weight: 800;
+      line-height: 1.2;
+      color: #ffffff;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+    .visual-title span {
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .visual-text {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.4);
+      line-height: 1.6;
+      max-width: 480px;
+    }
+
+    /* 🔐 O'NG TOMON — GLASSMORPHISM FORMA */
+    .login-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: rgba(11, 15, 25, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .register {
+      width: 100%;
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-radius: 24px;
+      padding: 45px 35px;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      text-align: left;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle-login {
+      font-size: 13.5px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 35px;
+    }
+
+    /* Formalar va Kiritish Maydoni */
+    .form-group {
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 8px;
+      margin-left: 2px;
+    }
+
+    .register input[type="text"],
+    .register input[type="password"] {
+      width: 100%;
+      height: 48px;
+      padding: 0 16px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      outline: none;
+      color: #ffffff;
+      font-size: 14.5px;
+      transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .register input[type="text"]:focus,
+    .register input[type="password"]:focus {
+      border-color: #00f2fe;
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.15);
+    }
+
+    /* Parol Konteyneri va Ko'rish Ko'rsatkichi */
+    .password-container {
+      position: relative;
+      width: 100%;
+    }
+    .password-container input {
+      padding-right: 50px !important;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      user-select: none;
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.4);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: 0.2s;
+    }
+    .toggle-password:hover {
+      color: #00f2fe;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Premium Kiber-Tugma */
+    .register input[type="submit"] {
+      width: 100%;
+      height: 48px;
+      margin-top: 15px;
+      border: none;
+      outline: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      color: #070a12;
+      font-size: 14.5px;
+      font-weight: 800;
+      text-uppercase: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 5px 20px rgba(0, 242, 254, 0.25);
+    }
+
+    .register input[type="submit"]:hover {
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.45);
+      transform: translateY(-1px);
+    }
+
+    /* Tizim Bildirishnomalari (Alerts) */
+    .custom-alert {
+      font-size: 13px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      line-height: 1.5;
+      width: 100%;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .alert-danger {
+      background: rgba(255, 0, 85, 0.04);
+      color: #ff808b;
+      border: 1px solid rgba(255, 0, 85, 0.15);
+    }
+
+    .alert-success {
+      background: rgba(0, 255, 170, 0.04);
+      color: #00ffaa;
+      border: 1px solid rgba(0, 255, 170, 0.15);
+    }
+
+    /* --- 📱 TELEFON EKRANLARI REJIMI (MUKAMMAL MOSLASHUVCHANLIK) --- */
+    @media (max-width: 768px) {
+      body {
+        overflow-y: auto; /* Klaviatura ochilganda skrol bo'lishini ta'minlash */
+        height: auto;
+        min-height: 100vh;
+        padding: 20px 0;
+        display: block; /* Markaziy qotish yechiladi */
+      }
+
+      .login-wrapper {
+        height: auto;
+        min-height: 100vh;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .login-visual {
+        display: none; /* Mobilda chap tomondagi vizual blok butkul yashirinadi */
+      }
+
+      .login-container {
+        padding: 15px;
+        background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        width: 100%;
+      }
+
+      .register {
+        max-width: 100%;
+        margin: auto;
+        padding: 35px 20px; /* Ichki padding zichlashtiriladi */
+        border-radius: 20px;
+        background: rgba(11, 15, 25, 0.5); /* Mobilda biroz quyuqroq oyna foni */
+        border-color: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .subtitle-login {
+        margin-bottom: 25px;
+        font-size: 13px;
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      .register input[type="text"],
+      .register input[type="password"] {
+        height: 45px;
+        font-size: 14px;
+      }
+
+      .register input[type="submit"] {
+        height: 45px;
+        font-size: 13.5px;
+        margin-top: 5px;
+      }
+    }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <div class="register">
-            <h1>Tizimga kirish</h1>
-            {% for message in messages %}
-                {% if 'login_message' in message.tags or 'admin_password_login' in message.tags %}
-                    <div class="alert alert-danger custom-alert">
-                    {{ message }}
-                    </div>
-                {% endif %}
-            {% endfor %}
 
-            <form method="post">
-                {% csrf_token %}
-                <label>Login
-                    <input type="text" name="username" placeholder="Login" required>
-                </label>
-                <label>Parol</label>
-                <div class="password-container">
-                    <label for="password"></label><input type="password" name="password" id="password" placeholder="Parol" required>
-                    <span class="toggle-password" onclick="togglePassword()"></span>
-                </div>
-                <input type="submit" value="Yuborish">
-            </form>
-        </div>
+<body>
+  <div class="cyber-bg"></div>
+  <div class="blur-glow"></div>
+  <div class="blur-glow right"></div>
+
+  <div class="login-wrapper">
+
+    <!-- 🎨 CHAP TOMON: BRAND VA VIZUAL EFFEKT MATRIX -->
+    <div class="login-visual">
+      <div class="visual-brand">⚡ FUMA<span>ISAK</span></div>
+      <h2 class="visual-title">Kelajak ta'limi va <span>intellektual</span> boshqaruv tizimi</h2>
+      <p class="visual-text">Onlayn dars rejalari, imtihon topshirish modullari va guruhlar mukammalligi ekotizimiga xush kelibsiz. Davom etish uchun shaxsiy profilingizga kiring.</p>
     </div>
 
-    <script>
-        function togglePassword() {
-            const passwordField = document.getElementById("password");
-            const passwordFieldType = passwordField.getAttribute("type");
-            if (passwordFieldType === "password") {
-                passwordField.setAttribute("type", "text");
-            } else {
-                passwordField.setAttribute("type", "password");
-            }
-        }
-    </script>
+    <!-- 🔐 O'NG TOMON: PREMIUM AVTORIZATSIYA FORMASI -->
+    <div class="login-container">
+      <div class="register">
+        <h1>Tizimga kiring</h1>
+        <p class="subtitle-login">Davom etish uchun hisob ma'lumotlarini kiriting</p>
+
+        <!-- DJANGO TIZIM XABARLARI -->
+        {% if messages %}
+          {% for message in messages %}
+            <div class="custom-alert {% if message.tags %}{% if 'error' in message.tags or 'danger' in message.tags or 'login_message' in message.tags or 'admin_password_login' in message.tags %}alert-danger{% else %}alert-success{% endif %}{% else %}alert-danger{% endif %}">
+              <i class="fas {% if 'error' in message.tags or 'danger' in message.tags %}fa-times-circle{% else %}fa-check-circle{% endif %}"></i>
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <!-- FORM INPUTS -->
+        <form method="post" action="">
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label for="username">Foydalanuvchi logini</label>
+            <input id="username" type="text" name="username" placeholder="Login nomini yozing" required autocomplete="username" />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Maxfiy parol</label>
+            <div class="password-container">
+              <input id="password" type="password" name="password" placeholder="Parolingizni kiriting" required autocomplete="current-password" />
+              <span id="togglePw" class="toggle-password" onclick="togglePassword()" aria-label="Parolni ko‘rsatish/yashirish" title="Parolni ko‘rsatish/yashirish">
+                <i class="far fa-eye" id="eyeIcon"></i>
+              </span>
+            </div>
+          </div>
+
+          <input type="submit" value="Tizimga kirish" />
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SCRIPT LOGIKASI -->
+  <script>
+    function togglePassword() {
+      const passwordField = document.getElementById("password");
+      const eyeIcon = document.getElementById("eyeIcon");
+
+      if (passwordField.type === "password") {
+        passwordField.type = "text";
+        eyeIcon.classList.remove("fa-eye");
+        eyeIcon.classList.add("fa-eye-slash");
+        eyeIcon.style.color = "#00f2fe";
+      } else {
+        passwordField.type = "password";
+        eyeIcon.classList.remove("fa-eye-slash");
+        eyeIcon.classList.add("fa-eye");
+        eyeIcon.style.color = "rgba(255, 255, 255, 0.4)";
+      }
+    }
+  </script>
 </body>
 </html>

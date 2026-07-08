@@ -1,9 +1,9 @@
-{% load custom_filters %}
+{% load static %}
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dars Jadvali</title>
+    <title>{% block title %}Boshqaruv paneli{% endblock %}</title>
     <!-- Google Fonts va FontAwesome Ikonkalar -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -45,7 +45,7 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             color: white;
-            width: 250px;
+            width: 260px;
             transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             flex-direction: column;
@@ -70,7 +70,8 @@
             border: 2px solid rgba(0, 242, 254, 0.2);
         }
         .toggle-btn {
-            margin-left: 30px;
+            margin-left: auto;
+            margin-right: 15px;
             background: none;
             border: none;
             color: white;
@@ -83,9 +84,9 @@
             color: #00f2fe;
         }
         .brand {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
-            margin-left: 15px;
+            margin-left: 12px;
             background: linear-gradient(135deg, #00f2fe, #4facfe);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -94,7 +95,8 @@
             display: none;
         }
         .sidebar.collapsed .toggle-btn {
-            display: none;
+            margin-left: 10px;
+            margin-right: 0;
         }
         .user-info {
             display: flex;
@@ -146,11 +148,26 @@
         .sidebar.collapsed .user-info span {
             display: none;
         }
-        .sidebar ul {
-            margin-top: 10px;
-            list-style: none;
-            padding: 8px;
+        .sidebar .menu-container {
             flex-grow: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        /* Guruhlangan menyu sarlavhalari */
+        .sidebar .menu-category {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: rgba(0, 242, 254, 0.4);
+            padding: 14px 16px 6px 16px;
+            letter-spacing: 1.5px;
+            display: block;
+        }
+        .sidebar.collapsed .menu-category {
+            display: none;
+        }
+        .sidebar ul {
+            list-style: none;
         }
         .sidebar ul li {
             display: flex;
@@ -158,7 +175,7 @@
             border-radius: 12px;
             transition: 0.3s;
             cursor: pointer;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .sidebar ul li:hover {
             background: rgba(255, 255, 255, 0.03);
@@ -170,13 +187,13 @@
             display: flex;
             align-items: center;
             text-decoration: none;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.65);
             width: 100%;
-            padding: 14px 16px;
+            padding: 11px 16px;
             font-weight: 600;
         }
         .sidebar ul li a i {
-            font-size: 16px;
+            font-size: 15px;
             width: 24px;
             text-align: center;
             flex-shrink: 0;
@@ -185,11 +202,23 @@
         .sidebar ul li a span {
             margin-left: 12px;
             white-space: nowrap;
-            font-size: 14px;
+            font-size: 13.5px;
             transition: 0.3s;
         }
         .sidebar.collapsed ul li a span {
             display: none;
+        }
+
+        /* --- Active Menu Styles --- */
+        .sidebar ul li.active {
+            background: rgba(0, 242, 254, 0.06);
+            border-left: 3px solid #00f2fe;
+            border-radius: 0 12px 12px 0;
+        }
+        .sidebar ul li.active a i,
+        .sidebar ul li.active a span {
+            color: #00f2fe !important;
+            text-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
         }
 
         /* Main Layout */
@@ -200,6 +229,7 @@
             height: 100vh;
             position: relative;
             z-index: 1;
+            overflow: hidden;
         }
 
         /* Header Style */
@@ -216,6 +246,19 @@
             position: sticky;
             top: 0;
             z-index: 1000;
+        }
+
+        .toggle-main-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: 20px;
+            display: none;
+        }
+        .toggle-main-btn:hover {
+            color: #00f2fe;
         }
 
         /* Profile and Notifications */
@@ -294,169 +337,57 @@
             width: 100%;
         }
 
-        .sarlavha-qatori {
+        /* Top toast modal alerts */
+        .modal-backdrop {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1998;
+            transition: opacity 0.3s ease;
+        }
+        .top-modal {
+            position: fixed;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 480px;
+            background: linear-gradient(135deg, #00b09b, #96c93d);
+            color: white;
+            padding: 16px 20px;
+            z-index: 1999;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+        }
+        .top-modal.show {
+            top: 30px;
+        }
+        .modal-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
         }
-
-        .sarlavha {
-            font-size: 22px;
-            font-weight: 800;
-            color: #ffffff;
-            border-left: 4px solid #00f2fe;
-            padding-left: 12px;
-            letter-spacing: -0.5px;
-        }
-
-        .btn-otish {
-            display: inline-block;
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.15);
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 13px;
+        .modal-message {
+            font-size: 13.5px;
             font-weight: 600;
-            transition: 0.3s;
-            text-align: center;
-            cursor: pointer;
+            line-height: 1.5;
         }
-        .btn-otish:hover {
-            background: linear-gradient(135deg, #00f2fe, #4facfe);
-            color: #070a12;
-            border-color: transparent;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
-        }
-
-        /* Matrix Table wrapper */
-        .matrix-container {
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            padding: 12px;
-            width: 100%;
-            overflow-x: auto;
-            margin-bottom: 25px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-        }
-        th {
-            padding: 16px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
-            letter-spacing: 0.5px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            background: #080d1a;
-        }
-        td {
-            padding: 12px;
-            font-size: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            color: rgba(255, 255, 255, 0.85);
-            vertical-align: top;
-            min-width: 140px;
-        }
-        tr:hover td {
-            background: rgba(255, 255, 255, 0.01);
-        }
-
-        /* Matrix cell input blocks */
-        .input-wrapper {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 8px;
-            align-items: center;
-        }
-        .input-wrapper input {
-            flex: 1;
-            padding: 8px 10px;
-            font-size: 12px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 8px;
-            color: white;
-            outline: none;
-            text-align: center;
-        }
-        .input-wrapper input:focus {
-            border-color: #00f2fe;
-        }
-        .input-wrapper input[readonly] {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: transparent;
-            color: rgba(255,255,255,0.4);
-            cursor: not-allowed;
-            font-weight: 600;
-        }
-
-        .remove-btn {
-            background: rgba(255, 0, 85, 0.1);
-            color: #ff0055;
-            border: 1px solid rgba(255, 0, 85, 0.3);
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-        }
-        .remove-btn:hover {
-            background: #ff0055;
-            color: white;
-        }
-
-        .add-btn {
-            background: rgba(0, 255, 170, 0.1);
-            color: #00ffaa;
-            border: 1px solid rgba(0, 255, 170, 0.3);
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-        }
-        .add-btn:hover {
-            background: #00ffaa;
-            color: #070a12;
-        }
-
-        .submit-wrapper {
-            text-align: center;
-            margin-top: 15px;
-        }
-        .btn-submit {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #00f2fe, #4facfe);
-            color: #070a12;
-            font-weight: 800;
+        .close-modal-btn {
+            background: rgba(255, 255, 255, 0.2);
             border: none;
-            border-radius: 12px;
+            font-size: 11px;
+            color: white;
             cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
-        }
-        .btn-submit:hover {
-            box-shadow: 0 0 25px rgba(0, 242, 254, 0.4);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* --- 📱 MOBIL QURILMALAR MEDIA REJIMI --- */
@@ -475,37 +406,34 @@
                 transform: translateX(0);
             }
             .sidebar.collapsed {
-                width: 250px;
+                width: 260px;
             }
-            .main .toggle-main {
+            .toggle-main-btn {
                 display: inline-block;
             }
             .sidebar.collapsed.show .brand,
             .sidebar.collapsed.show .toggle-btn,
             .sidebar.collapsed.show .user-info span,
+            .sidebar.collapsed.show .menu-category,
             .sidebar.collapsed.show ul li a span {
                 display: inline !important;
             }
 
             .konteyner {
-                padding: 16px 12px;
+                padding: 20px 15px;
                 height: auto;
                 overflow: visible;
+            }
+            .header {
+                padding: 0 10px;
             }
             #profile-panel {
                 right: 10px;
                 width: 180px;
             }
-            .sarlavha-qatori {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            .btn-otish {
-                width: 100%;
-            }
         }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
     <div class="cyber-bg"></div>
@@ -526,28 +454,54 @@
             {% endif %}
             <div style="display: flex; flex-direction: column;">
                 <span class="span">Admin</span>
-                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">{{ user.username }}</span>
+                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">
+                    {% if user.first_name or user.last_name %}
+                        {{ user.first_name }} {{ user.last_name }}
+                    {% else %}
+                        {{ user.username }}
+                    {% endif %}
+                </span>
             </div>
         </div>
 
-        <ul>
-            <li><a href="{% url 'all_groups_admin' %}"><i class="fas fa-layer-group"></i><span> Guruhlar</span></a></li>
-            <li><a href="{% url 'students_list_admin' %}"><i class="fas fa-user-graduate"></i><span> O'quvchilar</span></a></li>
-            <li><a href="{% url 'teachers_list_admin' %}"><i class="fas fa-chalkboard-teacher"></i><span> O'qituvchilar</span></a></li>
-            <li><a href="{% url 'admin_assignment_list' %}"><i class="fas fa-tasks"></i><span> Topshiriqlar</span></a></li>
-            <li><a href="{% url 'all_group_schedules' %}"><i class="fas fa-calendar-alt"></i><span> Dars rejasi</span></a></li>
-            <li><a href="{% url 'quiz_list' %}"><i class="fas fa-file-signature"></i><span> Testlar</span></a></li>
-            <li><a href="{% url 'question_list' %}"><i class="fas fa-question-circle"></i><span> Savollar</span></a></li>
-            <li><a href="{% url 'group_payment_list' %}"><i class="fas fa-credit-card"></i><span> Guruh to'lov</span></a></li>
-            <li><a href="{% url 'student_list' %}"><i class="fas fa-wallet"></i><span> Barcha to'lov</span></a></li>
-        </ul>
+        <div class="menu-container">
+            <span class="menu-category">Asosiy</span>
+            <ul>
+                <li><a href="{% url 'admin_dashboard' %}"><i class="fas fa-chart-line"></i><span> Dashboard</span></a></li>
+                <li><a href="{% url 'all_groups_admin' %}"><i class="fas fa-layer-group"></i><span> Guruhlar</span></a></li>
+            </ul>
+
+            <span class="menu-category">Foydalanuvchilar</span>
+            <ul>
+                <li><a href="{% url 'students_list_admin' %}"><i class="fas fa-user-graduate"></i><span> O'quvchilar</span></a></li>
+                <li><a href="{% url 'teachers_list_admin' %}"><i class="fas fa-chalkboard-teacher"></i><span> O'qituvchilar</span></a></li>
+            </ul>
+
+            <span class="menu-category">O'quv jarayoni</span>
+            <ul>
+                <li><a href="{% url 'admin_assignment_list' %}"><i class="fas fa-tasks"></i><span> Topshiriqlar</span></a></li>
+                <li><a href="{% url 'all_group_schedules' %}"><i class="fas fa-calendar-alt"></i><span> Dars rejasi</span></a></li>
+                <li><a href="{% url 'quiz_list' %}"><i class="fas fa-file-signature"></i><span> Testlar</span></a></li>
+                <li><a href="{% url 'question_list' %}"><i class="fas fa-question-circle"></i><span> Savollar</span></a></li>
+            </ul>
+
+            <span class="menu-category">Moliya</span>
+            <ul>
+                <li><a href="{% url 'group_payment_list' %}"><i class="fas fa-credit-card"></i><span> Guruh to'lov</span></a></li>
+                <li><a href="{% url 'student_list' %}"><i class="fas fa-wallet"></i><span> Barcha to'lov</span></a></li>
+            </ul>
+        </div>
     </div>
 
     <!-- ASOSIY KONTENT MAYDONI -->
     <div class="main">
         <div class="header">
-            <button class="toggle-main" id="mainToggle"><i class="fas fa-bars"></i></button>
+            <button class="toggle-main-btn" id="mainToggle"><i class="fas fa-bars"></i></button>
+
+            {% block header_search %}{% endblock %}
+
             <div class="user-profile">
+                {% block header_actions %}{% endblock %}
                 <a href="javascript:void(0);" id="profile-btn">
                     {% if user.profile_image %}
                     <img src="{{ user.profile_image.url }}" alt="User profile" class="user_profile_img">
@@ -563,63 +517,22 @@
         </div>
 
         <div class="konteyner">
-            <div class="sarlavha-qatori">
-                <h2 class="sarlavha">{{ group.name }} o'qituvchilari dars jadvali</h2>
-                <a href="{% url 'all_groups_admin' %}" class="btn-otish"><i class="fas fa-arrow-left"></i> Guruhlar ro'yxatiga qaytish</a>
-            </div>
+            {% block content %}{% endblock %}
 
-            <form method="POST">
-                {% csrf_token %}
-                <div class="matrix-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>O'qituvchi</th>
-                                {% for day_value, day_label in days %}
-                                    <th>{{ day_label }}</th>
-                                {% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for teacher in teachers %}
-                                <tr>
-                                    <td style="text-align: left; vertical-align: middle; font-weight: 700; color: #ffffff;">
-                                        <i class="fas fa-chalkboard-teacher" style="color: #00f2fe; margin-right: 8px;"></i>
-                                        {{ teacher.first_name }} {{ teacher.last_name }}
-                                    </td>
-                                    {% for day_value, _ in days %}
-                                        <td>
-                                            <div id="cell-{{ teacher.id }}-{{ day_value }}">
-                                                {% for entry in schedule_map|dict_get:teacher.id|dict_get:day_value %}
-                                                    <div class="input-wrapper">
-                                                        <input type="text"
-                                                               name="schedule-{{ teacher.id }}-{{ day_value }}"
-                                                               value="{{ entry.time }}{% if entry.readonly %} ({{ entry.group_name }}){% endif %}"
-                                                               {% if entry.readonly %}readonly{% endif %}>
-                                                        {% if not entry.readonly %}
-                                                            <button type="button" class="remove-btn" onclick="removeInput(this)">−</button>
-                                                        {% endif %}
-                                                    </div>
-                                                {% endfor %}
-                                                <div class="input-wrapper">
-                                                    <input type="text"
-                                                           name="schedule-{{ teacher.id }}-{{ day_value }}"
-                                                           placeholder="HH:MM - HH:MM">
-                                                    <button type="button" class="add-btn"
-                                                            onclick="addInput('{{ teacher.id }}', '{{ day_value }}')">+</button>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    {% endfor %}
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="submit-wrapper">
-                    <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Jadvalni saqlash</button>
-                </div>
-            </form>
+            <!-- TOAST MESSAGE NOTIFICATIONS -->
+            {% if messages %}
+                {% for message in messages %}
+                    {% if 'yangi_guruh' in message.tags or 'edit_group' in message.tags or 'payment_success' in message.tags or 'edit_user' in message.tags or 'teacher_list' in message.tags %}
+                        <div id="modalBackdrop" class="modal-backdrop"></div>
+                        <div id="topModal" class="top-modal show">
+                            <div class="modal-content">
+                                <span class="modal-message"><i class="fas fa-check-circle" style="color: #00ffaa; margin-right: 8px;"></i> {{ message }}</span>
+                                <button class="close-modal-btn" onclick="closeTopModal()">✖</button>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 
@@ -637,8 +550,8 @@
             }
         }
 
-        sidebarToggle.addEventListener('click', toggleSidebar);
-        mainToggle.addEventListener('click', toggleSidebar);
+        if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
+        if (mainToggle) mainToggle.addEventListener('click', toggleSidebar);
 
         window.addEventListener('resize', () => {
             if (window.innerWidth > 768) {
@@ -647,44 +560,44 @@
         });
 
         // Profile Dropdown
-        document.getElementById('profile-btn').addEventListener('click', function(e) {
-            document.getElementById('profile-panel').classList.toggle('active');
-            e.stopPropagation();
-        });
+        const profileBtn = document.getElementById('profile-btn');
+        if (profileBtn) {
+            profileBtn.addEventListener('click', function(e) {
+                document.getElementById('profile-panel').classList.toggle('active');
+                e.stopPropagation();
+            });
+        }
 
         document.addEventListener('click', function() {
-            document.getElementById('profile-panel').classList.remove('active');
+            const panel = document.getElementById('profile-panel');
+            if (panel) panel.classList.remove('active');
         });
 
-        // Add input rows dynamically
-        function addInput(teacherId, day) {
-            const container = document.getElementById(`cell-${teacherId}-${day}`);
-            const wrapper = document.createElement('div');
-            wrapper.className = 'input-wrapper';
-
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.name = `schedule-${teacherId}-${day}`;
-            input.placeholder = 'HH:MM - HH:MM';
-
-            const removeBtn = document.createElement('button');
-            removeBtn.type = 'button';
-            removeBtn.innerText = '−';
-            removeBtn.className = 'remove-btn';
-            removeBtn.onclick = function () {
-                wrapper.remove();
-            };
-
-            wrapper.appendChild(input);
-            wrapper.appendChild(removeBtn);
-            
-            // Insert before the last input wrapper (which contains the add button)
-            container.insertBefore(wrapper, container.lastElementChild);
+        function closeTopModal() {
+            document.getElementById('modalBackdrop')?.remove();
+            document.getElementById('topModal')?.remove();
         }
 
-        function removeInput(button) {
-            button.closest('.input-wrapper').remove();
-        }
+        // Auto close top alert message after 4 seconds
+        window.addEventListener('load', function() {
+            setTimeout(closeTopModal, 4000);
+        });
+
+        // --- 🔍 SAHIFANING URL MANZILIGA QARAB MENYUNI AVTOMATIK FAOLLASHTIRISH ---
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname;
+            const menuLinks = document.querySelectorAll(".sidebar ul li a");
+
+            menuLinks.forEach(link => {
+                const href = link.getAttribute("href");
+                if (currentPath === href || (href !== '/' && currentPath.includes(href))) {
+                    link.parentElement.classList.add("active");
+                } else {
+                    link.parentElement.classList.remove("active");
+                }
+            });
+        });
     </script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

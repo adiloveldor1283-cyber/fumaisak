@@ -29,9 +29,44 @@ from django.utils.dateparse import parse_time
 from django.http import HttpResponseForbidden
 from django.utils.dateparse import parse_datetime
 from django.utils.html import escape
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.units import mm
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, Image as RLImage
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 
 
+from django.db.models import Sum
+
+@login_required
+def admin_dashboard(request):
+    user = request.user
+    if not (user.is_superuser or user.is_staff or user.role == 'admin'):
+        return redirect('login')
+
+    total_students = CustomUser.objects.filter(role='student').count()
+    total_teachers = CustomUser.objects.filter(role='teacher').count()
+    total_groups = Group.objects.count()
+    
+    total_payments = StudentPayment.objects.aggregate(total=Sum('amount_paid'))['total'] or 0
+
+    recent_payments = StudentPayment.objects.select_related('student', 'group').order_by('-paid_at')[:5]
+    recent_students = CustomUser.objects.filter(role='student').order_by('-joined_at')[:5]
+    recent_assignments = Assignment.objects.select_related('group').order_by('-created_at')[:5]
+
+    return render(request, 'admin_dashboard.html', {
+        'total_students': total_students,
+        'total_teachers': total_teachers,
+        'total_groups': total_groups,
+        'total_payments': total_payments,
+        'recent_payments': recent_payments,
+        'recent_students': recent_students,
+        'recent_assignments': recent_assignments,
+    })
 
 #Guruh uchun
 @login_required
@@ -63,9 +98,9 @@ def edit_group_admin(request, group_id):
             return redirect('all_groups_admin')
 
         group.name = request.POST.get('group-name')
-        date_str = request.POST.get('date') + ' ' + request.POST.get('time')  # '2025-06-28 13:15'
-        naive_datetime = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
-        aware_datetime = make_aware(naive_datetime)
+        date_str = f"{request.POST.get('date')} {request.POST.get('time')}"  # '2025-06-28 13:15'
+        naive_datetime = parse_datetime(date_str)
+        aware_datetime = make_aware(naive_datetime) if naive_datetime else timezone.now()
 
         group.created_at = aware_datetime
         group.save()
@@ -399,6 +434,7 @@ def admin_password(request):
 
     return render(request, 'admin_password.html')
 
+@login_required
 def reset_student_password(request, student_id):
     user = request.user
 
@@ -427,6 +463,7 @@ def reset_student_password(request, student_id):
         'student': student
     })
 
+@login_required
 def reset_teacher_password(request, teacher_id):
     user = request.user
 
@@ -455,7 +492,12 @@ def reset_teacher_password(request, teacher_id):
         'teacher': teacher
     })
 
+@login_required
 def export_students_pdf(request):
+    user = request.user
+    if not (user.is_superuser or user.is_staff or user.role == 'admin'):
+        return HttpResponseForbidden("Sizda ushbu amalni bajarish uchun ruxsat yo'q!")
+
     group_id = request.GET.get('group_id')
 
     # 1. O‘quvchilarni olish
@@ -1071,14 +1113,24 @@ def add_group_payment(request, group_id):
 
 
 # Guruhdagi o‘quvchilar ro‘yxati
+@login_required
 def group_students(request, group_id):
+    user = request.user
+    if not (user.is_superuser or user.is_staff or user.role == 'admin'):
+        return redirect('login')
+
     group = get_object_or_404(Group, id=group_id)
     students = group.students.all()
     months = [m[0] for m in StudentPayment.MONTH_CHOICES]
     return render(request, "admin_group_students.html", {"group": group, "students": students, "months": months,})
 
 # O‘quvchi uchun to‘lov kiritish
+@login_required
 def student_payment(request, group_id, student_id):
+    user = request.user
+    if not (user.is_superuser or user.is_staff or user.role == 'admin'):
+        return redirect('login')
+
     group = get_object_or_404(Group, id=group_id)
     student = get_object_or_404(CustomUser, id=student_id, role="student")
     payment_info = get_object_or_404(GroupPaymentInfo, group=group)
@@ -1176,6 +1228,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 import hashlib
 
+
 def payment_receipt(request, payment_id):
     payment = get_object_or_404(StudentPayment, id=payment_id)
 
@@ -1189,70 +1242,111 @@ def payment_receipt(request, payment_id):
 
     # PDF response
     response = HttpResponse(content_type='application/pdf')
-    filename = f"tolov_{payment.student.last_name}_{payment.month}.pdf"
+    filename = f"chek_{payment.student.last_name}_{payment.month}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
-    p = canvas.Canvas(response, pagesize=A4)
-    width, height = A4
+    # 🖨️ Zamonaviy bank/terminal cheki o'lchami (Kengligi: 80mm, Bo'yi: 210mm)
+    width = 80 * mm
+    height = 210 * mm
+    p = canvas.Canvas(response, pagesize=(width, height))
 
-    # Sarlavha
-    p.setFont("Helvetica-Bold", 16)
-    p.drawCentredString(width / 2, height - 20*mm, "Kurs uchun to‘lov hujjati")
-    p.line(20 * mm, height - 22 * mm, width - 20 * mm, height - 22 * mm)
+    # Orqa fonni toza oq qilish (Chop etishda bo'yoq iqtisodi uchun)
+    p.setFillColor(colors.white)
+    p.rect(0, 0, width, height, fill=True, stroke=False)
 
-    # Jadval ma'lumotlari
+    # Dinamik boshlang'ich nuqta (Tepadan pastga qarab hisoblanadi)
+    current_y = height - 12 * mm
+
+    # 1. Tizim Logotipi (Mavjud bo'lsa markazga joylashadi)
+    site_settings = SiteSetting.objects.first()
+    if site_settings and site_settings.image:
+        try:
+            circle_img_buf = make_circle_image(site_settings.image.path, size_px=100)
+            logo_img = ImageReader(circle_img_buf)
+            p.drawImage(logo_img, (width / 2) - 10 * mm, current_y - 20 * mm, 20 * mm, 20 * mm, mask='auto')
+            current_y -= 24 * mm
+        except Exception:
+            pass
+
+    # 2. Chek Sarlavhasi (Kiberpank minimalizm)
+    p.setFillColor(colors.HexColor("#070a12"))  # To'q brend rang
+    p.setFont("Helvetica-Bold", 12)
+    p.drawCentredString(width / 2, current_y, "FUMAISAK TIZIMI")
+    current_y -= 5 * mm
+
+    p.setFont("Helvetica", 9)
+    p.setFillColor(colors.HexColor("#4facfe"))  # Neon ko'k urgu
+    p.drawCentredString(width / 2, current_y, "TO'LOV CHEKI")
+    current_y -= 6 * mm
+
+    # Yuqori ajratuvchi chiziq
+    p.setStrokeColor(colors.HexColor("#e2e8f0"))
+    p.setLineWidth(0.5)
+    p.line(6 * mm, current_y, width - 6 * mm, current_y)
+    current_y -= 6 * mm
+
+    # 3. Strukturaviy Ma'lumotlar (Kalit so'zlar chapda, qiymatlar o'ngda)
     data = [
-        ["Kvitansiya raqami:", inv_number],
-        ["O‘quvchi Ism Familiyasi:", f"{payment.student.first_name} {payment.student.last_name}"],
-        ["Qaysi guruh uchun:", payment.group.name],
-        ["Qaysi oy uchun:", payment.month],
-        ["To‘lanishi kerak bo‘lgan summa:", f"{payment.group.payment_info.monthly_fee} so‘m"],
-        ["To‘lov summasi:", f"{payment.amount_paid:,.2f} so‘m"],
-        ["To‘lov qilgan vaqt:", timezone.localtime(payment.paid_at).strftime("%Y-%m-%d %H:%M")],
-        ["To‘lov ID:", str(payment.id)],
+        ["Chek raqami:", inv_number],
+        ["O'quvchi:", f"{payment.student.first_name} {payment.student.last_name}"],
+        ["Guruh:", payment.group.name],
+        ["Oy uchun:", payment.month],
+        ["Kurs narxi:", f"{payment.group.payment_info.monthly_fee:,.0f} so'm"],
+        ["To'langan summa:", f"{payment.amount_paid:,.0f} so'm"],
+        ["To'lov vaqti:", timezone.localtime(payment.paid_at).strftime("%Y-%m-%d %H:%M")],
     ]
-    table = Table(data, colWidths=[80*mm, 95*mm])
+
+    table = Table(data, colWidths=[31 * mm, 37 * mm])
     table.setStyle(TableStyle([
-        ('BOX', (0, 0), (-1, -1), 1, colors.black),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-        ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
-        ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
-        ('FONTSIZE', (0, 0), (-1, -1), 11),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 8.5),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor("#1e293b")),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+
+        # To'langan summa satrini vizual ajratish (Yashil neon effekt)
+        ('FONTNAME', (0, 5), (1, 5), 'Helvetica-Bold'),
+        ('TEXTCOLOR', (0, 5), (1, 5), colors.HexColor("#00aa6c")),
+
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+        ('TOPPADDING', (0, 0), (-1, -1), 5),
+        ('LINEBELOW', (0, 0), (-1, -1), 0.3, colors.HexColor("#f1f5f9")),
     ]))
 
-    # Jadval joylashuvi (sarlavhadan 5 mm past)
-    table_height = len(data) * 7*mm
-    table_y = height - 20*mm - 5*mm - table_height
-    table.wrapOn(p, width, height)
-    table.drawOn(p, 20*mm, table_y)
+    # Jadval balandligini dinamik hisoblab chekni surish
+    tw, th = table.wrap(width - 12 * mm, height)
+    current_y -= th
+    table.drawOn(p, 6 * mm, current_y)
+    current_y -= 6 * mm
 
-    # QR kod tayyorlash (35×35 mm)
+    # Pastki ajratuvchi chiziq
+    p.line(6 * mm, current_y, width - 6 * mm, current_y)
+    current_y -= 8 * mm
+
+    # 4. Markazlashtirilgan QR Kod
     qr_img = qrcode.make(verify_url)
     qr_buffer = io.BytesIO()
     qr_img.save(qr_buffer, format="PNG")
     qr_buffer.seek(0)
     qr_image = ImageReader(qr_buffer)
-    qr_x = width - 50*mm
-    qr_y = table_y - 35*mm
-    p.drawImage(qr_image, qr_x, qr_y, 33*mm, 33*mm)
 
-    # “Tasdiqlovchi QR kod” matni (kichik shrift)
-    p.setFont("Helvetica", 8)
-    p.drawCentredString(qr_x + 15*mm, qr_y - 5*mm, "Tasdiqlovchi QR kod:")
+    qr_size = 28 * mm
+    current_y -= qr_size
+    p.drawImage(qr_image, (width / 2) - (qr_size / 2), current_y, qr_size, qr_size)
+    current_y -= 5 * mm
 
-    # Imzo va sana (QR kod bilan bir balandlikda chapda)
-    p.setFont("Helvetica", 12)
-    p.drawString(20*mm, qr_y + 15*mm, "Imzo: __________")
-    p.drawString(20*mm, qr_y + 22*mm, f"Sana: {datetime.now().strftime('%d.%m.%Y')}")
+    # QR kod ostidagi kichik ma'lumot matni
+    p.setFont("Helvetica", 7)
+    p.setFillColor(colors.HexColor("#64748b"))
+    p.drawCentredString(width / 2, current_y, "Chekni haqiqiyligini tekshirish uchun")
+    current_y -= 3 * mm
+    p.drawCentredString(width / 2, current_y, "QR-kodni skaner qiling.")
+    current_y -= 12 * mm
 
-    site_settings = SiteSetting.objects.first()
-    if site_settings and site_settings.image:
-        circle_img_buf = make_circle_image(site_settings.image.path, size_px=120)
-        logo_img = ImageReader(circle_img_buf)
-        p.drawImage(logo_img, 60 * mm, qr_y + 2 * mm, 25 * mm, 25 * mm, mask='auto')
+    # 5. Terminal yakuniy terminal matni
+    p.setFont("Helvetica-Bold", 8)
+    p.setFillColor(colors.HexColor("#070a12"))
+    p.drawCentredString(width / 2, current_y, "TO'LOV TASDIQLANGAN")
 
     p.showPage()
     p.save()
@@ -1274,57 +1368,231 @@ def verify_payment(request, payment_id, code):
     else:
         return HttpResponse("Bu hujjat bazada mavjud emas")
 
+
+@login_required
 def student_payment_pdf(request, student_id):
+    user = request.user
+    if not (user.is_superuser or user.is_staff or user.role == 'admin' or user.id == student_id):
+        return HttpResponseForbidden("Sizda ushbu amalni bajarish uchun ruxsat yo'q!")
+
+    # O'quvchini bazadan olish
     student = get_object_or_404(CustomUser, id=student_id, role='student')
 
-    # O‘quvchining barcha to‘lovlari
+    # O'quvchining barcha to'lovlari
     payments = StudentPayment.objects.filter(student=student).select_related("group").order_by("paid_at")
 
-    # HTTP javob PDF sifatida
+    # Jami moliyaviy ko'rsatkichlarni hisoblash
+    total_paid = sum(p.amount_paid for p in payments)
+    payment_count = payments.count()
+
+    # Superuser yoki admin rolidagilardan birortasini ismli variantini qidirish
+    admin_user = CustomUser.objects.filter(is_superuser=True).first() or CustomUser.objects.filter(role='admin').first()
+
+    if admin_user and (admin_user.first_name or admin_user.last_name):
+        admin_name = f"{admin_user.first_name} {admin_user.last_name}"
+    else:
+        admin_name = "Tizim Administratori"
+
+    # HTTP javobni PDF sifatida rasmiylashtirish
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="{student.username}_payments.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="reyestr_{student.last_name}_payments.pdf"'
 
-    # PDF hujjat
-    doc = SimpleDocTemplate(response, pagesize=A4)
+    # Rasmiy A4 moliya hujjati andozasi (Chekkalar: 15mm)
+    doc = SimpleDocTemplate(
+        response,
+        pagesize=A4,
+        leftMargin=15 * mm,
+        rightMargin=15 * mm,
+        topMargin=15 * mm,
+        bottomMargin=15 * mm
+    )
     elements = []
-
     styles = getSampleStyleSheet()
-    elements.append(Paragraph(f"To‘lov ma’lumotlari: {student.first_name} {student.last_name}", styles['Heading1']))
-    elements.append(Spacer(1, 12))
 
-    # Jadval sarlavhalari
-    data = [["Guruh", "Oy", "Kurs davomiyligi", "To‘lash kerak", "To‘langan summa", "To‘langan vaqti"]]
+    # --- 🏢 PROFESSIONAL MOLIYAVIY STILLAR ---
+    title_style = ParagraphStyle(
+        'DocTitle',
+        parent=styles['Heading1'],
+        fontName='Helvetica-Bold',
+        fontSize=20,
+        textColor=colors.HexColor("#0f172a"),
+        spaceAfter=2
+    )
+    subtitle_style = ParagraphStyle(
+        'DocSubtitle',
+        fontName='Helvetica-Bold',
+        fontSize=8.5,
+        textColor=colors.HexColor("#4facfe"),
+        spaceAfter=15
+    )
+    meta_label = ParagraphStyle(
+        'MetaLabel',
+        fontName='Helvetica-Bold',
+        fontSize=9,
+        textColor=colors.HexColor("#64748b"),
+        leading=14
+    )
+    meta_value = ParagraphStyle(
+        'MetaValue',
+        fontName='Helvetica',
+        fontSize=9,
+        textColor=colors.HexColor("#0f172a"),
+        leading=14
+    )
+    card_label = ParagraphStyle(
+        'CardLabel',
+        fontName='Helvetica-Bold',
+        fontSize=9.5,
+        textColor=colors.HexColor("#4facfe")
+    )
+    card_value = ParagraphStyle(
+        'CardValue',
+        fontName='Helvetica-Bold',
+        fontSize=15,
+        textColor=colors.HexColor("#0f172a")
+    )
+    th_style = ParagraphStyle(
+        'TableHeader',
+        fontName='Helvetica-Bold',
+        fontSize=9,
+        textColor=colors.white,
+        alignment=1
+    )
+    td_style = ParagraphStyle(
+        'TableCell',
+        fontName='Helvetica',
+        fontSize=9,
+        textColor=colors.HexColor("#334155"),
+        alignment=1,
+        leading=14
+    )
+
+    # 1. IKKI TOMONLAMA HEADER PANEL
+    left_header = [
+        [Paragraph("MOLIYAVIY TO'LOVLAR REYESTRI", title_style)],
+        [Paragraph("STATEMENT OF ACCOUNT / AUDIT REPORT", subtitle_style)]
+    ]
+    left_table = Table(left_header, colWidths=[105 * mm])
+    left_table.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP'), ('LEFTPADDING', (0, 0), (-1, -1), 0)]))
+
+    right_meta = [
+        [Paragraph("O'quvchi:", meta_label), Paragraph(f"{student.first_name} {student.last_name}", meta_value)],
+        [Paragraph("Talaba ID:", meta_label), Paragraph(f"#{student.id}", meta_value)],
+        [Paragraph("Yaratildi:", meta_label), Paragraph(timezone.now().strftime("%Y-%m-%d %H:%M"), meta_value)]
+    ]
+    right_table = Table(right_meta, colWidths=[20 * mm, 55 * mm])
+    right_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+    ]))
+
+    header_grid = Table([[left_table, right_table]], colWidths=[105 * mm, 75 * mm])
+    header_grid.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+    ]))
+    elements.append(header_grid)
+
+    elements.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#0f172a"), spaceAfter=15))
+
+    # 2. STATISTIKA VA BALANCE KARTALARI BLOKI
+    stats_data = [
+        [Paragraph("JAMI SHAKLLANTIRILGAN MABLAG'", card_label), Paragraph("MUVAFFAQIYATLI TO'LOVLAR", card_label)],
+        [Paragraph(f"{total_paid:,.0f} so'm", card_value), Paragraph(f"{payment_count} ta tranzaksiya", card_value)]
+    ]
+    stats_table = Table(stats_data, colWidths=[105 * mm, 75 * mm])
+    stats_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor("#f8fafc")),
+        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#e2e8f0")),
+        ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
+        ('TOPPADDING', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+        ('LEFTPADDING', (0, 0), (-1, -1), 15),
+    ]))
+    elements.append(stats_table)
+    elements.append(Spacer(1, 20))
+
+    # 3. MOLIYAVIY REYESTR JADVALI (Kengliklar: 180mm)
+    col_widths = [45 * mm, 23 * mm, 25 * mm, 27 * mm, 28 * mm, 32 * mm]
+
+    data = [[
+        Paragraph("Guruh nomi", th_style),
+        Paragraph("Hisob oyi", th_style),
+        Paragraph("Davomiyligi", th_style),
+        Paragraph("Kurs narxi", th_style),
+        Paragraph("To'langan", th_style),
+        Paragraph("Tranzaksiya vaqti", th_style)
+    ]]
 
     for p in payments:
         try:
             group_info = GroupPaymentInfo.objects.get(group=p.group)
             course_duration = f"{group_info.course_duration_months} oy"
-            monthly_fee = f"{group_info.monthly_fee} so‘m"
+            monthly_fee = f"{group_info.monthly_fee:,.0f} so'm"
         except GroupPaymentInfo.DoesNotExist:
             course_duration = "-"
             monthly_fee = "-"
 
         data.append([
-            p.group.name,
-            p.month,
-            course_duration,
-            monthly_fee,
-            f"{p.amount_paid} so‘m",
-            p.paid_at.strftime("%Y-%m-%d %H:%M"),
+            Paragraph(p.group.name, td_style),
+            Paragraph(p.month, td_style),
+            Paragraph(course_duration, td_style),
+            Paragraph(monthly_fee, td_style),
+            Paragraph(f"{p.amount_paid:,.0f} so'm",
+                      ParagraphStyle('GText', parent=td_style, textColor=colors.HexColor("#00aa6c"),
+                                     fontName='Helvetica-Bold')),
+            Paragraph(timezone.localtime(p.paid_at).strftime("%Y-%m-%d %H:%M"), td_style),
         ])
 
-    # Jadval
-    table = Table(data, repeatRows=1)
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.lightblue),
-        ('TEXTCOLOR', (0,0), (-1,0), colors.black),
-        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
-        ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
+    main_table = Table(data, colWidths=col_widths, repeatRows=1)
+    main_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+        ('TOPPADDING', (0, 1), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
     ]))
+    elements.append(main_table)
+    elements.append(Spacer(1, 35))
 
-    elements.append(table)
+    # 4. 🛡️ IMZOLAR VA AKADEMIYA LOGOTIPI ASOSIDAGI RASMIY MUHR BLOKI
+    # Muhr qutisi uchun default qiymat tayyorlash
+    stamp_element = Paragraph("[ Rasmiy muhr o'rni ]",
+                              ParagraphStyle('NoStamp', parent=td_style, textColor=colors.HexColor("#94a3b8")))
+
+    site_settings = SiteSetting.objects.first()
+    if site_settings and site_settings.image:
+        try:
+            # Dumaloq kiber muhr buferini generatsiya qilamiz
+            circle_img_buf = make_circle_image(site_settings.image.path, size_px=120)
+            # ReportLab oqim ob'ektiga o'tkazamiz (Hajmi: 26x26 mm)
+            stamp_element = RLImage(circle_img_buf, width=26 * mm, height=26 * mm)
+        except Exception:
+            pass
+
+    footer_data = [
+        [
+            Paragraph(f"<b>Bosh hisobchi:</b><br/>{admin_name}<br/><br/><br/>Imzo: ___________________", td_style),
+            Paragraph(f"<b>Moliya bo'limi boshlig'i:</b><br/>{admin_name}<br/><br/><br/>Imzo: ___________________",
+                      td_style),
+            stamp_element
+        ]
+    ]
+
+    footer_table = Table(footer_data, colWidths=[65 * mm, 65 * mm, 50 * mm])
+    footer_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('TOPPADDING', (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+    ]))
+    elements.append(footer_table)
+
+    # PDF hisobotni yakuniy yig'ish
     doc.build(elements)
-
     return response

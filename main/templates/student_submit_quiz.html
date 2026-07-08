@@ -1,707 +1,316 @@
+{% extends 'basestudent.html' %}
 {% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard teacher</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            height: 100vh;
-        }
-        .sidebar {
-            background-color: #1e1e2f;
-            color: white;
-            width: 250px;
-            transition: width 0.2s;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-        .sidebar.collapsed {
-            width: 70px;
-        }
-        .sidebar .toggle-container {
-            position: relative;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            padding-left: 10px;
-            border-bottom: 2px solid #333;
-        }
-        .sidebar .toggle-container img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-        }
-        .toggle-btn {
-            margin-left: 30px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 2;
-        }
-        .brand {
-            font-size: 20px;
-            font-weight: bold;
-            margin-left: 15px;
-        }
-        .sidebar.collapsed .brand {
-            display: none;
-        }
-        .sidebar.collapsed .toggle-btn {
-            display: none;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 2px solid #333;
-            gap: 10px;
-            transition: opacity 0.2s;
-            line-height: 1.6;
-        }
-        .toggle-main {
-            margin-left: 20px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-        }
-        .toggle-main {
-            display: none;
-        }
-        .sidebar.collapsed ~ .main .toggle-main {
-            display: inline-block;
-        }
-        .user-info img {
-            width: 40px;
-            height: 40px;
-            min-width: 40px;
-            max-width: 40px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        .user-info span {
-            font-size: 12px;
-            white-space: nowrap;
-        }
-        .span {
-            text-transform: uppercase;
-            font-size: 14px;
-        }
-        .sidebar.collapsed .user-info span {
-            display: none;
-        }
-        .sidebar ul {
-            margin-top: 10px;
-            list-style: none;
-            padding: 5px;
-            flex-grow: 1;
-        }
-        .sidebar ul li {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            transition: background 0.2s;
-            cursor: pointer;
-        }
-        .sidebar ul li:hover {
-            background-color: #333;
-        }
-        .sidebar ul li a {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            color: white;
-            width: 100%;
-            height: 100%;
-        }
-        .sidebar ul li a:hover {
-            background-color: #333;
-        }
-        .sidebar ul li a i {
-            font-size: 18px;
-            width: 20px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-        .sidebar ul li a span {
-            margin-left: 15px;
-            white-space: nowrap;
-            font-size: 14px;
-        }
-        .sidebar.collapsed ul li a span {
-            display: none;
-        }
-        .main {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
+{% block title %}Test Natijasi - Student Profili{% endblock %}
 
-        .header {
-            color: white;
-            background-color: #1f283e;
-            height: 69px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-        }
-        .search-form {
-            display: flex;
-            position: relative;
-        }
-        .search-input {
-            padding: 8px 12px;
-            font-size: 12px;
-            border: 2px solid #ccc;
-            border-radius: 5px 0 0 5px;
-            outline: none;
-            width: 25vw;
-            background-color: #1f283e;
-            color: white;
-            margin-left: 20px;
-            border-right: none;
-        }
-        .search-btn {
-            background-color: #1f283e;
-            border: 2px solid #ccc;
-            border-left: none;
-            padding: 8px 12px;
-            color: white;
-            font-size: 12px;
-            border-radius: 0 5px 5px 0;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .search-btn:hover {
-            background-color: #333;
-        }
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-left: auto;
-            justify-content: flex-end;
-            position: relative;
-        }
-        .user-profile i {
-            color: white;
-            font-size: 20px;
-        }
-        .user_profile_img {
-            margin-right: 15px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-        .dropdown-panel {
-            position: absolute;
-            top: 50px;
-            background: white;
-            border: 1px solid #ccc;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-            border-radius: 5px;
-            width: 300px;
-            padding: 12px;
-            display: none;
-            z-index: 100;
-            color: #1f283e;
-            margin-right: 15px;
-        }
-        .dropdown-item {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-        .dropdown-item i {
-            color: #1f283e;
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-
-        .dropdown-panel.active {
-            display: block;
-        }
-        .dropdown-panel::before {
-            content: "";
-            position: absolute;
-            top: -10px;
-            border-width: 0 20px 25px 20px;
-            border-style: solid;
-            border-color: transparent transparent white transparent;
-        }
-        .notification-badge {
-            position: absolute;
-            top: 5px;
-            right: 70px;
-            background-color: red;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 4px;
-            font-size: 12px;
-            font-weight: bold;
-            line-height: 1;
-            text-align: center;
-        }
-        #bell-panel {
-            right: 36px;
-        }
-        #bell-panel::before {
-            right: 15px;
-        }
-        #profile-panel {
-            right: 0;
-        }
-        #profile-panel::before {
-            right: 0;
-        }
-        .dropdown-item {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 12px;
-        }
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-        .content {
-            background-color: #1a2035;
-            padding: 20px;
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-        .content h2 {
-            color: white;
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-        .info-table {
-            width: 100%;
-            max-width: 600px;
-            border-collapse: collapse;
-            font-family: Arial, sans-serif;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        .info-table th,
-        .info-table td {
-            padding: 10px 16px;
-            border: 1px solid #333;
-            text-align: left;
-        }
-
-        .info-table th {
-            background-color: #1a2035;
-            width: 40%;
-            color: white;
-        }
-
-        .info-table td {
-            background-color: #1a2035;
-            color: white;
-        }
-
-
-        .score-box {
-            margin: 30px 0;
-        }
-
-        .score-label {
-            margin-bottom: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            background-color: #1f283e;
-            border-radius: 20px;
-            overflow: hidden;
-            height: 30px;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #1c57b7, #1c57b7);
-            text-align: center;
-            color: #fff;
-            line-height: 30px;
-            font-weight: bold;
-            transition: width 0.8s ease;
-        }
-
-        .question-block {
-            margin-top: 30px;
-            overflow-y: auto;
-        }
-
-        .question-block h3 {
-            color: #e74c3c;
-            margin-bottom: 15px;
-        }
-
-        .question-block ol {
-            padding-left: 20px;
-            color: white;
-        }
-
-        .question-block li {
-            margin-bottom: 12px;
-            padding: 10px 15px;
-            border-radius: 8px;
-
-        }
-
-        .btn-back {
-            display: inline-block;
-            margin-top: 30px;
-            text-decoration: none;
-            background-color: #003366;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 6px;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-back:hover {
-            background-color: #1c57b7;
-        }
-        @media (max-width: 768px) {
-        .sidebar {
-            position: absolute;
-            height: 100%;
-            transform: translateX(-100%);
-            z-index: 999;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar.show {
-            transform: translateX(0);
-        }
-
-        .sidebar.collapsed {
-            width: 250px;
-        }
-
-        .main .toggle-main {
-            display: inline-block;
-        }
-        .sidebar.collapsed.show .brand,
-        .sidebar.collapsed.show .toggle-btn,
-        .sidebar.collapsed.show .user-info span,
-        .sidebar.collapsed.show ul li a span {
-            display: inline !important;
-        }
-        .dropdown-panel {
-            top: 50px;
-            border-radius: 5px;
-            width: 200px;
-            padding: 1px 10px;
-            margin-right: 15px;
-        }
-
-        .content {
-            padding: 15px;
-        }
-        .content h2 {
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        .info-table {
-            max-width: 400px;
-        }
-        .info-table th,
-        .info-table td {
-            padding: 5px 10px;
-            border: 1px solid #333;
-            font-size: 12px;
-        }
-
-        .info-table th {
-            background-color: #1a2035;
-            width: 60%;
-            color: white;
-        }
-
-        .info-table td {
-            background-color: #1a2035;
-            color: white;
-        }
-
-
-        .score-box {
-            margin: 15px 0;
-        }
-
-        .score-label {
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
-        .progress-bar-container {
-            border-radius: 20px;
-            height: 15px;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #1c57b7, #1c57b7);
-            color: #fff;
-            line-height: 15px;
-            font-size: 10px;
-        }
-
-        .question-block {
-            margin-top: 30px;
-            overflow-y: auto;
-        }
-
-        .question-block h3 {
-            color: #e74c3c;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-        .question-block ol {
-            padding-left: 20px;
-            color: white;
-        }
-
-        .question-block li {
-            margin-bottom: 1px;
-            padding: 5px 15px;
-            border-radius: 8px;
-
-        }
-
-        .btn-back {
-
-            margin-top: 15px;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-        }
-
-        .btn-back:hover {
-            background-color: #1c57b7;
-        }
+{% block extra_css %}
+<style>
+    /* --- 🔒 ASOSIY CONTENT SKROLINI QOTIRISH --- */
+    body .content {
+        overflow: hidden !important;
     }
 
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-</head>
-<body>
-    <div class="sidebar collapsed" id="sidebar">
-        <div class="toggle-container">
-            <img src="{{ global_image }}" alt="Logatip photo">
-            <div class="brand">FUMAISAK</div>
-            <button class="toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+    .sarlavha {
+        font-size: 22px;
+        font-weight: 800;
+        color: #ffffff;
+        border-left: 4px solid #00f2fe;
+        padding-left: 12px;
+        letter-spacing: -0.5px;
+        margin-bottom: 25px;
+    }
+
+    /* --- 📊 GORIZONTAL KIBER-KARTALAR PANELI --- */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .kiber-karta {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 20px;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+
+    .kiber-karta .matn-qismi {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .kiber-karta .kichik-tizim {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .kiber-karta .katta-qiymat {
+        font-size: 16px;
+        font-weight: 800;
+        color: #ffffff;
+        line-height: 1.3;
+    }
+
+    .kiber-karta .ikonka-qutisi {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, rgba(0, 242, 254, 0.1), rgba(79, 172, 254, 0.1));
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        color: #00f2fe;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    /* Progress Karta va Chiziq */
+    .progress-karta {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .progress-bar-container {
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.02);
+        border-radius: 20px;
+        overflow: hidden;
+        height: 24px;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #00f2fe, #4facfe);
+        text-align: center;
+        color: #070a12;
+        line-height: 24px;
+        font-weight: 800;
+        font-size: 12px;
+        transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
+    }
+
+    /* --- 📜 MUSTAQIL SKROL BO'LUVCHI XATOLAR JURNALI --- */
+    .xatalar-konteyner {
+        background: rgba(11, 15, 25, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        box-shadow: 0 40px 80px rgba(0,0,0,0.2);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 24px;
+
+        /* Ekran balandligiga qarab sarlavhalardan keyingi qismini skrol qilish */
+        max-height: calc(100vh - 290px);
+        overflow-y: auto;
+    }
+
+    .xatalar-konteyner::-webkit-scrollbar {
+        width: 4px;
+    }
+    .xatalar-konteyner::-webkit-scrollbar-thumb {
+        background: rgba(255, 0, 85, 0.2);
+        border-radius: 4px;
+    }
+
+    .xatalar-konteyner h3 {
+        color: #ff0055;
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        border-left: 3px solid #ff0055;
+        padding-left: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: sticky;
+        top: 0;
+        background: #080d1a;
+        padding-top: 4px;
+        padding-bottom: 8px;
+        z-index: 10;
+    }
+
+    .xatalar-konteyner ol {
+        list-style: none;
+        padding-left: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .xatalar-konteyner li {
+        padding: 16px 20px;
+        background: rgba(255, 0, 85, 0.01);
+        border: 1px solid rgba(255, 0, 85, 0.12);
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(255,0,85,0.03);
+        line-height: 1.5;
+    }
+
+    .xatalar-konteyner p {
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .no-errors-msg {
+        color: #00ffaa;
+        font-weight: 600;
+        font-size: 14.5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(0, 255, 170, 0.03);
+        border: 1px solid rgba(0, 255, 170, 0.15);
+        padding: 14px 20px;
+        border-radius: 12px;
+    }
+
+    /* Pastki tugma */
+    .btn-back-row {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .btn-back {
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.03);
+        color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 10px 24px;
+        border-radius: 10px;
+        font-size: 13.5px;
+        font-weight: 700;
+        transition: 0.3s;
+    }
+
+    .btn-back:hover {
+        background: #ffffff;
+        color: #070a12;
+        border-color: #ffffff;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px);
+    }
+
+    /* --- 📱 MOBIL REJIMDA RESPONSIVE RESET --- */
+    @media (max-width: 768px) {
+        body .content {
+            overflow: auto !important; /* Mobilda umumiy sahifa skroli qulayroq */
+        }
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        .xatalar-konteyner {
+            max-height: none;
+            overflow: visible;
+            padding: 16px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+        .btn-back {
+            width: 100%;
+            text-align: center;
+            padding: 12px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h2 class="sarlavha">Test natijasi</h2>
+
+    <!-- 📊 GORIZONTAL KIBER PANELDAGI SMART KARTALAR -->
+    <div class="stats-grid">
+        <!-- 1. Imtihon va Guruh -->
+        <div class="kiber-karta">
+            <div class="matn-qismi">
+                <span class="kichik-tizim">Imtihon & Guruh</span>
+                <span class="katta-qiymat">{{ result.quiz.title }}</span>
+                <span style="font-size: 12px; color: #4facfe; font-weight: 600; margin-top: 2px;">{{ result.quiz.group.name }}</span>
+            </div>
+            <div class="ikonka-qutisi"><i class="fas fa-clipboard-list"></i></div>
         </div>
 
-        <div class="user-info">
-            {% if user.profile_image %}
-                <img src="{{ student.profile_image.url }}" alt="User Photo">
-            {% else %}
-                <img src="{{ default_profile_image }}" alt="User Photo">
-            {% endif %}
-            <div style="display: flex; flex-direction: column;">
-                <span class="span">
-                    {% if user.role == "teacher" %}
-                        O'qituvchi
-                    {% elif user.role == "student" %}
-                        O'quvchi
-                    {% else %}
-                        {{ user.role }}
-                    {% endif %}
-                </span>
-                <span>{{ student.first_name }} {{ student.last_name }}</span>
+        <!-- 2. O'qituvchi -->
+        <div class="kiber-karta">
+            <div class="matn-qismi">
+                <span class="kichik-tizim">Mas'ul O'qituvchi</span>
+                <span class="katta-qiymat">{{ result.quiz.teacher.get_full_name }}</span>
+            </div>
+            <div class="ikonka-qutisi"><i class="fas fa-user-tie"></i></div>
+        </div>
+
+        <!-- 3. Savollar Ko'rsatkichi -->
+        <div class="kiber-karta">
+            <div class="matn-qismi">
+                <span class="kichik-tizim">Savollar Tahlili</span>
+                <span class="katta-qiymat" style="color: #00ffaa;">{{ correct_count }} ta <span style="color: rgba(255,255,255,0.3); font-weight: 500;">/ {{ total_questions }} tadan</span></span>
+            </div>
+            <div class="ikonka-qutisi" style="color: #00ffaa; border-color: rgba(0,255,170,0.2);"><i class="fas fa-check-double"></i></div>
+        </div>
+
+        <!-- 4. Reyting unumdorligi -->
+        <div class="kiber-karta progress-karta">
+            <div class="kichik-tizim" style="margin-bottom: -4px;">Natija unumdorligi</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progressFill">{{ score_percent }}%</div>
             </div>
         </div>
-
-        <ul>
-            <li><a href="{% url 'student_home' %}"><i class="fas fa-home"></i><span> Dashboard</span></a></li>
-            <li><a href="{% url 'student_groups_view' %}"><i class="fas fa-list"></i><span>Guruhlarim</span></a></li>
-            <li><a href="{% url 'student_schedule' %}"><i class="fas fa-calendar-alt"></i><span>Dars jadval</span></a></li>
-            <li><a href="{% url 'student_quiz_list' %}"><i class="fas fa-clipboard-check"></i><span>Onlayn test</span></a></li>
-            <li><a href="{% url 'student_assignments' %}"><i class="fas fa-clipboard-list"></i><span> Topshiriqlarim</span></a></li>
-            <li><a href="{% url 'student_payment_view' %}"><i class="fa-solid fa-money-check-dollar"></i><span> To'lovlarim</span></a></li>
-        </ul>
-
     </div>
 
-    <div class="main">
-        <div class="header">
-            <button class="toggle-main" id="mainToggle"><i class="fas fa-bars"></i></button>
-
-            <div class="user-profile">
-                <a href="javascript:void(0);" id="bell-btn">
-                    <i class="fa fa-bell"></i>
-                    {% if total_notification_count  > 0 %}
-                    <span class="notification-badge">{{ total_notification_count }}</span>
-                    {% endif %}
-                </a>
-                <div class="dropdown-panel" id="bell-panel">
-                    {% if student_notification_list or quiz_notification_list %}
-                        {% for note in student_notification_list %}
-                            <div class="dropdown-item">
-                                <strong>Guruh:</strong> {{ note.group }}<br>
-                                <strong>Topshiriq nomi:</strong> {{ note.title }}<br>
-                                <strong>Qolgan vaqt:</strong> {{ note.remaining }}
-                            </div>
-                        {% endfor %}
-                        <hr style="width: 100px; border: 1px solid #333">
-                        {% for quiz in quiz_notification_list %}
-                            <div class="dropdown-item">
-                                <strong>Guruh:</strong> {{ quiz.group.name }}<br>
-                                <strong>Test nomi:</strong> {{ quiz.title }}<br>
-                                <strong>Holat:</strong> Hali bajarilmagan
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="dropdown-item">Bildirishnoma yo‘q</div>
-                    {% endif %}
+    <!-- 📜 MUSTAQIL ICHKI SKROL BO'LUVCHI XATOLAR BLOKI -->
+    <div class="xatalar-konteyner">
+        <h3>Noto‘g‘ri javob berilgan savollar</h3>
+        <ol>
+            {% for answer in result.answers.all %}
+                {% if not answer.selected_answer or not answer.selected_answer.is_correct %}
+                    <li>
+                        <p><strong style="color: #ff808b;"><i class="fas fa-times-circle" style="margin-right: 6px;"></i> {{ answer.question.text }}</strong></p>
+                    </li>
+                {% endif %}
+            {% empty %}
+                <div class="no-errors-msg">
+                    <i class="fas fa-check-circle"></i> Tabriklaymiz! Barcha javoblar to‘g‘ri topshirildi.
                 </div>
-
-                <a href="javascript:void(0);" id="profile-btn">
-                    {% if user.profile_image %}
-                    <img src="{{ student.profile_image.url }}" alt="User profile" class="user_profile_img">
-                    {% else %}
-                    <img src="{{ default_profile_image }}" alt="User profile" class="user_profile_img">
-                    {% endif %}
-                </a>
-                <div class="dropdown-panel" id="profile-panel">
-                    <a href="{% url 'student_profile' %}" class="dropdown-item"><i class="fas fa-user"></i> Profilim</a>
-                    <a href="{% url 'login' %}" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="content">
-            <h2>Test natijasi</h2>
-
-            <table class="info-table">
-                <tr>
-                    <th>Test nomi:</th>
-                    <td>{{ result.quiz.title }}</td>
-                </tr>
-                <tr>
-                    <th>Guruh:</th>
-                    <td>{{ result.quiz.group.name }}</td>
-                </tr>
-                <tr>
-                    <th>O‘qituvchi:</th>
-                    <td>{{ result.quiz.teacher.get_full_name }}</td>
-                </tr>
-                <tr>
-                    <th>Umumiy savollar soni:</th>
-                    <td>{{ total_questions }}</td>
-                </tr>
-                <tr>
-                    <th>To‘g‘ri javoblar soni:</th>
-                    <td>{{ correct_count }}</td>
-                </tr>
-            </table>
-
-
-
-            <div class="score-box">
-                <div class="score-label">Natija: {{ score_percent }}%</div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar-fill" id="progressFill">
-                        {{ score_percent }}%
-                    </div>
-                </div>
-            </div>
-
-            <div class="question-block">
-                <h3>Noto‘g‘ri javob berilgan savollar:</h3>
-                <ol>
-                    {% for answer in result.answers.all %}
-                        {% if not answer.selected_answer or not answer.selected_answer.is_correct %}
-                            <li>
-                                <p><strong style="color: #e74c3c">{{ answer.question.text }}</strong></p>
-                            </li>
-                        {% endif %}
-                    {% empty %}
-                        <p>Barcha javoblar to‘g‘ri.</p>
-                    {% endfor %}
-                </ol>
-            </div>
-
-            <a href="{% url 'student_quiz_list' %}" class="btn-back">Chiqish</a>
-        </div>
+            {% endfor %}
+        </ol>
     </div>
 
-    <script>
-        const sidebar = document.getElementById('sidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const mainToggle = document.getElementById('mainToggle');
+    <!-- ORQAGA QAYTISH -->
+    <div class="btn-back-row">
+        <a href="{% url 'student_quiz_list' %}" class="btn-back"><i class="fas fa-arrow-left" style="margin-right: 6px;"></i> Chiqish jurnali</a>
+    </div>
+{% endblock %}
 
-        function toggleSidebar() {
-            if (window.innerWidth <= 768) {
-                sidebar.classList.toggle('show');
-            } else {
-                sidebar.classList.toggle('collapsed');
-            }
-        }
-
-        sidebarToggle.addEventListener('click', toggleSidebar);
-        mainToggle.addEventListener('click', toggleSidebar);
-
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('show');
-            }
-        });
-
-        function togglePanel(idToShow) {
-        const panels = document.querySelectorAll('.dropdown-panel');
-        panels.forEach(panel => {
-            if (panel.id !== idToShow) {
-                panel.classList.remove('active');
-            }
-            });
-
-            const panel = document.getElementById(idToShow);
-            panel.classList.toggle('active');
-        }
-
-        document.getElementById('bell-btn').addEventListener('click', () => togglePanel('bell-panel'));
-        document.getElementById('profile-btn').addEventListener('click', () => togglePanel('profile-panel'));
-
-        document.addEventListener('click', function (e) {
-            if (!e.target.closest('.user-profile')) {
-            document.querySelectorAll('.dropdown-panel').forEach(p => p.classList.remove('active'));
-            }
-        });
+{% block extra_js %}
+<script>
+    /* --- 🔄 PROGRESS BAR FOIZINI ANIMATSIYA BILAN TO'LDIRISH --- */
+    document.addEventListener("DOMContentLoaded", function() {
         const fill = document.getElementById('progressFill');
-        const percent = parseInt(fill.textContent);
-
-        fill.style.width = percent + '%';
-    </script>
-</body>
-</html>
+        if (fill) {
+            const percent = parseInt(fill.textContent);
+            fill.style.width = percent + '%';
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,466 @@
+{% extends 'basestudent.html' %}
+
+{% block title %}Mustaqil AI Quiz Natijasi - {{ quiz.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- 🔄 ANDOZADAN KELAYOTGAN SKROL CHEKLOVINI OLIB TASHLASH (FIX) --- */
+    body .content {
+        overflow-y: auto !important;
+    }
+    body .content::-webkit-scrollbar {
+        width: 5px;
+    }
+    body .content::-webkit-scrollbar-thumb {
+        background: rgba(0, 242, 254, 0.2);
+        border-radius: 4px;
+    }
+
+    /* --- 📊 NATIJALAR VA SAVOLLAR TAHLILI STILLARI --- */
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        padding: 20px 25px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        margin-bottom: 25px;
+    }
+    .results-title-box h2 {
+        font-size: 18px;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 4px;
+    }
+    .results-title-box span {
+        font-size: 11.5px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 18px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        transition: all 0.2s;
+    }
+    .btn-back:hover {
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        color: #070a12;
+        border-color: transparent;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+    }
+
+    /* Top Grid: Score & AI Feedback */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 25px;
+        margin-bottom: 25px;
+        align-items: stretch;
+    }
+
+    .score-card {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 24px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    .gauge-container {
+        position: relative;
+        width: 140px;
+        height: 140px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .score-circle-svg {
+        transform: rotate(-90deg);
+    }
+    .score-text {
+        position: absolute;
+        font-size: 28px;
+        font-weight: 800;
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1;
+    }
+    .score-text span {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.4);
+        margin-top: 4px;
+        font-weight: 600;
+    }
+
+    .status-text {
+        font-size: 16px;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
+    .status-good { color: #00ffaa; }
+    .status-average { color: #ffc107; }
+    .status-poor { color: #ff0055; }
+
+    .score-details-text {
+        font-size: 12.5px;
+        color: rgba(255,255,255,0.4);
+        font-weight: 600;
+    }
+
+    /* AI Tutor Card */
+    .ai-feedback-card {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        display: flex;
+        flex-direction: column;
+    }
+    .ai-tutor-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 15px;
+        font-weight: 800;
+        color: #00f2fe;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 18px;
+    }
+    .ai-tutor-title i {
+        font-size: 18px;
+        background: rgba(0, 242, 254, 0.1);
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+    }
+    .ai-feedback-text {
+        font-size: 14px;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.85);
+        flex-grow: 1;
+        overflow-y: auto;
+        max-height: 220px;
+        padding-right: 8px;
+    }
+    .ai-feedback-text::-webkit-scrollbar {
+        width: 3px;
+    }
+    .ai-feedback-text::-webkit-scrollbar-thumb {
+        background: rgba(0, 242, 254, 0.2);
+        border-radius: 4px;
+    }
+    .ai-feedback-text p { margin-bottom: 12px; }
+    .ai-feedback-text ul, .ai-feedback-text ol { margin-left: 20px; margin-bottom: 12px; }
+    .ai-feedback-text li { margin-bottom: 6px; }
+    .ai-feedback-text strong { color: #00f2fe; }
+    .ai-feedback-text h1, .ai-feedback-text h2, .ai-feedback-text h3 {
+        color: #00f2fe; font-size: 15px; font-weight: 700; margin-top: 15px; margin-bottom: 10px;
+    }
+
+    /* Question Breakdown List */
+    .questions-header-title {
+        font-size: 16px;
+        font-weight: 800;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        color: #ffffff;
+        border-left: 4px solid #4facfe;
+        padding-left: 12px;
+    }
+
+    .question-result-card {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 20px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    .q-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    .q-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-size: 11.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .q-badge-correct {
+        background: rgba(0, 255, 170, 0.08); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.2);
+    }
+    .q-badge-incorrect {
+        background: rgba(255, 0, 85, 0.08); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.2);
+    }
+    .q-badge-unanswered {
+        background: rgba(255, 193, 7, 0.08); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.2);
+    }
+
+    .q-text {
+        font-size: 15px;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1.6;
+    }
+
+    /* Review options */
+    .review-options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .review-option {
+        display: flex;
+        align-items: center;
+        padding: 14px 18px;
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 12px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .option-correct-answer { background: rgba(0, 255, 170, 0.03); border-color: rgba(0, 255, 170, 0.3); color: #00ffaa; }
+    .option-selected-wrong { background: rgba(255, 0, 85, 0.03); border-color: rgba(255, 0, 85, 0.3); color: #ff0055; }
+    .review-icon { font-size: 14px; margin-right: 12px; width: 18px; text-align: center; }
+
+    /* AI Explanation section */
+    .explanation-trigger {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        padding: 12px 18px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        font-weight: 700;
+        color: rgba(0, 242, 254, 0.8);
+        transition: all 0.2s;
+    }
+    .explanation-trigger:hover {
+        background: rgba(0, 242, 254, 0.03); border-color: rgba(0, 242, 254, 0.2); color: #00f2fe;
+    }
+    .explanation-trigger i { transition: transform 0.2s; }
+    .explanation-trigger.active i { transform: rotate(180deg); }
+
+    .explanation-content {
+        display: none;
+        padding: 16px 18px;
+        background: rgba(0, 242, 254, 0.01);
+        border: 1px solid rgba(0, 242, 254, 0.08);
+        border-top: none;
+        border-radius: 0 0 12px 12px;
+        font-size: 13px;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    .explanation-trigger.active {
+        border-radius: 12px 12px 0 0; border-color: rgba(0, 242, 254, 0.08); background: rgba(0, 242, 254, 0.02);
+    }
+
+    /* Adaptation */
+    @media (max-width: 1024px) {
+        .summary-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+        .results-header { flex-direction: column; align-items: stretch; gap: 15px; padding: 15px; }
+        .question-result-card { padding: 16px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="results-header">
+        <div class="results-title-box">
+            <h2>{{ quiz.title }} (AI Quiz Natijasi)</h2>
+            <span>Topshirilgan sana: {{ quiz.submitted_at|date:"d.m.Y H:i" }}</span>
+        </div>
+        <a href="{% url 'ai_quiz_dashboard' %}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Jurnalga qaytish
+        </a>
+    </div>
+
+    <!-- Top Grid: Score & AI Review -->
+    <div class="summary-grid">
+        <!-- Score gauge -->
+        <div class="score-card">
+            <div class="gauge-container">
+                <svg class="score-circle-svg" width="140" height="140">
+                    <!-- Background track -->
+                    <circle cx="70" cy="70" r="60" stroke="rgba(255,255,255,0.03)" stroke-width="10" fill="transparent"/>
+                    <!-- Active gauge -->
+                    <circle cx="70" cy="70" r="60"
+                            stroke="{% if score_percent >= 80 %}#00ffaa{% elif score_percent >= 50 %}#ffc107{% else %}#ff0055{% endif %}"
+                            stroke-width="10"
+                            fill="transparent"
+                            stroke-dasharray="377"
+                            stroke-dashoffset="377"
+                            id="circleProgress"/>
+                </svg>
+                <div class="score-text">
+                    {{ score_percent }}%
+                    <span>Muvaffaqiyat</span>
+                </div>
+            </div>
+            <div class="status-text {% if score_percent >= 80 %}status-good{% elif score_percent >= 50 %}status-average{% else %}status-poor{% endif %}">
+                {% if score_percent >= 80 %}Ajoyib natija!
+                {% elif score_percent >= 50 %}Yaxshi harakat!
+                {% else %}Qayta urinib ko'ring!{% endif %}
+            </div>
+            <div class="score-details-text">
+                Ball: {{ quiz.score }} / {{ quiz.max_score }}
+            </div>
+        </div>
+
+        <!-- AI Repetitor sharhi -->
+        <div class="ai-feedback-card">
+            <div class="ai-tutor-title">
+                <i class="fas fa-robot"></i>
+                <span>AI Repetitor Sharhi & Maslahatlari</span>
+            </div>
+            <div id="aiFeedbackText" style="display:none;">{{ feedback_text }}</div>
+            <div class="ai-feedback-text" id="aiFeedbackRendered"></div>
+        </div>
+    </div>
+
+    <!-- Question breakdown -->
+    <h3 class="questions-header-title">Savollar tahlili va yechimlari</h3>
+
+    {% for item in questions_data %}
+        <div class="question-result-card">
+            <div class="q-card-header">
+                <div class="q-text">Savol {{ forloop.counter }}: {{ item.question.text }}</div>
+                <div>
+                    {% if item.selected_answer %}
+                        {% if item.is_correct %}
+                            <span class="q-badge q-badge-correct"><i class="fas fa-check-circle"></i> To'g'ri</span>
+                        {% else %}
+                            <span class="q-badge q-badge-incorrect"><i class="fas fa-times-circle"></i> Noto'g'ri</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="q-badge q-badge-unanswered"><i class="fas fa-exclamation-triangle"></i> Javobsiz</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="review-options">
+                {% for answer in item.answers %}
+                    <div class="review-option
+                        {% if answer.is_correct %}option-correct-answer
+                        {% elif item.selected_answer.id == answer.id and not item.is_correct %}option-selected-wrong{% endif %}">
+                        <span class="review-icon">
+                            {% if answer.is_correct %}
+                                <i class="fas fa-check-circle" style="color: #00ffaa;"></i>
+                            {% elif item.selected_answer.id == answer.id and not item.is_correct %}
+                                <i class="fas fa-times-circle" style="color: #ff0055;"></i>
+                            {% else %}
+                                <i class="far fa-circle" style="color: rgba(255,255,255,0.15);"></i>
+                            {% endif %}
+                        </span>
+                        <span>{{ answer.text }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if item.question.correct_explanation %}
+                <div class="explanation-container">
+                    <div class="explanation-trigger" onclick="toggleExplanation(this)">
+                        <span><i class="fas fa-info-circle" style="margin-right: 6px;"></i> Sun'iy intellekt tushuntirishi (Izoh)</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="explanation-content">
+                        {{ item.question.correct_explanation|linebreaksbr }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+    /* --- 🔄 ANIMATSIYALAR VA IZOHLARNI TOGGLE QILISH MANTIQLARI --- */
+    document.addEventListener("DOMContentLoaded", function() {
+        // Circle progress bar hisob-kitoblari
+        const percent = {{ score_percent }};
+        const circle = document.getElementById('circleProgress');
+        if (circle) {
+            const radius = circle.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius; // taxminan 377
+            const offset = circumference - (percent / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+        }
+
+        // AI Mentor fikrini Markdown formatda render qilish
+        const rawEl = document.getElementById("aiFeedbackText");
+        const renderedEl = document.getElementById("aiFeedbackRendered");
+        if (rawEl && renderedEl) {
+            const rawText = rawEl.textContent || "";
+            if (typeof marked !== "undefined" && typeof marked.parse === "function") {
+                renderedEl.innerHTML = marked.parse(rawText);
+            } else {
+                renderedEl.innerHTML = rawText.replace(/\n/g, "<br>");
+            }
+        }
+    });
+
+    // Sun'iy intellekt izoh panelini ochib-yopish funksiyasi
+    function toggleExplanation(el) {
+        el.classList.toggle('active');
+        const content = el.nextElementSibling;
+        if (content) {
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        }
+    }
+</script>
+{% endblock %}

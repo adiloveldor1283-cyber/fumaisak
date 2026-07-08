@@ -1,0 +1,601 @@
+{% extends 'basestudent.html' %}
+
+{% block title %}Mustaqil AI Quiz Dashboard - Student Profili{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- 🤖 AI INTERFEYSI VA FORMA ELEMENTLARI UCHUN STILLAR --- */
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    .content-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: #ffffff;
+        border-left: 4px solid #00f2fe;
+        padding-left: 12px;
+        letter-spacing: -0.5px;
+    }
+    .content-title span {
+        color: #00f2fe;
+    }
+
+    /* Kartalar */
+    .kartalar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+    .karta {
+        flex: 1;
+        min-width: 220px;
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 20px;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    .karta .matn {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 600;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .karta .pul {
+        font-size: 24px;
+        font-weight: 800;
+        color: white;
+        letter-spacing: -0.5px;
+    }
+    .karta .ikonka {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, rgba(0, 242, 254, 0.1), rgba(79, 172, 254, 0.1));
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        color: #00f2fe;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+    }
+
+    /* Main Workspace Grid */
+    .workspace-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 1.9fr;
+        gap: 25px;
+        align-items: start;
+    }
+
+    /* Glass Cards */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 24px;
+        padding: 25px;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+    }
+    .glass-card h3 {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #ffffff;
+        border-left: 3px solid #00f2fe;
+        padding-left: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Custom Category Field */
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.4);
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+    }
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 13.5px;
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        color: white;
+        outline: none;
+        transition: all 0.3s;
+    }
+    .form-control:focus {
+        border-color: #00f2fe;
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+    }
+
+    /* Difficulty Selection Styling */
+    .level-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+    .level-item input[type="radio"] {
+        display: none;
+    }
+    .level-label {
+        display: block;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.6);
+    }
+    .level-item input[type="radio"]:checked + .level-label {
+        background: rgba(0, 242, 254, 0.06);
+        border-color: #00f2fe;
+        color: #00f2fe;
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
+    }
+
+    /* Buttons */
+    .btn-generate {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        color: #070a12;
+        font-weight: 800;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn-generate:hover {
+        box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        transform: translateY(-2px);
+    }
+
+    /* History Table Card (Desktop) */
+    .table-container {
+        overflow: auto;
+        max-height: 400px;
+    }
+    .table-container::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+    .table-container::-webkit-scrollbar-thumb {
+        background: rgba(0, 242, 254, 0.2);
+        border-radius: 4px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+    th {
+        padding: 12px 10px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.4);
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    td {
+        padding: 14px 10px;
+        font-size: 13px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        color: rgba(255, 255, 255, 0.8);
+        vertical-align: middle;
+    }
+    tr:hover td {
+        background: rgba(255, 255, 255, 0.01);
+    }
+
+    /* Badges */
+    .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .badge-level {
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .badge-completed {
+        background: rgba(0, 255, 170, 0.08);
+        color: #00ffaa;
+        border: 1px solid rgba(0, 255, 170, 0.15);
+    }
+    .badge-pending {
+        background: rgba(255, 193, 7, 0.08);
+        color: #ffc107;
+        border: 1px solid rgba(255, 193, 7, 0.15);
+    }
+
+    .score-box {
+        font-weight: 800;
+        font-size: 13.5px;
+    }
+    .score-good { color: #00ffaa; }
+    .score-average { color: #ffc107; }
+    .score-poor { color: #ff0055; }
+
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 11.5px;
+        font-weight: 600;
+        transition: all 0.2s;
+        margin-left: 10px;
+    }
+    .btn-action:hover {
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        color: #070a12;
+        border-color: transparent;
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+    }
+
+    /* Message Toasts */
+    .toast {
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+        padding: 12px 16px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .toast-error {
+        background: rgba(255, 0, 85, 0.1);
+        border: 1px solid rgba(255, 0, 85, 0.2);
+        color: #ff0055;
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(7, 10, 18, 0.85);
+        backdrop-filter: blur(10px);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .spinner {
+        width: 60px;
+        height: 60px;
+        border: 3px solid rgba(0, 242, 254, 0.1);
+        border-radius: 50%;
+        border-top-color: #00f2fe;
+        animation: spin 1s ease-in-out infinite;
+        box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    .loading-text {
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .loading-subtext {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 12px;
+    }
+
+    /* --- 📱 MOBIL REJIM VERTIKAL REJIM --- */
+    @media (max-width: 1024px) {
+        .workspace-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    @media (max-width: 768px) {
+        .level-grid {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
+        }
+
+        /* JADVALNI KARTALARGA AYLANTIRISH */
+        .table-container {
+            max-height: none;
+            overflow: visible;
+            width: 100%;
+        }
+        table, thead, tbody, th, td, tr {
+            display: block;
+            width: 100% !important;
+        }
+        thead {
+            display: none;
+        }
+        tr {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        td {
+            display: flex !important;
+            justify-content: space-between;
+            align-items: center;
+            text-align: right !important;
+            padding: 12px 0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 13px;
+        }
+        td:last-child {
+            border-bottom: none;
+            padding-top: 14px !important;
+            justify-content: center !important;
+        }
+
+        td::before {
+            content: attr(data-label);
+            float: left;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+            padding: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">AI test savollarini tuzmoqda...</div>
+        <div class="loading-subtext">Bu biroz vaqt olishi mumkin, iltimos sahifani yopmang.</div>
+    </div>
+
+    <div class="content-header">
+        <h2 class="content-title">Mustaqil <span>AI Quiz Test</span></h2>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="toast {% if message.tags == 'error' %}toast-error{% endif %}">
+                <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Statistika Kartalari -->
+    <div class="kartalar">
+        <div class="karta">
+            <div>
+                <div class="matn">Jami AI Testlar</div>
+                <div class="pul">{{ total_quizzes_count }}</div>
+            </div>
+            <div class="ikonka"><i class="fas fa-robot"></i></div>
+        </div>
+        <div class="karta">
+            <div>
+                <div class="matn">Tugatilganlar</div>
+                <div class="pul" style="color: #00ffaa;">{{ completed_quizzes_count }}</div>
+            </div>
+            <div class="ikonka" style="color: #00ffaa; border-color: rgba(0,255,170,0.2); background: rgba(0,255,170,0.05);"><i class="fas fa-clipboard-check"></i></div>
+        </div>
+        <div class="karta">
+            <div>
+                <div class="matn">O'rtacha Natija</div>
+                <div class="pul" style="color: #ffc107;">{{ average_percent }}%</div>
+            </div>
+            <div class="ikonka" style="color: #ffc107; border-color: rgba(255,193,7,0.2); background: rgba(255,193,7,0.05);"><i class="fas fa-chart-line"></i></div>
+        </div>
+        <div class="karta">
+            <div>
+                <div class="matn">Eng Yuqori Natija</div>
+                <div class="pul" style="color: #00f2fe;">{% if best_quiz %}{{ best_percent }}%{% else %}Noma'lum{% endif %}</div>
+            </div>
+            <div class="ikonka" style="color: #00f2fe; border-color: rgba(0,242,254,0.2); background: rgba(0,242,254,0.05);"><i class="fas fa-trophy"></i></div>
+        </div>
+    </div>
+
+    <!-- Workspace Grid -->
+    <div class="workspace-grid">
+        <!-- Test yaratish -->
+        <div class="glass-card">
+            <h3><i class="fas fa-cog"></i> Yangi test sozlamalari</h3>
+            <form method="post" id="quizGeneratorForm">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="custom_category">Mavzuni yozing, AI shunga moslab test tuzib beradi *</label>
+                    <input type="text" class="form-control" id="custom_category" name="custom_category" placeholder="Masalan: Present Simple, Trigonometriya..." autocomplete="off" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Testlar soni</label>
+                    <div class="level-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr !important;">
+                        <div class="level-item">
+                            <input type="radio" name="num_questions" value="5" id="num5" checked>
+                            <label class="level-label" for="num5">5 ta</label>
+                        </div>
+                        <div class="level-item">
+                            <input type="radio" name="num_questions" value="10" id="num10">
+                            <label class="level-label" for="num10">10 ta</label>
+                        </div>
+                        <div class="level-item">
+                            <input type="radio" name="num_questions" value="15" id="num15">
+                            <label class="level-label" for="num15">15 ta</label>
+                        </div>
+                        <div class="level-item">
+                            <input type="radio" name="num_questions" value="20" id="num20">
+                            <label class="level-label" for="num20">20 ta</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Qiyinchilik darajasi</label>
+                    <div class="level-grid">
+                        <div class="level-item">
+                            <input type="radio" name="level" value="beginner" id="lvl1" checked>
+                            <label class="level-label" for="lvl1">A1-A2 (Past)</label>
+                        </div>
+                        <div class="level-item">
+                            <input type="radio" name="level" value="intermediate" id="lvl2">
+                            <label class="level-label" for="lvl2">B1-B2 (O'rta)</label>
+                        </div>
+                        <div class="level-item">
+                            <input type="radio" name="level" value="advanced" id="lvl3">
+                            <label class="level-label" for="lvl3">C1-C2 (Yuqori)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-generate">
+                    <i class="fas fa-magic"></i> AI orqali test yaratish
+                </button>
+            </form>
+        </div>
+
+        <!-- Testlar tarixi -->
+        <div class="glass-card">
+            <h3><i class="fas fa-history"></i> Testlar jurnali & Tarixi</h3>
+
+            <div class="table-container">
+                {% if quizzes %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mavzu nomi</th>
+                                <th>Daraja</th>
+                                <th>Natija</th>
+                                <th>Sana</th>
+                                <th>Harakat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for quiz in quizzes %}
+                                <tr>
+                                    <td data-label="Mavzu nomi" style="font-weight: bold; color: #ffffff;">{{ quiz.title }}</td>
+                                    <td data-label="Daraja">
+                                        <span class="badge badge-level">
+                                            {% if quiz.level == 'beginner' %}A1-A2
+                                            {% elif quiz.level == 'intermediate' %}B1-B2
+                                            {% else %}C1-C2{% endif %}
+                                        </span>
+                                    </td>
+                                    <td data-label="Natija">
+                                        {% if quiz.is_completed %}
+                                            <span class="score-box {% if quiz.score >= 80 %}score-good{% elif quiz.score >= 50 %}score-average{% else %}score-poor{% endif %}">
+                                                {{ quiz.score }}%
+                                            </span>
+                                        {% else %}
+                                            <span class="badge badge-pending">Topshirilmagan</span>
+                                        {% endif %}
+                                    </td>
+                                    <td data-label="Sana">{{ quiz.created_at|date:"d.m.Y H:i" }}</td>
+                                    <td data-label="Harakat">
+                                        {% if quiz.is_completed %}
+                                            <a href="{% url 'ai_quiz_results' quiz.id %}" class="btn-action">
+                                                <i class="fas fa-eye"></i> Natija
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'ai_quiz_take' quiz.id %}" class="btn-action" style="background: rgba(0, 242, 254, 0.08); border-color: rgba(0, 242, 254, 0.2); color: #00f2fe;">
+                                                <i class="fas fa-play"></i> Boshlash
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div style="text-align: center; padding: 40px 10px; color: rgba(255,255,255,0.3); font-style: italic;">
+                        <i class="fas fa-folder-open" style="font-size: 28px; display: block; margin-bottom: 12px; color: rgba(255,255,255,0.15);"></i>
+                        Siz hali AI orqali mustaqil test tuzmadingiz.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* --- 🔍 FAQAT FORM SUBMIT VA LOADING OVERLAY TRIPPER LOGIKASI --- */
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById('quizGeneratorForm');
+        const overlay = document.getElementById('loadingOverlay');
+
+        if (form && overlay) {
+            form.addEventListener('submit', function(e) {
+                const customInput = document.getElementById('custom_category').value.trim();
+
+                if (!customInput) {
+                    e.preventDefault();
+                    alert("Iltimos, mavzu kiriting!");
+                    return;
+                }
+
+                overlay.style.display = 'flex';
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,432 @@
+{% extends 'basestudent.html' %}
+
+{% block title %}Mustaqil AI Quiz - {{ quiz.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- 🔄 ANDOZADAN KELAYOTGAN SKROL CHEKLOVINI OLIB TASHLASH (FIX) --- */
+    body .content {
+        overflow-y: auto !important;
+    }
+    body .content::-webkit-scrollbar {
+        width: 5px;
+    }
+    body .content::-webkit-scrollbar-thumb {
+        background: rgba(0, 242, 254, 0.2);
+        border-radius: 4px;
+    }
+
+    /* --- ⏱️ TEST TOPSHIRISH, TAYMER VA PROGRESS BAR STILLARI --- */
+    .quiz-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        padding: 20px 25px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        margin-bottom: 25px;
+    }
+    .quiz-title-box h2 {
+        font-size: 18px;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 4px;
+    }
+    .quiz-title-box span {
+        font-size: 11.5px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .btn-quit {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 18px;
+        background: rgba(255, 0, 85, 0.08);
+        border: 1px solid rgba(255, 0, 85, 0.2);
+        color: #ff0055;
+        text-decoration: none;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        transition: all 0.2s;
+    }
+    .btn-quit:hover {
+        background: #ff0055;
+        color: #ffffff;
+        box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+    }
+
+    /* Progress Bar */
+    .progress-container {
+        margin-bottom: 30px;
+    }
+    .progress-text {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 8px;
+    }
+    .progress-bar-bg {
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 10px;
+        height: 10px;
+        width: 100%;
+        overflow: hidden;
+    }
+    .progress-bar-fill {
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        height: 100%;
+        width: 0%;
+        transition: width 0.4s ease-out;
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+    }
+
+    /* Question Form */
+    .quiz-form {
+        max-width: 800px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    .question-card {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 24px;
+        padding: 30px;
+        margin-bottom: 25px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    .question-number {
+        font-size: 11.5px;
+        font-weight: 800;
+        color: #00f2fe;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+    }
+    .question-text {
+        font-size: 16px;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1.6;
+        margin-bottom: 25px;
+    }
+
+    /* Options grid */
+    .options-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .option-item input[type="radio"] {
+        display: none;
+    }
+    .option-label {
+        display: flex;
+        align-items: center;
+        padding: 16px 20px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.8);
+        position: relative;
+    }
+    .option-label:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+    }
+    .option-circle {
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+        border-radius: 50%;
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+    .option-circle::after {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background: #070a12;
+        border-radius: 50%;
+        display: block;
+        transform: scale(0);
+        transition: transform 0.2s;
+    }
+
+    /* Option Checked State */
+    .option-item input[type="radio"]:checked + .option-label {
+        background: rgba(0, 242, 254, 0.04);
+        border-color: #00f2fe;
+        color: #00f2fe;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.1);
+    }
+    .option-item input[type="radio"]:checked + .option-label .option-circle {
+        border-color: #00f2fe;
+        background: #00f2fe;
+    }
+    .option-item input[type="radio"]:checked + .option-label .option-circle::after {
+        transform: scale(1);
+    }
+
+    /* Submit Button Block */
+    .submit-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+        margin-bottom: 50px;
+    }
+    .btn-submit-quiz {
+        padding: 16px 45px;
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        color: #070a12;
+        font-weight: 800;
+        border: none;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+        box-shadow: 0 10px 30px rgba(0, 242, 254, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .btn-submit-quiz:hover {
+        box-shadow: 0 0 30px rgba(0, 242, 254, 0.5);
+        transform: translateY(-2px);
+    }
+    .btn-submit-quiz:disabled {
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
+
+    /* Loading Screen on Submit */
+    .loading-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(7, 10, 18, 0.9);
+        backdrop-filter: blur(10px);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .spinner {
+        width: 60px;
+        height: 60px;
+        border: 3px solid rgba(255, 0, 85, 0.1);
+        border-radius: 50%;
+        border-top-color: #ff0055;
+        animation: spin 1s ease-in-out infinite;
+        box-shadow: 0 0 20px rgba(255, 0, 85, 0.2);
+    }
+    .loading-text {
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .loading-subtext {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 12px;
+    }
+
+    /* Mobile adaptation */
+    @media (max-width: 768px) {
+        .quiz-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+            padding: 15px;
+        }
+        .cyber-timer-card {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            justify-content: center;
+            width: 100%;
+        }
+        .question-card { padding: 20px; }
+        .option-label { padding: 14px 16px; font-size: 13px; }
+    }
+    @keyframes pulse {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
+    }
+    @keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="loading-overlay" id="submitOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Natijalaringiz AI Repetitorga yuborilmoqda...</div>
+        <div class="loading-subtext">AI sizning xatolaringizni tekshirib, shaxsiy tavsiyalar tayyorlamoqda. Sahifadan chiqmang.</div>
+    </div>
+
+    <div class="quiz-header">
+        <div class="quiz-title-box">
+            <h2>{{ quiz.title }}</h2>
+            <span>Daraja: {% if quiz.level == 'beginner' %}A1-A2 (Boshlang'ich){% elif quiz.level == 'intermediate' %}B1-B2 (O'rta){% else %}C1-C2 (Yuqori){% endif %}</span>
+        </div>
+        <div class="cyber-timer-card" style="padding: 8px 16px; min-width: 140px; margin-left: auto; margin-right: 20px; background: rgba(255, 0, 85, 0.04); border: 1px solid rgba(255, 0, 85, 0.2); box-shadow: 0 0 10px rgba(255, 0, 85, 0.1); border-radius: 12px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-stopwatch" style="color: #ff0055; animation: pulse 2s infinite; font-size: 18px;"></i>
+            <div>
+                <div style="font-size: 9px; text-transform: uppercase; color: rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 0.5px; line-height: 1;">Vaqt</div>
+                <div id="time" style="font-size: 18px; font-weight: 800; color: #ffffff; font-variant-numeric: tabular-nums; letter-spacing: -0.5px; line-height: 1.2;">00:00</div>
+            </div>
+        </div>
+        <a href="{% url 'ai_quiz_dashboard' %}" class="btn-quit" onclick="return confirm('Haqiqatan ham testdan chiqmoqchisiz? Barcha saqlanmagan javoblar yo\'qoladi.');">
+            <i class="fas fa-times-circle"></i> Chiqish
+        </a>
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-text">
+            <span>Jarayon</span>
+            <span id="progressText">0 / {{ questions|length }} bajarildi</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'ai_quiz_submit' quiz.id %}" class="quiz-form" id="quizSubmitForm">
+        {% csrf_token %}
+
+        {% for question in questions %}
+            <div class="question-card" data-q-id="{{ question.id }}">
+                <div class="question-number">Savol {{ forloop.counter }}</div>
+                <div class="question-text">{{ question.text }}</div>
+
+                <div class="options-list">
+                    {% for answer in question.answers.all %}
+                        <div class="option-item">
+                            <input type="radio" name="question_{{ question.id }}" value="{{ answer.id }}" id="ans_{{ answer.id }}" class="option-radio">
+                            <label class="option-label" for="ans_{{ answer.id }}">
+                                <div class="option-circle"></div>
+                                <span>{{ answer.text }}</span>
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="submit-container">
+            <button type="submit" class="btn-submit-quiz" id="btnSubmitQuiz" disabled>
+                <i class="fas fa-check-double"></i> Testni yakunlash
+            </button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* --- 🔄 TAYMER, VALIDATSIYA VA PROGRESS BAR LOGIKALARI --- */
+    document.addEventListener("DOMContentLoaded", function () {
+        const radios = document.querySelectorAll('.option-radio');
+        const submitBtn = document.getElementById('btnSubmitQuiz');
+        const totalQuestions = {{ questions|length }};
+        const uniqueQuestions = new Set();
+
+        radios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                const card = this.closest('.question-card');
+                const questionId = card.getAttribute('data-q-id');
+
+                uniqueQuestions.add(questionId);
+
+                // Progress barni yangilash
+                const answeredCount = uniqueQuestions.size;
+                const percent = (answeredCount / totalQuestions) * 100;
+
+                document.getElementById('progressBar').style.width = percent + '%';
+                document.getElementById('progressText').innerText = answeredCount + " / " + totalQuestions + " bajarildi";
+
+                // Hamma savol javob berilsa tugmani aktivlashtirish
+                if (answeredCount === totalQuestions) {
+                    if(submitBtn) submitBtn.disabled = false;
+                }
+            });
+        });
+
+        // Form yuklanayotganda ekranni qulflash
+        const form = document.getElementById('quizSubmitForm');
+        const overlay = document.getElementById('submitOverlay');
+
+        if(form && overlay) {
+            form.addEventListener('submit', function() {
+                overlay.style.display = 'flex';
+            });
+        }
+
+        // Teskari sanoq taymer mantiqi
+        let timeRemaining = {{ quiz.time_limit }} * 60;
+        function updateTimer() {
+            let minutes = Math.floor(timeRemaining / 60);
+            let seconds = timeRemaining % 60;
+            const timeElement = document.getElementById("time");
+
+            if (timeElement) {
+                timeElement.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }
+
+            // Vaqt 1 daqiqadan kam qolganda taymer blokini qizil ogohlantirishga o'tkazish
+            if (timeRemaining <= 60) {
+                const timerCard = document.querySelector('.cyber-timer-card');
+                if (timerCard) {
+                    timerCard.style.background = "rgba(255, 0, 85, 0.15)";
+                    timerCard.style.borderColor = "#ff0055";
+                    timerCard.style.boxShadow = "0 0 15px rgba(255, 0, 85, 0.3)";
+                }
+            }
+
+            timeRemaining--;
+
+            if (timeRemaining < 0) {
+                clearInterval(timerInterval);
+                if(overlay) overlay.style.display = 'flex';
+                if(form) form.submit();
+            }
+        }
+
+        const timerInterval = setInterval(updateTimer, 1000);
+        updateTimer();
+    });
+</script>
+{% endblock %}

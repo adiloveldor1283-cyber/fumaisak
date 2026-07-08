@@ -1,305 +1,681 @@
-<html lang="en">
+{% load static %}
+<html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foydalanuvchi qo'shish</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>O'quvchi Tahrirlash</title>
+    <!-- Google Fonts va FontAwesome Ikonkalar -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     <style>
         * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
 
-body {
-    font-family: sans-serif;
-    background-color: #111;
-    color: #ccc;
-}
+        body {
+            background: #070a12;
+            color: #ffffff;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-.headerr {
-    background-color: #2c5d77;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #fff;
-}
+        /* Cyberpunk Orqa Fon */
+        .cyber-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Cpath d='M0,150 Q200,80 500,200 T1000,80 T1500,250' fill='none' stroke='%2300f2fe' stroke-width='3'/%3E%3C/svg%3E");
+            background-size: cover;
+        }
 
-.headerr h1 {
-    font-size: 20px;
-}
+        /* Sidebar */
+        .sidebar {
+            background: rgba(11, 15, 25, 0.6);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: white;
+            width: 250px;
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1001;
+        }
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        .sidebar .toggle-container {
+            position: relative;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .sidebar .toggle-container img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 242, 254, 0.2);
+        }
+        .toggle-btn {
+            margin-left: 30px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 2;
+            transition: 0.3s;
+        }
+        .toggle-btn:hover {
+            color: #00f2fe;
+        }
+        .brand {
+            font-size: 20px;
+            font-weight: bold;
+            margin-left: 15px;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .sidebar.collapsed .brand {
+            display: none;
+        }
+        .sidebar.collapsed .toggle-btn {
+            display: none;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 12px;
+            transition: opacity 0.2s;
+            line-height: 1.6;
+        }
+        .toggle-main {
+            margin-left: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .toggle-main:hover {
+            color: #00f2fe;
+        }
+        .toggle-main {
+            display: none;
+        }
+        .sidebar.collapsed ~ .main .toggle-main {
+            display: inline-block;
+        }
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            max-width: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .user-info span {
+            font-size: 11px;
+            white-space: nowrap;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .span {
+            text-transform: uppercase;
+            font-size: 14px;
+            font-weight: 700;
+            color: #00f2fe !important;
+        }
+        .sidebar.collapsed .user-info span {
+            display: none;
+        }
+        .sidebar ul {
+            margin-top: 10px;
+            list-style: none;
+            padding: 8px;
+            flex-grow: 1;
+        }
+        .sidebar ul li {
+            display: flex;
+            align-items: center;
+            border-radius: 12px;
+            transition: 0.3s;
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+        .sidebar ul li:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .sidebar ul li:hover a i, .sidebar ul li:hover a span {
+            color: #00f2fe;
+        }
+        .sidebar ul li a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.6);
+            width: 100%;
+            padding: 14px 16px;
+            font-weight: 600;
+        }
+        .sidebar ul li a i {
+            font-size: 16px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+            transition: 0.3s;
+        }
+        .sidebar ul li a span {
+            margin-left: 12px;
+            white-space: nowrap;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .sidebar.collapsed ul li a span {
+            display: none;
+        }
 
-.headerr nav a {
-    color: #9cd;
-    text-decoration: none;
-    margin: 0 5px;
-}
+        /* Main Layout */
+        .main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
 
-.containerr {
-    display: flex;
-    height: calc(100vh - 50px);
-}
+        /* Header Style */
+        .header {
+            color: white;
+            background: rgba(11, 15, 25, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            height: 69px;
+            min-height: 69px;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-/* ==== Sidebar (chap panel) ==== */
-.asidee {
-    width: 300px;
-    background-color: #1e1e1e;
-    padding: 15px;
-    border-right: 1px solid #333;
-}
+        /* Profile and Notifications */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-left: auto;
+            justify-content: flex-end;
+            position: relative;
+            padding-right: 20px;
+        }
 
-.menuu h3 {
-    color: #aef;
-    font-size: 12px;
-    margin: 10px 0 5px;
-}
+        .user_profile_img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            transition: 0.3s;
+        }
+        .user_profile_img:hover {
+            border-color: #00f2fe;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+        }
 
-/* ==== Menu itemlar ==== */
-.itemm {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2px 0;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-}
+        /* Cyber Dropdown Panel */
+        .dropdown-panel {
+            position: absolute;
+            top: 55px;
+            background: #0c101d;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            border-radius: 16px;
+            width: 200px;
+            padding: 16px;
+            display: none;
+            z-index: 1002;
+            color: #ffffff;
+        }
+        .dropdown-item {
+            padding: 10px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 13px;
+            text-decoration: none;
+            color: rgba(255,255,255,0.8);
+            display: block;
+            transition: 0.2s;
+        }
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.02);
+            color: #00f2fe;
+        }
+        .dropdown-item i {
+            color: #4facfe;
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .dropdown-panel.active {
+            display: block;
+        }
+        #profile-panel {
+            right: 15px;
+        }
 
-.itemm:hover {
-    background-color: #333; /* Hover bo‘lganda fon */
-}
+        /* Content Area */
+        .konteyner {
+            background-color: transparent;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            height: calc(100vh - 69px);
+            overflow-y: auto;
+            width: 100%;
+        }
 
-.itemm a {
-    text-decoration: none;     /* 🔥 tagidan chiziq yo‘q */
-    display: block;
-    padding: 10px 12px;
-}
+        .sarlavha-qatori {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
 
-/* Chap tarafdagi link */
-.itemm .linkk {
-    color: #eee;
-    flex: 1;
-}
+        .sarlavha {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            border-left: 4px solid #00f2fe;
+            padding-left: 12px;
+            letter-spacing: -0.5px;
+        }
 
-/* O'ng tarafdagi + qo‘shish */
-.itemm .addd {
-    color: #7f7;
-    font-weight: bold;
-}
+        .btn-otish {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.3s;
+            text-align: center;
+            cursor: pointer;
+        }
+        .btn-otish:hover {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        }
 
-/* Hoverdagi o‘zgarishlar (ixtiyoriy) */
-.itemm .linkk:hover {
-    color: #fff;
-}
+        /* Cyber Form Card */
+        .form-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
 
-.itemm .addd:hover {
-    color: #9f9;
-}
-.main-main {
-    width: 100%;
-    padding: 8px 20px;
-    font-size: 12px;
-}
-.sariq-form {
-        padding: 20px;
+        .section-title {
+            background: rgba(0, 242, 254, 0.05);
+            border-left: 4px solid #00f2fe;
+            color: #00f2fe;
+            padding: 10px 15px;
+            font-size: 13.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 25px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
 
-    }
-.sariq-form p {
-    font-size: 14px;
-    margin-top: 15px;
-    font-weight: bold;
-}
-.title-text-p {
-    background-color: #2c5d77;
-    color: white;
-    padding: 8px;
-    width: 100%;
-    font-size: 14px;
-    display: inline-block;
-}
-.parol-saqlash {
-    background-color: #2b2b2b;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    font-size: 14px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 10px;
-    text-decoration: none;
-}
-.parol-saqlash:hover {
-    background-color: #444;
-}
-    .sariq-form h2 {
-        margin-bottom: 8px;
-    }
-    .sariq-form label {
-        display: block;
-        margin-top: 20px;
-        margin-bottom: 5px;
-    }
+        .form-group {
+            margin-bottom: 22px;
+        }
 
-    .sariq-form input[type="text"] {
-        width: 400px;
-        padding: 5px 10px;
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
 
-    }
-    .sariq-form input[type="password"] {
-        width: 200px;
-        padding: 5px;
-    }
-    .sariq-form select {
-        width: 100px;
-        padding: 5px;
-    }
-    .sariq-form input[type="file"] {
-        width: 300px;
-        padding: 5px;
-    }
-    .sariq-form input[type="text"],
-    .sariq-form input[type="password"],
-    .sariq-form select,
-    .sariq-form input[type="file"] {
-        background-color: #2b2b2b;
-        border: 1px solid #444;
-        border-radius: 4px;
-        color: white;
-    }
-    .sariq-form .radio-konteyner {
-        display: flex;
-        gap: 20px;
-    }
-    .sariq-form .radio-konteyner label {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    .sariq-form .info {
-      font-size: 10px;
-      color: #aaa;
-      margin-top: 5px;
-    }
-    .saqlash-tugmasi {
-        background-color: #2b2b2b;
-        color: white;
-        border: none;
-        padding: 8px 20px;
-        font-size: 14px;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-left: 10px;
-    }
-    .saqlash-tugmasi:hover {
-        background-color: #444;
-    }
-    hr {
-        border: none;
-        border-top: 1px solid #444;
-        margin: 10px 0;
-    }
+        .form-control {
+            width: 100%;
+            padding: 12px 18px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+        .form-control:focus {
+            border-color: #00f2fe;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+        }
+        select.form-control option {
+            background: #0c101d;
+            color: white;
+        }
+
+        .btn-password-reset {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(255, 0, 85, 0.1);
+            border: 1px solid rgba(255, 0, 85, 0.3);
+            color: #ff0055;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 800;
+            transition: 0.3s;
+            margin-top: 5px;
+        }
+        .btn-password-reset:hover {
+            background: #ff0055;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+        }
+
+        .tugmalar {
+            display: flex;
+            gap: 12px;
+            margin-top: 35px;
+        }
+
+        .btn-submit {
+            flex: 1;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            font-weight: 800;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .btn-submit:hover {
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- 📱 MOBIL QURILMALAR MEDIA REJIMI --- */
+        @media (max-width: 768px) {
+            body {
+                overflow: auto;
+            }
+            .sidebar {
+                position: fixed;
+                height: 100vh;
+                transform: translateX(-100%);
+                z-index: 2000;
+                background: rgba(11, 15, 25, 0.98);
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .sidebar.collapsed {
+                width: 250px;
+            }
+            .main .toggle-main {
+                display: inline-block;
+            }
+            .sidebar.collapsed.show .brand,
+            .sidebar.collapsed.show .toggle-btn,
+            .sidebar.collapsed.show .user-info span,
+            .sidebar.collapsed.show ul li a span {
+                display: inline !important;
+            }
+
+            .konteyner {
+                padding: 16px 12px;
+                height: auto;
+                overflow: visible;
+            }
+            #profile-panel {
+                right: 10px;
+                width: 180px;
+            }
+            .sarlavha-qatori {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .btn-otish {
+                width: 100%;
+            }
+
+            .form-card {
+                padding: 20px;
+            }
+
+            .tugmalar {
+                flex-direction: column;
+            }
+            .btn-submit, .btn-cancel {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="headerr">
-        <h1>Admin</h1>
-        <nav>
-            <a href="{% url 'admin:index' %}">ADMIN</a> /
-            <a href="{% url 'admin_password' %}">Parolni almashtirish</a> /
-            <a href="{% url 'login' %}">Chiqish</a>
-        </nav>
+    <div class="cyber-bg"></div>
+
+    <!-- SIDEBAR PANEL -->
+    <div class="sidebar collapsed" id="sidebar">
+        <div class="toggle-container">
+            <img src="{{ global_image }}" alt="Logatip photo">
+            <div class="brand">FUMAISAK</div>
+            <button class="toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        </div>
+
+        <div class="user-info">
+            {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" alt="User Photo">
+            {% else %}
+                <img src="{{ default_profile_image }}" alt="User Photo">
+            {% endif %}
+            <div style="display: flex; flex-direction: column;">
+                <span class="span">Admin</span>
+                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">{{ user.username }}</span>
+            </div>
+        </div>
+
+        <ul>
+            <li><a href="{% url 'all_groups_admin' %}"><i class="fas fa-layer-group"></i><span> Guruhlar</span></a></li>
+            <li><a href="{% url 'students_list_admin' %}"><i class="fas fa-user-graduate"></i><span> O'quvchilar</span></a></li>
+            <li><a href="{% url 'teachers_list_admin' %}"><i class="fas fa-chalkboard-teacher"></i><span> O'qituvchilar</span></a></li>
+            <li><a href="{% url 'admin_assignment_list' %}"><i class="fas fa-tasks"></i><span> Topshiriqlar</span></a></li>
+            <li><a href="{% url 'all_group_schedules' %}"><i class="fas fa-calendar-alt"></i><span> Dars rejasi</span></a></li>
+            <li><a href="{% url 'quiz_list' %}"><i class="fas fa-file-signature"></i><span> Testlar</span></a></li>
+            <li><a href="{% url 'question_list' %}"><i class="fas fa-question-circle"></i><span> Savollar</span></a></li>
+            <li><a href="{% url 'group_payment_list' %}"><i class="fas fa-credit-card"></i><span> Guruh to'lov</span></a></li>
+            <li><a href="{% url 'student_list' %}"><i class="fas fa-wallet"></i><span> Barcha to'lov</span></a></li>
+        </ul>
     </div>
 
-    <div class="containerr">
-        <div class="asidee">
-            <div class="menuu">
-                <h3>MENU</h3>
-                <div class="itemm">
-                    <a href="{% url 'all_groups_admin' %}" class="linkk">Guruhlar</a>
-                    <a href="{% url 'create_group_admin' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'students_list_admin' %}" class="linkk">O'quvchilar</a>
-                    <a href="{% url 'add_student' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'teachers_list_admin' %}" class="linkk">O'qituvchilar</a>
-                    <a href="{% url 'add_teacher' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'admin_assignment_list' %}" class="linkk">Topshiriqlar</a>
-                    <a href="{% url 'add_topshiriq' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'all_group_schedules' %}" class="linkk">Dars rejasi</a>
-                    <a href="{% url 'all_groups_admin' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'quiz_list' %}" class="linkk">Testlar</a>
-                    <a href="{% url 'add_quiz' %}" class="addd">+ qo'shish</a>
-                </div>
-
-                <div class="itemm">
-                    <a href="{% url 'question_list' %}" class="linkk">Savollar</a>
-                    <a href="{% url 'add_test_admin' %}" class="addd">+ qo'shish</a>
-                </div>
-                <div class="itemm">
-                    <a href="{% url 'group_payment_list' %}" class="linkk">Guruh to'lov</a>
-                </div>
-                <div class="itemm">
-                    <a href="{% url 'student_list' %}" class="linkk">Barcha to'lov</a>
+    <!-- ASOSIY KONTENT MAYDONI -->
+    <div class="main">
+        <div class="header">
+            <button class="toggle-main" id="mainToggle"><i class="fas fa-bars"></i></button>
+            <div class="user-profile">
+                <a href="javascript:void(0);" id="profile-btn">
+                    {% if user.profile_image %}
+                    <img src="{{ user.profile_image.url }}" alt="User profile" class="user_profile_img">
+                    {% else %}
+                    <img src="{{ default_profile_image }}" alt="User profile" class="user_profile_img">
+                    {% endif %}
+                </a>
+                <div class="dropdown-panel" id="profile-panel">
+                    <a href="{% url 'admin:index' %}" class="dropdown-item"><i class="fas fa-cogs"></i> Django Admin</a>
+                    <a href="{% url 'login' %}" class="dropdown-item" style="color: #ff808b;"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
                 </div>
             </div>
         </div>
 
-        <div class="main-main">
-            <form class="sariq-form" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <h2>O'quvchini tahrirlash</h2>
-                <p>{{ student.last_name }} {{ student.first_name }} ({{ student.get_role_display }})</p>
-                <hr>
+        <div class="konteyner">
+            <div class="sarlavha-qatori">
+                <h2 class="sarlavha">O'quvchini tahrirlash</h2>
+                <a href="{% url 'students_list_admin' %}" class="btn-otish"><i class="fas fa-arrow-left"></i> Orqaga</a>
+            </div>
 
-                <label for="kirit-nomi" style="font-size: 14px;">O'quvchi logini: </label>
-                <input type="text" id="kirit-nomi" name="username" value="{{ student.username }}">
+            <div class="form-card">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
 
-                <label style="font-size: 14px;">
-                    Parolni tiklash:
-                    <a href="{% url 'student_password' student.id %}" class="parol-saqlash">Password</a>
-                </label>
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        {% if student.profile_image %}
+                            <img src="{{ student.profile_image.url }}" alt="Student profile picture" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid #00f2fe; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); object-fit: cover;">
+                        {% else %}
+                            <img src="{{ default_profile_image }}" alt="Student profile picture" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.1); object-fit: cover;">
+                        {% endif %}
+                        <h3 style="margin-top: 12px; font-weight: 800; font-size: 16px;">{{ student.last_name }} {{ student.first_name }}</h3>
+                        <span style="font-size: 12px; text-transform: uppercase; color: rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 0.5px;">{{ student.get_role_display }}</span>
+                    </div>
 
-                <p class="title-text-p">Shaxsiy malumotlari</p>
-                <label for="last_name" style="font-size: 14px;">O'quvchi familiyasi: </label>
-                <input type="text" id="last_name" name="last_name" value="{{ student.last_name }}">
+                    <div class="section-title">Hisob Ma'lumotlari</div>
 
-                <label for="first_name" style="font-size: 14px;">O'quvchi ismi: </label>
-                <input type="text" id="first_name" name="first_name" value="{{ student.first_name }}">
+                    <div class="form-group">
+                        <label for="kirit-nomi">O'quvchi logini (Username)</label>
+                        <input type="text" class="form-control" id="kirit-nomi" name="username" value="{{ student.username }}" required>
+                    </div>
 
-                <label for="phone_number" style="font-size: 14px;">O'quvchining telefon raqami: </label>
-                <input type="text" id="phone_number" name="phone_number" value="{{ student.phone_number }}">
+                    <div class="form-group">
+                        <label>Parolni tiklash</label>
+                        <a href="{% url 'student_password' student.id %}" class="btn-password-reset"><i class="fas fa-key"></i> Parolni almashtirish</a>
+                    </div>
 
-                <p class="title-text-p">Qo'shimcha ma'lumotlar</p>
-                <p>O'quvchining aktivligini boshqarish</p>
-                <div class="radio-konteyner">
-                    <select name="is_active">
-                      <option value="true" {% if student.is_active %}selected{% endif %}>Faol</option>
-                      <option value="false" {% if not student.is_active %}selected{% endif %}>Bloklangan</option>
-                    </select>
-                </div>
+                    <div class="section-title">Shaxsiy malumotlari</div>
 
-                <label for="profil-rasmi" style="font-size: 14px;">Profil rasmi: </label>
-                <input type="file" id="profil-rasmi" name="profile_image">
+                    <div class="form-group">
+                        <label for="last_name">O'quvchi familiyasi</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" value="{{ student.last_name }}" required>
+                    </div>
 
-                <button type="submit" class="saqlash-tugmasi">Saqlash</button>
-            </form>
+                    <div class="form-group">
+                        <label for="first_name">O'quvchi ismi</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" value="{{ student.first_name }}" required>
+                    </div>
 
+                    <div class="form-group">
+                        <label for="phone_number">O'quvchining telefon raqami</label>
+                        <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ student.phone_number }}" required>
+                    </div>
+
+                    <div class="section-title">Qo'shimcha ma'lumotlar</div>
+
+                    <div class="form-group">
+                        <label>O'quvchining faollik holati</label>
+                        <select name="is_active" class="form-control">
+                            <option value="true" {% if student.is_active %}selected{% endif %}>Faol</option>
+                            <option value="false" {% if not student.is_active %}selected{% endif %}>Bloklangan</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profil-rasmi">Profil rasmini yangilash</label>
+                        <input type="file" class="form-control" id="profil-rasmi" name="profile_image">
+                    </div>
+
+                    <div class="tugmalar">
+                        <button type="submit" class="btn-submit"><i class="fas fa-save" style="margin-right: 6px;"></i> Saqlash</button>
+                        <a href="{% url 'students_list_admin' %}" class="btn-cancel">Bekor qilish</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-    <script>
 
+    <!-- SCRIPT LOGIKASI -->
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mainToggle = document.getElementById('mainToggle');
+
+        function toggleSidebar() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('show');
+            } else {
+                sidebar.classList.toggle('collapsed');
+            }
+        }
+
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        mainToggle.addEventListener('click', toggleSidebar);
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('show');
+            }
+        });
+
+        // Profile Dropdown
+        document.getElementById('profile-btn').addEventListener('click', function(e) {
+            document.getElementById('profile-panel').classList.toggle('active');
+            e.stopPropagation();
+        });
+
+        document.addEventListener('click', function() {
+            document.getElementById('profile-panel').classList.remove('active');
+        });
     </script>
 </body>
 </html>

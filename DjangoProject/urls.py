@@ -24,6 +24,7 @@ from main import views, teacher, student, adminpanel
 urlpatterns = [
     path('', views.login_view, name='login'),
     path('super-secret-panel-super-juda/', admin.site.urls),
+    path('adminpanel/dashboard/', adminpanel.admin_dashboard, name='admin_dashboard'),
     path('adminpanel/all-groups/', adminpanel.all_groups_admin, name='all_groups_admin'),
 
     path('teacher/teacher_home/', teacher.teacher_home_view, name='teacher_home'),
@@ -48,7 +49,7 @@ urlpatterns = [
     path('students/pdf/', adminpanel.export_students_pdf, name='students_pdf'),
 
     path('teacher/groups-list/', teacher.my_groups_view, name='teacher_group_list'),
-    path('teacher/group-detail/<int:group_id>/', teacher.group_detail_view, name='group_detail'),
+    path('teacher/groups-list/<int:group_id>/', teacher.group_detail_view, name='group_detail'),
     path('teacher/schedule/', teacher.teacher_schedule_view, name='teacher_schedule'),
 
     path('adminpanel/edit-schedule/<int:group_id>/', adminpanel.edit_group_teacher_schedule, name='edit_group_teacher_schedule'),
@@ -71,10 +72,10 @@ urlpatterns = [
     path('adminpanel/edit-questions/<int:question_id>/', adminpanel.update_question, name='update_question'),
     path('adminpanel/<int:pk>/questions-delete/', adminpanel.delete_question, name='delete_question'),
 
-    path('teacher/create-test/', teacher.create_quiz, name='create_quiz'),
-    path('teacher/add-test/<int:group_id>/', teacher.add_questions, name='add_questions'),
-    path('teacher/detail-test/<int:quiz_id>/', teacher.quiz_detail, name='quiz_detail'),
-    path('teacher/test-results/<int:quiz_id>/', teacher.teacher_view_results, name='quiz_results'),
+    path('teacher/quiz/', teacher.create_quiz, name='create_quiz'),
+    path('teacher/quiz/create/<int:group_id>/', teacher.add_questions, name='add_questions'),
+    path('teacher/quiz/detail/<int:quiz_id>/', teacher.quiz_detail, name='quiz_detail'),
+    path('teacher/quiz/results/<int:quiz_id>/', teacher.teacher_view_results, name='quiz_results'),
 
     path('student/quizzes/', student.student_quiz_list, name='student_quiz_list'),
     path('quiz/<int:quiz_id>/start/', student.start_quiz, name='start_quiz'),
@@ -84,13 +85,13 @@ urlpatterns = [
     path('student/assignments/<int:assignment_id>/submit/', student.submit_assignment, name='submit_assignment'),
 
     path('teacher/deadline/', teacher.teacher_deadline, name='teacher_deadline'),
-    path('teacher/deadline/<int:assignment_id>/', teacher.edit_assignment, name='edit_assignment'),
+    path('teacher/edit_deadline/<int:assignment_id>/', teacher.edit_assignment, name='edit_assignment'),
 
     path('teacher/attendance-groups/', teacher.teacher_attendance_groups, name='teacher_attendance_groups'),
     path('teacher/attendance-submit/<int:group_id>/', teacher.submit_attendance, name='submit_attendance'),
     path('teacher/attendance-list/<int:group_id>/', teacher.teacher_group_attendance, name='teacher_group_attendance'),
 
-    path('teacher/assignment/<int:assignment_id>/', teacher.teacher_assignment_submissions, name='teacher_assignment_submissions'),
+    path('teacher/deadline/<int:assignment_id>/', teacher.teacher_assignment_submissions, name='teacher_assignment_submissions'),
     path('teacher/assignment/grade/', teacher.grade_assignment, name='grade_assignment'),
 
 
@@ -114,6 +115,13 @@ urlpatterns = [
     path('payment/verify/<int:payment_id>/<str:code>/', adminpanel.verify_payment, name='verify_payment'),
 
     path('student_payment/', student.student_payment_view, name='student_payment_view'),
+
+    # AI Quiz URLs
+    path('student/ai-quiz/', student.ai_quiz_dashboard, name='ai_quiz_dashboard'),
+    path('student/ai-quiz/<int:quiz_id>/', student.ai_quiz_take, name='ai_quiz_take'),
+    path('student/ai-quiz/<int:quiz_id>/submit/', student.ai_quiz_submit, name='ai_quiz_submit'),
+    path('student/ai-quiz/<int:quiz_id>/results/', student.ai_quiz_results, name='ai_quiz_results'),
+    path('student/ai-plan/', student.student_ai_plan, name='student_ai_plan'),
 ]
 
 if settings.DEBUG:

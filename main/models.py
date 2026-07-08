@@ -107,10 +107,12 @@ class StudentAnswer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     selected_answer = models.ForeignKey(Answer, null=True, blank=True, on_delete=models.SET_NULL)
 
+from django.utils.text import get_valid_filename
+
 def assignment_upload_path(instance, filename):
     ext = filename.split('.')[-1]
-    group_name = instance.group.name.replace(" ", "_")
-    title_slug = instance.title.replace(" ", "_")
+    group_name = get_valid_filename(instance.group.name)
+    title_slug = get_valid_filename(instance.title)
     filename = f'{title_slug}.{ext}'
     return f'assignments/{group_name}/{filename}'
 
@@ -221,3 +223,60 @@ class StudentPayment(models.Model):
 
     def __str__(self):
         return f"{self.student} - {self.month} - {self.amount_paid}"
+
+
+class AIQuiz(models.Model):
+    LEVEL_CHOICES = (
+        ('beginner', 'Boshlang\'ich (Beginner / A1-A2)'),
+        ('intermediate', 'O\'rta (Intermediate / B1-B2)'),
+        ('advanced', 'Yuqori (Advanced / C1-C2)'),
+    )
+    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'role': 'student'}, related_name='ai_quizzes')
+    title = models.CharField(max_length=255, verbose_name="Mavzu nomi")
+    categories = models.TextField(verbose_name="Tanlangan kategoriyalar")
+    level = models.CharField(max_length=20, choices=LEVEL_CHOICES, verbose_name="Daraja")
+    score = models.IntegerField(null=True, blank=True, verbose_name="To'plangan ball")
+    max_score = models.PositiveIntegerField(default=100, verbose_name="Maksimal ball")
+    time_limit = models.PositiveIntegerField(default=10, verbose_name="Bajarish vaqti (daqiqa)")
+    ai_feedback = models.TextField(null=True, blank=True, verbose_name="AI Natija Tahlili")
+    is_completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    submitted_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.student} - {self.title} ({self.level})"
+
+
+class AIQuestion(models.Model):
+    quiz = models.ForeignKey(AIQuiz, on_delete=models.CASCADE, related_name='questions')
+    text = models.TextField(verbose_name="Savol matni")
+    correct_explanation = models.TextField(null=True, blank=True, verbose_name="To'g'ri javob izohi")
+
+    def __str__(self):
+        return self.text[:50]
+
+
+class AIAnswer(models.Model):
+    question = models.ForeignKey(AIQuestion, on_delete=models.CASCADE, related_name='answers')
+    text = models.CharField(max_length=255, verbose_name="Javob varianti")
+    is_correct = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.text
+
+
+class StudentAIAnswer(models.Model):
+    quiz = models.ForeignKey(AIQuiz, on_delete=models.CASCADE, related_name='student_answers')
+    question = models.ForeignKey(AIQuestion, on_delete=models.CASCADE)
+    selected_answer = models.ForeignKey(AIAnswer, on_delete=models.CASCADE, null=True, blank=True)
+
+
+class StudentAIPlan(models.Model):
+    student = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='ai_plan', limit_choices_to={'role': 'student'})
+    advice = models.TextField(verbose_name="AI Achchiq Tanbehi")
+    plan = models.TextField(verbose_name="Kelgusi kunlar rejasi")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.student.username} - AI Reja"
+

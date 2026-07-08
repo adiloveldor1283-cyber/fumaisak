@@ -1,0 +1,170 @@
+{% extends 'baseadmin.html' %}
+{% load static %}
+
+{% block title %}Dashboard | Boshqaruv paneli{% endblock %}
+
+{% block content %}
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <h2 class="sarlavha" style="font-size: 24px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Boshqaruv paneli (Dashboard)</h2>
+    <div style="font-size: 13.5px; color: rgba(255, 255, 255, 0.4); font-weight: 600; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 8px 16px; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
+        <i class="fas fa-calendar-day" style="color: #00f2fe;"></i> <span id="current-date">Bugun: {% now "d-m-Y" %}</span>
+    </div>
+</div>
+
+<!-- STATISTIKA KARTALARI -->
+<div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 35px;">
+    <!-- Guruhlar -->
+    <div class="stat-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 15px 30px rgba(0,0,0,0.15); transition: 0.3s; position: relative; overflow: hidden; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='#00f2fe'; this.style.boxShadow='0 20px 40px rgba(0, 242, 254, 0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255, 255, 255, 0.04)'; this.style.boxShadow='0 15px 30px rgba(0,0,0,0.15)';">
+        <div style="z-index: 2;">
+            <span style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px;">Guruhlar</span>
+            <h3 style="font-size: 28px; font-weight: 800; color: #ffffff; margin-top: 5px; letter-spacing: -1px;">{{ total_groups }}</h3>
+        </div>
+        <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.2); display: flex; align-items: center; justify-content: center; z-index: 2;">
+            <i class="fas fa-layer-group" style="font-size: 20px; color: #00f2fe;"></i>
+        </div>
+        <div style="position: absolute; bottom: -20px; right: -20px; font-size: 80px; color: rgba(0, 242, 254, 0.02); pointer-events: none; z-index: 1;"><i class="fas fa-layer-group"></i></div>
+    </div>
+
+    <!-- O'quvchilar -->
+    <div class="stat-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 15px 30px rgba(0,0,0,0.15); transition: 0.3s; position: relative; overflow: hidden; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='#00ffaa'; this.style.boxShadow='0 20px 40px rgba(0, 255, 170, 0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255, 255, 255, 0.04)'; this.style.boxShadow='0 15px 30px rgba(0,0,0,0.15)';">
+        <div style="z-index: 2;">
+            <span style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px;">O'quvchilar</span>
+            <h3 style="font-size: 28px; font-weight: 800; color: #ffffff; margin-top: 5px; letter-spacing: -1px;">{{ total_students }}</h3>
+        </div>
+        <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.2); display: flex; align-items: center; justify-content: center; z-index: 2;">
+            <i class="fas fa-user-graduate" style="font-size: 20px; color: #00ffaa;"></i>
+        </div>
+        <div style="position: absolute; bottom: -20px; right: -20px; font-size: 80px; color: rgba(0, 255, 170, 0.02); pointer-events: none; z-index: 1;"><i class="fas fa-user-graduate"></i></div>
+    </div>
+
+    <!-- O'qituvchilar -->
+    <div class="stat-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 15px 30px rgba(0,0,0,0.15); transition: 0.3s; position: relative; overflow: hidden; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='#9b51e0'; this.style.boxShadow='0 20px 40px rgba(155, 81, 224, 0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255, 255, 255, 0.04)'; this.style.boxShadow='0 15px 30px rgba(0,0,0,0.15)';">
+        <div style="z-index: 2;">
+            <span style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px;">O'qituvchilar</span>
+            <h3 style="font-size: 28px; font-weight: 800; color: #ffffff; margin-top: 5px; letter-spacing: -1px;">{{ total_teachers }}</h3>
+        </div>
+        <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(155, 81, 224, 0.1); border: 1px solid rgba(155, 81, 224, 0.2); display: flex; align-items: center; justify-content: center; z-index: 2;">
+            <i class="fas fa-chalkboard-teacher" style="font-size: 20px; color: #9b51e0;"></i>
+        </div>
+        <div style="position: absolute; bottom: -20px; right: -20px; font-size: 80px; color: rgba(155, 81, 224, 0.02); pointer-events: none; z-index: 1;"><i class="fas fa-chalkboard-teacher"></i></div>
+    </div>
+
+    <!-- Moliya / Daromad -->
+    <div class="stat-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 15px 30px rgba(0,0,0,0.15); transition: 0.3s; position: relative; overflow: hidden; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='#ff0055'; this.style.boxShadow='0 20px 40px rgba(255, 0, 85, 0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255, 255, 255, 0.04)'; this.style.boxShadow='0 15px 30px rgba(0,0,0,0.15)';">
+        <div style="z-index: 2;">
+            <span style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px;">Jami to'lovlar</span>
+            <h3 style="font-size: 22px; font-weight: 800; color: #ffffff; margin-top: 10px; letter-spacing: -0.5px;">{{ total_payments }} so'm</h3>
+        </div>
+        <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.2); display: flex; align-items: center; justify-content: center; z-index: 2;">
+            <i class="fas fa-wallet" style="font-size: 20px; color: #ff0055;"></i>
+        </div>
+        <div style="position: absolute; bottom: -20px; right: -20px; font-size: 80px; color: rgba(255, 0, 85, 0.02); pointer-events: none; z-index: 1;"><i class="fas fa-wallet"></i></div>
+    </div>
+</div>
+
+<!-- ASOSIY BO'LIMLAR (IKKI USTUN) -->
+<div class="content-row" style="display: flex; gap: 25px; flex-wrap: wrap; margin-bottom: 35px;">
+    <!-- Chap ustun: So'nggi to'lovlar -->
+    <div style="flex: 1.5; min-width: 320px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="font-size: 17px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 8px;"><i class="fas fa-credit-card" style="color: #ff0055;"></i> So'nggi to'lovlar</h3>
+            <a href="{% url 'student_list' %}" style="font-size: 12.5px; color: #00f2fe; text-decoration: none; font-weight: 700; transition: 0.3s;" onmouseover="this.style.textShadow='0 0 8px rgba(0,242,254,0.4)';" onmouseout="this.style.textShadow='none';">Barchasi <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 3px;"></i></a>
+        </div>
+        
+        <div class="jadval-container" style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 12px; overflow-x: auto; box-shadow: 0 15px 30px rgba(0,0,0,0.15);">
+            {% if recent_payments %}
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr>
+                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">O'quvchi</th>
+                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Guruh</th>
+                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Oy</th>
+                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Summa</th>
+                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Vaqti</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in recent_payments %}
+                    <tr>
+                        <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(255,255,255,0.02); font-weight: 700; color: #ffffff;">{{ p.student.get_full_name|default:p.student.username }}</td>
+                        <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(255,255,255,0.02); color: rgba(255,255,255,0.7);">{{ p.group.name }}</td>
+                        <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(255,255,255,0.02); color: #00f2fe; font-weight: 600;">{{ p.month }}</td>
+                        <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(255,255,255,0.02); color: #00ffaa; font-weight: 700;">{{ p.amount_paid }} so'm</td>
+                        <td style="padding: 12px 16px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.02); font-family: monospace; color: rgba(255,255,255,0.5);">{{ p.paid_at|date:"d-m H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="padding: 20px; font-style: italic; color: rgba(255,255,255,0.4); text-align: center;">Hozircha hech qanday to'lovlar mavjud emas.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- O'ng ustun: Yangi a'zolar -->
+    <div style="flex: 1; min-width: 280px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="font-size: 17px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 8px;"><i class="fas fa-user-plus" style="color: #00ffaa;"></i> Yangi o'quvchilar</h3>
+            <a href="{% url 'students_list_admin' %}" style="font-size: 12.5px; color: #00f2fe; text-decoration: none; font-weight: 700; transition: 0.3s;" onmouseover="this.style.textShadow='0 0 8px rgba(0,242,254,0.4)';" onmouseout="this.style.textShadow='none';">Barchasi <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 3px;"></i></a>
+        </div>
+
+        <div style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.15);">
+            {% if recent_students %}
+                {% for student in recent_students %}
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 12px; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(0, 255, 170, 0.05); border: 1px solid rgba(0, 255, 170, 0.2); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user-graduate" style="color: #00ffaa; font-size: 14px;"></i>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 13.5px; font-weight: 700; color: #ffffff; margin: 0;">{{ student.get_full_name|default:student.username }}</h4>
+                            <span style="font-size: 11px; color: rgba(255,255,255,0.4); display: block; margin-top: 2px;"><i class="fas fa-phone-alt" style="font-size: 10px; color: #00f2fe; margin-right: 4px;"></i>{{ student.phone_number }}</span>
+                        </div>
+                    </div>
+                    <span style="font-size: 11px; font-family: monospace; color: rgba(255,255,255,0.4); text-align: right;">{{ student.joined_at|date:"d.m.Y" }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="font-style: italic; color: rgba(255,255,255,0.4); text-align: center; padding: 10px;">Yangi o'quvchilar yo'q.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- SO'NGGI TOPSHIRIQ KARTASI -->
+<div style="margin-bottom: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3 style="font-size: 17px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 8px;"><i class="fas fa-tasks" style="color: #9b51e0;"></i> So'nggi topshiriqlar</h3>
+        <a href="{% url 'admin_assignment_list' %}" style="font-size: 12.5px; color: #00f2fe; text-decoration: none; font-weight: 700; transition: 0.3s;" onmouseover="this.style.textShadow='0 0 8px rgba(0,242,254,0.4)';" onmouseout="this.style.textShadow='none';">Barchasi <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 3px;"></i></a>
+    </div>
+
+    <div class="jadval-container" style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 12px; overflow-x: auto; box-shadow: 0 15px 30px rgba(0,0,0,0.15);">
+        {% if recent_assignments %}
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr>
+                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Sarlavha</th>
+                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Guruh</th>
+                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Maksimal Ball</th>
+                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Muddati (Deadline)</th>
+                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Yuklangan vaqti</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in recent_assignments %}
+                <tr>
+                    <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(255,255,255,0.02); font-weight: 700; color: #ffffff;">{{ a.title }}</td>
+                    <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(255,255,255,0.02); color: rgba(255,255,255,0.75);">{{ a.group.name }}</td>
+                    <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(255,255,255,0.02); color: #00f2fe; font-weight: 700;">{{ a.max_score }} ball</td>
+                    <td style="padding: 12px 16px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.02); font-family: monospace; color: #ff0055; font-weight: 600;">{{ a.deadline|date:"d-m-Y H:i" }}</td>
+                    <td style="padding: 12px 16px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.02); font-family: monospace; color: rgba(255,255,255,0.5);">{{ a.created_at|date:"d-m-Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="padding: 20px; font-style: italic; color: rgba(255,255,255,0.4); text-align: center;">Hozircha hech qanday topshiriqlar yuklanmagan.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
