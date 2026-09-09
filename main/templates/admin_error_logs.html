@@ -1,0 +1,158 @@
+{% extends "baseadmin.html" %}
+
+{% block title %}Xatoliklar jurnali | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .konteyner {
+        overflow-y: auto !important;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .pre-traceback {
+        background: #080d1a !important;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        padding: 18px;
+        color: #ff0055;
+        font-family: monospace;
+        font-size: 12.5px;
+        white-space: pre-wrap;
+        word-break: break-all;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="padding: 10px; display: flex; flex-direction: column; width: 100%;">
+    
+    <!-- Header -->
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <div>
+            <h2 class="sarlavha" style="font-size: 24px; font-weight: 800; color: #ffffff; border-left: 4px solid #ff0055; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 4px; line-height: 1;">Tizim xatoliklari jurnali</h2>
+            <p style="color: rgba(255,255,255,0.5); font-size: 13.5px; font-weight: 500; margin-bottom: 0; padding-left: 16px;">Tizimda yuzaga kelgan kutilmagan unhandled exception xatoliklar jurnali</p>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <!-- QIDIRUV FORMASI -->
+            <form class="search-form" method="GET" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
+                <input type="hidden" name="status" value="{{ current_status }}">
+                <input type="text" class="search-input" name="query" value="{{ query }}" placeholder="Qidirish..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+                <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+            </form>
+
+            {% if query or current_status != 'unresolved' %}
+                <a href="{% url 'admin_error_logs' %}" style="display: inline-block; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #ff0055; text-decoration: none; font-size: 13px; font-weight: 600; text-align: center; transition: 0.2s;" onmouseover="this.style.background='rgba(255, 0, 85, 0.1)'; this.style.borderColor='rgba(255, 0, 85, 0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.08)';">Filtrni tozalash</a>
+            {% endif %}
+
+            <a href="{% url 'admin_locked_pages' %}" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); color: #ffffff; font-weight: 700; padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.05)';" onmouseout="this.style.background='rgba(255,255,255,0.02)';">
+                <i class="fas fa-lock" style="color: #ff0055;"></i> Bloklangan sahifalar
+            </a>
+        </div>
+    </div>
+
+    <!-- Status Tabs -->
+    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-shrink: 0;">
+        <a href="?status=unresolved{% if query %}&query={{ query }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-decoration: none; border: 1px solid {% if current_status == 'unresolved' %}#ff0055; background: rgba(255,0,85,0.1); color: #ff0055;{% else %}rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.6);{% endif %} transition: 0.2s;">
+            Faol (Hal qilinmagan)
+        </a>
+        <a href="?status=resolved{% if query %}&query={{ query }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-decoration: none; border: 1px solid {% if current_status == 'resolved' %}#00f2fe; background: rgba(0, 242, 254, 0.1); color: #00f2fe;{% else %}rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.6);{% endif %} transition: 0.2s;">
+            Hal qilinganlar
+        </a>
+    </div>
+
+    <!-- Table Container -->
+    <div style="flex-grow: 1; overflow-y: auto; background: rgba(11, 15, 25, 0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); background: #080d1a; position: sticky; top: 0; z-index: 10;">
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 15%;">FOYDALANUVCHI</th>
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 25%;">URL MANZILI</th>
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 35%;">XATOLIK XABARI</th>
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 15%; text-align: right;">SANA VA VAQT</th>
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 10%; text-align: center;">AMAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if logs %}
+                    {% for log in logs %}
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.01)';" onmouseout="this.style.background='none';">
+                            <td data-label="FOYDALANUVCHI" style="padding: 18px 20px; font-weight: 700; color: #ffffff; font-size: 13.5px;">
+                                {% if log.user %}
+                                    {{ log.user.get_full_name }}
+                                    <small style="display: block; color: rgba(255,255,255,0.4); font-weight: 500;">@{{ log.user.username }} ({{ log.user.get_role_display }})</small>
+                                {% else %}
+                                    <span style="color: rgba(255,255,255,0.4); font-style: italic;">Anonim</span>
+                                {% endif %}
+                            </td>
+                            <td data-label="URL MANZILI" style="padding: 18px 20px; font-size: 13px; font-family: monospace; color: #ff5500; font-weight: 600; word-break: break-all;">
+                                {{ log.url_path }}
+                            </td>
+                            <td data-label="XATOLIK XABARI" style="padding: 18px 20px; font-size: 13.5px; color: rgba(255,255,255,0.85); font-weight: 500; word-break: break-word;">
+                                <div style="font-weight: 700; color: #ff0055; margin-bottom: 4px;">{{ log.error_message }}</div>
+                                <button onclick="showTraceback('{{ log.id }}')" style="background: none; border: none; color: #00f2fe; padding: 0; font-weight: 700; font-size: 12px; cursor: pointer; text-decoration: underline;">
+                                    Traceback-ni ko'rish
+                                </button>
+                                <div id="tb_data_{{ log.id }}" style="display: none;">{{ log.traceback }}</div>
+                            </td>
+                            <td data-label="SANA VA VAQT" style="padding: 18px 20px; font-size: 13px; font-family: monospace; color: rgba(255,255,255,0.5); text-align: right; font-weight: 600;">
+                                {{ log.timestamp|date:"d.m.Y" }} <br>
+                                <small style="color: rgba(255,255,255,0.3);">{{ log.timestamp|date:"H:i:s" }}</small>
+                            </td>
+                            <td data-label="AMAL" style="padding: 18px 20px; text-align: center;">
+                                {% if not log.is_resolved %}
+                                    <form action="{% url 'admin_resolve_error' log.id %}" method="POST" style="margin: 0;">
+                                        {% csrf_token %}
+                                        <button type="submit" style="background: rgba(0, 255, 170, 0.08); border: 1px solid rgba(0, 255, 170, 0.3); color: #00ffaa; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12.5px; transition: 0.2s;" onmouseover="this.style.background='rgba(0, 255, 170, 0.15)';" onmouseout="this.style.background='rgba(0, 255, 170, 0.08)';">
+                                            Hal etildi
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span style="color: #00ffaa; font-weight: 700; font-size: 12px;"><i class="fas fa-check-double"></i> Hal qilingan</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: rgba(255,255,255,0.3); padding: 40px 20px;">
+                            <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 40px 20px; text-align: center;">
+                                <i class="fas fa-check-circle" style="font-size: 36px; color: rgba(0, 255, 170, 0.3); margin-bottom: 15px; display: inline-block;"></i>
+                                <h4 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Xatoliklar topilmadi</h4>
+                                <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin: 0;">Tizimda hech qanday xatolik qayd etilmagan.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Traceback Modal -->
+<div id="tracebackModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: #0c101d; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; width: 90%; max-width: 800px; padding: 24px; position: relative;">
+        <h3 style="color: #ffffff; font-size: 18px; font-weight: 800; margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-terminal" style="color: #ff0055;"></i> Xatolik tafsilotlari (Traceback)</h3>
+        <button onclick="closeModal()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: rgba(255,255,255,0.5); font-size: 20px; cursor: pointer;"><i class="fas fa-times"></i></button>
+        <pre class="pre-traceback" id="modalPreContent"></pre>
+        <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+            <button onclick="closeModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); color: #ffffff; font-weight: 700; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 13.5px;">Yopish</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function showTraceback(logId) {
+    const data = document.getElementById('tb_data_' + logId).textContent;
+    document.getElementById('modalPreContent').textContent = data;
+    document.getElementById('tracebackModal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('tracebackModal').style.display = 'none';
+}
+</script>
+{% endblock %}

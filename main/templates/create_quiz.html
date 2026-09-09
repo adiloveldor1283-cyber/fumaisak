@@ -1,51 +1,87 @@
 {% extends 'baseteacher.html' %}
 {% load static %}
 
-{% block title %}Onlayn test paneli{% endblock %}
+{% block title %}Test yaratish{% endblock %}
 
 {% block extra_css %}
     <style>
-        /* --- 🔍 QIDIRUV PANELI - SPLIT DESIGN (STUDENT SHABLONI USLUBIDA) --- */
+        /* --- 🔍 QIDIRUV PANELI (UNIFIED PILL DESIGN) --- */
         .search-form {
             display: flex;
-            position: relative;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 4px 14px;
+            transition: 0.3s;
+            width: 280px;
+            margin: 0;
+        }
+        .search-form:focus-within {
+            border-color: #00f2fe !important;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.2) !important;
+            background: rgba(255, 255, 255, 0.05);
         }
         .search-input {
-            padding: 10px 16px;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            color: #ffffff !important;
             font-size: 13px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px 0 0 12px;
-            outline: none;
-            width: 25vw;
-            background-color: rgba(255, 255, 255, 0.02);
-            color: #ffffff;
-            margin-left: 20px;
-            border-right: none;
-            transition: 0.3s;
-        }
-        .search-input:focus {
-            border-color: #00f2fe;
-            background: rgba(255, 255, 255, 0.06);
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
+            width: 100% !important;
+            padding: 6px 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
         }
         .search-btn {
-            background-color: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-left: none;
-            padding: 10px 18px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 13px;
-            border-radius: 0 12px 12px 0;
+            background: none !important;
+            border: none !important;
+            color: rgba(255, 255, 255, 0.6) !important;
             cursor: pointer;
+            font-size: 13px;
             transition: 0.3s;
+            padding: 0 0 0 8px !important;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: none !important;
         }
         .search-btn:hover {
-            background-color: rgba(0, 242, 254, 0.1);
-            color: #00f2fe;
-            border-color: rgba(0, 242, 254, 0.2);
+            color: #00f2fe !important;
+        }
+
+        body.light-mode .search-form {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .search-form:focus-within {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode .search-input {
+            color: #0f172a !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+        body.light-mode .search-input:focus {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            background: transparent !important;
+        }
+        body.light-mode .search-btn {
+            color: #64748b !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        body.light-mode .search-btn:hover {
+            color: #0284c7 !important;
+            background: transparent !important;
+            border: none !important;
         }
 
         /* --- 📊 JADVAL VA STRUKTURA STILLARI --- */
@@ -158,18 +194,7 @@
         }
         .btn-otish:hover { background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; border-color: transparent; box-shadow: 0 0 12px rgba(0, 242, 254, 0.3); }
 
-        /* --- Cyberpunk Elegant Notification Modal --- */
-        .modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 8, 16, 0.7); backdrop-filter: blur(4px); z-index: 1050; }
-        .top-modal {
-            position: fixed; top: -200px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 480px;
-            background: #0c1424; color: white; padding: 16px 20px; z-index: 1051; box-shadow: 0 0 25px rgba(0, 255, 170, 0.2);
-            border: 1px solid #00ffaa; border-radius: 14px; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .top-modal.show { top: 30px; }
-        .modal-content { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
-        .modal-message { font-size: 13.5px; font-weight: 600; color: #00ffaa; display: flex; align-items: center; gap: 8px; }
-        .close-modal-btn { background: none; border: none; font-size: 14px; color: rgba(255,255,255,0.4); cursor: pointer; transition: 0.2s; }
-        .close-modal-btn:hover { color: #ff0055; }
+        
 
         /* ========================================================
            📱 RESPONSIVE SYSTEM (TELEFON REJIMIDAGI VERTIKAL FORMA)
@@ -196,29 +221,10 @@
     </style>
 {% endblock %}
 
-{% block header_search %}
-    <!-- QIDIRUV PANELI -->
-    <form class="search-form" onsubmit="handleSearch(event)">
-        <input type="text" class="search-input" placeholder="Quiz nomi bo'yicha qidiruv..." id="qidiruv">
-        <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
-    </form>
-{% endblock %}
+
 
 {% block content %}
-    <!-- TIZIM XABARLARI MODAL OYNASI -->
-    {% if messages %}
-        {% for message in messages %}
-            {% if 'test_modal' in message.tags %}
-                <div id="modal-backdrop" class="modal-backdrop"></div>
-                <div id="top-modal" class="top-modal show">
-                    <div class="modal-content">
-                        <span class="modal-message"><i class="fas fa-check-circle"></i> {{ message }}</span>
-                        <button class="close-modal-btn" onclick="closeTopModal()">✖</button>
-                    </div>
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
+    
 
     <h2 class="sarlavha">Test tuzish uchun guruh tanlang:</h2>
     <div class="guruhlar-qatori">
@@ -231,7 +237,14 @@
 
     <hr class="hr-joy">
 
-    <h2 class="sarlavha">Tuzilgan testlar to'plami</h2>
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0;">Tuzilgan testlar to'plami</h2>
+        <!-- QIDIRUV PANELI -->
+        <form class="search-form" onsubmit="handleSearch(event)" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px;">
+            <input type="text" class="search-input" placeholder="Quiz nomi bo'yicha qidiruv..." id="qidiruv" style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
     {% if quizzes %}
     <div class="jadval-container">
         <table id="group-table">
@@ -253,7 +266,7 @@
                         <td data-label="No" style="font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
                         <td data-label="Quiz nomi" style="font-weight: 600; color: #ffffff;">{{ quiz.title }}</td>
                         <td data-label="Guruh"><span style="color: #00f2fe; font-weight: 600;">{{ quiz.group.name }}</span></td>
-                        <td data-label="Yaratilgan vaqt" style="font-family: monospace; color: rgba(255,255,255,0.6);">{{ quiz.created_at|date:"H:i d-m-Y" }}</td>
+                        <td data-label="Yaratilgan vaqt" style="font-family: monospace; color: rgba(255,255,255,0.6);">{{ quiz.created_at|date:"d.m.Y  H:i" }}</td>
                         <td data-label="Savollar soni">{{ quiz.question_count }}</td>
                         <td data-label="Max ball" style="color: #00ffaa; font-weight: 700;">{{ quiz.max_score }}</td>
                         <td data-label="Natija"><a class="btn-otish" href="{% url 'quiz_results' quiz.id %}">Natija</a></td>
@@ -308,15 +321,7 @@
             }
         });
 
-        function closeTopModal() {
-            document.getElementById('modal-backdrop')?.remove();
-            document.getElementById('top-modal')?.remove();
-        }
-
-        // Xabarnoma modalini 5 soniyadan keyin avtomatik yopish
-        window.addEventListener('load', function () {
-            setTimeout(closeTopModal, 5000);
-        });
+    
 
         function handleSearch(event) {
             event.preventDefault();

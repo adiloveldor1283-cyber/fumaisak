@@ -1,7 +1,7 @@
 {% extends 'basestudent.html' %}
 {% load custom_filters %}
 
-{% block title %}To'lovlarim - Student Profili{% endblock %}
+{% block title %}To'lovlarim{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -33,45 +33,7 @@
         letter-spacing: 0.5px;
     }
 
-    /* Kiber Qidiruv Paneli (Header ichiga joylashadi) */
-    .search-form {
-        display: none; /* JS yuklangandan keyin headerda ko'rinadi */
-        position: relative;
-    }
-    .search-input {
-        padding: 10px 16px;
-        font-size: 13px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px 0 0 12px;
-        outline: none;
-        width: 25vw;
-        background-color: rgba(255, 255, 255, 0.02);
-        color: #ffffff;
-        margin-left: 20px;
-        border-right: none;
-        transition: 0.3s;
-    }
-    .search-input:focus {
-        border-color: #00f2fe;
-        background: rgba(255, 255, 255, 0.06);
-        box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
-    }
-    .search-btn {
-        background-color: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-left: none;
-        padding: 10px 18px;
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 13px;
-        border-radius: 0 12px 12px 0;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-    .search-btn:hover {
-        background-color: rgba(0, 242, 254, 0.1);
-        color: #00f2fe;
-        border-color: rgba(0, 242, 254, 0.2);
-    }
+
 
     /* 📊 TO'LOVLAR BLOKI MUSTAQIL SKROL BO'LISHI UCHUN */
     .jadval-container {
@@ -186,6 +148,7 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             text-align: right;
             font-weight: 600;
+            gap: 12px;
         }
 
         td:last-child {
@@ -201,76 +164,544 @@
             letter-spacing: 0.5px;
             text-align: left;
             padding-right: 15px;
+            flex-shrink: 0;
         }
+        .td-val {
+            display: block;
+            max-width: 70%;
+            word-break: break-word;
+            text-align: right;
+            flex-grow: 1;
+            min-width: 0;
+        }
+    }
+
+    .btn-otish {
+        display: inline-block;
+        padding: 6px 12px;
+        background: rgba(0, 242, 254, 0.07);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        color: #00f2fe;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 12.5px;
+        font-weight: 600;
+        transition: 0.3s;
+        text-align: center;
+        cursor: pointer;
+    }
+    .btn-otish:hover {
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        color: #070a12;
+        border-color: transparent;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+    }
+
+    /* 📊 JADVALNING O'ZI MUSTAQIL SKROL BO'LISHI UCHUN */
+    .table-scroll-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 420px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.01);
+        margin-top: 15px;
+    }
+    .table-scroll-wrapper::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+    .table-scroll-wrapper::-webkit-scrollbar-thumb {
+        background: rgba(0, 242, 254, 0.25);
+        border-radius: 4px;
+    }
+    .table-scroll-wrapper::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .table-scroll-wrapper th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: #0b0f19 !important;
+    }
+
+    /* 💸 QARZDORLIKLAR BILAN ISHLASH STILLARI (GORIZONTAL) */
+    .debt-box {
+        background: rgba(255, 0, 85, 0.04) !important;
+        border: 1px solid rgba(255, 0, 85, 0.2) !important;
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+    .debt-card {
+        background: rgba(255, 255, 255, 0.02) !important;
+        border: 1px solid rgba(255, 0, 85, 0.15) !important;
+        border-radius: 12px;
+        padding: 12px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px 20px;
+    }
+    .debt-title {
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 14px;
+    }
+    .debt-text {
+        color: rgba(255,255,255,0.7);
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .debt-label {
+        color: rgba(255,255,255,0.4);
+    }
+    .debt-val {
+        font-weight: 600;
+        color: #ffffff;
+    }
+    .debt-paid-val {
+        color: #00ffaa;
+        font-weight: 700;
+    }
+    .debt-rem-wrap {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+    }
+    .debt-remaining {
+        color: #ff0055;
+        font-weight: 600;
+    }
+    .debt-remaining-val {
+        color: #ff0055;
+        font-weight: 800;
+        font-size: 14px;
+    }
+    .no-debt-box {
+        background: rgba(0, 255, 170, 0.04) !important;
+        border: 1px solid rgba(0, 255, 170, 0.2) !important;
+        border-radius: 16px;
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Light mode overrides */
+    body.light-mode .table-scroll-wrapper {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
+    }
+    body.light-mode .table-scroll-wrapper th {
+        background: #f8fafc !important;
+        color: #475569 !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+    body.light-mode .debt-box {
+        background: rgba(239, 68, 68, 0.03) !important;
+        border: 1px solid rgba(239, 68, 68, 0.15) !important;
+    }
+    body.light-mode .debt-card {
+        background: #ffffff !important;
+        border: 1px solid #fee2e2 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
+    }
+    body.light-mode .debt-title {
+        color: #0f172a !important;
+    }
+    body.light-mode .debt-label {
+        color: #64748b !important;
+    }
+    body.light-mode .debt-val {
+        color: #0f172a !important;
+    }
+    body.light-mode .debt-paid-val {
+        color: #15803d !important;
+    }
+    body.light-mode .debt-remaining,
+    body.light-mode .debt-remaining-val {
+        color: #dc2626 !important;
+    }
+    body.light-mode .no-debt-box {
+        background: rgba(16, 185, 129, 0.03) !important;
+        border: 1px solid rgba(16, 185, 129, 0.15) !important;
+    }
+    body.light-mode td {
+        color: #334155 !important;
+        border-bottom-color: #f1f5f9 !important;
+    }
+    body.light-mode td[data-label="Oy"] span.td-val {
+        color: #0f172a !important;
+    }
+    body.light-mode td[data-label="Kurs davomiyligi"] span.td-val {
+        color: #475569 !important;
+    }
+    body.light-mode td[data-label="To'lash kerak"] span.td-val {
+        color: #0f172a !important;
+        font-weight: 700;
+    }
+    body.light-mode td[data-label="To'langan summa"] span.td-val {
+        color: #0f172a !important;
+        font-weight: 700;
+    }
+    body.light-mode td[data-label="To'langan vaqti"] span.td-val {
+        color: #475569 !important;
+    }
+    body.light-mode .btn-otish {
+        background: #0284c7 !important;
+        color: #ffffff !important;
+        border: none !important;
+        box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25) !important;
+    }
+    body.light-mode .btn-otish:hover {
+        background: #0369a1 !important;
+        color: #ffffff !important;
+    }
+
+    /* Modal Light Mode */
+    body.light-mode #paymentModalOverlay > div {
+        background: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+    }
+    body.light-mode #paymentModalTitle {
+        color: #0f172a !important;
+    }
+    body.light-mode #paymentModalOverlay label {
+        color: #475569 !important;
+    }
+    body.light-mode #paymentAmountInput {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    body.light-mode #paymentModalGroupInfo {
+        background: #f0fdf4 !important;
+        border-color: #bbf7d0 !important;
+    }
+    body.light-mode #paymentModalGroupText {
+        color: #0f172a !important;
+    }
+    body.light-mode .provider-choice small {
+        color: #64748b !important;
+    }
+    .payment-notice-banner {
+        background: rgba(255, 193, 7, 0.08);
+        border: 1px solid rgba(255, 193, 7, 0.25);
+        border-radius: 14px;
+        padding: 14px 18px;
+        margin-bottom: 22px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        color: #ffc107;
+    }
+    .debt-offline-badge {
+        background: rgba(255, 193, 7, 0.08);
+        border: 1px solid rgba(255, 193, 7, 0.25);
+        color: #ffc107;
+        border-radius: 8px;
+        padding: 5px 12px;
+        font-size: 11.5px;
+        font-weight: 600;
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    body.light-mode .payment-notice-banner {
+        background: #fffbeb !important;
+        border-color: #fde68a !important;
+        color: #b45309 !important;
+    }
+    body.light-mode .debt-offline-badge {
+        background: #fffbeb !important;
+        border-color: #fde68a !important;
+        color: #b45309 !important;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-    <form class="search-form" id="paymentSearchForm" onsubmit="event.preventDefault();">
-        <label>
-            <input type="text" class="search-input" id="group-search" placeholder="Guruh nomi bo'yicha...">
-        </label>
-        <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
-    </form>
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">To'lovlarim</h2>
+            <div style="display: flex; align-items: center; gap: 8px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 12px; padding: 6px 14px;">
+                <span style="color: rgba(255,255,255,0.6); font-size: 13px;">Hamyon:</span>
+                <span style="color: #00ffaa; font-weight: 800; font-size: 14px;">{{ request.user.balance|floatformat:0 }} so'm</span>
+            </div>
+            {% if online_payments_enabled %}
+            <button type="button" onclick="openTopUpModal()" style="background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #000; border: none; border-radius: 10px; padding: 7px 16px; font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3); transition: 0.2s;">
+                <i class="fas fa-plus-circle"></i> Balansni to'ldirish
+            </button>
+            {% endif %}
+        </div>
+        <!-- QIDIRUV FORMASI -->
+        <form class="search-form" id="paymentSearchForm" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
+            <input type="text" class="search-input" id="group-search" placeholder="Guruh nomi bo'yicha..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
 
-    <h2 class="sarlavha">To'lovlarim</h2>
+    {% if not online_payments_enabled %}
+    <div class="payment-notice-banner">
+        <i class="fas fa-info-circle" style="font-size: 22px; flex-shrink: 0;"></i>
+        <div style="font-size: 13.5px; line-height: 1.5;">
+            <strong>Eslatma:</strong> Payme va Click orqali onlayn to'lov tizimi to'liq shakllanmadi. Barcha o'quv to'lovlari o'quv markazi ma'muriyati (retseptsiya) orqali naqd yoki terminal shaklida qabul qilinadi.
+        </div>
+    </div>
+    {% endif %}
 
     <div class="jadval-container">
         {% if group_infos %}
             {% for info in group_infos %}
                 <div class="group-payment-block">
-                    <h4 class="group_name">{{ info.group.name }}</h4>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Oy</th>
-                                <th>Kurs davomiyligi</th>
-                                <th>To‘lash kerak</th>
-                                <th>To‘langan summa</th>
-                                <th>To‘langan vaqti</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% if info.payments %}
-                                {% for payment in info.payments %}
-                                    <tr>
-                                        <td data-label="Oy" style="font-weight: 700; color: #ffffff;">{{ payment.month }}</td>
-                                        <td data-label="Kurs davomiyligi">{{ info.course_duration }} oy</td>
-                                        <td data-label="To‘lash kerak" style="color: #ffc107; font-weight: 700;">{{ info.monthly_fee }} so‘m</td>
-                                        <td data-label="To‘langan summa" style="color: #00ffaa; font-weight: 700;">{{ payment.amount_paid }} so‘m</td>
-                                        <td data-label="To‘langan vaqti" style="color: rgba(255,255,255,0.65);">{{ payment.paid_at|date:"Y-m-d H:i" }}</td>
-                                    </tr>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                        <h4 class="group_name" style="margin: 0;">{{ info.group.name }}</h4>
+                        {% if info.badge %}
+                            <div style="display: flex; align-items: center; gap: 8px; background: {{ info.badge.color }}1a; border: 1px solid {{ info.badge.color }}; border-radius: 10px; padding: 6px 12px;" title="{{ info.badge.desc }}">
+                                <i class="{{ info.badge.icon }}" style="color: {{ info.badge.color }}; font-size: 13px;"></i>
+                                <span style="color: {{ info.badge.color }}; font-size: 12px; font-weight: 800; text-transform: uppercase;">{{ info.badge.name }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Qarzdorliklar (Breakdown of Debts) -->
+                    {% if info.monthly_debts %}
+                        <div class="debt-box">
+                            <h5 style="color: #ff0055; font-size: 14px; font-weight: 700; margin-top: 0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-exclamation-triangle"></i> Guruh bo'yicha qarzdorliklar:
+                            </h5>
+                            <div class="debt-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px;">
+                                {% for debt in info.monthly_debts %}
+                                    <div class="debt-card">
+                                        <div style="display: flex; align-items: center; gap: 10px; min-width: 140px;">
+                                            <span class="debt-title">{{ debt.month }} ({{ debt.year }})</span>
+                                            <span style="background: rgba(255, 0, 85, 0.1); color: #ff0055; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700;">Qarz</span>
+                                        </div>
+                                        <div class="debt-text">
+                                            <span class="debt-label">To'lov:</span>
+                                            <span class="debt-val">{{ debt.fee|floatformat:0 }} so'm</span>
+                                        </div>
+                                        <div class="debt-text">
+                                            <span class="debt-label">To'langan:</span>
+                                            <span class="debt-paid-val">{{ debt.paid|floatformat:0 }} so'm</span>
+                                        </div>
+                                        <div class="debt-rem-wrap">
+                                            <span class="debt-remaining">Qolgan qarz:</span>
+                                            <span class="debt-remaining-val">{{ debt.debt|floatformat:0 }} so'm</span>
+                                        </div>
+                                        {% if online_payments_enabled %}
+                                        <button type="button" onclick="openPaymentModal('{{ info.group.id }}', '{{ info.group.name|escapejs }}', '{{ debt.month }}', '{{ debt.debt }}')" style="background: rgba(0, 242, 254, 0.12); border: 1px solid #00f2fe; color: #00f2fe; border-radius: 8px; padding: 5px 14px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-left: auto;">
+                                            <i class="fas fa-bolt"></i> To'lash
+                                        </button>
+                                        {% else %}
+                                        <span class="debt-offline-badge">
+                                            <i class="fas fa-building"></i> Ma'muriyat orqali
+                                        </span>
+                                        {% endif %}
+                                    </div>
                                 {% endfor %}
-                            {% else %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="no-debt-box">
+                            <i class="fas fa-check-circle" style="color: #00ffaa;"></i>
+                            <span style="color: #00ffaa; font-size: 13.5px; font-weight: 600;">Ushbu guruh bo'yicha joriy oygacha bo'lgan to'lovlardan qarzdorlik mavjud emas.</span>
+                        </div>
+                    {% endif %}
+
+                    <div class="table-scroll-wrapper">
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td colspan="5" style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; padding: 30px 0;">To‘lovlar tarixi mavjud emas.</td>
+                                    <th>Oy</th>
+                                    <th>Kurs davomiyligi</th>
+                                    <th>To'lash kerak</th>
+                                    <th>To'langan summa</th>
+                                    <th>To'langan vaqti</th>
+                                    <th>Chek</th>
                                 </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {% if info.payments %}
+                                    {% for payment in info.payments %}
+                                        <tr>
+                                            <td data-label="Oy" style="font-weight: 700; color: #ffffff;"><span class="td-val">{{ payment.month }}</span></td>
+                                            <td data-label="Kurs davomiyligi"><span class="td-val">{{ info.course_duration }} oy</span></td>
+                                            <td data-label="To'lash kerak" style="color: #ffc107; font-weight: 700;"><span class="td-val">{{ info.monthly_fee }} so'm</span></td>
+                                            <td data-label="To'langan summa" style="color: #00ffaa; font-weight: 700;"><span class="td-val">{{ payment.amount_paid }} so'm</span></td>
+                                            <td data-label="To'langan vaqti" style="color: rgba(255,255,255,0.65);"><span class="td-val">{{ payment.paid_at|date:"d.m.Y H:i" }}</span></td>
+                                            <td data-label="Chek">
+                                                <a href="{% url 'payment_receipt' payment.id %}" class="btn-otish td-val"><i class="fas fa-file-pdf"></i> Chek</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; padding: 30px 0;">To'lovlar tarixi mavjud emas.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             {% endfor %}
         {% else %}
-            <p style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; padding: 40px 0;">Sizda faol to‘lov ma’lumotlari mavjud emas.</p>
+            <p style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; padding: 40px 0;">Sizda faol to'lov ma'lumotlari mavjud emas.</p>
         {% endif %}
+    </div>
+
+    <!-- 💳 ONLAYN TO'LOV MODALI (PAYME / CLICK) -->
+    <div id="paymentModalOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 99999; align-items: center; justify-content: center; padding: 15px;">
+        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; max-width: 460px; width: 100%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow: hidden;">
+            <div style="padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center;">
+                <h4 id="paymentModalTitle" style="color: #ffffff; font-size: 17px; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-wallet" style="color: #00f2fe;"></i> Onlayn To'lov
+                </h4>
+                <button type="button" onclick="closePaymentModal()" style="background: none; border: none; color: rgba(255,255,255,0.5); font-size: 20px; cursor: pointer; line-height: 1;"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="padding: 24px;">
+                <div id="paymentModalGroupInfo" style="display: none; background: rgba(0, 242, 254, 0.04); border: 1px solid rgba(0, 242, 254, 0.15); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px;">
+                    <div style="color: rgba(255,255,255,0.6); font-size: 12px;">Guruh va Oy:</div>
+                    <div id="paymentModalGroupText" style="color: #ffffff; font-weight: 700; font-size: 14px;">-</div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 600; margin-bottom: 8px; display: block;">To'lov summasi (so'm):</label>
+                    <div style="position: relative;">
+                        <input type="number" id="paymentAmountInput" placeholder="Masalan: 500000" style="width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 12px 16px; color: #ffffff; font-size: 18px; font-weight: 800; outline: none; box-sizing: border-box;">
+                        <span style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); font-size: 14px; font-weight: 700;">UZS</span>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 600; margin-bottom: 10px; display: block;">To'lov tizimini tanlang:</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="provider-choice selected" id="providerPayme" onclick="selectProvider('payme')" style="background: rgba(0, 242, 254, 0.08); border: 2px solid #00f2fe; border-radius: 14px; padding: 14px; text-align: center; cursor: pointer; transition: 0.2s;">
+                            <span style="display: block; font-weight: 800; font-size: 16px; color: #00f2fe;">Payme</span>
+                            <small style="color: rgba(255,255,255,0.5); font-size: 11px;">Karta yoki ilova</small>
+                        </div>
+                        <div class="provider-choice" id="providerClick" onclick="selectProvider('click')" style="background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px; text-align: center; cursor: pointer; transition: 0.2s;">
+                            <span style="display: block; font-weight: 800; font-size: 16px; color: #00aaff;">Click</span>
+                            <small style="color: rgba(255,255,255,0.5); font-size: 11px;">Click Up / Pass</small>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" id="paymentGroupId" value="">
+                <input type="hidden" id="paymentMonth" value="">
+
+                <button type="button" id="startPaymentBtn" onclick="submitOnlinePayment()" style="width: 100%; background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #000; border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3); transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>To'lovga o'tish</span> <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
     </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    /* --- 🔍 FAQAT TO'LOVLARNI GURUH BO'YICHA FILTRLASH LOGIKASI --- */
-    document.addEventListener("DOMContentLoaded", function () {
-        // Formani andozadagi Header qatlamiga dinamik ko'chirish
-        const searchForm = document.getElementById('paymentSearchForm');
-        const header = document.querySelector('.header');
-        const userProfile = document.querySelector('.user-profile');
+    let selectedPaymentProvider = 'payme';
 
-        if (header && userProfile && searchForm) {
-            header.insertBefore(searchForm, userProfile);
-            searchForm.style.display = 'flex';
+    function selectProvider(provider) {
+        selectedPaymentProvider = provider;
+        const pPayme = document.getElementById('providerPayme');
+        const pClick = document.getElementById('providerClick');
+
+        if (provider === 'payme') {
+            pPayme.style.border = '2px solid #00f2fe';
+            pPayme.style.background = 'rgba(0, 242, 254, 0.08)';
+            pClick.style.border = '2px solid rgba(255,255,255,0.1)';
+            pClick.style.background = 'rgba(255,255,255,0.03)';
+        } else {
+            pClick.style.border = '2px solid #00aaff';
+            pClick.style.background = 'rgba(0, 170, 255, 0.08)';
+            pPayme.style.border = '2px solid rgba(255,255,255,0.1)';
+            pPayme.style.background = 'rgba(255,255,255,0.03)';
+        }
+    }
+
+    function openTopUpModal() {
+        document.getElementById('paymentModalTitle').innerHTML = '<i class="fas fa-wallet" style="color: #00f2fe;"></i> Balansni to\'ldirish';
+        document.getElementById('paymentModalGroupInfo').style.display = 'none';
+        document.getElementById('paymentGroupId').value = '';
+        document.getElementById('paymentMonth').value = '';
+        document.getElementById('paymentAmountInput').value = '100000';
+        selectProvider('payme');
+        document.getElementById('paymentModalOverlay').style.display = 'flex';
+    }
+
+    function openPaymentModal(groupId, groupName, month, debtAmount) {
+        document.getElementById('paymentModalTitle').innerHTML = '<i class="fas fa-receipt" style="color: #00f2fe;"></i> Guruh to\'lovi';
+        document.getElementById('paymentModalGroupInfo').style.display = 'block';
+        document.getElementById('paymentModalGroupText').textContent = groupName + ' (' + month + ')';
+        document.getElementById('paymentGroupId').value = groupId;
+        document.getElementById('paymentMonth').value = month;
+        document.getElementById('paymentAmountInput').value = parseInt(debtAmount) || 0;
+        selectProvider('payme');
+        document.getElementById('paymentModalOverlay').style.display = 'flex';
+    }
+
+    function closePaymentModal() {
+        document.getElementById('paymentModalOverlay').style.display = 'none';
+    }
+
+    function submitOnlinePayment() {
+        const amount = document.getElementById('paymentAmountInput').value;
+        const groupId = document.getElementById('paymentGroupId').value;
+        const month = document.getElementById('paymentMonth').value;
+        const btn = document.getElementById('startPaymentBtn');
+
+        if (!amount || parseInt(amount) < 1000) {
+            alert("Minimal to'lov summasi: 1,000 so'm");
+            return;
         }
 
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Tayyorlanmoqda...';
+
+        const formData = new FormData();
+        formData.append('amount', amount);
+        formData.append('provider', selectedPaymentProvider);
+        if (groupId) formData.append('group_id', groupId);
+        if (month) formData.append('month', month);
+
+        fetch("{% url 'create_payment_order' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success' && data.payment_url) {
+                window.location.href = data.payment_url;
+            } else {
+                alert(data.message || "To'lov buyurtmasini shakllantirishda xatolik yuz berdi.");
+                btn.disabled = false;
+                btn.innerHTML = '<span>To\'lovga o\'tish</span> <i class="fas fa-arrow-right"></i>';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Tarmoq xatosi. Iltimos qaytadan urinib ko'ring.");
+            btn.disabled = false;
+            btn.innerHTML = '<span>To\'lovga o\'tish</span> <i class="fas fa-arrow-right"></i>';
+        });
+    }
+
+    /* --- 🔍 FAQAT TO'LOVLARNI GURUH BO'YICHA FILTRLASH LOGIKASI --- */
+    document.addEventListener("DOMContentLoaded", function () {
         // Jonli qidiruv mantiqi
         const searchInput = document.getElementById("group-search");
         if (searchInput) {

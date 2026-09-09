@@ -1,0 +1,227 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %}OMR skaner | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .sarlavha {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #ffffff;
+            border-left: 4px solid #00f2fe;
+            padding-left: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .upload-card {
+            background: rgba(11, 15, 25, 0.4);
+            border: 2px dashed rgba(0, 242, 254, 0.2);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 50px 30px;
+            text-align: center;
+            max-width: 600px;
+            margin: 40px auto;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .upload-card:hover {
+            border-color: #00f2fe;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .upload-icon {
+            font-size: 50px;
+            color: #00f2fe;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+
+        .form-control-file {
+            display: none;
+        }
+
+        .btn-dtm {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #ff9f43, #ff5252);
+            color: #070a12;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 159, 67, 0.2);
+            text-align: center;
+            display: inline-block;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .btn-dtm:hover {
+            box-shadow: 0 0 20px rgba(255, 159, 67, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+        }
+
+        /* 🤖 FULLSCREEN AI SCANNER OVERLAY */
+        #scanner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(7, 10, 18, 0.95);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #ffffff;
+        }
+
+        .scan-animation {
+            width: 150px;
+            height: 150px;
+            border: 3px solid #00f2fe;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.2);
+            margin-bottom: 30px;
+        }
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: #00f2fe;
+            box-shadow: 0 0 15px #00f2fe;
+            animation: scanning 2s linear infinite;
+        }
+
+        @keyframes scanning {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+
+        .loader-text {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #00f2fe;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .loader-subtext {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            max-width: 300px;
+            line-height: 1.5;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="{% url 'admin_dtm_list' %}" class="back-arrow-btn" title="Orqaga">
+                <i class="fas fa-chevron-left" style="font-size: 16px;"></i>
+            </a>
+            <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">AI OMR skaner (Javoblar varaqasini tekshirish)</h2>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.2); color: #00ffaa; padding: 15px 20px; border-radius: 16px; margin-bottom: 25px; font-size: 14px; line-height: 1.6;">
+                {{ message|safe }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="upload-card" onclick="document.getElementById('omr_image').click()">
+        <form method="POST" enctype="multipart/form-data" id="omrForm" onsubmit="showScannerLoader()">
+            {% csrf_token %}
+            <i class="fas fa-qrcode upload-icon"></i>
+            <h3 style="color: #ffffff; font-size: 16px; font-weight: 800; margin-bottom: 8px;">Javoblar varaqasi rasmini yuklash</h3>
+            <p style="color: rgba(255,255,255,0.4); font-size: 12.5px; margin-bottom: 20px;">Rasm aniq, yorug' joyda olingan va burchaklari to'g'ri bo'lishi lozim (JPG, PNG)</p>
+            
+            <input type="file" name="omr_image" id="omr_image" class="form-control-file" accept="image/*" required onchange="displayFileName(this)">
+            
+            <div id="file-name-display" style="display: none; color: #00ffaa; font-weight: 700; font-size: 13.5px; margin-bottom: 15px;"></div>
+            
+            <button type="submit" class="btn-dtm" id="submitBtn"><i class="fas fa-magic"></i> Rasmni tahlil qilish (AI)</button>
+        </form>
+    </div>
+
+    <!-- Scanner Loading Overlay -->
+    <div id="scanner-overlay">
+        <div class="scan-animation">
+            <div class="scan-line"></div>
+            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; opacity: 0.15; font-size: 80px;">
+                <i class="fas fa-file-invoice"></i>
+            </div>
+        </div>
+        <div class="loader-text" id="status-text">Sun'iy intellekt tahlil qilmoqda...</div>
+        <div class="loader-subtext">Javoblar varaqasidan kitobcha raqami va belgilangan javoblarni Vision AI orqali aniqlash. Iltimos, kuting.</div>
+    </div>
+
+    <script>
+        function displayFileName(input) {
+            const display = document.getElementById('file-name-display');
+            if (input.files && input.files[0]) {
+                display.textContent = "Tanlangan fayl: " + input.files[0].name;
+                display.style.display = "block";
+            } else {
+                display.style.display = "none";
+            }
+        }
+
+        function showScannerLoader() {
+            const overlay = document.getElementById('scanner-overlay');
+            overlay.style.display = 'flex';
+            
+            // Dynamic text updates to keep user engaged
+            const steps = [
+                "Tasvir sifatini tahlil qilish...",
+                "Kitobcha raqamini aniqlash (Vision OCR)...",
+                "Doirachalar koordinatalarini hisoblash...",
+                "Belgilangan variantlarni aniqlash (OMR)...",
+                "To'g'ri javoblar kaliti bilan solishtirish...",
+                "Natija va ballarni hisoblash..."
+            ];
+            let idx = 0;
+            setInterval(() => {
+                if (idx < steps.length) {
+                    document.getElementById('status-text').textContent = steps[idx];
+                    idx++;
+                }
+            }, 1800);
+        }
+    </script>
+{% endblock %}

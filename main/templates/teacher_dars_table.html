@@ -1,7 +1,7 @@
 {% extends 'baseteacher.html' %}
 {% load static %}
 
-{% block title %}O'qituvchi dars jadvali{% endblock %}
+{% block title %}Dars jadvalim{% endblock %}
 
 {% block extra_css %}
     <style>
@@ -96,20 +96,27 @@
             border-radius: 24px;
             padding: 24px;
             flex-grow: 1;
-            overflow-y: auto;
-            max-height: calc(100vh - 210px);
+            overflow-y: auto !important;
+            overflow-x: auto !important;
+            max-height: calc(100vh - 300px);
+            min-height: 300px;
         }
         .jadval-container::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
+            width: 6px;
+            height: 6px;
         }
         .jadval-container::-webkit-scrollbar-thumb {
-            background: rgba(0, 242, 254, 0.2);
-            border-radius: 4px;
+            background: rgba(0, 242, 254, 0.12);
+            border-radius: 10px;
+        }
+        .jadval-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 242, 254, 0.3);
         }
 
         table {
-            width: 100%;
+            width: max-content !important;
+            min-width: 100% !important;
+            white-space: nowrap;
             border-collapse: collapse;
             text-align: center;
         }
@@ -264,19 +271,58 @@
                 padding-left: 14px !important;
             }
         }
+
+        /* --- ☀️ LIGHT MODE SPECIFIC OVERRIDES --- */
+        body.light-mode #jadval th {
+            background: #f8fafc !important;
+            color: #475569 !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        body.light-mode #jadval td {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        body.light-mode #jadval th.today {
+            background: #0284c7 !important;
+            color: #ffffff !important;
+            border: 1.5px solid #0284c7 !important;
+        }
+        body.light-mode #jadval th.today small {
+            color: #e0f2fe !important;
+        }
+        body.light-mode #jadval td.today-td {
+            background: #e0f2fe !important; /* Standout light blue background */
+            border: 1.5px solid #0284c7 !important;
+        }
+        body.light-mode #jadval td.today-td div {
+            background: #ffffff !important;
+            color: #0284c7 !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        body.light-mode #jadval .guruh-ustuni {
+            background: #f1f5f9 !important;
+            color: #0f172a !important;
+            border-right: 1.5px solid #cbd5e1 !important;
+        }
+        body.light-mode #jadval .dars-yoq {
+            color: #94a3b8 !important;
+        }
+        body.light-mode #jadval td:not(.guruh-ustuni):hover {
+            background-color: #f1f5f9 !important;
+        }
     </style>
 {% endblock %}
 
-{% block header_search %}
-    <!-- GURUH QIDIRUV FORMASI -->
-    <form class="search-form" onsubmit="event.preventDefault();">
-        <input type="text" class="search-input" placeholder="Guruh bo'yicha qidiruv..." id="qidiruv">
-        <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
-    </form>
-{% endblock %}
-
 {% block content %}
-    <h3 class="sarlavha">Dars reja</h3>
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <h3 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">Dars reja</h3>
+        <!-- GURUH QIDIRUV FORMASI -->
+        <form class="search-form" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
+            <input type="text" class="search-input" placeholder="Guruh bo'yicha qidiruv..." id="qidiruv" style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
 
     <div class="hafta-sur">
         <button class="hafta-sur_bir" onclick="haftaniOldinga()"><i class="fas fa-chevron-left"></i> Oldingi hafta</button>

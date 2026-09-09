@@ -1,0 +1,534 @@
+{% extends 'baseadmin.html' %}
+{% load static %}
+
+{% block title %}Tizim sozlamalari | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 30px;
+        margin-bottom: 35px;
+    }
+
+    .settings-card {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        display: flex;
+        flex-direction: column;
+        transition: 0.3s;
+    }
+
+    .settings-card:hover {
+        border-color: rgba(0, 242, 254, 0.2);
+        box-shadow: 0 25px 50px rgba(0, 242, 254, 0.05);
+    }
+
+    .card-header-custom {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 15px;
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: rgba(0, 242, 254, 0.1);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #00f2fe;
+        font-size: 20px;
+    }
+
+    .card-title-custom {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .image-preview-container {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 2px dashed var(--border-input);
+        margin: 0 auto 25px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+        background: var(--bg-input);
+    }
+
+    .image-preview-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .image-placeholder {
+        font-size: 32px;
+        color: var(--text-muted);
+    }
+
+    .file-input-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .file-input-btn {
+        border: 1px solid var(--border-input);
+        background: var(--bg-input);
+        color: var(--text-primary);
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 13.5px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+        width: 100%;
+    }
+
+    .file-input-btn:hover {
+        background: var(--bg-dropdown-hover);
+        border-color: var(--accent-primary);
+        color: var(--accent-primary);
+    }
+
+    .file-input-wrapper input[type=file] {
+        font-size: 100px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .file-name-label {
+        font-size: 11px;
+        color: var(--text-secondary);
+        text-align: center;
+        display: block;
+        margin-top: -12px;
+        margin-bottom: 20px;
+        min-height: 16px;
+    }
+
+    .btn-save-settings {
+        background: var(--accent-gradient);
+        color: #070a12;
+        font-weight: 800;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 24px;
+        cursor: pointer;
+        transition: 0.3s;
+        text-transform: uppercase;
+        width: 100%;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    html.light-theme .btn-save-settings {
+        color: #ffffff;
+    }
+
+    .btn-save-settings:hover {
+        box-shadow: var(--shadow-card-hover);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <h2 class="sarlavha" style="font-size: 24px; font-weight: 800; color: var(--text-primary); border-left: 4px solid var(--accent-primary); padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Tizim sozlamalari</h2>
+    <div style="font-size: 13.5px; color: var(--text-secondary); font-weight: 600; background: var(--bg-card); border: 1px solid var(--border-card); padding: 8px 16px; border-radius: 10px;">
+        <i class="fas fa-cog" style="color: var(--accent-primary); margin-right: 6px;"></i> Sozlamalar
+    </div>
+</div>
+
+{% if messages %}
+    <div style="margin-bottom: 25px;">
+        {% for message in messages %}
+            {% if 'settings_toast' not in message.tags %}
+                <div style="background: rgba(0, 255, 170, 0.08); border: 1px solid rgba(0, 255, 170, 0.25); border-radius: 12px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; color: #00ffaa; font-size: 14px; font-weight: 600; margin-bottom: 10px;">
+                    <i class="fas fa-check-circle" style="font-size: 18px;"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="settings-grid">
+    <!-- Logotip Sozlamalari Card -->
+    <div class="settings-card">
+        <div class="card-header-custom">
+            <div class="card-icon"><i class="fas fa-image"></i></div>
+            <h3 class="card-title-custom">Tizim logotipi</h3>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="image-preview-container" id="logo-preview-box">
+                {% if setting and setting.image %}
+                    <img src="{{ setting.image.url }}" alt="Loyiha logotipi" id="logo-preview-img">
+                {% else %}
+                    <div class="image-placeholder" id="logo-placeholder"><i class="fas fa-graduation-cap"></i></div>
+                {% endif %}
+            </div>
+
+            <div class="file-input-wrapper">
+                <span class="file-input-btn"><i class="fas fa-upload"></i> Rasmni tanlash</span>
+                <input type="file" name="logo" id="logo-file-input" accept="image/*" onchange="previewImage(this, 'logo')">
+            </div>
+            <span class="file-name-label" id="logo-file-name">Fayl tanlanmagan</span>
+
+            <button type="submit" class="btn-save-settings">
+                <i class="fas fa-save"></i> Logotipni saqlash
+            </button>
+        </form>
+    </div>
+
+    <!-- Standart Profil Rasmi Sozlamalari Card -->
+    <div class="settings-card">
+        <div class="card-header-custom">
+            <div class="card-icon" style="color: #00ffaa; background: rgba(0, 255, 170, 0.1); border-color: rgba(0, 255, 170, 0.2);"><i class="fas fa-user-circle"></i></div>
+            <h3 class="card-title-custom">Standart profil rasmi</h3>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="image-preview-container" id="profile-preview-box">
+                {% if profile and profile.image %}
+                    <img src="{{ profile.image.url }}" alt="Standart avatar" id="profile-preview-img">
+                {% else %}
+                    <div class="image-placeholder" id="profile-placeholder"><i class="fas fa-user"></i></div>
+                {% endif %}
+            </div>
+
+            <div class="file-input-wrapper">
+                <span class="file-input-btn"><i class="fas fa-upload"></i> Rasmni tanlash</span>
+                <input type="file" name="default_profile" id="profile-file-input" accept="image/*" onchange="previewImage(this, 'profile')">
+            </div>
+            <span class="file-name-label" id="profile-file-name">Fayl tanlanmagan</span>
+
+            <button type="submit" class="btn-save-settings" style="background: linear-gradient(135deg, #00ffaa, #00b09b);">
+                <i class="fas fa-save"></i> Rasmni saqlash
+            </button>
+        </form>
+    </div>
+
+    <!-- Brend Sozlamalari Card -->
+    <div class="settings-card">
+        <div class="card-header-custom">
+            <div class="card-icon" style="color: #ff9f43; background: rgba(255, 159, 67, 0.1); border-color: rgba(255, 159, 67, 0.2);"><i class="fas fa-signature"></i></div>
+            <h3 class="card-title-custom">Brend va tizim sozlamalari</h3>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label for="site-name-input" style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Muassasa / Tizim nomi:</label>
+                <input type="text" name="site_name" id="site-name-input" class="form-control" value="{{ setting.site_name|default:'Tizim' }}" required style="width: 100%; padding: 12px 18px; font-size: 14px;">
+            </div>
+
+            <button type="submit" class="btn-save-settings" style="background: linear-gradient(135deg, #ff9f43, #ff6b6b) !important; color: #070a12 !important;">
+                <i class="fas fa-save"></i> Tizim nomini saqlash
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Sub-adminlar Boshqaruvi Section -->
+<div id="subadmins" class="settings-card" style="margin-top: 35px; width: 100%;">
+    <div class="card-header-custom" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="card-icon" style="color: var(--accent-primary); background: var(--accent-bg-glow); border-color: var(--accent-border-glow);"><i class="fas fa-users-cog"></i></div>
+            <h3 class="card-title-custom">Sub-adminlar (Retseptsiya) boshqaruvi</h3>
+        </div>
+        <button class="btn-save-settings" style="width: auto; font-size: 12px; padding: 10px 20px;" onclick="openSubadminModal('add')">
+            <i class="fas fa-user-plus"></i> Yangi sub-admin qo'shish
+        </button>
+    </div>
+
+    <!-- Sub-adminlar Jadvali -->
+    <div class="jadval-container" style="margin-top: 15px; border: none; box-shadow: none; background: transparent;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px;">
+            <thead>
+                <tr>
+                    <th style="padding: 15px;">F.I.SH.</th>
+                    <th style="padding: 15px;">FOYDALANUVCHI NOMI</th>
+                    <th style="padding: 15px;">TELEFON RAQAMI</th>
+                    <th style="padding: 15px;">BIRIKTIRILGAN HUQUQLAR</th>
+                    <th style="padding: 15px; text-align: right;">AMALLAR</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sub in sub_admins %}
+                <tr style="transition: 0.3s;" onmouseover="this.style.background='var(--table-row-hover)'" onmouseout="this.style.background='none'">
+                    <td data-label="F.I.SH." style="padding: 15px; font-weight: 700; color: var(--text-primary);">{{ sub.first_name }} {{ sub.last_name }}</td>
+                    <td data-label="Foydalanuvchi nomi" style="padding: 15px; color: var(--accent-primary);">@{{ sub.username }}</td>
+                    <td data-label="Telefon raqami" style="padding: 15px; color: var(--text-secondary);">{{ sub.phone_number }}</td>
+                    <td data-label="Biriktirilgan huquqlar" style="padding: 15px; max-width: 300px; word-wrap: break-word;">
+                        {% for perm in sub.subadmin_permissions %}
+                            <span style="display: inline-block; background: var(--accent-bg-glow); border: 1px solid var(--accent-border-glow); color: var(--accent-primary); padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; margin: 2px 1px;">
+                                {% if perm == 'manage_students' %}O'quvchilar
+                                {% elif perm == 'manage_teachers' %}O'qituvchilar
+                                {% elif perm == 'manage_groups' %}Guruhlar
+                                {% elif perm == 'manage_payments' %}To'lovlar
+                                {% elif perm == 'manage_attendance' %}Davomat
+                                {% elif perm == 'manage_announcements' %}E'lonlar
+                                {% elif perm == 'manage_quizzes' %}Viktorinalar
+                                {% elif perm == 'manage_assignments' %}Topshiriqlar
+                                {% elif perm == 'manage_schedules' %}Jadvallar
+                                {% elif perm == 'manage_subjects' %}Fanlar
+                                {% elif perm == 'manage_dtm' %}DTM imtihonlari
+                                {% else %}{{ perm }}{% endif %}
+                            </span>
+                        {% empty %}
+                            <span style="color: var(--text-muted); font-style: italic;">Hech qanday huquq biriktirilmagan</span>
+                        {% endfor %}
+                    </td>
+                    <td data-label="Amallar" style="padding: 15px; text-align: right;">
+                        <button style="background: none; border: 1px solid var(--border-input); color: var(--accent-primary); padding: 6px 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 12px; font-weight: 700; margin-right: 8px;" 
+                                onclick="openSubadminModal('edit', '{{ sub.id }}', '{{ sub.first_name|escapejs }}', '{{ sub.last_name|escapejs }}', '{{ sub.username|escapejs }}', '{{ sub.phone_number|escapejs }}', '{{ sub.subadmin_permissions|join:',' }}')"
+                                title="Tahrirlash">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <form method="POST" action="{% url 'delete_subadmin' sub.id %}" style="display: inline-block;" onsubmit="return confirm('Haqiqatan ham ushbu sub-adminni o\'chirmoqchimisiz?')">
+                            {% csrf_token %}
+                            <button type="submit" style="background: none; border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; padding: 6px 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 12px; font-weight: 700;" title="O'chirish">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="padding: 30px; text-align: center; color: var(--text-muted); font-style: italic;">Hozircha sub-adminlar (retseptsiya) mavjud emas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Sub-admin Modal Oynasi (Qo'shish / Tahrirlash) -->
+<div id="subadmin-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+    <div style="background: var(--bg-dropdown); border: 1px solid var(--border-dropdown); border-radius: 20px; width: 90%; max-width: 550px; padding: 30px; box-shadow: var(--shadow-panel); display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-dropdown); padding-bottom: 15px;">
+            <h3 id="modal-title" style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0;">Sub-admin qo'shish</h3>
+            <span style="font-size: 20px; color: var(--text-secondary); cursor: pointer;" onclick="closeSubadminModal()">&times;</span>
+        </div>
+
+        <form id="modal-form" method="POST" action="">
+            {% csrf_token %}
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div class="form-group">
+                    <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Ism:</label>
+                    <input type="text" name="first_name" id="modal-first-name" required style="width: 100%; padding: 10px 15px; border-radius: 10px; font-size: 13.5px;">
+                </div>
+                <div class="form-group">
+                    <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Familiya:</label>
+                    <input type="text" name="last_name" id="modal-last-name" required style="width: 100%; padding: 10px 15px; border-radius: 10px; font-size: 13.5px;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div class="form-group" id="username-container">
+                    <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Foydalanuvchi nomi:</label>
+                    <input type="text" name="username" id="modal-username" style="width: 100%; padding: 10px 15px; border-radius: 10px; font-size: 13.5px;">
+                </div>
+                <div class="form-group">
+                    <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Telefon raqami:</label>
+                    <input type="text" name="phone_number" id="modal-phone" required style="width: 100%; padding: 10px 15px; border-radius: 10px; font-size: 13.5px;">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label id="password-label" style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Parol:</label>
+                <input type="password" name="password" id="modal-password" style="width: 100%; padding: 10px 15px; border-radius: 10px; font-size: 13.5px;">
+                <span id="password-hint" style="font-size: 10.5px; color: var(--text-muted); display: none; margin-top: 4px;">Parolni o'zgartirishni xohlamasangiz, bo'sh qoldiring.</span>
+            </div>
+
+            <!-- Huquqlar ro'yxati -->
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Tizim bo'limlariga ruxsatlar:</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: var(--bg-input); border: 1px solid var(--border-input); border-radius: 12px; padding: 15px;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-primary); cursor: pointer;">
+                        <input type="checkbox" name="permissions" value="manage_students" class="perm-checkbox"> O'quvchilar
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-primary); cursor: pointer;">
+                        <input type="checkbox" name="permissions" value="manage_teachers" class="perm-checkbox"> O'qituvchilar
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-primary); cursor: pointer;">
+                        <input type="checkbox" name="permissions" value="manage_groups" class="perm-checkbox"> Guruhlar
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-primary); cursor: pointer;">
+                        <input type="checkbox" name="permissions" value="manage_payments" class="perm-checkbox"> To'lovlar
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-primary); cursor: pointer;">
+                        <input type="checkbox" name="permissions" value="manage_attendance" class="perm-checkbox"> Davomat
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-primary); cursor: pointer;">
+                        <input type="checkbox" name="permissions" value="manage_announcements" class="perm-checkbox"> E'lonlar
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-primary); cursor: pointer;">
+                        <input type="checkbox" name="permissions" value="manage_quizzes" class="perm-checkbox"> Viktorinalar
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-primary); cursor: pointer;">
+                        <input type="checkbox" name="permissions" value="manage_assignments" class="perm-checkbox"> Topshiriqlar
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-primary); cursor: pointer;">
+                        <input type="checkbox" name="permissions" value="manage_schedules" class="perm-checkbox"> Jadvallar
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-primary); cursor: pointer;">
+                        <input type="checkbox" name="permissions" value="manage_subjects" class="perm-checkbox"> Fanlar
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-primary); cursor: pointer; grid-column: span 2;">
+                        <input type="checkbox" name="permissions" value="manage_dtm" class="perm-checkbox"> DTM imtihonlari
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-save-settings">
+                <i class="fas fa-save"></i> Saqlash
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function previewImage(input, type) {
+        const file = input.files[0];
+        const label = document.getElementById(type + '-file-name');
+        const container = document.getElementById(type + '-preview-box');
+
+        if (file) {
+            label.textContent = file.name;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Remove placeholder if it exists
+                const placeholder = document.getElementById(type + '-placeholder');
+                if (placeholder) placeholder.style.display = 'none';
+
+                // Look for existing image or create one
+                let img = document.getElementById(type + '-preview-img');
+                if (!img) {
+                    img = document.createElement('img');
+                    img.id = type + '-preview-img';
+                    container.appendChild(img);
+                }
+                img.src = e.target.result;
+                img.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            label.textContent = 'Fayl tanlanmagan';
+        }
+    }
+
+    function openSubadminModal(mode, id, firstName, lastName, username, phone, permissionsStr) {
+        const modal = document.getElementById('subadmin-modal');
+        const form = document.getElementById('modal-form');
+        const title = document.getElementById('modal-title');
+        const usernameContainer = document.getElementById('username-container');
+        const passwordHint = document.getElementById('password-hint');
+        const passwordInput = document.getElementById('modal-password');
+
+        // Reset checkboxes
+        document.querySelectorAll('.perm-checkbox').forEach(cb => cb.checked = false);
+
+        if (mode === 'add') {
+            title.textContent = "Yangi sub-admin qo'shish";
+            form.action = "{% url 'add_subadmin' %}";
+            usernameContainer.style.display = 'block';
+            document.getElementById('modal-username').required = true;
+            passwordInput.required = true;
+            passwordHint.style.display = 'none';
+            
+            // Clear values
+            document.getElementById('modal-first-name').value = '';
+            document.getElementById('modal-last-name').value = '';
+            document.getElementById('modal-username').value = '';
+            document.getElementById('modal-phone').value = '';
+            passwordInput.value = '';
+        } else {
+            title.textContent = "Sub-admin ma'lumotlarini tahrirlash";
+            form.action = `/adminpanel/settings/subadmin/edit/${id}/`;
+            usernameContainer.style.display = 'none';
+            document.getElementById('modal-username').required = false;
+            passwordInput.required = false;
+            passwordHint.style.display = 'block';
+
+            // Set values
+            document.getElementById('modal-first-name').value = firstName;
+            document.getElementById('modal-last-name').value = lastName;
+            document.getElementById('modal-phone').value = phone;
+            passwordInput.value = '';
+
+            // Check permissions
+            if (permissionsStr) {
+                const perms = permissionsStr.split(',');
+                perms.forEach(perm => {
+                    const cb = document.querySelector(`.perm-checkbox[value="${perm}"]`);
+                    if (cb) cb.checked = true;
+                });
+            }
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    function closeSubadminModal() {
+        document.getElementById('subadmin-modal').style.display = 'none';
+    }
+
+    // Smooth scroll to subadmins section if hash matches
+    function checkHashAndScroll() {
+        if (window.location.hash === '#subadmins') {
+            const el = document.getElementById('subadmins');
+            const container = document.querySelector('.konteyner');
+            if (el && container) {
+                setTimeout(() => {
+                    container.scrollTo({
+                        top: el.offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                }, 300);
+            }
+        }
+    }
+
+    window.addEventListener('hashchange', checkHashAndScroll);
+    window.addEventListener('load', checkHashAndScroll);
+</script>
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends 'baseadmin.html' %}
+{% load static %}
+
+{% block title %}Fanni tahrirlash: {{ subject.name }} | VLE Tizimi{% endblock %}
+
+{% block content %}
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="{% url 'subject_list_admin' %}" class="back-arrow-btn" title="Orqaga">
+            <i class="fas fa-chevron-left" style="font-size: 16px;"></i>
+        </a>
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Fanni tahrirlash: {{ subject.name }}</h2>
+    </div>
+</div>
+
+<div class="form-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); width: 100%; max-width: 600px; margin: 0 auto;">
+    <form class="form-main" method="POST">
+        {% csrf_token %}
+
+        {% if messages %}
+            {% for message in messages %}
+                {% if 'error' in message.tags or 'warning' in message.tags %}
+                    <div style="background: rgba(255, 79, 79, 0.1); border: 1px solid rgba(255, 79, 79, 0.2); border-radius: 12px; padding: 12px 18px; color: #ff4f4f; font-size: 13.5px; margin-bottom: 20px; font-weight: 600;">
+                        <i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i> {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <div class="form-group" style="margin-bottom: 22px;">
+            <label for="name" style="display: block; font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Fan nomi *</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ subject.name }}" required style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; transition: 0.3s;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 22px;">
+            <label for="description" style="display: block; font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Fan haqida ma'lumot</label>
+            <textarea class="form-control" id="description" name="description" placeholder="Fan to'g'risida qisqacha ma'lumot..." style="width: 100%; height: 120px; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; transition: 0.3s; resize: none;">{{ subject.description|default:'' }}</textarea>
+        </div>
+
+        <div class="tugmalar" style="display: flex; gap: 12px; margin-top: 35px;">
+            <button type="submit" class="btn-submit" style="flex: 1; padding: 12px 24px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; transition: 0.3s; text-transform: uppercase;"><i class="fas fa-save" style="margin-right: 6px;"></i> O'zgarishlarni saqlash</button>
+            
+            <button type="button" onclick="confirmDelete()" style="flex: 1; padding: 12px 24px; background: rgba(255, 79, 79, 0.1); border: 1px solid rgba(255, 79, 79, 0.3); color: #ff4f4f; border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: 800; text-transform: uppercase;">
+                <i class="fas fa-trash-alt" style="margin-right: 6px;"></i> Fanni o'chirish
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Dars Materiallari Card -->
+<div class="form-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); width: 100%; max-width: 600px; margin: 25px auto 0 auto;">
+    <h3 style="font-size: 16px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 10px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px;">Fan materiallari (Fayllar, hujjatlar)</h3>
+    
+    <!-- Material yuklash formasi -->
+    <form method="POST" enctype="multipart/form-data" style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="upload_material">
+        
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label for="material_title" style="display: block; font-size: 11px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">Material nomi (ixtiyoriy, bo'sh qolsa fayl nomi olinadi)</label>
+            <input type="text" class="form-control" id="material_title" name="material_title" placeholder="Masalan: 1-ma'ruzalar to'plami" style="width: 100%; padding: 10px 14px; font-size: 13.5px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; outline: none;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label for="material_description" style="display: block; font-size: 11px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">Tavsif (ixtiyoriy)</label>
+            <input type="text" class="form-control" id="material_description" name="material_description" placeholder="Material haqida qisqacha izoh..." style="width: 100%; padding: 10px 14px; font-size: 13.5px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; outline: none;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px; display: flex; flex-direction: column;">
+            <label for="material_file" style="display: block; font-size: 11px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Fayl tanlang *</label>
+            <input type="file" id="material_file" name="material_file" required style="font-size: 13px; color: rgba(255,255,255,0.6); outline: none;">
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 12px 20px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; font-weight: 800; border: none; border-radius: 10px; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;"><i class="fas fa-upload" style="margin-right: 6px;"></i> Materialni yuklash</button>
+    </form>
+
+    <!-- Mavjud materiallar ro'yxati -->
+    <div>
+        <h4 style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">Biriktirilgan materiallar ro'yxati</h4>
+        {% if materials %}
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                {% for material in materials %}
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="background: rgba(0, 242, 254, 0.1); border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; color: #00f2fe; font-size: 14px;">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div>
+                                <a href="{{ material.file.url }}" target="_blank" style="color: #ffffff; font-size: 13px; font-weight: 700; text-decoration: none; transition: 0.2s;" onmouseover="this.style.color='#00f2fe'" onmouseout="this.style.color='#ffffff'">{{ material.title }}</a>
+                                <div style="color: rgba(255,255,255,0.4); font-size: 11px; margin-top: 2px;">
+                                    {{ material.description|default:"Tavsif yo'q" }} • {{ material.created_at|date:"d.m.Y" }}
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{% url 'delete_subject_material_admin' material.id %}" onclick="return confirm('Ushbu materialni o\'chirmoqchimisiz?');" style="color: rgba(255,79,79,0.6); font-size: 14px; transition: color 0.2s; cursor: pointer; text-decoration: none;" onmouseover="this.style.color='#ff4f4f'" onmouseout="this.style.color='rgba(255,79,79,0.6)'"><i class="fas fa-trash"></i></a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 25px 15px; color: rgba(255,255,255,0.4);">
+                <i class="fas fa-folder-open" style="font-size: 26px; margin-bottom: 8px; opacity: 0.5; display: block;"></i>
+                Ushbu fanga hali o'quv materiallari biriktirilmagan.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Elektron Kitoblar Card -->
+<div class="form-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); width: 100%; max-width: 600px; margin: 25px auto 0 auto;">
+    <h3 style="font-size: 16px; font-weight: 800; color: #ffffff; border-left: 4px solid #00ffaa; padding-left: 10px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px;">Elektron darsliklar va kitoblar (PDF)</h3>
+    
+    <!-- Kitob yuklash formasi -->
+    <form method="POST" enctype="multipart/form-data" style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="upload_book">
+        
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label for="book_title" style="display: block; font-size: 11px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">Kitob nomi (ixtiyoriy)</label>
+            <input type="text" class="form-control" id="book_title" name="book_title" placeholder="Masalan: Fizika 10-sinf darslik" style="width: 100%; padding: 10px 14px; font-size: 13.5px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; outline: none;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label for="book_description" style="display: block; font-size: 11px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">Kitob haqida qisqacha tavsif (ixtiyoriy)</label>
+            <input type="text" class="form-control" id="book_description" name="book_description" placeholder="Mavzu yoki boblar haqida..." style="width: 100%; padding: 10px 14px; font-size: 13.5px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; outline: none;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px; display: flex; flex-direction: column;">
+            <label for="book_file" style="display: block; font-size: 11px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">PDF kitob fayli *</label>
+            <input type="file" id="book_file" name="book_file" required accept=".pdf" style="font-size: 13px; color: rgba(255,255,255,0.6); outline: none;">
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 12px 20px; background: linear-gradient(135deg, #00ffaa, #00b4d8); color: #070a12; font-weight: 800; border: none; border-radius: 10px; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;"><i class="fas fa-upload" style="margin-right: 6px;"></i> Kitobni yuklash</button>
+    </form>
+
+    <!-- Mavjud kitoblar ro'yxati -->
+    <div>
+        <h4 style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">Biriktirilgan kitoblar ro'yxati</h4>
+        {% if books %}
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                {% for book in books %}
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="background: rgba(0, 255, 170, 0.1); border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; color: #00ffaa; font-size: 14px;">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div>
+                                <span style="color: #ffffff; font-size: 13px; font-weight: 700;">{{ book.title }}</span>
+                                <div style="color: rgba(255,255,255,0.4); font-size: 11px; margin-top: 2px;">
+                                    {{ book.description|default:"Tavsif yo'q" }} • {{ book.created_at|date:"d.m.Y" }}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <a href="{% url 'student_book_flipbook' book.id %}" target="_blank" style="color: #00f2fe; font-size: 14px; text-decoration: none;" title="Varaqalab ko'rish"><i class="fas fa-book-open"></i></a>
+                            <a href="{% url 'delete_book_admin' book.id %}" onclick="return confirm('Ushbu kitobni o\'chirmoqchimisiz?');" style="color: rgba(255,79,79,0.6); font-size: 14px; transition: color 0.2s; cursor: pointer; text-decoration: none;" onmouseover="this.style.color='#ff4f4f'" onmouseout="this.style.color='rgba(255,79,79,0.6)'"><i class="fas fa-trash"></i></a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 25px 15px; color: rgba(255,255,255,0.4);">
+                <i class="fas fa-book-open" style="font-size: 26px; margin-bottom: 8px; opacity: 0.5; display: block;"></i>
+                Ushbu fanga hali elektron kitoblar biriktirilmagan.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Yashirin o'chirish formasi -->
+<form id="delete-form" method="POST" style="display: none;">
+    {% csrf_token %}
+    <input type="hidden" name="delete" value="1">
+</form>
+
+<script>
+    function confirmDelete() {
+        if (confirm("Haqiqatan ham ushbu fanni o'chirmoqchimisiz? Ushbu fanga bog'langan guruhlar fani yo'qoladi, ammo o'chib ketmaydi.")) {
+            document.getElementById('delete-form').submit();
+        }
+    }
+</script>
+{% endblock %}

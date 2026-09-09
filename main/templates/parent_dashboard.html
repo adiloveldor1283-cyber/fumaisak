@@ -1,0 +1,371 @@
+{% extends 'basestudent.html' %}
+{% load static %}
+
+{% block title %}Ota-ona paneli{% endblock %}
+
+{% block extra_css %}
+<style>
+    .parent-card {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 24px;
+        padding: 25px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        margin-bottom: 25px;
+    }
+    
+    .tabs-navigation {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        padding-bottom: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .tab-btn {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.05);
+        color: rgba(255,255,255,0.6);
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-size: 13.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .tab-btn:hover {
+        background: rgba(255,255,255,0.06);
+        color: white;
+    }
+    .tab-btn.active {
+        background: rgba(0, 242, 254, 0.1);
+        border-color: rgba(0, 242, 254, 0.25);
+        color: #00f2fe;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.1);
+    }
+    
+    .tab-pane {
+        display: none;
+    }
+    .tab-pane.active {
+        display: block;
+        animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+    th {
+        padding: 14px 18px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.4);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        letter-spacing: 0.5px;
+    }
+    td {
+        padding: 14px 18px;
+        font-size: 13.5px;
+        color: #ffffff;
+        border-bottom: 1px solid rgba(255,255,255,0.02);
+    }
+    
+    .badge-status {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 11.5px;
+        font-weight: 700;
+    }
+    .badge-present {
+        background: rgba(0, 255, 170, 0.1);
+        border: 1px solid rgba(0, 255, 170, 0.25);
+        color: #00ffaa;
+    }
+    .badge-absent {
+        background: rgba(255, 79, 79, 0.1);
+        border: 1px solid rgba(255, 79, 79, 0.25);
+        color: #ff4f4f;
+    }
+    
+    /* Light Mode */
+    body.light-mode .parent-card {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03) !important;
+    }
+    body.light-mode .tab-btn {
+        background: #f1f5f9 !important;
+        border-color: #e2e8f0 !important;
+        color: #64748b !important;
+    }
+    body.light-mode .tab-btn.active {
+        background: rgba(2, 132, 199, 0.08) !important;
+        border-color: rgba(2, 132, 199, 0.2) !important;
+        color: #0284c7 !important;
+    }
+    body.light-mode td {
+        color: #0f172a !important;
+        border-bottom-color: #e2e8f0 !important;
+    }
+    body.light-mode th {
+        color: #64748b !important;
+        border-bottom-color: #cbd5e1 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Sarlavha -->
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px;">Ota-ona kabineti</h2>
+</div>
+
+<!-- Child Profile Card -->
+<div class="parent-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+    <div style="display: flex; align-items: center; gap: 18px;">
+        <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(0, 242, 254, 0.1); border: 2px solid rgba(0, 242, 254, 0.3); display: flex; align-items: center; justify-content: center; color: #00f2fe; font-size: 26px; box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);">
+            <i class="fas fa-user-graduate"></i>
+        </div>
+        <div>
+            <h3 style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0;">{{ student.first_name }} {{ student.last_name }}</h3>
+            <span style="font-size: 11.5px; color: rgba(255,255,255,0.4); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">{{ site_name|default:"Tizim" }} O'quvchisi</span>
+        </div>
+    </div>
+    
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <!-- Balans Hamyon -->
+        <div style="background: rgba(0, 255, 170, 0.05); border: 1px solid rgba(0, 255, 170, 0.15); padding: 12px 20px; border-radius: 16px; min-width: 160px; text-align: center;">
+            <div style="font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px;">Farzandingiz Balansi</div>
+            <div style="font-size: 16px; font-weight: 800; color: #00ffaa;">{{ student.balance }} UZS</div>
+        </div>
+        <!-- Phone and info -->
+        <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.06); padding: 12px 20px; border-radius: 16px; min-width: 180px;">
+            <div style="font-size: 10.5px; color: rgba(255,255,255,0.4); margin-bottom: 2px;"><i class="fas fa-phone" style="margin-right: 5px;"></i> {{ student.phone_number }}</div>
+            <div style="font-size: 10.5px; color: rgba(255,255,255,0.4);"><i class="fas fa-calendar-alt" style="margin-right: 5px;"></i> Qo'shilgan: {{ student.joined_at|date:"d.m.Y" }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs Navigation -->
+<div class="tabs-navigation">
+    <button class="tab-btn active" onclick="switchTab('tab-attendance', this)"><i class="fas fa-calendar-check"></i> Davomat</button>
+    <button class="tab-btn" onclick="switchTab('tab-assignments', this)"><i class="fas fa-clipboard-list"></i> Vazifalar</button>
+    <button class="tab-btn" onclick="switchTab('tab-quizzes', this)"><i class="fas fa-clipboard-check"></i> Test Natijalari</button>
+    <button class="tab-btn" onclick="switchTab('tab-payments', this)"><i class="fa-solid fa-money-check-dollar"></i> To'lovlar & Hamyon</button>
+</div>
+
+<!-- Tabs Contents -->
+<div class="parent-card" style="padding: 20px;">
+    <!-- Tab 1: Davomat -->
+    <div id="tab-attendance" class="tab-pane active">
+        <h4 style="font-size: 14px; font-weight: 800; border-left: 3px solid #00f2fe; padding-left: 8px; margin-bottom: 20px; text-transform: uppercase;">Darslardagi ishtiroki (Oxirgi 15 ta dars)</h4>
+        {% if attendance_list %}
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sana</th>
+                            <th>Guruh</th>
+                            <th>Dars holati</th>
+                            <th>O'qituvchi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for att in attendance_list %}
+                        <tr>
+                            <td style="font-family: monospace;">{{ att.date|date:"d.m.Y" }}</td>
+                            <td style="font-weight: 700;">{{ att.group.name }}</td>
+                            <td>
+                                {% if att.status == 'present' %}
+                                    <span class="badge-status badge-present"><i class="fas fa-check-circle"></i> Keldi</span>
+                                {% else %}
+                                    <span class="badge-status badge-absent"><i class="fas fa-times-circle"></i> Kelmadi</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ att.teacher.first_name }} {{ att.teacher.last_name }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="color: rgba(255,255,255,0.4); font-style: italic; text-align: center; padding: 20px 0;">Hozircha davomat yozilmagan.</p>
+        {% endif %}
+    </div>
+
+    <!-- Tab 2: Vazifalar -->
+    <div id="tab-assignments" class="tab-pane">
+        <h4 style="font-size: 14px; font-weight: 800; border-left: 3px solid #00f2fe; padding-left: 8px; margin-bottom: 20px; text-transform: uppercase;">Uyga vazifalar va baholar</h4>
+        {% if submissions %}
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Vazifa nomi</th>
+                            <th>Guruh</th>
+                            <th>Topshirilgan vaqt</th>
+                            <th>Baho</th>
+                            <th>O'qituvchi izohi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sub in submissions %}
+                        <tr>
+                            <td style="font-weight: 700;">{{ sub.assignment.title }}</td>
+                            <td>{{ sub.assignment.group.name }}</td>
+                            <td style="font-family: monospace;">{{ sub.submitted_at|date:"d.m.Y H:i" }}</td>
+                            <td>
+                                {% if sub.grade is not null %}
+                                    <span style="font-size: 14px; font-weight: 800; color: #00ffaa; background: rgba(0,255,170,0.1); border: 1px solid rgba(0,255,170,0.2); padding: 4px 10px; border-radius: 6px;">{{ sub.grade }} ball</span>
+                                {% else %}
+                                    <span style="color: rgba(255,255,255,0.4); font-style: italic;">Baholanmagan</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ sub.teacher_feedback|default:"-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="color: rgba(255,255,255,0.4); font-style: italic; text-align: center; padding: 20px 0;">Topshirilgan vazifalar topilmadi.</p>
+        {% endif %}
+    </div>
+
+    <!-- Tab 3: Test Natijalari -->
+    <div id="tab-quizzes" class="tab-pane">
+        <h4 style="font-size: 14px; font-weight: 800; border-left: 3px solid #00f2fe; padding-left: 8px; margin-bottom: 20px; text-transform: uppercase;">Test va Quiz topshirish natijalari</h4>
+        {% if quiz_results %}
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Test nomi</th>
+                            <th>Guruh</th>
+                            <th>Ball / Natija</th>
+                            <th>To'g'ri javoblar</th>
+                            <th>Topshirilgan vaqt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for res in quiz_results %}
+                        <tr>
+                            <td style="font-weight: 700;">{{ res.quiz.title }}</td>
+                            <td>{{ res.quiz.group.name }}</td>
+                            <td>
+                                <span style="font-size: 14px; font-weight: 800; color: #00f2fe; background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.2); padding: 4px 10px; border-radius: 6px;">{{ res.score }} ball</span>
+                            </td>
+                            <td style="font-weight: 700;">{{ res.correct_answers_count }} / {{ res.total_questions_count }}</td>
+                            <td style="font-family: monospace;">{{ res.completed_at|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="color: rgba(255,255,255,0.4); font-style: italic; text-align: center; padding: 20px 0;">Test natijalari topilmadi.</p>
+        {% endif %}
+    </div>
+
+    <!-- Tab 4: To'lovlar & Hamyon -->
+    <div id="tab-payments" class="tab-pane">
+        <!-- Guruh To'lovlari Tarixi -->
+        <h4 style="font-size: 14px; font-weight: 800; border-left: 3px solid #00ffaa; padding-left: 8px; margin-bottom: 15px; text-transform: uppercase;">Dars to'lovlari tarixi</h4>
+        {% if payments %}
+            <div class="table-responsive" style="margin-bottom: 30px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Guruh</th>
+                            <th>Oy</th>
+                            <th>To'langan summa</th>
+                            <th>To'lov sanasi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pay in payments %}
+                        <tr>
+                            <td style="font-weight: 700;">{{ pay.group.name }}</td>
+                            <td>{{ pay.month }}</td>
+                            <td style="color: #00ffaa; font-weight: 700;">{{ pay.amount_paid }} UZS</td>
+                            <td style="font-family: monospace;">{{ pay.paid_at|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="color: rgba(255,255,255,0.4); font-style: italic; text-align: center; padding: 15px 0;">To'lovlar tarixi topilmadi.</p>
+        {% endif %}
+
+        <!-- Hamyon Tranzaksiyalari -->
+        <h4 style="font-size: 14px; font-weight: 800; border-left: 3px solid #00f2fe; padding-left: 8px; margin-bottom: 15px; text-transform: uppercase; margin-top: 20px;">Virtual hamyon operatsiyalari</h4>
+        {% if wallet_txs %}
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Operatsiya turi</th>
+                            <th>Summa</th>
+                            <th>Tavsif</th>
+                            <th>Sana</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in wallet_txs %}
+                        <tr>
+                            <td style="font-weight: 700;">{{ tx.get_transaction_type_display }}</td>
+                            <td>
+                                {% if tx.amount > 0 %}
+                                    <span style="color: #00ffaa; font-weight: 700;">+{{ tx.amount }} UZS</span>
+                                {% else %}
+                                    <span style="color: #ff4f4f; font-weight: 700;">{{ tx.amount }} UZS</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ tx.description|default:"-" }}</td>
+                            <td style="font-family: monospace;">{{ tx.created_at|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="color: rgba(255,255,255,0.4); font-style: italic; text-align: center; padding: 15px 0;">Tranzaksiyalar tarixi topilmadi.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function switchTab(tabId, btn) {
+        // Deactivate all tabs
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        // Activate current
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
+</script>
+{% endblock %}

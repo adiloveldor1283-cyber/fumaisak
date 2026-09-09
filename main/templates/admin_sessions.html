@@ -1,0 +1,264 @@
+{% extends 'baseadmin.html' %}
+{% load static %}
+
+{% block title %}Faol seanslar | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sessions-table-container {
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.01);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        padding: 12px;
+        width: 100%;
+        overflow-x: auto;
+        margin-bottom: 25px;
+    }
+
+    .sessions-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .sessions-table th {
+        padding: 16px 20px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.4);
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        background: #080d1a;
+    }
+
+    .sessions-table td {
+        padding: 16px 20px;
+        font-size: 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        color: rgba(255, 255, 255, 0.85);
+        vertical-align: middle;
+    }
+
+    .sessions-table tr:hover td {
+        background: rgba(255, 255, 255, 0.01);
+    }
+
+    .device-icon {
+        font-size: 18px;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.03);
+        margin-right: 10px;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .btn-terminate {
+        background: rgba(255, 0, 85, 0.08);
+        border: 1px solid rgba(255, 0, 85, 0.25);
+        color: #ff0055;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 12.5px;
+        cursor: pointer;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-terminate:hover {
+        background: #ff0055;
+        color: #070a12;
+        box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+    }
+
+    .status-active-badge {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 11px;
+        text-transform: uppercase;
+        background: rgba(0, 255, 170, 0.08);
+        color: #00ffaa;
+        border: 1px solid rgba(0, 255, 170, 0.2);
+    }
+
+    .status-inactive-badge {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 11px;
+        text-transform: uppercase;
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+    <h2 class="sarlavha" style="font-size: 24px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Faol foydalanuvchi seanslari</h2>
+    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+        <!-- QIDIRUV FORMASI -->
+        <form class="search-form" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
+            <input type="text" class="search-input" id="session-search" placeholder="Foydalanuvchi yoki IP bo'yicha qidirish..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        </form>
+
+        <div style="font-size: 13.5px; color: rgba(255, 255, 255, 0.4); font-weight: 600; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 8px 16px; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-users-cog" style="color: #00f2fe;"></i> <span id="current-date">Jami: {{ sessions.count }} ta</span>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+    <div style="margin-bottom: 25px;">
+        {% for message in messages %}
+            <div style="background: rgba(0, 255, 170, 0.08); border: 1px solid rgba(0, 255, 170, 0.25); border-radius: 12px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; color: #00ffaa; font-size: 14px; font-weight: 600; margin-bottom: 10px;">
+                <i class="fas fa-check-circle" style="font-size: 18px;"></i>
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if sessions %}
+<div class="jadval-container" style="flex-grow: 1; overflow-y: auto; overflow-x: auto; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+    <table class="sessions-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); background: #080d1a; position: sticky; top: 0; z-index: 10;">
+                <th>FOYDALANUVCHI</th>
+                <th>ROL</th>
+                <th>QURILMA / OS</th>
+                <th>BRAUZER</th>
+                <th>IP / JOYLASHUV</th>
+                <th>OXIRGI FAOLLIK</th>
+                <th>HOLAT</th>
+                <th>AMAL</th>
+            </tr>
+        </thead>
+        <tbody id="sessions-tbody">
+            {% for s in sessions %}
+            <tr>
+                <td data-label="FOYDALANUVCHI" style="font-weight: 700; color: #ffffff;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        {% if s.user.profile_image %}
+                            <img src="{{ s.user.profile_image.url }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                        {% else %}
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); display: flex; align-items: center; justify-content: center; color: #00f2fe; font-size: 12px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <span>{{ s.user.get_full_name|default:s.user.username }}</span>
+                            <span style="display: block; font-size: 11px; font-family: monospace; color: rgba(255,255,255,0.4); margin-top: 2px;">@{{ s.user.username }}</span>
+                        </div>
+                    </div>
+                </td>
+                <td data-label="ROL">
+                    {% if s.user.role == 'admin' %}
+                        <span style="color: #ff0055; font-weight: 700; font-size: 12px; text-transform: uppercase;">Admin</span>
+                    {% elif s.user.role == 'teacher' %}
+                        <span style="color: #9b51e0; font-weight: 700; font-size: 12px; text-transform: uppercase;">O'qituvchi</span>
+                    {% else %}
+                        <span style="color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase;">O'quvchi</span>
+                    {% endif %}
+                </td>
+                <td data-label="QURILMA / OS">
+                    <span class="device-icon">
+                        {% if s.device_type == 'Mobile' %}
+                            <i class="fas fa-mobile-alt"></i>
+                        {% elif s.device_type == 'Tablet' %}
+                            <i class="fas fa-tablet-alt"></i>
+                        {% else %}
+                            <i class="fas fa-desktop"></i>
+                        {% endif %}
+                    </span>
+                    <span>{{ s.os }}</span>
+                </td>
+                <td data-label="BRAUZER">
+                    <span>{{ s.browser }}</span>
+                </td>
+                <td data-label="IP / JOYLASHUV">
+                    <span style="font-family: monospace; font-weight: 600;">{{ s.ip_address }}</span>
+                    <span style="display: block; font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 3px;"><i class="fas fa-map-marker-alt" style="color: #ff0055; margin-right: 4px;"></i> {{ s.location }}</span>
+                </td>
+                <td data-label="OXIRGI FAOLLIK" style="font-family: monospace; color: rgba(255,255,255,0.6);">
+                    {{ s.last_activity|date:"d.m.Y H:i" }}
+                </td>
+                <td data-label="HOLAT">
+                    {% if s.is_active %}
+                        <span class="status-active-badge">Faol</span>
+                    {% else %}
+                        <span class="status-inactive-badge">Faol emas</span>
+                    {% endif %}
+                </td>
+                <td data-label="AMAL">
+                    {% if request.session.session_key == s.session_key %}
+                        <span style="font-size: 12px; font-weight: 700; color: #00ffaa; font-style: italic;"><i class="fas fa-check-double"></i> Joriy seans</span>
+                    {% else %}
+                        <form method="POST" action="{% url 'terminate_session' s.session_key %}" style="margin:0; display: inline;" onsubmit="return confirm('Haqiqatan ham ushbu foydalanuvchi seansini majburiy yopmoqchimisiz? Foydalanuvchi tizimdan chiqarib yuboriladi.')">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-terminate">
+                                <i class="fas fa-user-slash"></i> Yakunlash
+                            </button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+    <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 40px 20px; text-align: center; margin-top: 20px;">
+        <i class="fas fa-user-clock" style="font-size: 36px; color: rgba(255,255,255,0.2); margin-bottom: 15px; display: inline-block;"></i>
+        <h4 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Seanslar topilmadi</h4>
+        <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin: 0;">Hozircha hech qanday faol seans qayd etilmagan.</p>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById("session-search");
+        const tbody = document.getElementById("sessions-tbody");
+        
+        if (searchInput && tbody) {
+            const rows = tbody.querySelectorAll("tr");
+            
+            searchInput.addEventListener("input", function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                
+                rows.forEach(row => {
+                    const userCell = row.cells[0];
+                    const nameText = userCell ? userCell.textContent.toLowerCase() : "";
+                    
+                    const ipCell = row.cells[4];
+                    const ipText = ipCell ? ipCell.textContent.toLowerCase() : "";
+                    
+                    const roleCell = row.cells[1];
+                    const roleText = roleCell ? roleCell.textContent.toLowerCase() : "";
+                    
+                    if (nameText.includes(searchTerm) || ipText.includes(searchTerm) || roleText.includes(searchTerm)) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

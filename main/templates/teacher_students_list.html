@@ -5,83 +5,125 @@
 
 {% block extra_css %}
     <style>
-        /* --- 🔍 QIDIRUV PANELI - SPLIT DESIGN --- */
+        /* --- 🔍 QIDIRUV PANELI (UNIFIED PILL DESIGN) --- */
         .search-form {
             display: flex;
-            position: relative;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 4px 14px;
+            transition: 0.3s;
+            width: 280px;
+            margin: 0;
+        }
+        .search-form:focus-within {
+            border-color: #00f2fe !important;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.2) !important;
+            background: rgba(255, 255, 255, 0.05);
         }
         .search-input {
-            padding: 10px 16px;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            color: #ffffff !important;
             font-size: 13px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px 0 0 12px;
-            outline: none;
-            width: 25vw;
-            background-color: rgba(255, 255, 255, 0.02);
-            color: #ffffff;
-            margin-left: 20px;
-            border-right: none;
-            transition: 0.3s;
-        }
-        .search-input:focus {
-            border-color: #00f2fe;
-            background: rgba(255, 255, 255, 0.06);
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
+            width: 100% !important;
+            padding: 6px 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
         }
         .search-btn {
-            background-color: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-left: none;
-            padding: 10px 18px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 13px;
-            border-radius: 0 12px 12px 0;
+            background: none !important;
+            border: none !important;
+            color: rgba(255, 255, 255, 0.6) !important;
             cursor: pointer;
+            font-size: 13px;
             transition: 0.3s;
+            padding: 0 0 0 8px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none !important;
         }
         .search-btn:hover {
-            background-color: rgba(0, 242, 254, 0.1);
-            color: #00f2fe;
-            border-color: rgba(0, 242, 254, 0.2);
+            color: #00f2fe !important;
         }
 
-        /* --- 📊 CHEKSIZ SKROL BO'LUVCHI JADVAL KONTEYNERI --- */
+        body.light-mode .search-form {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .search-form:focus-within {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode .search-input {
+            color: #0f172a !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+        body.light-mode .search-input:focus {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            background: transparent !important;
+        }
+        body.light-mode .search-btn {
+            color: #64748b !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        body.light-mode .search-btn:hover {
+            color: #0284c7 !important;
+            background: transparent !important;
+            border: none !important;
+        }
+
         .jadval-container {
             flex-grow: 1;
-            overflow-y: auto; /* Faqat shu konteyner pastga skrol bo'ladi */
+            overflow-y: auto !important;
+            overflow-x: auto !important;
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 20px;
             background: rgba(255, 255, 255, 0.01);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            max-height: calc(100vh - 140px); /* Ekrandan chiqib ketmasligi uchun chegara */
+            max-height: calc(100vh - 165px);
+            min-height: 400px;
         }
 
         /* Skrolbar dizayni */
         .jadval-container::-webkit-scrollbar {
-            width: 1px;
-
+            width: 6px;
+            height: 6px;
         }
         .jadval-container::-webkit-scrollbar-track {
             background: transparent;
         }
         .jadval-container::-webkit-scrollbar-thumb {
-            background: rgba(0, 242, 254, 0.2);
-            border-radius: 4px;
+            background: rgba(0, 242, 254, 0.12);
+            border-radius: 10px;
         }
         .jadval-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 242, 254, 0.4);
+            background: rgba(0, 242, 254, 0.3);
         }
 
         table {
-            width: 100%;
+            width: max-content !important;
+            min-width: 100% !important;
+            white-space: nowrap;
             border-collapse: collapse;
             text-align: left;
         }
         th {
             padding: 16px 18px;
-            font-size: 12px;
+            font-size: 13.5px;
             font-weight: 700;
             text-transform: uppercase;
             color: rgba(255, 255, 255, 0.4);
@@ -113,6 +155,34 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
+        /* --- ☀️ LIGHT MODE MOSLASHUVI --- */
+        body.light-mode .jadval-container {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode th {
+            background: #f8fafc !important;
+            color: #475569 !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+        body.light-mode td {
+            color: #1e293b !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+        }
+        body.light-mode td[data-label="Familiya"] {
+            color: #0f172a !important;
+        }
+        body.light-mode td[data-label="Telefon raqam"] {
+            color: #059669 !important;
+        }
+        body.light-mode tr:hover td {
+            background: #f8fafc !important;
+        }
+        body.light-mode .sarlavha {
+            color: #0f172a !important;
+        }
+
         /* TELEFON EKRANI UCHUN REJIM (Table-to-Cards) */
         @media (max-width: 768px) {
             .konteyner {
@@ -131,31 +201,42 @@
                 border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
                 backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             }
+            body.light-mode #jadval-qatorlari tr {
+                background: #ffffff !important;
+                border: 1px solid #e2e8f0 !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.04) !important;
+            }
             #jadval-qatorlari td {
                 display: flex; justify-content: space-between; align-items: center;
                 padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.03); text-align: right; font-size: 13px;
+            }
+            body.light-mode #jadval-qatorlari td {
+                border-bottom: 1px solid #f1f5f9 !important;
             }
             #jadval-qatorlari td:last-child { border-bottom: none; }
             #jadval-qatorlari td::before {
                 content: attr(data-label); float: left; font-weight: 700; color: rgba(255, 255, 255, 0.4);
                 text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;
             }
+            body.light-mode #jadval-qatorlari td::before {
+                color: #64748b !important;
+            }
             #jadval-qatorlari td[data-label="№"] { border-bottom: 1px solid rgba(0, 242, 254, 0.1); padding-bottom: 12px; margin-bottom: 6px; }
+            body.light-mode #jadval-qatorlari td[data-label="№"] { border-bottom: 1px solid #e2e8f0 !important; }
         }
     </style>
 {% endblock %}
 
-{% block header_search %}
-    <!-- QIDIRUV PANELI -->
-    <form class="search-form" onsubmit="event.preventDefault();">
-        <input type="text" class="search-input" placeholder="Familiya bo'yicha qidiruv..." id="qidiruv">
-        <button type="submit" class="search-btn">
-            <i class="fas fa-search"></i>
-        </button>
-    </form>
-{% endblock %}
-
 {% block content %}
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">O'quvchilar ro'yxati</h2>
+        <!-- QIDIRUV PANELI -->
+        <form class="search-form" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
+            <input type="text" class="search-input" placeholder="Familiya bo'yicha qidiruv..." id="qidiruv" style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
+
     <!-- JADVAL KONTENYNERI (TO'LIQ RO'YXAT VA ICHKI SKROL) -->
     <div class="jadval-container">
         <table>
@@ -184,7 +265,7 @@
                         </td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="5" style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; padding: 40px 0;">O‘quvchilar topilmadi.</td></tr>
+                    <tr><td colspan="5" style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; padding: 40px 0;">O'quvchilar topilmadi.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

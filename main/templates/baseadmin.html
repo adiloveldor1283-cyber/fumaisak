@@ -3,12 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>{% block title %}Boshqaruv paneli{% endblock %}</title>
+    <title>{% block title %}Boshqaruv paneli | {{ site_name|default:"VLE Tizimi" }}{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% url 'circular_favicon' %}">
+    <link rel="shortcut icon" type="image/png" href="{% url 'circular_favicon' %}">
+    <link rel="apple-touch-icon" href="{% url 'circular_favicon' %}">
     <!-- Google Fonts va FontAwesome Ikonkalar -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
+    <script>
+        // Immediately apply theme before rendering to avoid screen flash
+        (function() {
+            const theme = localStorage.getItem('theme') || 'dark';
+            if (theme === 'light') {
+                document.documentElement.classList.add('light-theme');
+            }
+        })();
+    </script>
+
     <style>
+        :root {
+            /* Dark Mode (Cyberpunk default) variables */
+            --bg-primary: #070a12;
+            --bg-card: rgba(11, 15, 25, 0.4);
+            --border-card: rgba(255, 255, 255, 0.05);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.5);
+            --text-muted: rgba(255, 255, 255, 0.3);
+            --bg-sidebar: rgba(11, 15, 25, 0.6);
+            --border-sidebar: rgba(255, 255, 255, 0.05);
+            --bg-header: rgba(11, 15, 25, 0.4);
+            --border-header: rgba(255, 255, 255, 0.04);
+            --accent-primary: #00f2fe;
+            --accent-hover: #4facfe;
+            --accent-gradient: linear-gradient(135deg, #00f2fe, #4facfe);
+            --accent-bg-glow: rgba(0, 242, 254, 0.1);
+            --accent-border-glow: rgba(0, 242, 254, 0.2);
+            --shadow-panel: 0 20px 40px rgba(0, 0, 0, 0.6);
+            --shadow-card-hover: 0 0 10px rgba(0, 242, 254, 0.3);
+            --bg-dropdown: #0c101d;
+            --border-dropdown: rgba(255, 255, 255, 0.1);
+            --bg-dropdown-hover: rgba(255, 255, 255, 0.02);
+            --scrollbar-thumb: rgba(0, 242, 254, 0.12);
+            --scrollbar-thumb-hover: rgba(0, 242, 254, 0.3);
+            --bg-user-info: transparent;
+            --border-user-info: rgba(255, 255, 255, 0.05);
+            --menu-item-hover: rgba(255, 255, 255, 0.03);
+            --menu-item-active-bg: rgba(0, 242, 254, 0.06);
+            --menu-item-active-text: #00f2fe;
+            --menu-category: rgba(0, 242, 254, 0.7);
+            --bg-input: rgba(255, 255, 255, 0.02);
+            --border-input: rgba(255, 255, 255, 0.08);
+            --text-input: #ffffff;
+            --table-header-bg: rgba(255, 255, 255, 0.02);
+            --table-border: rgba(255, 255, 255, 0.03);
+            --table-row-hover: rgba(255, 255, 255, 0.01);
+            --bg-ticker: rgba(0, 242, 254, 0.03);
+            --border-ticker: rgba(0, 242, 254, 0.1);
+            --text-ticker: rgba(255, 255, 255, 0.85);
+
+            /* Stats specific colors in dark mode */
+            --stat-card-text: #ffffff;
+            --stat-card-muted: rgba(255, 255, 255, 0.4);
+            --shadow-stat-group-hover: 0 20px 40px rgba(0, 242, 254, 0.1);
+            --shadow-stat-student-hover: 0 20px 40px rgba(0, 255, 170, 0.1);
+            --shadow-stat-teacher-hover: 0 20px 40px rgba(155, 81, 224, 0.1);
+            --shadow-stat-finance-hover: 0 20px 40px rgba(255, 0, 85, 0.1);
+
+            --accent-guruh: #00f2fe;
+            --bg-accent-guruh: rgba(0, 242, 254, 0.1);
+            --border-accent-guruh: rgba(0, 242, 254, 0.2);
+
+            --accent-student: #00ffaa;
+            --bg-accent-student: rgba(0, 255, 170, 0.1);
+            --border-accent-student: rgba(0, 255, 170, 0.2);
+
+            --accent-teacher: #9b51e0;
+            --bg-accent-teacher: rgba(155, 81, 224, 0.1);
+            --border-accent-teacher: rgba(155, 81, 224, 0.2);
+
+            --accent-finance: #ff0055;
+            --bg-accent-finance: rgba(255, 0, 85, 0.1);
+            --border-accent-finance: rgba(255, 0, 85, 0.2);
+
+            --accent-session: #00ffaa;
+            --bg-accent-session: rgba(0, 255, 170, 0.1);
+            --border-accent-session: rgba(0, 255, 170, 0.2);
+
+            --bg-warning-panel: rgba(255, 79, 79, 0.05);
+            --border-warning-panel: rgba(255, 79, 79, 0.15);
+            --text-warning-title: #ff4f4f;
+            --bg-warning-card: rgba(11, 15, 25, 0.4);
+            --border-warning-card: rgba(255, 255, 255, 0.03);
+            --warning-search-bg: rgba(0, 0, 0, 0.2);
+            --warning-search-border: rgba(255, 79, 79, 0.2);
+            --warning-search-text: #ffffff;
+            --warning-search-icon: rgba(255, 79, 79, 0.5);
+
+            /* Unfold fallback / standard inputs */
+            --unfold-bg: #070a12;
+            --unfold-text: #ffffff;
+        }
+
+        html.light-theme, body.light-theme {
+            /* Light Mode variables */
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --border-card: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --bg-sidebar: #ffffff;
+            --border-sidebar: #e2e8f0;
+            --bg-header: #ffffff;
+            --border-header: #e2e8f0;
+            --accent-primary: #0284c7;
+            --accent-hover: #0284c7;
+            --accent-gradient: linear-gradient(135deg, #0284c7, #3b82f6);
+            --accent-bg-glow: rgba(2, 132, 199, 0.08);
+            --accent-border-glow: rgba(2, 132, 199, 0.2);
+            --shadow-panel: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --shadow-card-hover: 0 10px 25px rgba(2, 132, 199, 0.15);
+            --bg-dropdown: #ffffff;
+            --border-dropdown: #e2e8f0;
+            --bg-dropdown-hover: #f8fafc;
+            --scrollbar-thumb: #cbd5e1;
+            --scrollbar-thumb-hover: #94a3b8;
+            --bg-user-info: #f8fafc;
+            --border-user-info: #cbd5e1;
+            --menu-item-hover: #f1f5f9;
+            --menu-item-active-bg: #e0f2fe;
+            --menu-item-active-text: #0284c7;
+            --menu-category: #475569;
+            --bg-input: #ffffff;
+            --border-input: #cbd5e1;
+            --text-input: #0f172a;
+            --table-header-bg: #f8fafc;
+            --table-border: #e2e8f0;
+            --table-row-hover: #f8fafc;
+            --bg-ticker: rgba(2, 132, 199, 0.05);
+            --border-ticker: rgba(2, 132, 199, 0.15);
+            --text-ticker: #334155;
+
+            /* Stats specific colors in light mode */
+            --stat-card-text: #0f172a;
+            --stat-card-muted: #64748b;
+            --shadow-stat-group-hover: 0 10px 25px rgba(2, 132, 199, 0.1);
+            --shadow-stat-student-hover: 0 10px 25px rgba(16, 185, 129, 0.1);
+            --shadow-stat-teacher-hover: 0 10px 25px rgba(139, 92, 246, 0.1);
+            --shadow-stat-finance-hover: 0 10px 25px rgba(239, 68, 68, 0.1);
+
+            /* Stats accents for cards - Light Theme */
+            --accent-guruh: #0284c7;
+            --bg-accent-guruh: rgba(2, 132, 199, 0.08);
+            --border-accent-guruh: rgba(2, 132, 199, 0.2);
+
+            --accent-student: #10b981;
+            --bg-accent-student: rgba(16, 185, 129, 0.08);
+            --border-accent-student: rgba(16, 185, 129, 0.2);
+
+            --accent-teacher: #8b5cf6;
+            --bg-accent-teacher: rgba(139, 92, 246, 0.08);
+            --border-accent-teacher: rgba(139, 92, 246, 0.2);
+
+            --accent-finance: #ef4444;
+            --bg-accent-finance: rgba(239, 68, 68, 0.08);
+            --border-accent-finance: rgba(239, 68, 68, 0.2);
+
+            --accent-session: #10b981;
+            --bg-accent-session: rgba(16, 185, 129, 0.08);
+            --border-accent-session: rgba(16, 185, 129, 0.2);
+
+            /* Warning styles - Light Theme */
+            --bg-warning-panel: #fef2f2;
+            --border-warning-panel: #fecaca;
+            --text-warning-title: #b91c1c;
+            --bg-warning-card: #ffffff;
+            --border-warning-card: #fee2e2;
+            --warning-search-bg: #ffffff;
+            --warning-search-border: #fca5a5;
+            --warning-search-text: #0f172a;
+            --warning-search-icon: #ef4444;
+
+            /* Unfold fallback / standard inputs */
+            --unfold-bg: #f8fafc;
+            --unfold-text: #0f172a;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -17,11 +198,43 @@
         }
 
         body {
-            background: #070a12;
-            color: #ffffff;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             display: flex;
             height: 100vh;
             overflow: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Global Form Controls & Select Options */
+        select {
+            color-scheme: dark;
+        }
+        select option {
+            background-color: #0c101d !important;
+            color: #ffffff !important;
+        }
+
+        /* Global premium, barely visible scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-thumb-hover);
+        }
+        /* Firefox uchun bilinar-bilinmas scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb) transparent;
         }
 
         /* Cyberpunk Orqa Fon */
@@ -36,17 +249,23 @@
             opacity: 0.03;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Cpath d='M0,150 Q200,80 500,200 T1000,80 T1500,250' fill='none' stroke='%2300f2fe' stroke-width='3'/%3E%3C/svg%3E");
             background-size: cover;
+            transition: background-image 0.3s, opacity 0.3s;
+        }
+
+        html.light-theme .cyber-bg {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Cpath d='M0,150 Q200,80 500,200 T1000,80 T1500,250' fill='none' stroke='%230284c7' stroke-width='3'/%3E%3C/svg%3E");
+            opacity: 0.02;
         }
 
         /* Sidebar */
         .sidebar {
-            background: rgba(11, 15, 25, 0.6);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-sidebar);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            color: white;
+            color: var(--text-primary);
             width: 260px;
-            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s, border-color 0.3s;
             display: flex;
             flex-direction: column;
             position: relative;
@@ -61,63 +280,63 @@
             display: flex;
             align-items: center;
             padding-left: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--border-sidebar);
         }
         .sidebar .toggle-container img {
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            border: 2px solid rgba(0, 242, 254, 0.2);
+            border: 2px solid var(--accent-border-glow);
         }
         .toggle-btn {
             margin-left: auto;
             margin-right: 15px;
             background: none;
             border: none;
-            color: white;
+            color: var(--text-secondary);
             font-size: 20px;
             cursor: pointer;
             z-index: 2;
             transition: 0.3s;
         }
         .toggle-btn:hover {
-            color: #00f2fe;
+            color: var(--accent-primary);
         }
         .brand {
             font-size: 18px;
             font-weight: bold;
             margin-left: 12px;
-            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            background: var(--accent-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-        .sidebar.collapsed .brand {
+        .sidebar.collapsed .brand, .sidebar.collapsed .toggle-btn {
             display: none;
-        }
-        .sidebar.collapsed .toggle-btn {
-            margin-left: 10px;
-            margin-right: 0;
         }
         .user-info {
             display: flex;
             align-items: center;
             padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--border-sidebar);
+            background: var(--bg-user-info);
             gap: 12px;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s, background 0.3s, border-color 0.3s;
             line-height: 1.6;
         }
         .toggle-main {
             margin-left: 20px;
             background: none;
             border: none;
-            color: white;
+            color: var(--text-primary);
             font-size: 20px;
             cursor: pointer;
             transition: 0.3s;
         }
         .toggle-main:hover {
-            color: #00f2fe;
+            color: var(--accent-primary);
         }
         .toggle-main {
             display: none;
@@ -132,42 +351,72 @@
             max-width: 40px;
             border-radius: 50%;
             flex-shrink: 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-user-info);
         }
         .user-info span {
             font-size: 11px;
             white-space: nowrap;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-secondary);
         }
         .span {
             text-transform: uppercase;
             font-size: 14px;
             font-weight: 700;
-            color: #00f2fe !important;
+            color: var(--accent-primary) !important;
         }
-        .sidebar.collapsed .user-info span {
+        .sidebar.collapsed .user-info {
             display: none;
         }
         .sidebar .menu-container {
             flex-grow: 1;
             overflow-y: auto;
             padding: 8px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+        .sidebar .menu-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
         /* Guruhlangan menyu sarlavhalari */
         .sidebar .menu-category {
-            font-size: 10px;
+            font-size: 11px;
             text-transform: uppercase;
             font-weight: 800;
-            color: rgba(0, 242, 254, 0.4);
+            color: var(--menu-category);
             padding: 14px 16px 6px 16px;
             letter-spacing: 1.5px;
-            display: block;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+        }
+        .sidebar .menu-category:hover {
+            color: var(--accent-guruh, #00f2fe) !important;
+        }
+        .sidebar .menu-category::after {
+            content: '\f107'; /* FontAwesome Chevron Down */
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            font-size: 9px;
+            transition: transform 0.2s;
+            opacity: 0.5;
+        }
+        .sidebar .menu-category.collapsed::after {
+            transform: rotate(-90deg);
         }
         .sidebar.collapsed .menu-category {
             display: none;
         }
         .sidebar ul {
             list-style: none;
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar:not(.collapsed) .menu-category.collapsed + ul {
+            max-height: 0;
         }
         .sidebar ul li {
             display: flex;
@@ -178,16 +427,16 @@
             margin-bottom: 2px;
         }
         .sidebar ul li:hover {
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--menu-item-hover);
         }
         .sidebar ul li:hover a i, .sidebar ul li:hover a span {
-            color: #00f2fe;
+            color: var(--accent-primary);
         }
         .sidebar ul li a {
             display: flex;
             align-items: center;
             text-decoration: none;
-            color: rgba(255, 255, 255, 0.65);
+            color: var(--text-secondary);
             width: 100%;
             padding: 11px 16px;
             font-weight: 600;
@@ -211,14 +460,14 @@
 
         /* --- Active Menu Styles --- */
         .sidebar ul li.active {
-            background: rgba(0, 242, 254, 0.06);
-            border-left: 3px solid #00f2fe;
+            background: var(--menu-item-active-bg);
+            border-left: 3px solid var(--menu-item-active-text);
             border-radius: 0 12px 12px 0;
         }
         .sidebar ul li.active a i,
         .sidebar ul li.active a span {
-            color: #00f2fe !important;
-            text-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
+            color: var(--menu-item-active-text) !important;
+            text-shadow: 0 0 8px var(--accent-border-glow);
         }
 
         /* Main Layout */
@@ -230,13 +479,14 @@
             position: relative;
             z-index: 1;
             overflow: hidden;
+            min-width: 0;
         }
 
         /* Header Style */
         .header {
-            color: white;
-            background: rgba(11, 15, 25, 0.4);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+            background: var(--bg-header);
+            border-bottom: 1px solid var(--border-header);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             height: 69px;
@@ -246,19 +496,7 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-        }
-
-        .toggle-main-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            margin-left: 20px;
-            display: none;
-        }
-        .toggle-main-btn:hover {
-            color: #00f2fe;
+            transition: background 0.3s, border-color 0.3s;
         }
 
         /* Profile and Notifications */
@@ -277,43 +515,43 @@
             height: 40px;
             border-radius: 50%;
             cursor: pointer;
-            border: 2px solid rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--border-user-info);
             transition: 0.3s;
         }
         .user_profile_img:hover {
-            border-color: #00f2fe;
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 10px var(--accent-border-glow);
         }
 
         /* Cyber Dropdown Panel */
         .dropdown-panel {
             position: absolute;
             top: 55px;
-            background: #0c101d;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            background: var(--bg-dropdown);
+            border: 1px solid var(--border-dropdown);
+            box-shadow: var(--shadow-panel);
             border-radius: 16px;
             width: 200px;
             padding: 16px;
             display: none;
             z-index: 1002;
-            color: #ffffff;
+            color: var(--text-primary);
         }
         .dropdown-item {
             padding: 10px 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid var(--border-user-info);
             font-size: 13px;
             text-decoration: none;
-            color: rgba(255,255,255,0.8);
+            color: var(--text-secondary);
             display: block;
             transition: 0.2s;
         }
         .dropdown-item:hover {
-            background: rgba(255,255,255,0.02);
-            color: #00f2fe;
+            background: var(--bg-dropdown-hover);
+            color: var(--accent-primary);
         }
         .dropdown-item i {
-            color: #4facfe;
+            color: var(--accent-hover);
             margin-right: 10px;
             width: 20px;
             text-align: center;
@@ -334,6 +572,7 @@
             flex-grow: 1;
             height: calc(100vh - 69px);
             overflow-y: auto;
+            overflow-x: hidden;
             width: 100%;
         }
 
@@ -366,7 +605,7 @@
         .top-modal.show {
             top: 30px;
         }
-        .modal-content {
+        .top-modal .modal-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -390,50 +629,1037 @@
             justify-content: center;
         }
 
-        /* --- 📱 MOBIL QURILMALAR MEDIA REJIMI --- */
-        @media (max-width: 768px) {
-            body {
-                overflow: auto;
-            }
-            .sidebar {
-                position: fixed;
-                height: 100vh;
-                transform: translateX(-100%);
-                z-index: 2000;
-                background: rgba(11, 15, 25, 0.98);
-            }
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            .sidebar.collapsed {
-                width: 260px;
-            }
-            .toggle-main-btn {
-                display: inline-block;
-            }
-            .sidebar.collapsed.show .brand,
-            .sidebar.collapsed.show .toggle-btn,
-            .sidebar.collapsed.show .user-info span,
-            .sidebar.collapsed.show .menu-category,
-            .sidebar.collapsed.show ul li a span {
-                display: inline !important;
-            }
+        /* --- 🍞 GLOBAL FLOATING TOAST NOTIFICATIONS --- */
+        .global-toasts-container {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 380px;
+            width: 90%;
+            pointer-events: none;
+        }
+        .global-toast {
+            pointer-events: auto;
+            background: rgba(13, 20, 35, 0.88);
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #ffffff;
+            padding: 14px 18px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: all 0.3s ease;
+        }
+        @keyframes toastSlideIn {
+            from { opacity: 0; transform: translateX(50px) scale(0.95); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13.5px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        .toast-content i.text-success { color: #00ffaa; text-shadow: 0 0 10px rgba(0, 255, 170, 0.3); }
+        .toast-content i.text-error { color: #ff0055; text-shadow: 0 0 10px rgba(255, 0, 85, 0.3); }
+        .toast-content i.text-warning { color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+        .toast-content i.text-info { color: #00f2fe; text-shadow: 0 0 10px rgba(0, 242, 254, 0.3); }
+        .toast-close-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.2s;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .toast-close-btn:hover { color: #ff0055; }
 
-            .konteyner {
-                padding: 20px 15px;
-                height: auto;
-                overflow: visible;
-            }
-            .header {
+        /* --- LIGHT THEME SPECIFIC OVERRIDES --- */
+        
+        /* Central layout overrides */
+        html.light-theme .sarlavha {
+            color: var(--text-primary) !important;
+            border-left-color: var(--accent-primary) !important;
+        }
+
+        /* Card panels: Dashboard cards, forms, bulk add, list cards, dual grids, calendar sidebar */
+        html.light-theme .stat-card,
+        html.light-theme .warning-panel-admin,
+        html.light-theme .jadval-container,
+        html.light-theme .recent-students-card,
+        html.light-theme .charts-grid > div,
+        html.light-theme .actions-card,
+        html.light-theme .settings-card,
+        html.light-theme .stats-card,
+        html.light-theme .form-card,
+        html.light-theme .bulk-card,
+        html.light-theme .dual-list-container,
+        html.light-theme .matrix-container,
+        html.light-theme .grid-layout > div,
+        html.light-theme .sessions-table-container,
+        html.light-theme .calendar-card,
+        html.light-theme .sidebar-card,
+        html.light-theme .list-box,
+        html.light-theme .kiber-karta,
+        html.light-theme .upload-card,
+        html.light-theme .filter-card,
+        html.light-theme .question-card,
+        html.light-theme .preview-question-card,
+        html.light-theme .radio-konteyner,
+        html.light-theme .options-list,
+        html.light-theme .pagination-container,
+        html.light-theme .group-schedule-card,
+        html.light-theme .schedule-row {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;
+        }
+
+        /* Hover animations for cards */
+        html.light-theme .settings-card:hover,
+        html.light-theme .stats-card:hover,
+        html.light-theme .form-card:hover,
+        html.light-theme .bulk-card:hover,
+        html.light-theme .list-box:hover {
+            border-color: #0284c7 !important;
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.15) !important;
+        }
+
+        /* Card Header adjustments */
+        html.light-theme .card-header-custom {
+            border-bottom-color: #e2e8f0 !important;
+        }
+        html.light-theme .card-icon {
+            background: rgba(2, 132, 199, 0.08) !important;
+            border: 1px solid rgba(2, 132, 199, 0.2) !important;
+            color: #0284c7 !important;
+        }
+
+        /* Local list-box h3 and text color */
+        html.light-theme .list-box {
+            color: #334155 !important;
+        }
+        html.light-theme .list-box h3 {
+            color: #0284c7 !important;
+            border-bottom-color: #cbd5e1 !important;
+        }
+
+        /* Radio containers text colors */
+        html.light-theme .radio-konteyner label {
+            color: #334155 !important;
+        }
+
+        /* Table overrides */
+        html.light-theme table {
+            border-collapse: collapse !important;
+        }
+        html.light-theme th,
+        html.light-theme td,
+        html.light-theme table th,
+        html.light-theme table td {
+            background: #ffffff !important;
+            color: #334155 !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+        html.light-theme th,
+        html.light-theme table th,
+        html.light-theme [style*="background: #080d1a"],
+        html.light-theme [style*="background:#080d1a"] {
+            background: #f8fafc !important;
+            color: #475569 !important;
+            font-weight: 700 !important;
+            border-bottom: 2px solid #cbd5e1 !important;
+        }
+        html.light-theme tr:hover td,
+        html.light-theme table tr:hover td {
+            background: #f8fafc !important;
+        }
+
+        /* Attendance Matrix sticky columns overrides */
+        html.light-theme th.sticky-col-name {
+            background-color: #f8fafc !important;
+            border-bottom: 2px solid #cbd5e1 !important;
+            color: #475569 !important;
+        }
+        html.light-theme td.sticky-col-name {
+            background-color: #ffffff !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+        html.light-theme tr:hover td.sticky-col-name {
+            background-color: #f8fafc !important;
+        }
+
+        /* Inputs, Form elements, Search bars, Select, Option, Textarea */
+        html.light-theme input,
+        html.light-theme select,
+        html.light-theme textarea,
+        html.light-theme .search-input,
+        html.light-theme .search-box,
+        html.light-theme .actions-card input,
+        html.light-theme .actions-card select,
+        html.light-theme .form-control,
+        html.light-theme .score-input {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        html.light-theme input::placeholder,
+        html.light-theme select::placeholder,
+        html.light-theme textarea::placeholder,
+        html.light-theme .search-input::placeholder,
+        html.light-theme .search-box::placeholder,
+        html.light-theme .form-control::placeholder {
+            color: #94a3b8 !important;
+        }
+        html.light-theme input:focus,
+        html.light-theme select:focus,
+        html.light-theme textarea:focus,
+        html.light-theme .search-input:focus,
+        html.light-theme .search-box:focus,
+        html.light-theme .form-control:focus,
+        html.light-theme .score-input:focus {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
+            outline: none !important;
+            background: #ffffff !important;
+        }
+        html.light-theme select {
+            color-scheme: light !important;
+        }
+        html.light-theme select option,
+        html.light-theme .form-control option {
+            background: #ffffff !important;
+            color: #0f172a !important;
+        }
+
+        /* Action bar elements and Badges */
+        html.light-theme .actions-card label {
+            color: #475569 !important;
+        }
+        html.light-theme .selected-badge {
+            background: #e0f2fe !important;
+            color: #0369a1 !important;
+            border: 1px solid #bae6fd !important;
+        }
+
+        /* Status and Activity Badges */
+        html.light-theme .status-badge.status-active,
+        html.light-theme .status-active-badge,
+        html.light-theme .btn-dtm-success,
+        html.light-theme [style*="color: #00ffaa"],
+        html.light-theme [style*="color:#00ffaa"] {
+            color: #0d9488 !important;
+        }
+        html.light-theme [style*="background: rgba(0, 255, 170"],
+        html.light-theme [style*="background:rgba(0, 255, 170"],
+        html.light-theme [style*="background:rgba(0,255,170"],
+        html.light-theme [style*="background: rgba(0,255,170"] {
+            background: #e6fbf4 !important;
+            border-color: #a7f3d0 !important;
+        }
+        html.light-theme .attendance-badge.present {
+            background: #e6fbf4 !important;
+            color: #0d9488 !important;
+            border: 1px solid #a7f3d0 !important;
+        }
+
+        html.light-theme .status-badge.status-blocked,
+        html.light-theme .status-inactive-badge,
+        html.light-theme .warning-badge,
+        html.light-theme .btn-dtm-warning,
+        html.light-theme [style*="color: #ff0055"],
+        html.light-theme [style*="color:#ff0055"],
+        html.light-theme [style*="color: #ff3366"],
+        html.light-theme [style*="color:#ff3366"],
+        html.light-theme [style*="color: #ff808b"],
+        html.light-theme [style*="color:#ff808b"] {
+            color: #b91c1c !important;
+        }
+        html.light-theme [style*="background: rgba(255, 0, 85"],
+        html.light-theme [style*="background:rgba(255, 0, 85"],
+        html.light-theme [style*="background:rgba(255,0,85"],
+        html.light-theme [style*="background: rgba(255,0,85"] {
+            background: #fef2f2 !important;
+            border-color: #fecaca !important;
+        }
+        html.light-theme .attendance-badge.absent {
+            background: #fef2f2 !important;
+            color: #b91c1c !important;
+            border: 1px solid #fecaca !important;
+        }
+        html.light-theme .attendance-badge.none {
+            background: #f1f5f9 !important;
+            color: #94a3b8 !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+
+        /* Search Form header component */
+        html.light-theme .search-form {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        html.light-theme .search-form .search-input {
+            color: #0f172a !important;
+            background: transparent !important;
+            border: none !important;
+        }
+        html.light-theme .search-form .search-btn {
+            color: #64748b !important;
+        }
+
+        /* Buttons overrides: primary, secondary, special actions */
+        html.light-theme .btn-action-submit {
+            background: #fff1f2 !important;
+            border: 1px solid #fecdd3 !important;
+            color: #e11d48 !important;
+        }
+        html.light-theme .btn-action-submit:hover {
+            background: #ffe4e6 !important;
+        }
+        
+        /* Save / Submit primary buttons */
+        html.light-theme button[type="submit"],
+        html.light-theme .btn-primary,
+        html.light-theme .guruh-btn,
+        html.light-theme .btn-save-settings,
+        html.light-theme .btn-pdf-submit,
+        html.light-theme .btn-submit,
+        html.light-theme .btn-save,
+        html.light-theme .btn-generate,
+        html.light-theme .btn-submit-all,
+        html.light-theme .btn-password-reset,
+        html.light-theme [style*="background: linear-gradient(135deg, #00f2fe"],
+        html.light-theme [style*="background:linear-gradient(135deg,#00f2fe"] {
+            background: linear-gradient(135deg, #0284c7, #3b82f6) !important;
+            color: #ffffff !important;
+            border: none !important;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2) !important;
+        }
+        html.light-theme button[type="submit"]:hover,
+        html.light-theme .btn-primary:hover,
+        html.light-theme .guruh-btn:hover,
+        html.light-theme .btn-save-settings:hover,
+        html.light-theme .btn-submit:hover,
+        html.light-theme .btn-save:hover,
+        html.light-theme .btn-generate:hover,
+        html.light-theme .btn-submit-all:hover,
+        html.light-theme .btn-password-reset:hover,
+        html.light-theme [style*="background: linear-gradient(135deg, #00f2fe"]:hover {
+            background: linear-gradient(135deg, #0369a1, #2563eb) !important;
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3) !important;
+        }
+
+        /* Contextual page search layout overrides */
+        .sarlavha-qatori .search-form .search-input {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 6px 0 !important;
+            font-size: 13px !important;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            height: auto !important;
+        }
+        .sarlavha-qatori .search-form .search-btn {
+            background: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            padding-left: 8px !important;
+            margin: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: auto !important;
+            height: auto !important;
+            box-shadow: none !important;
+        }
+        html.light-theme .sarlavha-qatori .search-form .search-input {
+            background: transparent !important;
+            border: none !important;
+            color: #0f172a !important;
+        }
+        html.light-theme .sarlavha-qatori .search-form .search-btn {
+            background: none !important;
+            border: none !important;
+            color: #334155 !important;
+        }
+
+        /* Back / Cancel / Secondary buttons */
+        html.light-theme a[style*="background: rgba(255,255,255,0.05)"],
+        html.light-theme a[style*="background:rgba(255,255,255,0.05)"],
+        html.light-theme button[style*="background: rgba(255,255,255,0.05)"],
+        html.light-theme button[style*="background:rgba(255,255,255,0.05)"],
+        html.light-theme .btn-secondary,
+        html.light-theme .btn-back,
+        html.light-theme .btn-cancel,
+        html.light-theme .btn-clear,
+        html.light-theme .btn-download {
+            background: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        html.light-theme a[style*="background: rgba(255,255,255,0.05)"]:hover,
+        html.light-theme button[style*="background: rgba(255,255,255,0.05)"]:hover,
+        html.light-theme .btn-secondary:hover,
+        html.light-theme .btn-cancel:hover,
+        html.light-theme .btn-clear:hover,
+        html.light-theme .btn-download:hover {
+            background: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        /* Navigation action buttons like Guruhga otish / Tahrirlash */
+        html.light-theme .btn-otish,
+        html.light-theme a[style*="background: rgba(0, 242, 254"],
+        html.light-theme a[style*="background:rgba(0,242,254"],
+        html.light-theme button[style*="background: rgba(0, 242, 254"],
+        html.light-theme button[style*="background:rgba(0,242,254"] {
+            background: rgba(2, 132, 199, 0.08) !important;
+            border: 1px solid rgba(2, 132, 199, 0.2) !important;
+            color: #0284c7 !important;
+        }
+        html.light-theme .btn-otish:hover,
+        html.light-theme a[style*="background: rgba(0, 242, 254"]:hover,
+        html.light-theme button[style*="background: rgba(0, 242, 254"]:hover {
+            background: rgba(2, 132, 199, 0.15) !important;
+            border-color: rgba(2, 132, 199, 0.3) !important;
+            color: #0369a1 !important;
+        }
+
+        /* Global Back Arrow Button */
+        .back-arrow-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #ffffff;
+            transition: 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        .back-arrow-btn:hover {
+            background: rgba(0, 242, 254, 0.1);
+            border-color: rgba(0, 242, 254, 0.3);
+            color: #00f2fe;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+        }
+        html.light-theme .back-arrow-btn {
+            background: rgba(0, 0, 0, 0.02) !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            color: #0f172a !important;
+        }
+        html.light-theme .back-arrow-btn:hover {
+            background: rgba(2, 132, 199, 0.07) !important;
+            border-color: rgba(2, 132, 199, 0.3) !important;
+            color: #0284c7 !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.15);
+        }
+
+        /* Controls navigation buttons (e.g. dual lists) */
+        html.light-theme .controls button {
+            background: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #475569 !important;
+        }
+        html.light-theme .controls button:hover {
+            background: linear-gradient(135deg, #0284c7, #3b82f6) !important;
+            color: #ffffff !important;
+            border-color: transparent !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.3) !important;
+        }
+
+        /* Danger action buttons */
+        html.light-theme .btn-danger-action,
+        html.light-theme .btn-delete,
+        html.light-theme .btn-terminate {
+            background: #fef2f2 !important;
+            border: 1px solid #fecaca !important;
+            color: #b91c1c !important;
+        }
+        html.light-theme .btn-danger-action:hover,
+        html.light-theme .btn-delete:hover,
+        html.light-theme .btn-terminate:hover {
+            background: #fee2e2 !important;
+            color: #991b1b !important;
+        }
+
+        /* Scroll matrix buttons */
+        html.light-theme .btn-scroll {
+            background: rgba(2, 132, 199, 0.08) !important;
+            border-color: rgba(2, 132, 199, 0.3) !important;
+            color: #0284c7 !important;
+        }
+        html.light-theme .btn-scroll:hover {
+            background: rgba(2, 132, 199, 0.2) !important;
+            color: #0369a1 !important;
+        }
+
+        /* Tab Buttons Navigation */
+        html.light-theme .tab-btn {
+            color: #64748b !important;
+        }
+        html.light-theme .tab-btn:hover {
+            color: #0f172a !important;
+            background: #f1f5f9 !important;
+        }
+        html.light-theme .tab-btn.active {
+            color: #0284c7 !important;
+            background: rgba(2, 132, 199, 0.08) !important;
+            border-color: rgba(2, 132, 199, 0.2) !important;
+            box-shadow: 0 0 15px rgba(2, 132, 199, 0.1) !important;
+        }
+        html.light-theme .tabs-nav {
+            border-bottom-color: #cbd5e1 !important;
+        }
+        html.light-theme .filter-pill {
+            background: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #475569 !important;
+        }
+        html.light-theme .filter-pill.active,
+        html.light-theme .filter-pill:hover {
+            background: rgba(2, 132, 199, 0.08) !important;
+            color: #0284c7 !important;
+            border-color: rgba(2, 132, 199, 0.4) !important;
+        }
+
+        /* Typography & Color Overrides */
+        html.light-theme label,
+        html.light-theme .form-label {
+            color: #475569 !important;
+        }
+        html.light-theme h1,
+        html.light-theme h2,
+        html.light-theme h3,
+        html.light-theme h4,
+        html.light-theme h5,
+        html.light-theme h6 {
+            color: #0f172a !important;
+        }
+        html.light-theme [style*="color: white"],
+        html.light-theme [style*="color:white"],
+        html.light-theme [style*="color: #fff"],
+        html.light-theme [style*="color:#fff"],
+        html.light-theme [style*="color: #ffffff"],
+        html.light-theme [style*="color:#ffffff"],
+        html.light-theme [style*="color:rgba(255, 255, 255"],
+        html.light-theme [style*="color:rgba(255,255,255"],
+        html.light-theme [style*="color: rgba(255,255,255"],
+        html.light-theme [style*="color: rgba(255, 255, 255"] {
+            color: var(--text-primary) !important;
+        }
+        html.light-theme [style*="color: rgba(255, 255, 255, 0.85)"],
+        html.light-theme [style*="color:rgba(255,255,255,0.85)"],
+        html.light-theme [style*="color: rgba(255,255,255,0.85)"],
+        html.light-theme [style*="color:rgba(255, 255, 255, 0.85)"],
+        html.light-theme [style*="color: rgba(255, 255, 255, 0.7)"],
+        html.light-theme [style*="color:rgba(255,255,255,0.7)"],
+        html.light-theme [style*="color: rgba(255,255,255,0.7)"],
+        html.light-theme [style*="color:rgba(255, 255, 255, 0.7)"],
+        html.light-theme [style*="color: rgba(255, 255, 255, 0.65)"],
+        html.light-theme [style*="color:rgba(255,255,255,0.65)"],
+        html.light-theme [style*="color: rgba(255,255,255,0.65)"],
+        html.light-theme [style*="color:rgba(255, 255, 255, 0.65)"],
+        html.light-theme [style*="color: rgba(255, 255, 255, 0.6)"],
+        html.light-theme [style*="color:rgba(255,255,255,0.6)"],
+        html.light-theme [style*="color: rgba(255,255,255,0.6)"],
+        html.light-theme [style*="color:rgba(255, 255, 255, 0.6)"] {
+            color: #334155 !important;
+        }
+        html.light-theme [style*="color: rgba(255, 255, 255, 0.4)"],
+        html.light-theme [style*="color:rgba(255,255,255,0.4)"],
+        html.light-theme [style*="color: rgba(255,255,255,0.4)"],
+        html.light-theme [style*="color:rgba(255, 255, 255, 0.4)"] {
+            color: #64748b !important;
+        }
+        html.light-theme [style*="color: rgba(255, 255, 255, 0.5)"],
+        html.light-theme [style*="color:rgba(255,255,255,0.5)"],
+        html.light-theme [style*="color: rgba(255,255,255,0.5)"],
+        html.light-theme [style*="color:rgba(255, 255, 255, 0.5)"] {
+            color: #475569 !important;
+        }
+        html.light-theme [style*="color: rgba(255, 255, 255, 0.3)"],
+        html.light-theme [style*="color:rgba(255,255,255,0.3)"],
+        html.light-theme [style*="color: rgba(255,255,255,0.3)"],
+        html.light-theme [style*="color:rgba(255, 255, 255, 0.3)"] {
+            color: #94a3b8 !important;
+        }
+        
+        /* Cyan text elements mapped to deep blue */
+        html.light-theme td[data-label="USERNAME"],
+        html.light-theme td[data-label="LOGINI"],
+        html.light-theme td[style*="font-family: monospace"],
+        html.light-theme [style*="color: #00f2fe"],
+        html.light-theme [style*="color:#00f2fe"],
+        html.light-theme [style*="color: #4facfe"],
+        html.light-theme [style*="color:#4facfe"] {
+            color: #0284c7 !important;
+        }
+
+        /* Specific Day highlight badges colors inside schedule page */
+        html.light-theme [style*="color: #60a5fa"] { color: #2563eb !important; }
+        html.light-theme [style*="color: #c084fc"] { color: #7c3aed !important; }
+        html.light-theme [style*="color: #22d3ee"] { color: #0891b2 !important; }
+        html.light-theme [style*="color: #fb923c"] { color: #ea580c !important; }
+        html.light-theme [style*="color: #4ade80"] { color: #16a34a !important; }
+        html.light-theme [style*="color: #f472b6"] { color: #db2777 !important; }
+
+        html.light-theme [style*="background: rgba(59, 130, 246"],
+        html.light-theme [style*="background:rgba(59, 130, 246"],
+        html.light-theme [style*="background:rgba(59,130,246"],
+        html.light-theme [style*="background: rgba(59,130,246"] { background: rgba(37, 99, 235, 0.08) !important; border-color: rgba(37, 99, 235, 0.2) !important; }
+        
+        html.light-theme [style*="background: rgba(168, 85, 247"],
+        html.light-theme [style*="background:rgba(168, 85, 247"],
+        html.light-theme [style*="background:rgba(168,85,247"],
+        html.light-theme [style*="background: rgba(168,85,247"] { background: rgba(124, 58, 237, 0.08) !important; border-color: rgba(124, 58, 237, 0.2) !important; }
+        
+        html.light-theme [style*="background: rgba(6, 182, 212"],
+        html.light-theme [style*="background:rgba(6, 182, 212"],
+        html.light-theme [style*="background:rgba(6,182,212"],
+        html.light-theme [style*="background: rgba(6,182,212"] { background: rgba(8, 145, 178, 0.08) !important; border-color: rgba(8, 145, 178, 0.2) !important; }
+        
+        html.light-theme [style*="background: rgba(249, 115, 22"],
+        html.light-theme [style*="background:rgba(249, 115, 22"],
+        html.light-theme [style*="background:rgba(249,115,22"],
+        html.light-theme [style*="background: rgba(249,115,22"] { background: rgba(234, 88, 12, 0.08) !important; border-color: rgba(234, 88, 12, 0.2) !important; }
+        
+        html.light-theme [style*="background: rgba(34, 197, 94"],
+        html.light-theme [style*="background:rgba(34, 197, 94"],
+        html.light-theme [style*="background:rgba(34,197,94"],
+        html.light-theme [style*="background: rgba(34,197,94"] { background: rgba(22, 163, 74, 0.08) !important; border-color: rgba(22, 163, 74, 0.2) !important; }
+        
+        html.light-theme [style*="background: rgba(236, 72, 153"],
+        html.light-theme [style*="background:rgba(236, 72, 153"],
+        html.light-theme [style*="background:rgba(236,72,153"],
+        html.light-theme [style*="background: rgba(236,72,153"] { background: rgba(219, 39, 119, 0.08) !important; border-color: rgba(219, 39, 119, 0.2) !important; }
+
+        /* Inline Background overrides for dark containers */
+        html.light-theme [style*="background: #0c101d"],
+        html.light-theme [style*="background:#0c101d"],
+        html.light-theme [style*="background: #080d1a"],
+        html.light-theme [style*="background:#080d1a"],
+        html.light-theme [style*="background:rgba(255, 255, 255, 0.01)"],
+        html.light-theme [style*="background:rgba(255,255,255,0.01)"],
+        html.light-theme [style*="background: rgba(255,255,255,0.01)"],
+        html.light-theme [style*="background: rgba(255, 255, 255, 0.01)"],
+        html.light-theme [style*="background:rgba(255, 255, 255, 0.02)"],
+        html.light-theme [style*="background:rgba(255,255,255,0.02)"],
+        html.light-theme [style*="background: rgba(255,255,255,0.02)"],
+        html.light-theme [style*="background: rgba(255, 255, 255, 0.02)"],
+        html.light-theme [style*="background:rgba(255, 255, 255, 0.03)"],
+        html.light-theme [style*="background:rgba(255,255,255,0.03)"],
+        html.light-theme [style*="background: rgba(255,255,255,0.03)"],
+        html.light-theme [style*="background: rgba(255, 255, 255, 0.03)"],
+        html.light-theme [style*="background:rgba(255, 255, 255, 0.05)"],
+        html.light-theme [style*="background:rgba(255,255,255,0.05)"],
+        html.light-theme [style*="background: rgba(255,255,255,0.05)"],
+        html.light-theme [style*="background: rgba(255, 255, 255, 0.05)"],
+        html.light-theme [style*="background: rgba(11, 15, 25"],
+        html.light-theme [style*="background:rgba(11, 15, 25"],
+        html.light-theme [style*="background: #1e293b"],
+        html.light-theme [style*="background:#1e293b"],
+        html.light-theme [style*="background: rgba(15, 23, 42"],
+        html.light-theme [style*="background:rgba(15, 23, 42"],
+        html.light-theme [style*="background:rgba(15,23,42"],
+        html.light-theme [style*="background: rgba(15,23,42"],
+        html.light-theme [style*="background: rgba(0, 0, 0"],
+        html.light-theme [style*="background:rgba(0, 0, 0"],
+        html.light-theme [style*="background:rgba(0,0,0"],
+        html.light-theme [style*="background: rgba(0,0,0"] {
+            background: #ffffff !important;
+            color: var(--text-primary) !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+
+        /* Info labels and icons */
+        html.light-theme .info {
+            color: #64748b !important;
+        }
+        html.light-theme .info i {
+            color: #0284c7 !important;
+        }
+
+        /* Transparent overrides */
+        html.light-theme [style*="background: transparent"],
+        html.light-theme [style*="background:none"],
+        html.light-theme [style*="background: none"] {
+            background: transparent !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Border overrides */
+        html.light-theme [style*="border: 1px solid rgba(255, 255, 255"],
+        html.light-theme [style*="border: 1px solid rgba(255,255,255"],
+        html.light-theme [style*="border: 1px solid rgba(0, 242, 254"],
+        html.light-theme [style*="border: 1px solid rgba(0,242,254"] {
+            border: 1px solid #cbd5e1 !important;
+        }
+
+        /* Modals in Light Mode */
+        html.light-theme .pdf-modal-content,
+        html.light-theme .modal-content {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04) !important;
+        }
+        html.light-theme .pdf-modal-content h3,
+        html.light-theme .modal-content h3 {
+            color: #0f172a !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+        html.light-theme .pdf-modal-content label,
+        html.light-theme .modal-content label {
+            color: #64748b !important;
+        }
+        html.light-theme .pdf-modal-content select,
+        html.light-theme .modal-content select {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        html.light-theme .pdf-close-btn,
+        html.light-theme .close-modal {
+            color: #64748b !important;
+        }
+
+        /* Section Title override */
+        html.light-theme .section-title {
+            background: rgba(2, 132, 199, 0.08) !important;
+            border-left-color: #0284c7 !important;
+            color: #0284c7 !important;
+        }
+
+        /* Math Editor Tabs (DTM questions) */
+        html.light-theme .math-tab-btn {
+            background: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #475569 !important;
+        }
+        html.light-theme .math-tab-btn:hover {
+            background: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+        html.light-theme .math-tab-btn.active {
+            background: rgba(2, 132, 199, 0.08) !important;
+            border-color: rgba(2, 132, 199, 0.2) !important;
+            color: #0284c7 !important;
+        }
+
+        /* Calendar planner specific overrides */
+        html.light-theme .calendar-card,
+        html.light-theme .sidebar-card {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05) !important;
+        }
+        html.light-theme .fc {
+            color: #0f172a !important;
+        }
+        html.light-theme .fc .fc-toolbar-title {
+            background: linear-gradient(135deg, #0284c7 0%, #3b82f6 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+        }
+        html.light-theme .fc .fc-button-primary {
+            background: rgba(2, 132, 199, 0.08) !important;
+            border: 1px solid rgba(2, 132, 199, 0.3) !important;
+            color: #0284c7 !important;
+        }
+        html.light-theme .fc .fc-button-primary:hover {
+            background: #0284c7 !important;
+            color: #ffffff !important;
+            border-color: #0284c7 !important;
+        }
+        html.light-theme .fc-theme-standard td,
+        html.light-theme .fc-theme-standard th {
+            border: 1px solid #e2e8f0 !important;
+        }
+        html.light-theme .fc-theme-standard .fc-scrollgrid {
+            border: 1px solid #cbd5e1 !important;
+        }
+        html.light-theme .fc .fc-col-header-cell-cushion {
+            color: #475569 !important;
+        }
+        html.light-theme .fc .fc-timegrid-slot-label-cushion {
+            color: #64748b !important;
+        }
+        html.light-theme .fc-v-event {
+            background: linear-gradient(135deg, rgba(2, 132, 199, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%) !important;
+            border: 1px solid #0284c7 !important;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.1) !important;
+        }
+        html.light-theme .fc-v-event:hover {
+            box-shadow: 0 0 15px rgba(2, 132, 199, 0.3) !important;
+        }
+        html.light-theme .fc-v-event .fc-event-main {
+            color: #0f172a !important;
+        }
+        html.light-theme .fc-v-event .fc-event-time {
+            color: #0284c7 !important;
+        }
+        html.light-theme .guide-title {
+            color: #0284c7 !important;
+            border-bottom-color: rgba(2, 132, 199, 0.15) !important;
+        }
+        html.light-theme .guide-item {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #475569 !important;
+        }
+        html.light-theme .guide-item strong {
+            color: #0f172a !important;
+        }
+        html.light-theme .teacher-badge {
+            background: rgba(2, 132, 199, 0.08) !important;
+            border: 1px solid rgba(2, 132, 199, 0.2) !important;
+            color: #0284c7 !important;
+        }
+
+        /* 1. Header Search Lupa Icon reset */
+        html.light-theme .search-form button[type="submit"],
+        html.light-theme .search-btn {
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: #64748b !important;
+        }
+        html.light-theme .search-form button[type="submit"]:hover,
+        html.light-theme .search-btn:hover {
+            color: #0f172a !important;
+            background: none !important;
+            box-shadow: none !important;
+        }
+
+        /* 2. Standard Cancel Buttons style */
+        html.light-theme .btn-cancel {
+            background: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        html.light-theme .btn-cancel:hover {
+            background: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        /* 3. Attendance Matrix headers */
+        html.light-theme .jadval-container thead th,
+        html.light-theme th.date-col,
+        html.light-theme .date-col {
+            background-color: #f8fafc !important;
+            color: #475569 !important;
+            border-bottom: 2px solid #cbd5e1 !important;
+        }
+        html.light-theme th.date-col,
+        html.light-theme .date-col {
+            color: #0284c7 !important;
+        }
+
+        /* 4. Edit Question Add Answer Green Link */
+        html.light-theme .yashil-link {
+            color: #16a34a !important;
+        }
+        html.light-theme .yashil-link:hover {
+            color: #15803d !important;
+            text-shadow: none !important;
+        }
+
+        /* 5. DTM Page Day Mode Components */
+        html.light-theme .btn-dtm {
+            background: rgba(2, 132, 199, 0.08) !important;
+            border: 1px solid rgba(2, 132, 199, 0.3) !important;
+            color: #0284c7 !important;
+        }
+        html.light-theme .btn-dtm:hover {
+            background: linear-gradient(135deg, #0284c7, #3b82f6) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2) !important;
+        }
+        html.light-theme .btn-dtm-success {
+            background: #e6fbf4 !important;
+            border-color: #a7f3d0 !important;
+            color: #0d9488 !important;
+        }
+        html.light-theme .btn-dtm-success:hover {
+            background: linear-gradient(135deg, #0d9488, #0ea5e9) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2) !important;
+        }
+        html.light-theme .btn-dtm-warning {
+            background: #fffbeb !important;
+            border-color: #fde68a !important;
+            color: #d97706 !important;
+        }
+        html.light-theme .btn-dtm-warning:hover {
+            background: linear-gradient(135deg, #d97706, #dc2626) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2) !important;
+        }
+        html.light-theme .stats-container {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05) !important;
+        }
+        html.light-theme .stat-card {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        html.light-theme .stat-card .stat-val {
+            color: #0284c7 !important;
+        }
+        html.light-theme .stat-card .stat-label {
+            color: #64748b !important;
+        }
+        html.light-theme .action-link {
+            border: 1px solid #cbd5e1 !important;
+            color: #475569 !important;
+            background: #f8fafc !important;
+        }
+        html.light-theme .action-link:hover {
+            background: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+        html.light-theme .action-link.cyan {
+            border-color: rgba(2, 132, 199, 0.3) !important;
+            color: #0284c7 !important;
+            background: rgba(2, 132, 199, 0.05) !important;
+        }
+        html.light-theme .action-link.cyan:hover {
+            background: #0284c7 !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.3) !important;
+        }
+        html.light-theme .action-link.green {
+            border-color: rgba(13, 148, 136, 0.3) !important;
+            color: #0d9488 !important;
+            background: rgba(13, 148, 136, 0.05) !important;
+        }
+        html.light-theme .action-link.green:hover {
+            background: #0d9488 !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 10px rgba(13, 148, 136, 0.3) !important;
+        }
+
+        /* Announcement Ticker styles */
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-100%); }
+        }
+        @keyframes pulse-dot-anim {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+        .pulse-dot {
+            animation: pulse-dot-anim 2s infinite ease-in-out;
+        }
+        .ticker-container {
+            flex-grow: 1;
+            margin: 0 30px;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: var(--bg-ticker);
+            border: 1px solid var(--border-ticker);
+            border-radius: 30px;
+            height: 38px;
+            padding: 0 15px;
+            max-width: 600px;
+            min-width: 0;
+        }
+        .ticker-badge {
+            background: var(--accent-bg-glow);
+            border: 1px solid var(--accent-border-glow);
+            border-radius: 20px;
+            padding: 2px 10px;
+            color: var(--accent-primary);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+        .ticker-scroll-wrapper {
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .ticker-content {
+            display: inline-block;
+            white-space: nowrap;
+            padding-left: 100%; /* Start scrolling from far right inside wrapper */
+            animation: ticker-scroll 35s linear infinite;
+        }
+        .ticker-content:hover {
+            animation-play-state: paused;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .ticker-container {
+                margin: 0 10px;
+                height: 32px;
                 padding: 0 10px;
             }
-            #profile-panel {
-                right: 10px;
-                width: 180px;
+            .ticker-badge-text {
+                display: none;
+            }
+            .ticker-badge {
+                margin-right: 8px;
+                padding: 2px 6px;
+            }
+            .ticker-content {
+                font-size: 11px !important;
+            }
+            .sarlavha-qatori {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 10px !important;
+            }
+            .sarlavha-qatori .search-form {
+                width: 100% !important;
             }
         }
     </style>
     {% block extra_css %}{% endblock %}
+    <!-- KaTeX 2D Math Rendering (Local Static + CDN Fallback) -->
+    <link rel="stylesheet" href="{% static 'katex/katex.min.css' %}" onerror="this.href='https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css'">
+    <script src="{% static 'katex/katex.min.js' %}"></script>
+    <script src="{% static 'katex/auto-render.min.js' %}"></script>
 </head>
 <body>
     <div class="cyber-bg"></div>
@@ -442,7 +1668,7 @@
     <div class="sidebar collapsed" id="sidebar">
         <div class="toggle-container">
             <img src="{{ global_image }}" alt="Logatip photo">
-            <div class="brand">FUMAISAK</div>
+            <div class="brand">{{ site_name|default:"Tizim" }}</div>
             <button class="toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
         </div>
 
@@ -453,8 +1679,8 @@
                 <img src="{{ default_profile_image }}" alt="User Photo">
             {% endif %}
             <div style="display: flex; flex-direction: column;">
-                <span class="span">Admin</span>
-                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">
+                <span class="span">Administrator</span>
+                <span style="color: var(--text-primary); font-weight: 600; font-size: 13px;">
                     {% if user.first_name or user.last_name %}
                         {{ user.first_name }} {{ user.last_name }}
                     {% else %}
@@ -467,41 +1693,129 @@
         <div class="menu-container">
             <span class="menu-category">Asosiy</span>
             <ul>
-                <li><a href="{% url 'admin_dashboard' %}"><i class="fas fa-chart-line"></i><span> Dashboard</span></a></li>
+                <li><a href="{% url 'admin_dashboard' %}"><i class="fas fa-chart-line"></i><span> Boshqaruv paneli</span></a></li>
+                {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_groups' in request.user.subadmin_permissions %}
                 <li><a href="{% url 'all_groups_admin' %}"><i class="fas fa-layer-group"></i><span> Guruhlar</span></a></li>
+                {% endif %}
+                {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_subjects' in request.user.subadmin_permissions %}
+                <li><a href="{% url 'subject_list_admin' %}"><i class="fas fa-book"></i><span> Fanlar</span></a></li>
+                <li><a href="{% url 'admin_books_report' %}"><i class="fas fa-book-reader"></i><span> Kitoblar hisoboti</span></a></li>
+                {% endif %}
+                {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_announcements' in request.user.subadmin_permissions %}
+                <li><a href="{% url 'announcement_list' %}"><i class="fas fa-bullhorn"></i><span> E'lonlar</span></a></li>
+                {% endif %}
             </ul>
 
+            {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_students' in request.user.subadmin_permissions or 'manage_teachers' in request.user.subadmin_permissions %}
             <span class="menu-category">Foydalanuvchilar</span>
             <ul>
+                {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_students' in request.user.subadmin_permissions %}
                 <li><a href="{% url 'students_list_admin' %}"><i class="fas fa-user-graduate"></i><span> O'quvchilar</span></a></li>
+                {% endif %}
+                {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_teachers' in request.user.subadmin_permissions %}
                 <li><a href="{% url 'teachers_list_admin' %}"><i class="fas fa-chalkboard-teacher"></i><span> O'qituvchilar</span></a></li>
+                {% endif %}
+                {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff %}
+                <li><a href="{% url 'admin_settings' %}#subadmins"><i class="fas fa-user-shield"></i><span> Sub-adminlar</span></a></li>
+                {% endif %}
             </ul>
+            {% endif %}
 
-            <span class="menu-category">O'quv jarayoni</span>
-            <ul>
-                <li><a href="{% url 'admin_assignment_list' %}"><i class="fas fa-tasks"></i><span> Topshiriqlar</span></a></li>
-                <li><a href="{% url 'all_group_schedules' %}"><i class="fas fa-calendar-alt"></i><span> Dars rejasi</span></a></li>
-                <li><a href="{% url 'quiz_list' %}"><i class="fas fa-file-signature"></i><span> Testlar</span></a></li>
-                <li><a href="{% url 'question_list' %}"><i class="fas fa-question-circle"></i><span> Savollar</span></a></li>
-            </ul>
-
+            {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_payments' in request.user.subadmin_permissions %}
             <span class="menu-category">Moliya</span>
             <ul>
-                <li><a href="{% url 'group_payment_list' %}"><i class="fas fa-credit-card"></i><span> Guruh to'lov</span></a></li>
-                <li><a href="{% url 'student_list' %}"><i class="fas fa-wallet"></i><span> Barcha to'lov</span></a></li>
+                {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff %}
+                <li><a href="{% url 'admin_salaries' %}"><i class="fas fa-wallet"></i><span> O'qituvchilar maoshi</span></a></li>
+                <li><a href="{% url 'admin_wallets' %}"><i class="fa-solid fa-money-check-dollar"></i><span> O'quvchi hamyonlari</span></a></li>
+                {% endif %}
+                <li><a href="{% url 'group_payment_list' %}"><i class="fas fa-credit-card"></i><span> Guruh to'lovlari</span></a></li>
+                <li><a href="{% url 'student_list' %}"><i class="fas fa-wallet"></i><span> Barcha to'lovlar</span></a></li>
+                <li><a href="{% url 'debtors_list' %}"><i class="fas fa-user-times"></i><span> Qarzdorlar ro'yxati</span></a></li>
             </ul>
+            {% endif %}
+
+            {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_assignments' in request.user.subadmin_permissions or 'manage_schedules' in request.user.subadmin_permissions or 'manage_attendance' in request.user.subadmin_permissions or 'manage_quizzes' in request.user.subadmin_permissions or 'manage_dtm' in request.user.subadmin_permissions or 'manage_media' in request.user.subadmin_permissions %}
+            <span class="menu-category">O'quv jarayoni</span>
+            <ul>
+                {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_assignments' in request.user.subadmin_permissions %}
+                <li><a href="{% url 'admin_assignment_list' %}"><i class="fas fa-tasks"></i><span> Topshiriqlar</span></a></li>
+                {% endif %}
+                {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_schedules' in request.user.subadmin_permissions %}
+                <li><a href="{% url 'all_group_schedules' %}"><i class="fas fa-calendar-alt"></i><span> Dars jadvallari</span></a></li>
+                <li><a href="{% url 'admin_calendar_planner' %}"><i class="fas fa-calendar-week"></i><span> Taqvim rejasi</span></a></li>
+                {% endif %}
+                {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_attendance' in request.user.subadmin_permissions %}
+                <li><a href="{% url 'admin_attendance_overview' %}"><i class="fas fa-user-check"></i><span> Davomat nazorati</span></a></li>
+                {% endif %}
+                {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_quizzes' in request.user.subadmin_permissions %}
+                <li><a href="{% url 'quiz_list' %}"><i class="fas fa-file-signature"></i><span> Testlar</span></a></li>
+                <li><a href="{% url 'question_list' %}"><i class="fas fa-question-circle"></i><span> Savollar bazasi</span></a></li>
+                {% endif %}
+                {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_dtm' in request.user.subadmin_permissions %}
+                <li><a href="{% url 'admin_dtm_list' %}"><i class="fas fa-graduation-cap"></i><span> DTM imtihonlari</span></a></li>
+                <li><a href="{% url 'admin_dtm_omr_scan' %}"><i class="fas fa-qrcode"></i><span> OMR skaner (AI)</span></a></li>
+                {% endif %}
+                {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_media' in request.user.subadmin_permissions %}
+                <li><a href="{% url 'admin_media_gallery' %}"><i class="fas fa-video"></i><span> Media galereya</span></a></li>
+                {% endif %}
+            </ul>
+            {% endif %}
+
+            {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff %}
+            <span class="menu-category">Tizim</span>
+            <ul>
+                <li><a href="{% url 'admin_sessions' %}"><i class="fas fa-users-cog"></i><span> Faol seanslar</span></a></li>
+                <li><a href="{% url 'admin_audit_logs' %}"><i class="fas fa-history"></i><span> Audit jurnali</span></a></li>
+                <li>
+                    <a href="{% url 'admin_error_logs' %}">
+                        <i class="fas fa-bug"></i>
+                        <span> Xatoliklar jurnali</span>
+                        {% if unread_errors_count > 0 %}
+                            <span style="display: inline-block; background: #ff0055; color: #ffffff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 8px; margin-left: 6px; vertical-align: middle; box-shadow: 0 0 8px rgba(255, 0, 85, 0.4);">
+                                {{ unread_errors_count }}
+                            </span>
+                        {% endif %}
+                    </a>
+                </li>
+                <li><a href="{% url 'admin_locked_pages' %}"><i class="fas fa-lock"></i><span> Bloklangan sahifalar</span></a></li>
+                <li><a href="{% url 'admin_settings' %}"><i class="fas fa-cogs"></i><span> Sozlamalar</span></a></li>
+            </ul>
+            {% endif %}
         </div>
     </div>
 
     <!-- ASOSIY KONTENT MAYDONI -->
     <div class="main">
         <div class="header">
-            <button class="toggle-main-btn" id="mainToggle"><i class="fas fa-bars"></i></button>
+            <button class="toggle-main" id="mainToggle"><i class="fas fa-bars"></i></button>
 
-            {% block header_search %}{% endblock %}
+            <!-- Tizim e'lonlari uchun ticker -->
+            {% if always_show_announcements or one_time_announcements %}
+            <div class="ticker-container">
+                <div class="ticker-badge">
+                    <span class="pulse-dot" style="width: 6px; height: 6px; background-color: var(--accent-primary); border-radius: 50%; display: inline-block;"></span> <span class="ticker-badge-text">E'lonlar</span>
+                </div>
+                <div class="ticker-scroll-wrapper">
+                    <div class="ticker-content" style="color: var(--text-ticker); font-size: 13px; font-weight: 500;">
+                        {% for announce in always_show_announcements %}
+                            <span style="margin-right: 60px; font-weight: 700; color: #ff9f43;"><i class="fas fa-exclamation-triangle" style="margin-right: 6px;"></i> {{ announce.title }}: <span style="font-weight: 500; color: var(--text-ticker);">{{ announce.message }}</span></span>
+                        {% endfor %}
+                        {% for announce in one_time_announcements %}
+                            <span style="margin-right: 60px; font-weight: 700; color: var(--accent-primary);"><i class="fas fa-bullhorn" style="margin-right: 6px;"></i> {{ announce.title }}: <span style="font-weight: 500; color: var(--text-ticker);">{{ announce.message }}</span></span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
             <div class="user-profile">
                 {% block header_actions %}{% endblock %}
+
+                <!-- Rejimlarni almashtiruvchi tugma -->
+                <button id="theme-toggle" style="background: none; border: none; color: inherit; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; transition: 0.3s; margin-right: 8px;" title="Rejimni o'zgartirish (Yorug'/Qorong'i)">
+                    <i class="fas fa-sun" id="theme-icon"></i>
+                </button>
+
                 <a href="javascript:void(0);" id="profile-btn">
                     {% if user.profile_image %}
                     <img src="{{ user.profile_image.url }}" alt="User profile" class="user_profile_img">
@@ -510,8 +1824,12 @@
                     {% endif %}
                 </a>
                 <div class="dropdown-panel" id="profile-panel">
+                    {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff %}
+                    <a href="{% url 'admin_settings' %}" class="dropdown-item"><i class="fas fa-sliders-h"></i> Sozlamalar</a>
+                    <a href="{% url 'admin_password' %}" class="dropdown-item"><i class="fas fa-key"></i> Parolni o'zgartirish</a>
                     <a href="{% url 'admin:index' %}" class="dropdown-item"><i class="fas fa-cogs"></i> Django Admin</a>
-                    <a href="{% url 'login' %}" class="dropdown-item" style="color: #ff808b;"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
+                    {% endif %}
+                    <a href="{% url 'logout' %}" class="dropdown-item" style="color: #ff808b;"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
                 </div>
             </div>
         </div>
@@ -519,19 +1837,36 @@
         <div class="konteyner">
             {% block content %}{% endblock %}
 
-            <!-- TOAST MESSAGE NOTIFICATIONS -->
+            <!-- FLOATING TOAST MESSAGE NOTIFICATIONS -->
             {% if messages %}
-                {% for message in messages %}
-                    {% if 'yangi_guruh' in message.tags or 'edit_group' in message.tags or 'payment_success' in message.tags or 'edit_user' in message.tags or 'teacher_list' in message.tags %}
-                        <div id="modalBackdrop" class="modal-backdrop"></div>
-                        <div id="topModal" class="top-modal show">
-                            <div class="modal-content">
-                                <span class="modal-message"><i class="fas fa-check-circle" style="color: #00ffaa; margin-right: 8px;"></i> {{ message }}</span>
-                                <button class="close-modal-btn" onclick="closeTopModal()">✖</button>
+                <div class="global-toasts-container">
+                    {% for message in messages %}
+                        <div class="global-toast">
+                            <div class="toast-content">
+                                {% if 'success' in message.tags or 'payment_success' in message.tags %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% elif 'error' in message.tags %}
+                                    <i class="fas fa-exclamation-circle text-error"></i>
+                                {% elif 'warning' in message.tags %}
+                                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-info-circle text-info"></i>
+                                {% endif %}
+                                <span>{{ message|safe }}</span>
                             </div>
+                            <button class="toast-close-btn" onclick="this.parentElement.remove()">✖</button>
                         </div>
-                    {% endif %}
-                {% endfor %}
+                    {% endfor %}
+                </div>
+                <script>
+                    setTimeout(() => {
+                        document.querySelectorAll('.global-toast').forEach(el => {
+                            el.style.opacity = '0';
+                            el.style.transform = 'translateX(50px)';
+                            setTimeout(() => el.remove(), 300);
+                        });
+                    }, 4500);
+                </script>
             {% endif %}
         </div>
     </div>
@@ -543,20 +1878,43 @@
         const mainToggle = document.getElementById('mainToggle');
 
         function toggleSidebar() {
-            if (window.innerWidth <= 768) {
-                sidebar.classList.toggle('show');
-            } else {
-                sidebar.classList.toggle('collapsed');
-            }
+            sidebar.classList.toggle('collapsed');
         }
 
         if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
         if (mainToggle) mainToggle.addEventListener('click', toggleSidebar);
 
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('show');
-            }
+        // Sidebar accordion category collapse
+        document.addEventListener('DOMContentLoaded', () => {
+            const categories = document.querySelectorAll('.sidebar .menu-category');
+            categories.forEach((cat) => {
+                const list = cat.nextElementSibling;
+                if (list && list.tagName === 'UL') {
+                    // Check if this category has an active link
+                    const hasActive = list.querySelector('li.active');
+                    
+                    // Default: collapsed, unless it contains the active menu item
+                    if (hasActive) {
+                        cat.classList.remove('collapsed');
+                    } else {
+                        cat.classList.add('collapsed');
+                    }
+
+                    cat.addEventListener('click', function() {
+                        if (sidebar && !sidebar.classList.contains('collapsed')) {
+                            const isCurrentlyCollapsed = this.classList.contains('collapsed');
+                            
+                            // Collapse all categories
+                            categories.forEach(c => c.classList.add('collapsed'));
+                            
+                            // If it was collapsed, expand it now
+                            if (isCurrentlyCollapsed) {
+                                this.classList.remove('collapsed');
+                            }
+                        }
+                    });
+                }
+            });
         });
 
         // Profile Dropdown
@@ -578,6 +1936,17 @@
             document.getElementById('topModal')?.remove();
         }
 
+        // Global horizontal scroll handler for tables using mouse wheel
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.jadval-container, .table-responsive, .group-table').forEach(container => {
+                container.addEventListener('wheel', (e) => {
+                    if (e.deltaY !== 0 && container.scrollWidth > container.clientWidth) {
+                        container.scrollLeft += e.deltaY * 1.2;
+                    }
+                }, { passive: true });
+            });
+        });
+
         // Auto close top alert message after 4 seconds
         window.addEventListener('load', function() {
             setTimeout(closeTopModal, 4000);
@@ -588,15 +1957,230 @@
             const currentPath = window.location.pathname;
             const menuLinks = document.querySelectorAll(".sidebar ul li a");
 
+            // Ichki (nested) sahifalarni asosiy menyu bandlariga moslashtirish (mapping)
+            function getMainMenuHref(path) {
+                // Guruhlar ichki sahifalari
+                if (path.startsWith('/adminpanel/edit-group/') || path.startsWith('/adminpanel/add-group/')) {
+                    return '/adminpanel/all-groups/';
+                }
+                // Fanlar ichki sahifalari
+                if (path.startsWith('/adminpanel/subjects/')) {
+                    return '/adminpanel/subjects/';
+                }
+                // Tizim xabarlari ichki sahifalari
+                if (path.startsWith('/adminpanel/announcements/')) {
+                    return '/adminpanel/announcements/';
+                }
+                // O'quvchilar ichki sahifalari
+                if (path.startsWith('/adminpanel/add-student/') ||
+                    path.startsWith('/adminpanel/edit-student/') ||
+                    path.startsWith('/adminpanel/student-password/')) {
+                    return '/adminpanel/students-list/';
+                }
+                // O'qituvchilar ichki sahifalari
+                if (path.startsWith('/adminpanel/add-teacher/') ||
+                    path.startsWith('/adminpanel/edit-teacher/') ||
+                    path.startsWith('/adminpanel/teacher-password/')) {
+                    return '/adminpanel/teachers-list/';
+                }
+                // Topshiriqlar ichki sahifalari
+                if (path.startsWith('/adminpanel/add-topshiriq/') ||
+                    path.startsWith('/adminpanel/edit-assignments/') ||
+                    path.startsWith('/adminpanel/add-assignments/') ||
+                    path.startsWith('/adminpanel/delete-assignments/') ||
+                    path.startsWith('/adminpanel/assignments/')) {
+                    return '/adminpanel/assignments-list/';
+                }
+                // Dars rejasi ichki sahifalari
+                if (path.startsWith('/adminpanel/edit-schedule/')) {
+                    return '/adminpanel/schedules-list/';
+                }
+                // Davomat ichki sahifalari
+                if (path.startsWith('/adminpanel/attendance/')) {
+                    return '/adminpanel/attendance/';
+                }
+                // Testlar ichki sahifalari
+                if (path.startsWith('/adminpanel/add-quiz/') ||
+                    path.startsWith('/adminpanel/edit-quiz/') ||
+                    path.startsWith('/adminpanel/quiz-delete/') ||
+                    path.startsWith('/adminpanel/quiz/')) {
+                    return '/adminpanel/quizs-list/';
+                }
+                // Savollar ichki sahifalari
+                if (path.startsWith('/adminpanel/add-questions/') ||
+                    path.startsWith('/adminpanel/edit-questions/') ||
+                    path.includes('/questions-delete/')) {
+                    return '/adminpanel/questions-list/';
+                }
+                // Videodarslar ichki sahifalari
+                if (path.startsWith('/adminpanel/media/')) {
+                    return '/adminpanel/media/';
+                }
+                // Guruh to'lov ichki sahifalari
+                if (path.includes('/payment/add/')) {
+                    return '/adminpanel/group-payment/';
+                }
+                // Barcha to'lovlar va cheklar ichki sahifalari
+                if (path.includes('/payments/') ||
+                    path.includes('/receipt/') ||
+                    path.includes('/verify/') ||
+                    path.includes('/students/') ||
+                    path.includes('/student/')) {
+                    if (path.includes('groups') && path.includes('students')) {
+                        return '/adminpanel/group-payment/';
+                    }
+                    return '/students/';
+                }
+                // Qarzdorlar ichki sahifalari
+                if (path.startsWith('/adminpanel/debtors/')) {
+                    return '/adminpanel/debtors/';
+                }
+                // Faol seanslar ichki sahifalari
+                if (path.startsWith('/adminpanel/sessions/')) {
+                    return '/adminpanel/sessions/';
+                }
+                // Tizim tarixi / Audit jurnali ichki sahifalari
+                if (path.startsWith('/adminpanel/audit-logs/')) {
+                    return '/adminpanel/audit-logs/';
+                }
+                // Xatoliklar jurnali ichki sahifalari
+                if (path.startsWith('/adminpanel/error-logs/')) {
+                    return '/adminpanel/error-logs/';
+                }
+                // Bloklangan sahifalar ichki sahifalari
+                if (path.startsWith('/adminpanel/locked-pages/')) {
+                    return '/adminpanel/locked-pages/';
+                }
+                // Sozlamalar ichki sahifalari
+                if (path.startsWith('/adminpanel/settings/') || path.startsWith('/adminpanel/password/')) {
+                    return '/adminpanel/settings/';
+                }
+                // Imtihonlar (DTM) ichki sahifalari (AI OMR Scanner sahifasidan tashqari)
+                if (path.startsWith('/adminpanel/dtm/') && !path.startsWith('/adminpanel/dtm/omr-scan/')) {
+                    return '/adminpanel/dtm/';
+                }
+
+                return path;
+            }
+
+            const mappedPath = getMainMenuHref(currentPath);
+
+            let exactMatchFound = false;
             menuLinks.forEach(link => {
                 const href = link.getAttribute("href");
-                if (currentPath === href || (href !== '/' && currentPath.includes(href))) {
+                if (mappedPath === href) {
+                    exactMatchFound = true;
+                }
+            });
+
+            const currentHash = window.location.hash;
+
+            menuLinks.forEach(link => {
+                const href = link.getAttribute("href");
+                let isMatch = false;
+                
+                if (href.includes('#')) {
+                    const [pathPart, hashPart] = href.split('#');
+                    isMatch = (mappedPath === pathPart && currentHash === '#' + hashPart);
+                } else {
+                    isMatch = (mappedPath === href && !currentHash);
+                }
+
+                if (isMatch) {
+                    link.parentElement.classList.add("active");
+                } else if (!exactMatchFound && href !== '/' && !href.includes('#') && mappedPath.startsWith(href)) {
                     link.parentElement.classList.add("active");
                 } else {
                     link.parentElement.classList.remove("active");
                 }
             });
         });
+
+        // 3 soatlik faolsizlik taymeri (Auto-logout on 3 hours inactivity)
+        (function() {
+            let inactivityTime = function () {
+                let time;
+                window.onload = resetTimer;
+                document.onmousemove = resetTimer;
+                document.onkeypress = resetTimer;
+                document.onclick = resetTimer;
+                document.onscroll = resetTimer;
+
+                function logoutUser() {
+                    window.location.href = "{% url 'logout' %}";
+                }
+
+                function resetTimer() {
+                    clearTimeout(time);
+                    time = setTimeout(logoutUser, 10800000); // 3 hours = 10,800,000 ms
+                }
+            };
+            inactivityTime();
+        })();
+    </script>
+
+    <!-- Global KaTeX Auto-Render for all Admin pages -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function autoRenderAllAdminMath() {
+                if (typeof renderMathInElement === "function") {
+                    try {
+                        renderMathInElement(document.body, {
+                            delimiters: [
+                                {left: "$$", right: "$$", display: true},
+                                {left: "$", right: "$", display: false},
+                                {left: "\(", right: "\)", display: false},
+                                {left: "\[", right: "\]", display: true}
+                            ],
+                            throwOnError: false
+                        });
+                    } catch(e) {
+                        console.error("Global KaTeX error:", e);
+                    }
+                }
+            }
+
+            autoRenderAllAdminMath();
+            setTimeout(autoRenderAllAdminMath, 300);
+            setTimeout(autoRenderAllAdminMath, 1000);
+        });
+    </script>
+
+    <script>
+        const themeToggleBtn = document.getElementById("theme-toggle");
+        const themeIcon = document.getElementById("theme-icon");
+
+        function updateThemeElements(theme) {
+            if (theme === 'light') {
+                document.documentElement.classList.add('light-theme');
+                document.body.classList.add('light-theme');
+                if (themeIcon) {
+                    themeIcon.className = 'fas fa-moon';
+                }
+            } else {
+                document.documentElement.classList.remove('light-theme');
+                document.body.classList.remove('light-theme');
+                if (themeIcon) {
+                    themeIcon.className = 'fas fa-sun';
+                }
+            }
+            // Trigger a custom event to notify nested templates (like charts) that theme changed
+            const event = new CustomEvent('themeChanged', { detail: { theme: theme } });
+            document.dispatchEvent(event);
+        }
+
+        // Initialize theme UI matching stored selection
+        const initialTheme = localStorage.getItem('theme') || 'dark';
+        updateThemeElements(initialTheme);
+
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+                const isLight = document.documentElement.classList.contains('light-theme') || document.body.classList.contains('light-theme');
+                const newTheme = isLight ? 'dark' : 'light';
+                localStorage.setItem('theme', newTheme);
+                updateThemeElements(newTheme);
+            });
+        }
     </script>
     {% block extra_js %}{% endblock %}
 </body>

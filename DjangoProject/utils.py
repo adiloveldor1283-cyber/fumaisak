@@ -38,3 +38,49 @@ def rate_limit(limit=5, period=60):
             return view_func(request, *args, **kwargs)
         return _wrapped_view
     return decorator
+
+
+def get_site_setting():
+    try:
+        from main.models import SiteSetting
+        return SiteSetting.objects.first()
+    except Exception:
+        return None
+
+
+def get_admin_site_title(request=None):
+    setting = get_site_setting()
+    site_name = setting.site_name if setting and setting.site_name else "Boshqaruv Paneli"
+    return f"{site_name} Admin Panel"
+
+
+def get_admin_site_header(request=None):
+    setting = get_site_setting()
+    if setting and setting.site_name:
+        return setting.site_name
+    return "Boshqaruv Tizimi"
+
+
+def get_admin_site_subheader(request=None):
+    return "O'quv markaz admin paneli"
+
+
+def get_admin_site_icon(request=None):
+    setting = get_site_setting()
+    if setting and setting.image:
+        try:
+            return setting.image.url
+        except Exception:
+            return None
+    return None
+
+
+def get_admin_site_logo(request=None):
+    setting = get_site_setting()
+    if setting and setting.image:
+        try:
+            return setting.image.url
+        except Exception:
+            return None
+    return None
+

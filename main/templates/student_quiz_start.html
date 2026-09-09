@@ -1,6 +1,6 @@
 {% extends 'basestudent.html' %}
 
-{% block title %}Onlayn Imtihon - Student Profili{% endblock %}
+{% block title %}Test yechish{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -280,6 +280,7 @@
     let quizStarted = false;
     let timeRemaining = {{ quiz.time_limit }} * 60;
     let timerInterval;
+    let warningCount = 0;
 
     document.addEventListener("DOMContentLoaded", function() {
         let minutes = Math.floor(timeRemaining / 60);
@@ -295,7 +296,49 @@
                 }
             });
         });
+
+        // Intercept form submit to check unanswered questions
+        const quizForm = document.getElementById('quiz-form');
+        if (quizForm) {
+            quizForm.addEventListener('submit', function(e) {
+                if (!quizStarted) return; // If already submitting from forced event, let it pass
+                
+                e.preventDefault(); // Stop default submit
+                
+                // Calculate unanswered questions
+                const totalQuestionsCount = document.querySelectorAll('.savollar-bloki').length;
+                let answeredCount = 0;
+                
+                const questionBlocks = document.querySelectorAll('.savollar-bloki');
+                questionBlocks.forEach(block => {
+                    const radioChecked = block.querySelector('input[type="radio"]:checked');
+                    if (radioChecked) {
+                        answeredCount++;
+                    }
+                });
+                
+                const unansweredCount = totalQuestionsCount - answeredCount;
+                
+                if (unansweredCount > 0) {
+                    showConfirmSubmitModal(unansweredCount);
+                } else {
+                    submitQuizForm();
+                }
+            });
+        }
     });
+
+    function enterFullscreen() {
+        const docEl = document.documentElement;
+        try {
+            if (docEl.requestFullscreen) { docEl.requestFullscreen().catch(() => {}); }
+            else if (docEl.mozRequestFullScreen) { docEl.mozRequestFullScreen().catch(() => {}); }
+            else if (docEl.webkitRequestFullscreen) { docEl.webkitRequestFullscreen().catch(() => {}); }
+            else if (docEl.msRequestFullscreen) { docEl.msRequestFullscreen().catch(() => {}); }
+        } catch (e) {
+            console.log("Fullscreen request failed", e);
+        }
+    }
 
     function startQuizSecurely() {
         const overlay = document.getElementById("quizOverlay");
@@ -304,11 +347,7 @@
         overlay.style.display = "none";
         mainContent.classList.add("started");
 
-        const docEl = document.documentElement;
-        if (docEl.requestFullscreen) { docEl.requestFullscreen(); }
-        else if (docEl.mozRequestFullScreen) { docEl.mozRequestFullScreen(); }
-        else if (docEl.webkitRequestFullscreen) { docEl.webkitRequestFullscreen(); }
-        else if (docEl.msRequestFullscreen) { docEl.msRequestFullscreen(); }
+        enterFullscreen();
 
         quizStarted = true;
         timerInterval = setInterval(updateTimer, 1000);
@@ -337,29 +376,83 @@
 
         if (timeRemaining < 0) {
             clearInterval(timerInterval);
-            quizStarted = false;
-            document.getElementById("quiz-form").submit();
+            submitQuizForm();
         }
     }
 
     /* --- 🛡️ STRIKT GUARD SECURITY DETECTOR --- */
+    function triggerWarning(reason) {
+        warningCount++;
+        if (warningCount >= 4) {
+            quizStarted = false;
+            clearInterval(timerInterval);
+            alert("Imtihon qoidalarini 4 marta buzganingiz sababli, test avtomatik ravishda yakunlandi va natijangiz saqlandi!");
+            document.getElementById('was_forced').value = "true";
+            submitQuizForm();
+        } else {
+            showPremiumToastWarning(`Ogohlantirish ${warningCount}/3: ${reason}`);
+        }
+    }
+
+    // Escaping fullscreen detector
+    document.addEventListener('fullscreenchange', () => {
+        if (quizStarted && !document.fullscreenElement) {
+            triggerWarning("To'liq ekran rejimidan chiqish taqiqlanadi!");
+            enterFullscreen();
+        }
+    });
+    document.addEventListener('webkitfullscreenchange', () => {
+        if (quizStarted && !document.webkitFullscreenElement) {
+            triggerWarning("To'liq ekran rejimidan chiqish taqiqlanadi!");
+            enterFullscreen();
+        }
+    });
+
+    // Visibility change / tab switches detector
+    document.addEventListener('visibilitychange', () => {
+        if (quizStarted && document.visibilityState === 'hidden') {
+            triggerWarning("Boshqa sahifaga o'tish taqiqlanadi!");
+        }
+    });
+    window.addEventListener('blur', () => {
+        if (quizStarted) {
+            triggerWarning("Imtihon oynasidan boshqa dasturga o'tish taqiqlanadi!");
+        }
+    });
+
+    // Block context menu
+    document.addEventListener('contextmenu', (e) => {
+        if (quizStarted) {
+            e.preventDefault();
+            triggerWarning("Sichqonchaning o'ng tugmasini bosish taqiqlanadi!");
+        }
+    });
+
+    // Block dangerous keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (!quizStarted) return;
+        
+        if (e.key === 'F12') {
+            e.preventDefault();
+            triggerWarning("Tizimni tekshirish (Inspect Element) taqiqlanadi!");
+        }
+        if (e.ctrlKey && (e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C') || e.key === 'u' || e.key === 'U')) {
+            e.preventDefault();
+            triggerWarning("Taqiqlangan klaviatura kombinatsiyasi!");
+        }
+    });
+
+    // Block links outside quiz form click detector
     document.addEventListener("click", function(e) {
         if (!quizStarted) return;
 
         const targetElement = e.target.closest('a, button');
 
         if (targetElement) {
-            if (!targetElement.closest('#quiz-form')) {
+            if (!targetElement.closest('#quiz-form') && !targetElement.closest('#confirmSubmitModal')) {
                 e.preventDefault();
                 e.stopPropagation();
-
-                quizStarted = false;
-
-                // Yashirin input qiymatini o'zgartiramiz, backend buni ushlab ro'yxatga yo'naltirishi uchun
-                document.getElementById('was_forced').value = "true";
-
-                alert("Tizimli Cheklov: Imtihon vaqtida taqiqlangan amal bajarildi! Javoblaringiz saqlanadi va siz avtomatik ravishda testlar ro'yxatiga qaytarilasiz.");
-                document.getElementById("quiz-form").submit();
+                triggerWarning("Imtihon maydonidan chiqish taqiqlanadi!");
             }
         }
     }, true);
@@ -371,5 +464,131 @@
             return e.returnValue;
         }
     });
+
+    /* --- 🎨 UI DIALOG BUILDERS (TOASTS AND MODALS) --- */
+    function showPremiumToastWarning(message) {
+        let warningToast = document.getElementById('warningToast');
+        if (!warningToast) {
+            warningToast = document.createElement('div');
+            warningToast.id = 'warningToast';
+            warningToast.style.position = 'fixed';
+            warningToast.style.top = '30px';
+            warningToast.style.left = '50%';
+            warningToast.style.transform = 'translateX(-50%) scale(0.9)';
+            warningToast.style.background = 'linear-gradient(135deg, #ff0055, #ff5e00)';
+            warningToast.style.color = '#ffffff';
+            warningToast.style.padding = '16px 28px';
+            warningToast.style.borderRadius = '16px';
+            warningToast.style.boxShadow = '0 15px 35px rgba(255, 0, 85, 0.4)';
+            warningToast.style.zIndex = '999999';
+            warningToast.style.display = 'flex';
+            warningToast.style.alignItems = 'center';
+            warningToast.style.gap = '12px';
+            warningToast.style.fontWeight = '700';
+            warningToast.style.fontSize = '14.5px';
+            warningToast.style.transition = 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            warningToast.style.opacity = '0';
+            warningToast.innerHTML = `<i class="fas fa-exclamation-circle" style="font-size: 18px;"></i> <span id="warningToastText"></span>`;
+            document.body.appendChild(warningToast);
+        }
+        
+        document.getElementById('warningToastText').innerText = message;
+        
+        setTimeout(() => {
+            warningToast.style.opacity = '1';
+            warningToast.style.transform = 'translateX(-50%) scale(1)';
+        }, 50);
+        
+        setTimeout(() => {
+            warningToast.style.opacity = '0';
+            warningToast.style.transform = 'translateX(-50%) scale(0.9)';
+        }, 4000);
+    }
+
+    function showConfirmSubmitModal(unansweredCount) {
+        let confirmModal = document.getElementById('confirmSubmitModal');
+        let confirmBackdrop = document.getElementById('confirmSubmitBackdrop');
+        
+        if (!confirmModal) {
+            confirmBackdrop = document.createElement('div');
+            confirmBackdrop.id = 'confirmSubmitBackdrop';
+            confirmBackdrop.style.position = 'fixed';
+            confirmBackdrop.style.top = '0';
+            confirmBackdrop.style.left = '0';
+            confirmBackdrop.style.width = '100vw';
+            confirmBackdrop.style.height = '100vh';
+            confirmBackdrop.style.background = 'rgba(7, 10, 18, 0.8)';
+            confirmBackdrop.style.backdropFilter = 'blur(10px)';
+            confirmBackdrop.style.zIndex = '999998';
+            document.body.appendChild(confirmBackdrop);
+            
+            confirmModal = document.createElement('div');
+            confirmModal.id = 'confirmSubmitModal';
+            confirmModal.style.position = 'fixed';
+            confirmModal.style.top = '50%';
+            confirmModal.style.left = '50%';
+            confirmModal.style.transform = 'translate(-50%, -50%) scale(0.9)';
+            confirmModal.style.background = '#0c101d';
+            confirmModal.style.border = '1px solid rgba(0, 242, 254, 0.2)';
+            confirmModal.style.boxShadow = '0 0 30px rgba(0, 242, 254, 0.15)';
+            confirmModal.style.borderRadius = '24px';
+            confirmModal.style.padding = '30px';
+            confirmModal.style.maxWidth = '480px';
+            confirmModal.style.width = '90%';
+            confirmModal.style.textAlign = 'center';
+            confirmModal.style.zIndex = '999999';
+            confirmModal.style.transition = 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            confirmModal.style.opacity = '0';
+            
+            confirmModal.innerHTML = `
+                <i class="fas fa-question-circle" style="font-size: 45px; color: #00f2fe; margin-bottom: 20px; text-shadow: 0 0 15px rgba(0, 242, 254, 0.4);"></i>
+                <h4 style="font-size: 18px; font-weight: 800; color: #ffffff; margin-bottom: 12px; text-transform: uppercase;">Testni yakunlaysizmi?</h4>
+                <p id="confirmModalText" style="font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.6; margin-bottom: 25px;"></p>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button id="btnConfirmCancel" style="flex: 1; padding: 12px 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #ffffff; font-weight: 700; cursor: pointer; transition: 0.3s;">Ortga qaytish</button>
+                    <button id="btnConfirmSubmit" style="flex: 1; padding: 12px 20px; border-radius: 10px; border: none; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; font-weight: 800; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(0, 242, 254, 0.2);">Ha, yakunlash</button>
+                </div>
+            `;
+            document.body.appendChild(confirmModal);
+            
+            document.getElementById('btnConfirmCancel').addEventListener('click', closeConfirmSubmitModal);
+            document.getElementById('btnConfirmSubmit').addEventListener('click', () => {
+                closeConfirmSubmitModal();
+                submitQuizForm();
+            });
+        }
+        
+        document.getElementById('confirmModalText').innerHTML = `Siz <strong>${unansweredCount} ta</strong> savolni belgilamadingiz (ya'ni shunchasi qoldi).<br>Testni baribir yakunlashni xohlaysizmi?`;
+        
+        confirmBackdrop.style.display = 'block';
+        confirmModal.style.display = 'block';
+        
+        setTimeout(() => {
+            confirmModal.style.opacity = '1';
+            confirmModal.style.transform = 'translate(-50%, -50%) scale(1)';
+        }, 50);
+    }
+
+    function closeConfirmSubmitModal() {
+        const confirmModal = document.getElementById('confirmSubmitModal');
+        const confirmBackdrop = document.getElementById('confirmSubmitBackdrop');
+        if (confirmModal) {
+            confirmModal.style.opacity = '0';
+            confirmModal.style.transform = 'translate(-50%, -50%) scale(0.9)';
+            setTimeout(() => {
+                confirmModal.style.display = 'none';
+                if (confirmBackdrop) confirmBackdrop.style.display = 'none';
+            }, 300);
+        }
+    }
+
+    function submitQuizForm() {
+        quizStarted = false;
+        clearInterval(timerInterval);
+        if (document.fullscreenElement) {
+            document.exitFullscreen().catch(() => {});
+        }
+        document.getElementById("quiz-form").submit();
+    }
 </script>
 {% endblock %}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Foydalanuvchilar ro‘yxati</title>
+    <title>Foydalanuvchilar ro'yxati</title>
     <!-- Google Fonts va FontAwesome Ikonkalar -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -515,7 +515,7 @@
     <div class="sidebar collapsed" id="sidebar">
         <div class="toggle-container">
             <img src="{{ global_image }}" alt="Logatip photo">
-            <div class="brand">FUMAISAK</div>
+            <div class="brand">{{ site_name|default:"Tizim" }}</div>
             <button class="toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
         </div>
 
@@ -527,7 +527,13 @@
             {% endif %}
             <div style="display: flex; flex-direction: column;">
                 <span class="span">Admin</span>
-                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">{{ user.username }}</span>
+                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">
+                    {% if user.first_name or user.last_name %}
+                        {{ user.first_name }} {{ user.last_name }}
+                    {% else %}
+                        {{ user.username }}
+                    {% endif %}
+                </span>
             </div>
         </div>
 
@@ -549,7 +555,7 @@
         <div class="header">
             <button class="toggle-main" id="mainToggle"><i class="fas fa-bars"></i></button>
             <div class="user-profile">
-                <a href="{% url 'admin_password' %}"><i class="fas fa-key"></i> Parolni o‘zgartirish</a>
+                <a href="{% url 'admin_password' %}"><i class="fas fa-key"></i> Parolni o'zgartirish</a>
                 <a href="javascript:void(0);" id="profile-btn">
                     {% if user.profile_image %}
                     <img src="{{ user.profile_image.url }}" alt="User profile" class="user_profile_img">
@@ -559,20 +565,20 @@
                 </a>
                 <div class="dropdown-panel" id="profile-panel">
                     <a href="{% url 'admin:index' %}" class="dropdown-item"><i class="fas fa-cogs"></i> Django Admin</a>
-                    <a href="{% url 'login' %}" class="dropdown-item" style="color: #ff808b;"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
+                    <a href="{% url 'logout' %}" class="dropdown-item" style="color: #ff808b;"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
                 </div>
             </div>
         </div>
 
         <div class="konteyner">
-            <h2 class="sarlavha">Foydalanuvchilar Ro‘yxati</h2>
+            <h2 class="sarlavha">Foydalanuvchilar Ro'yxati</h2>
 
             <div class="filters">
-                <input type="text" id="searchInput" placeholder="Ism, login bo‘yicha qidiring...">
+                <input type="text" id="searchInput" placeholder="Ism, login bo'yicha qidiring...">
                 <select id="roleFilter">
                     <option value="all">Barchasi</option>
                     <option value="teacher">Ustoz</option>
-                    <option value="student">O‘quvchi</option>
+                    <option value="student">O'quvchi</option>
                 </select>
             </div>
 
@@ -592,7 +598,7 @@
                         <div class="user-info-row">
                             <strong>Rol</strong>
                             <span class="role-badge {% if u.role == 'teacher' %}role-teacher{% else %}role-student{% endif %}">
-                                {% if u.role == 'teacher' %}Ustoz{% elif u.role == 'student' %}O‘quvchi{% else %}Noma’lum{% endif %}
+                                {% if u.role == 'teacher' %}Ustoz{% elif u.role == 'student' %}O'quvchi{% else %}Noma'lum{% endif %}
                             </span>
                         </div>
                         
@@ -603,7 +609,7 @@
 
                         {% if u.role == 'student' %}
                             <div class="user-info-row">
-                                <strong>O‘qituvchilar soni</strong>
+                                <strong>O'qituvchilar soni</strong>
                                 <span>{{ u.related_teachers_count }}</span>
                             </div>
                         {% endif %}

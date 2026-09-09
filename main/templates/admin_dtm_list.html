@@ -1,0 +1,318 @@
+{% extends 'baseadmin.html' %}
+{% load static %}
+
+{% block title %}DTM imtihonlari | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .sarlavha {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #ffffff;
+            border-left: 4px solid #00f2fe;
+            padding-left: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn-dtm {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            color: #00f2fe;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 700;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .btn-dtm:hover {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-dtm-success {
+            background: rgba(0, 255, 170, 0.08);
+            border: 1px solid rgba(0, 255, 170, 0.2);
+            color: #00ffaa;
+        }
+        .btn-dtm-success:hover {
+            background: linear-gradient(135deg, #00ffaa, #00b3ff);
+            color: #070a12;
+            box-shadow: 0 0 15px rgba(0, 255, 170, 0.4);
+        }
+
+        .btn-dtm-warning {
+            background: rgba(255, 159, 67, 0.08);
+            border: 1px solid rgba(255, 159, 67, 0.2);
+            color: #ff9f43;
+        }
+        .btn-dtm-warning:hover {
+            background: linear-gradient(135deg, #ff9f43, #ff5252);
+            color: #070a12;
+            box-shadow: 0 0 15px rgba(255, 159, 67, 0.4);
+        }
+
+        .jadval-container {
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-height: calc(100vh - 240px);
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th {
+            padding: 16px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            position: sticky;
+            top: 0;
+            background: #080d1a;
+            z-index: 2;
+        }
+        td {
+            padding: 14px 18px;
+            font-size: 13.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.8);
+            vertical-align: middle;
+        }
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+            color: #ffffff;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-link {
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            transition: 0.2s;
+        }
+        .action-link:hover {
+            background: rgba(255,255,255,0.05);
+            color: #ffffff;
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .action-link.cyan {
+            border-color: rgba(0, 242, 254, 0.2);
+            color: #00f2fe;
+            background: rgba(0, 242, 254, 0.05);
+        }
+        .action-link.cyan:hover {
+            background: #00f2fe;
+            color: #000;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+        }
+
+        .action-link.green {
+            border-color: rgba(0, 255, 170, 0.2);
+            color: #00ffaa;
+            background: rgba(0, 255, 170, 0.05);
+        }
+        .action-link.green:hover {
+            background: #00ffaa;
+            color: #000;
+            box-shadow: 0 0 10px rgba(0, 255, 170, 0.3);
+        }
+
+        .stats-container {
+            background: rgba(11, 15, 25, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .stat-val {
+            font-size: 20px;
+            font-weight: 800;
+            color: #00f2fe;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .controls-row { flex-direction: column; }
+            .btn-dtm { width: 100%; text-align: center; justify-content: center; }
+            table, thead, tbody, th, td, tr { display: block; }
+            thead { display: none; }
+            tr {
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 16px;
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            }
+            td:last-child { border-bottom: none; }
+            td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: rgba(255, 255, 255, 0.4);
+                font-size: 11px;
+                text-transform: uppercase;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h2 class="sarlavha">Mock imtihonlari (DTM)</h2>
+
+    <!-- 📈 Savollar bazasi statistikasi -->
+    <div class="stats-container">
+        <h3 style="color: #ffffff; font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
+            <i class="fas fa-database" style="color: #00f2fe;"></i> Savollar bazasi statistikasi
+        </h3>
+        <div class="stats-grid">
+            <div class="stat-card" style="border-color: rgba(0, 242, 254, 0.15); display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <div class="stat-val" style="color: #00f2fe; font-size: 26px;">{{ total_questions }}</div>
+                <div class="stat-label">Jami savollar</div>
+            </div>
+            {% for s in stats %}
+                <div class="stat-card">
+                    <div class="stat-val" style="color: #ffffff; font-size: 15px; font-weight: 800; min-height: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; margin-bottom: 8px;">
+                        {{ s.subject }}
+                    </div>
+                    <div style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.6;">
+                        <div><b>Jami:</b> <span style="color: #00f2fe;">{{ s.total }} ta</span></div>
+                        <div><b>Majburiy:</b> <span style="color: #ffd700;">{{ s.compulsory }} ta</span></div>
+                        <div><b>Blok:</b> <span style="color: #00ffaa;">{{ s.block }} ta</span></div>
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 4px;">
+                            Qiyin: {{ s.hard }} | O'rta: {{ s.medium }} | Oson: {{ s.easy }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="controls-row">
+        <a href="{% url 'admin_dtm_create' %}" class="btn-dtm"><i class="fas fa-plus"></i> Yangi imtihon yaratish</a>
+        <a href="{% url 'admin_dtm_questions_list' %}" class="btn-dtm" style="background: rgba(79, 172, 254, 0.08); border-color: rgba(79, 172, 254, 0.2); color: #4facfe;"><i class="fas fa-list"></i> Savollar bazasi (DTM)</a>
+        <a href="{% url 'admin_dtm_upload_ai' %}" class="btn-dtm btn-dtm-success"><i class="fas fa-plus-circle"></i> Savollar kiritish</a>
+        <a href="{% url 'dtm_bubble_sheet_pdf' %}" target="_blank" class="btn-dtm"><i class="fas fa-file-download"></i> Javoblar varaqasi (PDF)</a>
+        <a href="{% url 'admin_dtm_omr_scan' %}" class="btn-dtm btn-dtm-warning"><i class="fas fa-qrcode"></i> AI OMR skaner (Tekshirish)</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.2); color: #00ffaa; padding: 12px 20px; border-radius: 12px; margin-bottom: 20px; font-size: 13.5px;">
+                {{ message|safe }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="jadval-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>IMTIHON NOMI</th>
+                    <th>RO'YXATDAN O'TISH MUDDATI</th>
+                    <th>IMTIHON KUNI</th>
+                    <th style="text-align: center;">FAN BLOKLARI VA BALLARI</th>
+                    <th>HOLATI</th>
+                    <th style="width: 250px;">AMALLAR</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exam in exams %}
+                    <tr>
+                        <td data-label="IMTIHON NOMI" style="font-weight: 700; color: #ffffff;">{{ exam.title }}</td>
+                        <td data-label="RO'YXATDAN O'TISH MUDDATI" style="font-family: monospace; color: #ff9f43;">{{ exam.registration_deadline|date:"d.m.Y H:i" }}</td>
+                        <td data-label="IMTIHON KUNI" style="font-family: monospace; color: #00f2fe;">{{ exam.exam_date|date:"d.m.Y H:i" }}</td>
+                        <td data-label="FAN BLOKLARI VA BALLARI" style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5;">
+                            <div><b>1-blok:</b> {{ exam.block1_questions_count }} savol / {{ exam.block1_score }} ball</div>
+                            <div><b>2-blok:</b> {{ exam.block2_questions_count }} savol / {{ exam.block2_score }} ball</div>
+                            <div><b>Majburiy:</b> 3 x {{ exam.compulsory_questions_count }} savol / {{ exam.compulsory_score }} ball</div>
+                        </td>
+                        <td data-label="HOLATI">
+                            {% if exam.is_active %}
+                                <span style="background: rgba(0, 255, 170, 0.1); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.2); padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 11px;">FAOL</span>
+                            {% else %}
+                                <span style="background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 11px;">FAOL EMAS</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="AMALLAR">
+                            <div class="action-row">
+                                <a href="{% url 'admin_dtm_registrations' exam.id %}" class="action-link cyan"><i class="fas fa-users"></i> Ro'yxatdan o'tganlar</a>
+                                <a href="{% url 'admin_dtm_edit' exam.id %}" class="action-link" style="border-color: rgba(255, 159, 67, 0.2); color: #ff9f43; background: rgba(255, 159, 67, 0.05);"><i class="fas fa-edit"></i> Tahrirlash</a>
+                                <a href="{% url 'admin_dtm_results_view' exam.id %}" class="action-link green"><i class="fas fa-trophy"></i> Natijalar</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: rgba(255,255,255,0.3); padding: 40px 20px;">
+                            <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 40px 20px; text-align: center;">
+                                <i class="fas fa-clipboard-check" style="font-size: 36px; color: rgba(255,255,255,0.2); margin-bottom: 15px; display: inline-block;"></i>
+                                <h4 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">DTM imtihonlari topilmadi</h4>
+                                <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin: 0;">Hozircha hech qanday DTM imtihoni yaratilmagan.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

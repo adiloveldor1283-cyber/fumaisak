@@ -1,0 +1,79 @@
+{% extends "baseadmin.html" %}
+
+{% block title %}Bloklangan sahifalar | VLE Tizimi{% endblock %}
+
+{% block content %}
+<div style="padding: 10px; display: flex; flex-direction: column; width: 100%;">
+    
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-shrink: 0; flex-wrap: wrap; gap: 15px;">
+        <div>
+            <h2 style="color: var(--text-primary); font-size: 24px; font-weight: 800; margin-bottom: 4px; letter-spacing: 0.5px; border-left: 4px solid #ff0055; padding-left: 12px;">Bloklangan sahifalar</h2>
+            <p style="color: var(--text-secondary); font-size: 13.5px; font-weight: 500; margin: 0;">Xatoliklar tufayli avtomatik cheklangan yoki yopilgan sahifalar boshqaruvi</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <a href="{% url 'admin_error_logs' %}" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-card); color: var(--text-primary); font-weight: 700; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-size: 13.5px; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s;">
+                <i class="fas fa-bug" style="color: #ff0055;"></i> Xatoliklar jurnali
+            </a>
+        </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="jadval-container" style="flex-grow: 1; overflow-y: auto; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: var(--shadow-panel);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border-dropdown); background: var(--table-header-bg); position: sticky; top: 0; z-index: 10;">
+                    <th style="padding: 16px 20px; color: var(--accent-primary); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 30%;">BLOKLANGAN URL MANZIL</th>
+                    <th style="padding: 16px 20px; color: var(--accent-primary); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 40%;">BLOKLANISH SABABI (XATOLIK)</th>
+                    <th style="padding: 16px 20px; color: var(--accent-primary); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 15%; text-align: center;">HOLAT</th>
+                    <th style="padding: 16px 20px; color: var(--accent-primary); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 15%; text-align: center;">AMALLAR</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if pages %}
+                    {% for page in pages %}
+                        <tr style="border-bottom: 1px solid var(--table-border); transition: background 0.2s;" onmouseover="this.style.background='var(--table-row-hover)';" onmouseout="this.style.background='none';">
+                            <td data-label="Bloklangan URL manzil" style="padding: 18px 20px; font-size: 13.5px; font-family: monospace; color: var(--text-primary); font-weight: 700; word-break: break-all;">
+                                {{ page.url_path }}
+                            </td>
+                            <td data-label="Bloklanish sababi" style="padding: 18px 20px; font-size: 13.5px; color: var(--text-secondary); font-weight: 500; word-break: break-word;">
+                                {{ page.reason }}
+                                <small style="display: block; color: var(--text-muted); margin-top: 4px; font-weight: 500;"><i class="fas fa-clock"></i> Bloklangan vaqt: {{ page.locked_at|date:"d.m.Y H:i:s" }}</small>
+                            </td>
+                            <td data-label="Holat" style="padding: 18px 20px; text-align: center;">
+                                {% if page.is_active %}
+                                    <span style="background: rgba(255, 0, 85, 0.08); border: 1px solid rgba(255, 0, 85, 0.25); color: #ff0055; padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;">Bloklangan</span>
+                                {% else %}
+                                    <span style="background: rgba(0, 255, 170, 0.08); border: 1px solid rgba(0, 255, 170, 0.25); color: #00ffaa; padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;">Faol (Ochiq)</span>
+                                {% endif %}
+                            </td>
+                            <td data-label="Amallar" style="padding: 18px 20px; text-align: center;">
+                                {% if page.is_active %}
+                                    <form action="{% url 'admin_unlock_page' page.id %}" method="POST" style="margin: 0;">
+                                        {% csrf_token %}
+                                        <button type="submit" style="background: var(--accent-bg-glow); border: 1px solid var(--accent-border-glow); color: var(--accent-primary); font-weight: 700; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 12.5px; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;">
+                                            <i class="fas fa-lock-open"></i> Blokdan chiqarish
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span style="color: var(--text-muted); font-size: 12.5px; font-weight: 600;">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4" style="padding: 50px 20px; text-align: center;">
+                            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                <i class="fas fa-shield-alt" style="font-size: 42px; margin-bottom: 12px; color: var(--accent-primary); opacity: 0.4;"></i>
+                                <h4 style="color: var(--text-primary); font-size: 16px; font-weight: 700; margin-bottom: 6px;">Bloklangan sahifalar mavjud emas</h4>
+                                <p style="color: var(--text-muted); font-size: 13.5px; margin: 0;">Tizimda xatolik tufayli cheklangan yoki yopilgan sahifalar topilmadi.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,43 +1,157 @@
 {% extends 'baseadmin.html' %}
 {% load static %}
 
-{% block title %}To'lov tarixi{% endblock %}
+{% block title %}{{ student.first_name }} {{ student.last_name }} to'lov tarixi | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .konteyner {
+        overflow-y: auto !important;
+        display: flex;
+        flex-direction: column;
+    }
+    .jadval-container {
+        width: 100%;
+        overflow-x: auto !important;
+        overflow-y: auto !important;
+        max-height: calc(100vh - 220px);
+    }
+    table {
+        width: max-content !important;
+        min-width: 100% !important;
+        white-space: nowrap;
+    }
+    .back-arrow-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: #ffffff;
+        transition: 0.3s;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .back-arrow-btn:hover {
+        background: rgba(0, 242, 254, 0.1);
+        border-color: rgba(0, 242, 254, 0.3);
+        color: #00f2fe;
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+    }
+    
+    html.light-theme .back-arrow-btn {
+        background: rgba(0, 0, 0, 0.02) !important;
+        border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        color: #0f172a !important;
+    }
+    html.light-theme .back-arrow-btn:hover {
+        background: rgba(2, 132, 199, 0.07) !important;
+        border-color: rgba(2, 132, 199, 0.3) !important;
+        color: #0284c7 !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.15);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-    <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">{{ student.first_name }} {{ student.last_name }} to'lov tarixi</h2>
-    <a href="{% url 'student_list' %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-arrow-left"></i> Orqaga</a>
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="{% url 'student_list' %}" class="back-arrow-btn" title="Orqaga">
+            <i class="fas fa-chevron-left" style="font-size: 16px;"></i>
+        </a>
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">{{ student.first_name }} {{ student.last_name }} - to'lov tarixi</h2>
+    </div>
+
+    <!-- QIDIRUV FORMASI -->
+    <form class="search-form" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
+        <input type="text" class="search-input" id="payment-search" placeholder="Guruh yoki oy bo'yicha..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+        <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+    </form>
 </div>
 
 {% if grouped_payments %}
-    {% for item in grouped_payments %}
-        <h4 class="guruh-nomi" style="font-size: 15px; font-weight: 800; color: #00f2fe; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-layer-group" style="font-size: 14px;"></i> {{ item.group.name }}</h4>
-        <div class="jadval-container" style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 12px; width: 100%; overflow-x: auto; margin-bottom: 25px;">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                <thead>
-                    <tr>
-                        <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Oy</th>
-                        <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Kurs davomiyligi</th>
-                        <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">To‘lash kerak</th>
-                        <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">To‘langan summa</th>
-                        <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">To‘langan vaqti</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for payment in item.payments %}
-                        <tr>
-                            <td data-label="Oy" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ payment.month }}</td>
-                            <td data-label="Kurs davomiyligi" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">{{ item.group.payment_info.course_duration_months }} oy</td>
-                            <td data-label="To‘lash kerak" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #00f2fe; font-weight: 600;">{{ item.group.payment_info.monthly_fee }} so'm</td>
-                            <td data-label="To‘langan summa" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #00ffaa; font-weight: 700;">{{ payment.amount_paid }} so'm</td>
-                            <td data-label="To‘langan vaqti" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ payment.paid_at|date:"Y-m-d H:i" }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% endfor %}
+    <div id="payment-blocks-container">
+        {% for item in grouped_payments %}
+            <div class="guruh-payment-block" style="margin-bottom: 25px;">
+                <h4 class="guruh-nomi" style="font-size: 15px; font-weight: 800; color: #00f2fe; text-transform: uppercase; letter-spacing: 0.5px;  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-layer-group" style="font-size: 14px;"></i> {{ item.group.name }}</h4>
+                <div class="jadval-container" style="flex-grow: 1; overflow-y: auto; overflow-x: auto; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); background: #080d1a; position: sticky; top: 0; z-index: 10;">
+                                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">OY</th>
+                                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">KURS DAVOMIYLIGI</th>
+                                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">TO'LASH KERAK</th>
+                                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">TO'LANGAN SUMMA</th>
+                                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">TO'LANGAN VAQTI</th>
+                                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">KVITANSIYA / CHEK</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in item.payments %}
+                                <tr>
+                                    <td data-label="Oy" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ payment.month }}</td>
+                                    <td data-label="Kurs davomiyligi" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">{{ item.group.payment_info.course_duration_months }} oy</td>
+                                    <td data-label="To'lash kerak" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #00f2fe; font-weight: 600;">{{ item.group.payment_info.monthly_fee }} so'm</td>
+                                    <td data-label="To'langan summa" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #00ffaa; font-weight: 700;">{{ payment.amount_paid }} so'm</td>
+                                    <td data-label="To'langan vaqti" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ payment.paid_at|date:"d.m.Y H:i" }}</td>
+                                    <td data-label="Kvitansiya" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><a href="{% url 'payment_receipt' payment.id %}" class="btn-otish" style="display: inline-block; padding: 6px 12px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 12.5px; font-weight: 600; transition: 0.3s; text-align: center;"><i class="fas fa-file-pdf"></i> Chek yuklab olish</a></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 {% else %}
-    <p style="color: rgba(255,255,255,0.4); font-style: italic; text-align: center; padding: 30px;">To‘lov ma'lumotlari yo‘q.</p>
+    <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 40px 20px; text-align: center; margin-top: 20px;">
+        <i class="fas fa-receipt" style="font-size: 40px; color: rgba(255, 255, 255, 0.2); margin-bottom: 15px; display: block;"></i>
+        <h4 style="color: rgba(255, 255, 255, 0.8); font-size: 16px; margin-bottom: 8px;">To'lov ma'lumotlari mavjud emas</h4>
+        <p style="color: rgba(255, 255, 255, 0.4); font-size: 13.5px; margin: 0;">Ushbu o'quvchi bo'yicha to'lovlar tarixi topilmadi.</p>
+    </div>
 {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("payment-search");
+        if (searchInput) {
+            searchInput.addEventListener("input", function () {
+                const searchTerm = this.value.toLowerCase().trim();
+                const blocks = document.querySelectorAll(".guruh-payment-block");
+
+                blocks.forEach(block => {
+                    const groupTitle = block.querySelector(".guruh-nomi").textContent.toLowerCase();
+                    const tableRows = block.querySelectorAll("tbody tr");
+                    let hasMatchingRow = false;
+
+                    tableRows.forEach(row => {
+                        const monthCell = row.querySelector('[data-label="Oy"]');
+                        const monthText = monthCell ? monthCell.textContent.toLowerCase() : "";
+                        
+                        if (monthText.includes(searchTerm) || groupTitle.includes(searchTerm)) {
+                            row.style.display = "";
+                            hasMatchingRow = true;
+                        } else {
+                            row.style.display = "none";
+                        }
+                    });
+
+                    if (hasMatchingRow || groupTitle.includes(searchTerm)) {
+                        block.style.display = "";
+                        if (groupTitle.includes(searchTerm) && !hasMatchingRow) {
+                            tableRows.forEach(row => row.style.display = "");
+                        }
+                    } else {
+                        block.style.display = "none";
+                    }
+                });
+            });
+        }
+    });
+</script>
 {% endblock %}

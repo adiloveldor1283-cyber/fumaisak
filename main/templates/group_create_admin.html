@@ -1,822 +1,270 @@
+{% extends 'baseadmin.html' %}
 {% load static %}
-<html lang="uz">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Guruh Qo'shish</title>
-    <!-- Google Fonts va FontAwesome Ikonkalar -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+{% block title %}Guruh yaratish | VLE Tizimi{% endblock %}
 
-        body {
-            background: #070a12;
-            color: #ffffff;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+{% block extra_css %}
+<style>
+    .section-title {
+        background: rgba(0, 242, 254, 0.05);
+        border-left: 4px solid #00f2fe;
+        color: #00f2fe;
+        padding: 10px 15px;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 30px;
+        margin-bottom: 15px;
+        border-radius: 0 8px 8px 0;
+    }
 
-        /* Cyberpunk Orqa Fon */
-        .cyber-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.03;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Cpath d='M0,150 Q200,80 500,200 T1000,80 T1500,250' fill='none' stroke='%2300f2fe' stroke-width='3'/%3E%3C/svg%3E");
-            background-size: cover;
-        }
+    .dual-list-container {
+        display: grid;
+        grid-template-columns: 1fr 50px 1fr;
+        gap: 15px;
+        align-items: center;
+        margin-bottom: 30px;
+    }
 
-        /* Sidebar */
-        .sidebar {
-            background: rgba(11, 15, 25, 0.6);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            color: white;
-            width: 250px;
-            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            z-index: 1001;
-        }
-        .sidebar.collapsed {
-            width: 70px;
-        }
-        .sidebar .toggle-container {
-            position: relative;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            padding-left: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .sidebar .toggle-container img {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 2px solid rgba(0, 242, 254, 0.2);
-        }
-        .toggle-btn {
-            margin-left: 30px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 2;
-            transition: 0.3s;
-        }
-        .toggle-btn:hover {
-            color: #00f2fe;
-        }
-        .brand {
-            font-size: 20px;
-            font-weight: bold;
-            margin-left: 15px;
-            background: linear-gradient(135deg, #00f2fe, #4facfe);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .sidebar.collapsed .brand {
-            display: none;
-        }
-        .sidebar.collapsed .toggle-btn {
-            display: none;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            gap: 12px;
-            transition: opacity 0.2s;
-            line-height: 1.6;
-        }
-        .toggle-main {
-            margin-left: 20px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .toggle-main:hover {
-            color: #00f2fe;
-        }
-        .toggle-main {
-            display: none;
-        }
-        .sidebar.collapsed ~ .main .toggle-main {
-            display: inline-block;
-        }
-        .user-info img {
-            width: 40px;
-            height: 40px;
-            min-width: 40px;
-            max-width: 40px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .user-info span {
-            font-size: 11px;
-            white-space: nowrap;
-            color: rgba(255, 255, 255, 0.5);
-        }
-        .span {
-            text-transform: uppercase;
-            font-size: 14px;
-            font-weight: 700;
-            color: #00f2fe !important;
-        }
-        .sidebar.collapsed .user-info span {
-            display: none;
-        }
-        .sidebar ul {
-            margin-top: 10px;
-            list-style: none;
-            padding: 8px;
-            flex-grow: 1;
-        }
-        .sidebar ul li {
-            display: flex;
-            align-items: center;
-            border-radius: 12px;
-            transition: 0.3s;
-            cursor: pointer;
-            margin-bottom: 4px;
-        }
-        .sidebar ul li:hover {
-            background: rgba(255, 255, 255, 0.03);
-        }
-        .sidebar ul li:hover a i, .sidebar ul li:hover a span {
-            color: #00f2fe;
-        }
-        .sidebar ul li a {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.6);
-            width: 100%;
-            padding: 14px 16px;
-            font-weight: 600;
-        }
-        .sidebar ul li a i {
-            font-size: 16px;
-            width: 24px;
-            text-align: center;
-            flex-shrink: 0;
-            transition: 0.3s;
-        }
-        .sidebar ul li a span {
-            margin-left: 12px;
-            white-space: nowrap;
-            font-size: 14px;
-            transition: 0.3s;
-        }
-        .sidebar.collapsed ul li a span {
-            display: none;
-        }
+    .list-box {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .list-box h3 {
+        font-size: 13px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.6);
+    }
+    .list-box select {
+        height: 180px;
+        width: 100%;
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        color: white;
+        padding: 10px;
+        outline: none;
+        font-size: 13.5px;
+    }
+    .list-box select option {
+        background: #0c101d;
+        padding: 6px 10px;
+        border-radius: 4px;
+        margin-bottom: 2px;
+    }
 
-        /* Main Layout */
-        .main {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            position: relative;
-            z-index: 1;
-        }
+    .search-box {
+        width: 100%;
+        padding: 8px 14px;
+        background: rgba(255,255,255,0.01);
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 8px;
+        color: white;
+        font-size: 13px;
+        outline: none;
+    }
+    .search-box:focus {
+        border-color: #00f2fe;
+    }
 
-        /* Header Style */
-        .header {
-            color: white;
-            background: rgba(11, 15, 25, 0.4);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            height: 69px;
-            min-height: 69px;
-            display: flex;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+    .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        justify-content: center;
+        align-items: center;
+    }
+    .controls button {
+        background: rgba(0, 242, 254, 0.1);
+        border: 1px solid rgba(0, 242, 254, 0.3);
+        color: #00f2fe;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .controls button:hover {
+        background: #00f2fe;
+        color: #070a12;
+    }
 
-        /* Profile and Notifications */
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            margin-left: auto;
-            justify-content: flex-end;
-            position: relative;
-            padding-right: 20px;
-        }
+    .time-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-top: 15px;
+    }
 
-        .user_profile_img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid rgba(255, 255, 255, 0.05);
-            transition: 0.3s;
-        }
-        .user_profile_img:hover {
-            border-color: #00f2fe;
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
-        }
-
-        /* Cyber Dropdown Panel */
-        .dropdown-panel {
-            position: absolute;
-            top: 55px;
-            background: #0c101d;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-            border-radius: 16px;
-            width: 200px;
-            padding: 16px;
-            display: none;
-            z-index: 1002;
-            color: #ffffff;
-        }
-        .dropdown-item {
-            padding: 10px 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            font-size: 13px;
-            text-decoration: none;
-            color: rgba(255,255,255,0.8);
-            display: block;
-            transition: 0.2s;
-        }
-        .dropdown-item:hover {
-            background: rgba(255,255,255,0.02);
-            color: #00f2fe;
-        }
-        .dropdown-item i {
-            color: #4facfe;
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-        .dropdown-panel.active {
-            display: block;
-        }
-        #profile-panel {
-            right: 15px;
-        }
-
-        /* Content Area */
-        .konteyner {
-            background-color: transparent;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            height: calc(100vh - 69px);
-            overflow-y: auto;
-            width: 100%;
-        }
-
-        .sarlavha-qatori {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .sarlavha {
-            font-size: 22px;
-            font-weight: 800;
-            color: #ffffff;
-            border-left: 4px solid #00f2fe;
-            padding-left: 12px;
-            letter-spacing: -0.5px;
-        }
-
-        .btn-otish {
-            display: inline-block;
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.15);
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            transition: 0.3s;
-            text-align: center;
-            cursor: pointer;
-        }
-        .btn-otish:hover {
-            background: linear-gradient(135deg, #00f2fe, #4facfe);
-            color: #070a12;
-            border-color: transparent;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
-        }
-
-        /* Cyber Form Card */
-        .form-card {
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            width: 100%;
-            margin: 0 auto;
-        }
-
-        .form-group {
-            margin-bottom: 22px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.4);
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 18px;
-            font-size: 14px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            color: white;
-            outline: none;
-            transition: 0.3s;
-        }
-        .form-control:focus {
-            border-color: #00f2fe;
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
-        }
-
-        /* Dual List Styling */
-        .section-title {
-            background: rgba(0, 242, 254, 0.05);
-            border-left: 4px solid #00f2fe;
-            color: #00f2fe;
-            padding: 10px 15px;
-            font-size: 13px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            border-radius: 0 8px 8px 0;
-        }
-
+    @media (max-width: 768px) {
         .dual-list-container {
-            display: grid;
-            grid-template-columns: 1fr 50px 1fr;
-            gap: 15px;
-            align-items: center;
-            margin-bottom: 30px;
+            grid-template-columns: 1fr;
         }
-
-        .list-box {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .list-box h3 {
-            font-size: 13px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.6);
-        }
-        .list-box select {
-            height: 180px;
-            width: 100%;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            color: white;
-            padding: 10px;
-            outline: none;
-            font-size: 13.5px;
-        }
-        .list-box select option {
-            background: #0c101d;
-            padding: 6px 10px;
-            border-radius: 4px;
-            margin-bottom: 2px;
-        }
-
-        .search-box {
-            width: 100%;
-            padding: 8px 14px;
-            background: rgba(255,255,255,0.01);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 8px;
-            color: white;
-            font-size: 13px;
-            outline: none;
-        }
-        .search-box:focus {
-            border-color: #00f2fe;
-        }
-
         .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            align-items: center;
-            justify-content: center;
+            flex-direction: row;
         }
-        .controls button {
-            width: 38px;
-            height: 38px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: white;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-        .controls button:hover {
-            background: #00f2fe;
-            color: #070a12;
-            border-color: transparent;
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
-        }
-
         .time-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 25px;
+            grid-template-columns: 1fr;
         }
+    }
+</style>
+{% endblock %}
 
-        .tugmalar {
-            display: flex;
-            gap: 12px;
-            margin-top: 35px;
-        }
-
-        .btn-submit {
-            flex: 1;
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #00f2fe, #4facfe);
-            color: #070a12;
-            font-weight: 800;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
-        }
-        .btn-submit:hover {
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
-        }
-
-        .btn-cancel {
-            flex: 1;
-            padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: white;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-weight: 800;
-            text-transform: uppercase;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .btn-cancel:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* --- 📱 MOBIL QURILMALAR MEDIA REJIMI --- */
-        @media (max-width: 768px) {
-            body {
-                overflow: auto;
-            }
-            .sidebar {
-                position: fixed;
-                height: 100vh;
-                transform: translateX(-100%);
-                z-index: 2000;
-                background: rgba(11, 15, 25, 0.98);
-            }
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            .sidebar.collapsed {
-                width: 250px;
-            }
-            .main .toggle-main {
-                display: inline-block;
-            }
-            .sidebar.collapsed.show .brand,
-            .sidebar.collapsed.show .toggle-btn,
-            .sidebar.collapsed.show .user-info span,
-            .sidebar.collapsed.show ul li a span {
-                display: inline !important;
-            }
-
-            .konteyner {
-                padding: 16px 12px;
-                height: auto;
-                overflow: visible;
-            }
-            #profile-panel {
-                right: 10px;
-                width: 180px;
-            }
-            .sarlavha-qatori {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            .btn-otish {
-                width: 100%;
-            }
-
-            .form-card {
-                padding: 20px;
-            }
-
-            .dual-list-container {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            .controls {
-                flex-direction: row;
-                margin: 10px 0;
-            }
-            .controls button {
-                transform: rotate(90deg);
-            }
-
-            .time-container {
-                grid-template-columns: 1fr;
-            }
-
-            .tugmalar {
-                flex-direction: column;
-            }
-            .btn-submit, .btn-cancel {
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="cyber-bg"></div>
-
-    <!-- SIDEBAR PANEL -->
-    <div class="sidebar collapsed" id="sidebar">
-        <div class="toggle-container">
-            <img src="{{ global_image }}" alt="Logatip photo">
-            <div class="brand">FUMAISAK</div>
-            <button class="toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
-        </div>
-
-        <div class="user-info">
-            {% if user.profile_image %}
-                <img src="{{ user.profile_image.url }}" alt="User Photo">
-            {% else %}
-                <img src="{{ default_profile_image }}" alt="User Photo">
-            {% endif %}
-            <div style="display: flex; flex-direction: column;">
-                <span class="span">Admin</span>
-                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">{{ user.username }}</span>
-            </div>
-        </div>
-
-        <ul>
-            <li><a href="{% url 'all_groups_admin' %}"><i class="fas fa-layer-group"></i><span> Guruhlar</span></a></li>
-            <li><a href="{% url 'students_list_admin' %}"><i class="fas fa-user-graduate"></i><span> O'quvchilar</span></a></li>
-            <li><a href="{% url 'teachers_list_admin' %}"><i class="fas fa-chalkboard-teacher"></i><span> O'qituvchilar</span></a></li>
-            <li><a href="{% url 'admin_assignment_list' %}"><i class="fas fa-tasks"></i><span> Topshiriqlar</span></a></li>
-            <li><a href="{% url 'all_group_schedules' %}"><i class="fas fa-calendar-alt"></i><span> Dars rejasi</span></a></li>
-            <li><a href="{% url 'quiz_list' %}"><i class="fas fa-file-signature"></i><span> Testlar</span></a></li>
-            <li><a href="{% url 'question_list' %}"><i class="fas fa-question-circle"></i><span> Savollar</span></a></li>
-            <li><a href="{% url 'group_payment_list' %}"><i class="fas fa-credit-card"></i><span> Guruh to'lov</span></a></li>
-            <li><a href="{% url 'student_list' %}"><i class="fas fa-wallet"></i><span> Barcha to'lov</span></a></li>
-        </ul>
+{% block content %}
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="{% url 'all_groups_admin' %}" class="back-arrow-btn" title="Orqaga">
+            <i class="fas fa-chevron-left" style="font-size: 16px;"></i>
+        </a>
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Guruh yaratish</h2>
     </div>
+</div>
 
-    <!-- ASOSIY KONTENT MAYDONI -->
-    <div class="main">
-        <div class="header">
-            <button class="toggle-main" id="mainToggle"><i class="fas fa-bars"></i></button>
-            <div class="user-profile">
-                <a href="javascript:void(0);" id="profile-btn">
-                    {% if user.profile_image %}
-                    <img src="{{ user.profile_image.url }}" alt="User profile" class="user_profile_img">
-                    {% else %}
-                    <img src="{{ default_profile_image }}" alt="User profile" class="user_profile_img">
-                    {% endif %}
-                </a>
-                <div class="dropdown-panel" id="profile-panel">
-                    <a href="{% url 'admin:index' %}" class="dropdown-item"><i class="fas fa-cogs"></i> Django Admin</a>
-                    <a href="{% url 'login' %}" class="dropdown-item" style="color: #ff808b;"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
-                </div>
+<div class="form-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); width: 100%; margin: 0 auto;">
+    <form class="form-main" method="POST">
+        {% csrf_token %}
+
+        <div class="form-group" style="margin-bottom: 22px;">
+            <label for="group-name" style="display: block; font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Guruh nomi *</label>
+            <input type="text" class="form-control" id="group-name" name="group-name" placeholder="Masalan: Web Dasturlash" required style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; transition: 0.3s;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 22px;">
+            <label for="subject" style="display: block; font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Fan (ixtiyoriy)</label>
+            <select class="form-control" id="subject" name="subject" style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; transition: 0.3s; cursor: pointer;">
+                <option value="" style="background: #0c101d;">-- Fanni tanlang (ixtiyoriy) --</option>
+                {% for subject in all_subjects %}
+                    <option value="{{ subject.id }}" style="background: #0c101d;">{{ subject.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- O'QITUVCHILAR BO'LIMI -->
+        <div class="section-title">O'qituvchilar</div>
+
+        <div class="dual-list-container">
+            <div class="list-box">
+                <h3>Mavjud o'qituvchilar</h3>
+                <input type="text" class="search-box" data-target="available-teachers" placeholder="Familiya bo'yicha qidirish...">
+                <select id="available-teachers" multiple>
+                    {% for teacher in all_teachers %}
+                        <option value="{{ teacher.id }}">{{ teacher.last_name }} {{ teacher.first_name }} ({% for s in teacher.subjects.all %}{{ s.name }}{% if not forloop.last %}, {% endif %}{% empty %}Fan yo'q{% endfor %})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="controls">
+                <button type="button" onclick="moveSelected('available-teachers', 'selected-teachers')" title="O'tkazish"><i class="fas fa-chevron-right"></i></button>
+                <button type="button" onclick="moveSelected('selected-teachers', 'available-teachers')" title="Qaytarish"><i class="fas fa-chevron-left"></i></button>
+            </div>
+
+            <div class="list-box">
+                <h3>Tanlangan o'qituvchilar</h3>
+                <input type="text" class="search-box" data-target="selected-teachers" placeholder="Familiya bo'yicha qidirish...">
+                <select id="selected-teachers" name="selected_teachers" multiple></select>
             </div>
         </div>
 
-        <div class="konteyner">
-            <div class="sarlavha-qatori">
-                <h2 class="sarlavha">Guruh yaratish</h2>
-                <a href="{% url 'all_groups_admin' %}" class="btn-otish"><i class="fas fa-arrow-left"></i> Orqaga</a>
+        <!-- O'QUVCHILAR BO'LIMI -->
+        <div class="section-title">O'quvchilar</div>
+
+        <div class="dual-list-container">
+            <div class="list-box">
+                <h3>Mavjud o'quvchilar</h3>
+                <input type="text" class="search-box" data-target="available-students" placeholder="Familiya bo'yicha qidirish...">
+                <select id="available-students" multiple>
+                    {% for student in all_students %}
+                        <option value="{{ student.id }}">{{ student.last_name }} {{ student.first_name }} (O'quvchi)</option>
+                    {% endfor %}
+                </select>
             </div>
 
-            <div class="form-card">
-                <form class="form-main" method="POST">
-                    {% csrf_token %}
+            <div class="controls">
+                <button type="button" onclick="moveSelected('available-students', 'selected-students')" title="O'tkazish"><i class="fas fa-chevron-right"></i></button>
+                <button type="button" onclick="moveSelected('selected-students', 'available-students')" title="Qaytarish"><i class="fas fa-chevron-left"></i></button>
+            </div>
 
-                    <div class="form-group">
-                        <label for="group-name">Guruh nomini kiritish *</label>
-                        <input type="text" class="form-control" id="group-name" name="group-name" placeholder="Masalan: Web Full-Stack" required>
-                    </div>
-
-                    <!-- O'QITUVCHILAR BO'LIMI -->
-                    <div class="section-title">O'qituvchilar</div>
-
-                    <div class="dual-list-container">
-                        <div class="list-box">
-                            <h3>Mavjud o‘qituvchilar</h3>
-                            <input type="text" class="search-box" data-target="available-teachers" placeholder="Familiya bo'yicha qidiruv...">
-                            <select id="available-teachers" multiple>
-                                {% for teacher in all_teachers %}
-                                    <option value="{{ teacher.id }}">{{ teacher.last_name }} {{ teacher.first_name }} (O'qituvchi)</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="controls">
-                            <button type="button" onclick="moveSelected('available-teachers', 'selected-teachers')"><i class="fas fa-chevron-right"></i></button>
-                            <button type="button" onclick="moveSelected('selected-teachers', 'available-teachers')"><i class="fas fa-chevron-left"></i></button>
-                        </div>
-
-                        <div class="list-box">
-                            <h3>Tanlangan o‘qituvchilar</h3>
-                            <input type="text" class="search-box" data-target="selected-teachers" placeholder="Familiya bo'yicha qidiruv...">
-                            <select id="selected-teachers" name="selected_teachers" multiple></select>
-                        </div>
-                    </div>
-
-                    <!-- O'QUVCHILAR BO'LIMI -->
-                    <div class="section-title">O'quvchilar</div>
-
-                    <div class="dual-list-container">
-                        <div class="list-box">
-                            <h3>Mavjud o‘quvchilar</h3>
-                            <input type="text" class="search-box" data-target="available-students" placeholder="Familiya bo'yicha qidiruv...">
-                            <select id="available-students" multiple>
-                                {% for student in all_students %}
-                                    <option value="{{ student.id }}">{{ student.last_name }} {{ student.first_name }} (O'quvchi)</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="controls">
-                            <button type="button" onclick="moveSelected('available-students', 'selected-students')"><i class="fas fa-chevron-right"></i></button>
-                            <button type="button" onclick="moveSelected('selected-students', 'available-students')"><i class="fas fa-chevron-left"></i></button>
-                        </div>
-
-                        <div class="list-box">
-                            <h3>Tanlangan o‘quvchilar</h3>
-                            <input type="text" class="search-box" data-target="selected-students" placeholder="Familiya bo'yicha qidiruv...">
-                            <select id="selected-students" name="selected_students" multiple></select>
-                        </div>
-                    </div>
-
-                    <!-- SANA VA VAQT -->
-                    <div class="section-title">Guruh ochilgan vaqti</div>
-                    <div class="time-container">
-                        <div class="form-group" style="margin: 0;">
-                            <label for="date">Sana</label>
-                            <input type="date" class="form-control" id="date" name="date" value="{{ timezone.now|date:'Y-m-d' }}">
-                        </div>
-                        <div class="form-group" style="margin: 0;">
-                            <label for="time">Vaqt</label>
-                            <input type="time" class="form-control" id="time" name="time" value="{{ timezone.now|time:'H:i:s' }}">
-                        </div>
-                    </div>
-
-                    <div class="tugmalar">
-                        <button type="submit" class="btn-submit"><i class="fas fa-save" style="margin-right: 6px;"></i> SAQLASH</button>
-                        <a href="{% url 'all_groups_admin' %}" class="btn-cancel">Bekor qilish</a>
-                    </div>
-                </form>
+            <div class="list-box">
+                <h3>Tanlangan o'quvchilar</h3>
+                <input type="text" class="search-box" data-target="selected-students" placeholder="Familiya bo'yicha qidirish...">
+                <select id="selected-students" name="selected_students" multiple></select>
             </div>
         </div>
-    </div>
 
-    <!-- SCRIPT LOGIKASI -->
-    <script>
-        const sidebar = document.getElementById('sidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const mainToggle = document.getElementById('mainToggle');
+        <!-- SANA VA VAQT -->
+        <div class="section-title">Guruh ochilgan sana va vaqt</div>
+        <div class="time-container">
+            <div class="form-group" style="margin: 0;">
+                <label for="date" style="display: block; font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Sana</label>
+                <input type="date" class="form-control" id="date" name="date" value="{{ date_now|default:'' }}" style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; transition: 0.3s;">
+            </div>
+            <div class="form-group" style="margin: 0;">
+                <label for="time" style="display: block; font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Vaqt</label>
+                <input type="time" class="form-control" id="time" name="time" value="{{ time_now|default:'' }}" style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; transition: 0.3s;">
+            </div>
+        </div>
 
-        function toggleSidebar() {
-            if (window.innerWidth <= 768) {
-                sidebar.classList.toggle('show');
-            } else {
-                sidebar.classList.toggle('collapsed');
-            }
+        <div class="tugmalar" style="display: flex; gap: 12px; margin-top: 35px;">
+            <button type="submit" class="btn-submit" style="flex: 1; padding: 12px 24px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; transition: 0.3s; text-transform: uppercase;"><i class="fas fa-check" style="margin-right: 6px;"></i> Guruhni yaratish</button>
+            <a href="{% url 'all_groups_admin' %}" class="btn-cancel" style="flex: 1; padding: 12px 24px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); color: white; border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: 800; text-transform: uppercase; text-decoration: none; display: flex; align-items: center; justify-content: center;">Bekor qilish</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Familiya bosh harfiga qarab qidiruv qilish
+    function filterOptions(searchInput, targetSelectId) {
+        const searchTerm = searchInput.value.toLowerCase();
+        const targetSelect = document.getElementById(targetSelectId);
+        const options = targetSelect.options;
+
+        for (let i = 0; i < options.length; i++) {
+            const option = options[i];
+            const text = option.text.toLowerCase();
+
+            // Familiya deb birinchi so'zni olamiz
+            const words = text.trim().split(/\s+/);
+            const lastName = words[0] || "";
+
+            // Familiya boshlanishi mos bo'lsa ko'rsatamiz
+            option.hidden = !lastName.startsWith(searchTerm);
         }
+    }
 
-        sidebarToggle.addEventListener('click', toggleSidebar);
-        mainToggle.addEventListener('click', toggleSidebar);
-
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('show');
-            }
-        });
-
-        // Profile Dropdown
-        document.getElementById('profile-btn').addEventListener('click', function(e) {
-            document.getElementById('profile-panel').classList.toggle('active');
-            e.stopPropagation();
-        });
-
-        document.addEventListener('click', function() {
-            document.getElementById('profile-panel').classList.remove('active');
-        });
-
-        // Familiya bosh harfiga qarab qidiruv qilish
-        function filterOptions(searchInput, targetSelectId) {
-            const searchTerm = searchInput.value.toLowerCase();
-            const targetSelect = document.getElementById(targetSelectId);
-            const options = targetSelect.options;
-
-            for (let i = 0; i < options.length; i++) {
-                const option = options[i];
-                const text = option.text.toLowerCase();
-
-                // Familiya deb birinchi so‘zni olamiz
-                const words = text.trim().split(/\s+/);
-                const lastName = words[0] || "";
-
-                // Familiya boshlanishi mos bo‘lsa ko‘rsatamiz
-                option.hidden = !lastName.startsWith(searchTerm);
-            }
-        }
-
-        // Qidiruv inputlarining hodisasini ulash
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.search-box').forEach(input => {
-                const targetId = input.dataset.target;
-                input.addEventListener('input', function () {
-                    filterOptions(input, targetId);
-                });
-            });
-
-            // Form yuborilganda barcha tanlangan optionlarni selected qilamiz
-            document.querySelector('form').addEventListener('submit', function () {
-                document.querySelectorAll('#selected-teachers option, #selected-students option').forEach(option => {
-                    option.selected = true;
-                });
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.search-box').forEach(input => {
+            const targetId = input.dataset.target;
+            input.addEventListener('input', function () {
+                filterOptions(input, targetId);
             });
         });
 
-        // O‘qituvchi yoki talabani chapdan o‘ngga o‘tkazish
-        function moveSelected(fromId, toId) {
-            const from = document.getElementById(fromId);
-            const to = document.getElementById(toId);
-            const selected = Array.from(from.options).filter(option => option.selected);
-
-            selected.forEach(option => {
-                from.removeChild(option);
+        document.querySelector('form').addEventListener('submit', function () {
+            document.querySelectorAll('#selected-teachers option, #selected-students option').forEach(option => {
                 option.selected = true;
-                option.hidden = false; // yangi selectda ko‘rinsin
-                to.appendChild(option);
             });
-        }
-    </script>
-</body>
-</html>
+        });
+    });
+
+    // O'qituvchi yoki talabani chapdan o'ngga o'tkazish
+    function moveSelected(fromId, toId) {
+        const from = document.getElementById(fromId);
+        const to = document.getElementById(toId);
+        const selected = Array.from(from.options).filter(option => option.selected);
+
+        selected.forEach(option => {
+            from.removeChild(option);
+            option.selected = true;
+            option.hidden = false;
+            to.appendChild(option);
+        });
+    }
+</script>
+{% endblock %}

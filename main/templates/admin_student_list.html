@@ -1,46 +1,84 @@
 {% extends 'baseadmin.html' %}
 {% load static %}
 
-{% block title %}O'quvchilar ro'yhati{% endblock %}
+{% block title %}O'quvchilar ro'yxati | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .konteyner {
+        overflow-y: auto !important;
+        display: flex;
+        flex-direction: column;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .sarlavha-qatori, .search-bar {
+        flex-shrink: 0;
+    }
+
+    .jadval-container {
+        width: 100%;
+        overflow-x: auto !important;
+        overflow-y: auto !important;
+        max-height: calc(100vh - 220px);
+        min-height: 300px;
+    }
+
+    table {
+        width: max-content !important;
+        min-width: 100% !important;
+        white-space: nowrap;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <form method="POST" onsubmit="event.preventDefault();">
     {% csrf_token %}
-    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px;">O'quvchilarning to'lovlari ro'yhati</h2>
-    </div>
-
-    <div class="search-bar" style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); padding: 16px; border-radius: 16px;">
-        <input type="text" class="search-input" id="search-lastname" placeholder="Familiya bo'yicha qidirish..." style="flex: 1; min-width: 200px; padding: 12px 18px; font-size: 14px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; background: rgba(255, 255, 255, 0.01); color: #ffffff; outline: none; transition: 0.3s;">
-        <div class="filter-bar" style="display: flex; align-items: center; gap: 10px;">
-            <label for="status-filter" style="font-size: 13px; color: rgba(255,255,255,0.4); font-weight: 700; text-transform: uppercase;">Faollik</label>
-            <select id="status-filter" style="padding: 12px 18px; font-size: 13.5px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; background: #0c101d; color: #ffffff; outline: none; cursor: pointer; transition: 0.3s;">
-                <option value="">Hammasi</option>
-                <option value="faol">Faol</option>
-                <option value="bloklangan">Bloklangan</option>
-            </select>
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0; line-height: 1;">O'quvchilarning to'lovlari ro'yxati</h2>
+        
+        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <!-- QIDIRUV FORMASI -->
+            <div class="search-form" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
+                <input type="text" class="search-input" id="search-lastname" placeholder="Ism yoki familiya bo'yicha qidirish..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+                <i class="fas fa-search" style="color: var(--text-secondary); font-size: 13px; padding-left: 8px;"></i>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <select id="status-filter" style="padding: 8px 14px; font-size: 13px; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; background: #0c101d; color: #ffffff; outline: none; cursor: pointer; transition: 0.3s; font-weight: 600;">
+                    <option value="">Holati: Barchasi</option>
+                    <option value="faol">Faol</option>
+                    <option value="bloklangan">Bloklangan</option>
+                </select>
+            </div>
         </div>
     </div>
 
     {% if students %}
-    <div class="jadval-container" style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 12px; width: 100%; overflow-x: auto;">
+    <div class="jadval-container" style="flex-grow: 1; overflow-y: auto; overflow-x: auto; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
         <table class="group-table" style="width: 100%; border-collapse: collapse; text-align: left;">
             <thead>
-                <tr>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">NO</th>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); background: #080d1a; position: sticky; top: 0; z-index: 10;">
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">№</th>
                     <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FAMILIYASI</th>
                     <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">ISMI</th>
                     <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">QO'SHILGAN VAQTI</th>
                     <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">GURUHLARI</th>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FAOLLIGI</th>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">TO'LOVI</th>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">TO'LOV PDF</th>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">HOLATI</th>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">TO'LOV TARIXI</th>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">TO'LOV CHEKI (PDF)</th>
                 </tr>
             </thead>
             <tbody id="group-body">
                 {% for student in students %}
                 <tr>
-                    <td data-label="NO" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
+                    <td data-label="№" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
                     <td data-label="FAMILIYASI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ student.last_name }}</td>
                     <td data-label="ISMI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ student.first_name }}</td>
                     <td data-label="QO'SHILGAN VAQTI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ student.joined_at|date:"d.m.Y H:i" }}</td>
@@ -53,22 +91,26 @@
                             <span style="color: rgba(255,255,255,0.3)">Yo'q</span>
                         {% endif %}
                     </td>
-                    <td data-label="FAOLLIGI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                    <td data-label="HOLATI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
                         {% if student.is_active %}
                             <span class="status-badge status-active" data-status="faol" style="padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(0, 255, 170, 0.1); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.2);">Faol</span>
                         {% else %}
                             <span class="status-badge status-blocked" data-status="bloklangan" style="padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(255, 0, 85, 0.1); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.2);">Bloklangan</span>
                         {% endif %}
                     </td>
-                    <td data-label="TO'LOVI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><a href="{% url 'student_payment_history' student.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">O'tish</a></td>
-                    <td data-label="TO'LOV PDF" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><a href="{% url 'student_payment_pdf' student.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(255, 128, 139, 0.1); border: 1px solid rgba(255, 128, 139, 0.3); color: #ff808b; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-file-pdf"></i> PDF</a></td>
+                    <td data-label="TO'LOV TARIXI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><a href="{% url 'student_payment_history' student.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-history" style="margin-right: 5px;"></i> Tarix</a></td>
+                    <td data-label="TO'LOV CHEKI (PDF)" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><a href="{% url 'student_payment_pdf' student.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(255, 128, 139, 0.1); border: 1px solid rgba(255, 128, 139, 0.3); color: #ff808b; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-file-pdf" style="margin-right: 5px;"></i> Yuklab olish</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-        <p style="color: rgba(255,255,255,0.4); font-style: italic; padding: 10px;">Hech qanday o'quvchi topilmadi.</p>
+    <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 40px 20px; text-align: center; margin-top: 20px;">
+        <i class="fas fa-user-graduate" style="font-size: 36px; color: rgba(255, 255, 255, 0.2); margin-bottom: 15px; display: block;"></i>
+        <h4 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">O'quvchilar topilmadi</h4>
+        <p style="color: rgba(255, 255, 255, 0.4); font-size: 13px; margin: 0;">Tizimda hozircha birorta ham o'quvchi mavjud emas.</p>
+    </div>
     {% endif %}
 </form>
 {% endblock %}
@@ -76,7 +118,7 @@
 {% block extra_js %}
 <script>
     // Live search & status filters
-    const searchInput = document.querySelector('.search-input');
+    const searchInput = document.getElementById('search-lastname');
     const statusFilter = document.getElementById('status-filter');
     const rows = document.querySelectorAll('#group-body tr');
 
@@ -85,11 +127,12 @@
         const selectedStatus = statusFilter.value;
 
         rows.forEach(row => {
-            const lastName = row.children[1].textContent.toLowerCase(); // Familiya column
+            const lastName = row.children[1] ? row.children[1].textContent.toLowerCase() : '';
+            const firstName = row.children[2] ? row.children[2].textContent.toLowerCase() : '';
             const statusSpan = row.querySelector('.status-badge');
             const status = statusSpan ? statusSpan.getAttribute('data-status') : '';
 
-            const matchesQuery = lastName.includes(query);
+            const matchesQuery = lastName.includes(query) || firstName.includes(query);
             const matchesStatus = !selectedStatus || status === selectedStatus;
 
             row.style.display = (matchesQuery && matchesStatus) ? '' : 'none';

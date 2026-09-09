@@ -1,6 +1,6 @@
 {% extends 'basestudent.html' %}
 
-{% block title %}AI Maslahatchi & Kelgusi Reja - Student Profili{% endblock %}
+{% block title %}AI Maslahatchi va reja{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -312,15 +312,6 @@
             </form>
         {% endif %}
     </div>
-
-    {% if messages %}
-        {% for message in messages %}
-            <div class="toast {% if message.tags == 'error' %}toast-error{% endif %}">
-                <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
 
     {% if ai_plan %}
         <!-- MULTI-PANEL AREA -->

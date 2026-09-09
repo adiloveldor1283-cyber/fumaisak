@@ -3,15 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FUMA ISAK — Tizimga kirish</title>
-
-  <!-- Google Fonts va FontAwesome Ikonkalar -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-  {% if static_files_exist %}
-    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
-  {% endif %}
+  <title>Tizimga kirish | {{ site_name|default:"Tizim" }}</title>
+  <link rel="icon" type="image/png" href="{% url 'circular_favicon' %}">
+  <link rel="shortcut icon" type="image/png" href="{% url 'circular_favicon' %}">
+  <link rel="apple-touch-icon" href="{% url 'circular_favicon' %}">
 
   <style>
     * {
@@ -82,18 +77,38 @@
       justify-content: center;
       padding: 80px;
       position: relative;
+      overflow: hidden;
     }
 
-    /* Geometrik texnologik to'r foni */
-    .login-visual::before {
-      content: '';
+    /* Shaffof Orqa Fon Illyustratsiyasi (To'liq chap panelni egallaydi) */
+    .visual-bg-hero {
       position: absolute;
       inset: 0;
-      opacity: 0.15;
-      background-image: linear-gradient(rgba(0, 242, 254, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 254, 0.1) 1px, transparent 1px);
-      background-size: 40px 40px;
-      mask-image: radial-gradient(circle at 40% 50%, black, transparent 70%);
-      -webkit-mask-image: radial-gradient(circle at 40% 50%, black, transparent 70%);
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      opacity: 0.28;
+      z-index: 1;
+      pointer-events: none;
+      filter: contrast(110%) brightness(90%);
+      animation: bgHeroPulse 12s ease-in-out infinite alternate;
+    }
+
+    /* Qorong'u Gradiyent Qatlam — Matn aniq va chiroyli o'qilishi uchun */
+    .visual-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(7, 10, 18, 0.9) 0%, rgba(13, 21, 39, 0.65) 50%, rgba(7, 10, 18, 0.85) 100%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* Matnlar va Kontent Uchun Yuqori Qatlam (z-index: 5) */
+    .visual-content-box {
+      position: relative;
+      z-index: 5;
+      max-width: 540px;
     }
 
     .visual-brand {
@@ -116,6 +131,7 @@
       color: #ffffff;
       letter-spacing: -1px;
       margin-bottom: 20px;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
     }
     .visual-title span {
       background: linear-gradient(135deg, #00f2fe, #4facfe);
@@ -124,10 +140,49 @@
     }
 
     .visual-text {
-      font-size: 16px;
-      color: rgba(255, 255, 255, 0.4);
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.65);
       line-height: 1.6;
       max-width: 480px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Soddalashtirilgan Mayin Fon Animatsiyasi */
+    @keyframes bgHeroPulse {
+      0% {
+        transform: scale(1) translateY(0);
+        opacity: 0.25;
+      }
+      100% {
+        transform: scale(1.06) translateY(-8px);
+        opacity: 0.38;
+      }
+    }
+
+    /* Wave Bottom Animation */
+    .cyber-wave-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      line-height: 0;
+      z-index: 3;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .cyber-wave-svg {
+      position: relative;
+      display: block;
+      width: calc(150% + 1.3px);
+      height: 70px;
+      animation: waveMove 12s linear infinite;
+    }
+
+    @keyframes waveMove {
+      0% { transform: translateX(0); }
+      50% { transform: translateX(-25%); }
+      100% { transform: translateX(0); }
     }
 
     /* 🔐 O'NG TOMON — GLASSMORPHISM FORMA */
@@ -365,9 +420,31 @@
 
     <!-- 🎨 CHAP TOMON: BRAND VA VIZUAL EFFEKT MATRIX -->
     <div class="login-visual">
-      <div class="visual-brand">⚡ FUMA<span>ISAK</span></div>
-      <h2 class="visual-title">Kelajak ta'limi va <span>intellektual</span> boshqaruv tizimi</h2>
-      <p class="visual-text">Onlayn dars rejalari, imtihon topshirish modullari va guruhlar mukammalligi ekotizimiga xush kelibsiz. Davom etish uchun shaxsiy profilingizga kiring.</p>
+      <!-- Fullscreen Semi-transparent Background Animated Illustration -->
+      <img src="{% static 'imgs/login_illustration.png' %}" alt="Tizim Fon Grafikasi" class="visual-bg-hero" onerror="this.src='https://cdni.iconscout.com/illustration/premium/thumb/online-educational-platform-illustration-download-in-svg-png-gif-file-formats--e-learning-course-study-education-pack-school-illustrations-7789721.png?f=webp&h=700'">
+      
+      <!-- Gradient Overlay for Contrast -->
+      <div class="visual-overlay"></div>
+
+      <!-- Text Content Layer on Top -->
+      <div class="visual-content-box">
+        <div class="visual-brand">⚡ {{ site_name|default:"Tizim" }}</div>
+        <h2 class="visual-title">Kelajak ta'limi va <span>intellektual</span> boshqaruv tizimi</h2>
+        <p class="visual-text">Onlayn dars rejalari, imtihon topshirish modullari va guruhlar mukammalligi ekotizimiga xush kelibsiz. Davom etish uchun shaxsiy profilingizga kiring.</p>
+      </div>
+
+      <!-- Moving Wave Effect at Bottom -->
+      <div class="cyber-wave-container">
+        <svg class="cyber-wave-svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+          <path d="M0,0 C150,90 350,-40 500,40 C650,120 900,10 1200,40 L1200,120 L0,120 Z" fill="url(#waveGradient)"></path>
+          <defs>
+            <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.3" />
+              <stop offset="100%" stop-color="#4facfe" stop-opacity="0.1" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
     </div>
 
     <!-- 🔐 O'NG TOMON: PREMIUM AVTORIZATSIYA FORMASI -->
@@ -399,7 +476,7 @@
             <label for="password">Maxfiy parol</label>
             <div class="password-container">
               <input id="password" type="password" name="password" placeholder="Parolingizni kiriting" required autocomplete="current-password" />
-              <span id="togglePw" class="toggle-password" onclick="togglePassword()" aria-label="Parolni ko‘rsatish/yashirish" title="Parolni ko‘rsatish/yashirish">
+              <span id="togglePw" class="toggle-password" onclick="togglePassword()" aria-label="Parolni ko'rsatish/yashirish" title="Parolni ko'rsatish/yashirish">
                 <i class="far fa-eye" id="eyeIcon"></i>
               </span>
             </div>

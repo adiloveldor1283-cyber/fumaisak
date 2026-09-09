@@ -10,6 +10,11 @@ environ.Env.read_env()
 
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = env('SECRET_KEY')
+GEMINI_API_KEY = env('GEMINI_API_KEY', default=None)
+TELEGRAM_BOT_TOKEN = env('TELEGRAM_BOT_TOKEN', default=None)
+TELEGRAM_BOT_USERNAME = env('TELEGRAM_BOT_USERNAME', default=None)
+TELEGRAM_WEBHOOK_SECRET_TOKEN = env('TELEGRAM_WEBHOOK_SECRET_TOKEN', default=None)
+
 
 # DEBUG statusni .env fayldan o'qiymiz (lokal ishlash uchun default True qilinadi)
 DEBUG = env.bool('DEBUG', default=True)
@@ -35,9 +40,10 @@ INSTALLED_APPS = [
 ]
 
 UNFOLD = {
-    "SITE_TITLE": "FUMA ISAK Admin Panel",
-    "SITE_HEADER": "FUMA ISAK Boshqaruv Tizimi",
-    "SITE_SUBHEADER": "O'quv markaz admin paneli",
+    "SITE_TITLE": "DjangoProject.utils.get_admin_site_title",
+    "SITE_HEADER": "DjangoProject.utils.get_admin_site_header",
+    "SITE_SUBHEADER": "DjangoProject.utils.get_admin_site_subheader",
+    "SITE_ICON": "DjangoProject.utils.get_admin_site_icon",
     "THEME": "dark",  # default to dark theme
     "SHOW_HISTORY": True,
     "SIDEBAR": {
@@ -56,6 +62,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'main.middleware.NoCacheMiddleware',
+    'main.middleware.SessionDeviceTrackerMiddleware',
+    'main.middleware.ErrorTrackingMiddleware',
 ]
 
 ROOT_URLCONF = 'DjangoProject.urls'
@@ -74,6 +83,8 @@ TEMPLATES = [
                 'main.context_processors.all_student_notifications',
                 'main.context_processors.teacher_notifications',
                 'main.context_processors.site_images',
+                'main.context_processors.system_announcements',
+                'main.context_processors.error_notifications',
             ],
         },
     },
@@ -81,11 +92,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'DjangoProject.wsgi.application'
 
-# ✅ Lokal uchun SQLite
+# ✅ PostgreSQL 17 DATABASES sozlamalari
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / "db.sqlite3",
+        'ENGINE': env('DB_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': env('DB_NAME', default='fumaisak_db'),
+        'USER': env('DB_USER', default='postgres'),
+        'PASSWORD': env('DB_PASSWORD', default='123456'),
+        'HOST': env('DB_HOST', default='127.0.0.1'),
+        'PORT': env('DB_PORT', default='5432'),
+        'CONN_MAX_AGE': 600,
     }
 }
 
@@ -110,6 +126,9 @@ LANGUAGE_CODE = 'uz'
 TIME_ZONE = 'Asia/Tashkent'
 USE_I18N = True
 USE_TZ = True
+FORMAT_MODULE_PATH = [
+    'DjangoProject.formats',
+]
 
 # Static fayllar (local uchun oddiy sozlama)
 STATIC_URL = '/static/'
@@ -134,4 +153,40 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    X_FRAME_OPTIONS = 'DENY'
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# Avtomatik seans o'chish sozlamalari (5 soat)
+SESSION_COOKIE_AGE = 18000
+SESSION_SAVE_EVERY_REQUEST = False
+
+# High-concurrency cached_db sessiya tizimi (Xotira keshidan birinchi o'qiydi, DB ga ortiqcha yozmaydi)
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+
+# Kesh tizimi sozlamalari (Local Memory Cache - Concurrency optimizatsiyasi uchun)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'fumaisak-cache-store',
+        'TIMEOUT': 300,
+        'OPTIONS': {
+            'MAX_ENTRIES': 10000
+        }
+    }
+}
+
+# ==============================================================================
+# 💳 ONLINE TO'LOV SHLYUZLARI SOZLAMALARI (PAYME & CLICK)
+# ==============================================================================
+ONLINE_PAYMENTS_ENABLED = env.bool('ONLINE_PAYMENTS_ENABLED', default=False)
+PAYME_MERCHANT_ID = env('PAYME_MERCHANT_ID', default='')
+PAYME_SECRET_KEY = env('PAYME_SECRET_KEY', default='')
+PAYME_TEST_MODE = env.bool('PAYME_TEST_MODE', default=True)
+
+CLICK_SERVICE_ID = env('CLICK_SERVICE_ID', default='')
+CLICK_MERCHANT_ID = env('CLICK_MERCHANT_ID', default='')
+CLICK_SECRET_KEY = env('CLICK_SECRET_KEY', default='')
+CLICK_MERCHANT_USER_ID = env('CLICK_MERCHANT_USER_ID', default='')
+CLICK_TEST_MODE = env.bool('CLICK_TEST_MODE', default=True)
+
+

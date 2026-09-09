@@ -1,6 +1,6 @@
 {% extends 'basestudent.html' %}
 
-{% block title %}Dars jadvali - Student Profili{% endblock %}
+{% block title %}Dars jadvali{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -41,7 +41,6 @@
         transform: translateY(-1px);
     }
 
-    /* Glassmorphic Table Container Card */
     .jadval-container {
         background: rgba(255, 255, 255, 0.01);
         border: 1px solid rgba(255, 255, 255, 0.04);
@@ -51,19 +50,27 @@
         border-radius: 24px;
         padding: 24px;
         flex-grow: 1;
-        overflow-y: auto;
+        overflow-y: auto !important;
+        overflow-x: auto !important;
+        max-height: calc(100vh - 300px);
+        min-height: 300px;
     }
     .jadval-container::-webkit-scrollbar {
-        width: 4px;
-        height: 4px;
+        width: 6px;
+        height: 6px;
     }
     .jadval-container::-webkit-scrollbar-thumb {
-        background: rgba(0, 242, 254, 0.2);
-        border-radius: 4px;
+        background: rgba(0, 242, 254, 0.12);
+        border-radius: 10px;
+    }
+    .jadval-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 242, 254, 0.3);
     }
 
     table {
-        width: 100%;
+        width: max-content !important;
+        min-width: 100% !important;
+        white-space: nowrap;
         border-collapse: collapse;
         text-align: center;
     }
@@ -190,6 +197,46 @@
             border-radius: 0 10px 10px 0;
             padding-left: 14px !important;
         }
+    }
+
+    /* --- ☀️ LIGHT MODE SPECIFIC OVERRIDES --- */
+    body.light-mode #jadval th {
+        background: #f8fafc !important;
+        color: #475569 !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+    body.light-mode #jadval td {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+    body.light-mode #jadval th.today {
+        background: #0284c7 !important;
+        color: #ffffff !important;
+        border: 1.5px solid #0284c7 !important;
+    }
+    body.light-mode #jadval th.today small {
+        color: #e0f2fe !important;
+    }
+    body.light-mode #jadval td.today-td {
+        background: #e0f2fe !important; /* Standout light blue background */
+        border: 1.5px solid #0284c7 !important;
+    }
+    body.light-mode #jadval td.today-td div {
+        background: #ffffff !important;
+        color: #0284c7 !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    body.light-mode #jadval .guruh-ustuni {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+        border-right: 1.5px solid #cbd5e1 !important;
+    }
+    body.light-mode #jadval .dars-yoq {
+        color: #94a3b8 !important;
+    }
+    body.light-mode #jadval td:not(.guruh-ustuni):hover {
+        background-color: #f1f5f9 !important;
     }
 </style>
 {% endblock %}

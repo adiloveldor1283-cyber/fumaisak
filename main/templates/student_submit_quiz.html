@@ -1,7 +1,7 @@
 {% extends 'basestudent.html' %}
 {% load static %}
 
-{% block title %}Test Natijasi - Student Profili{% endblock %}
+{% block title %}Test natijasi{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -183,31 +183,42 @@
         border-radius: 12px;
     }
 
-    /* Pastki tugma */
-    .btn-back-row {
-        margin-top: 20px;
+    /* Yuqoridagi orqaga chiqish strelkasi */
+    .back-arrow-btn {
         display: flex;
-        justify-content: flex-start;
-    }
-
-    .btn-back {
-        text-decoration: none;
-        background: rgba(255, 255, 255, 0.03);
-        color: rgba(255, 255, 255, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 10px 24px;
-        border-radius: 10px;
-        font-size: 13.5px;
-        font-weight: 700;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: rgba(0, 242, 254, 0.08);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        color: #00f2fe;
         transition: 0.3s;
+        text-decoration: none;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+    .back-arrow-btn:hover {
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        color: #070a12;
+        border-color: transparent;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        transform: translateY(-1px);
+    }
+    .back-arrow-btn i {
+        font-size: 16px;
     }
 
-    .btn-back:hover {
-        background: #ffffff;
-        color: #070a12;
-        border-color: #ffffff;
-        box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-        transform: translateY(-1px);
+    body.light-mode .back-arrow-btn {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #0284c7 !important;
+    }
+    body.light-mode .back-arrow-btn:hover {
+        background: #0284c7 !important;
+        color: #ffffff !important;
+        border-color: #0284c7 !important;
     }
 
     /* --- 📱 MOBIL REJIMDA RESPONSIVE RESET --- */
@@ -227,17 +238,17 @@
             border: none;
             box-shadow: none;
         }
-        .btn-back {
-            width: 100%;
-            text-align: center;
-            padding: 12px;
-        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-    <h2 class="sarlavha">Test natijasi</h2>
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+        <a href="{% url 'student_quiz_list' %}" class="back-arrow-btn" title="Orqaga">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Test natijasi</h2>
+    </div>
 
     <!-- 📊 GORIZONTAL KIBER PANELDAGI SMART KARTALAR -->
     <div class="stats-grid">
@@ -280,7 +291,7 @@
 
     <!-- 📜 MUSTAQIL ICHKI SKROL BO'LUVCHI XATOLAR BLOKI -->
     <div class="xatalar-konteyner">
-        <h3>Noto‘g‘ri javob berilgan savollar</h3>
+        <h3>Noto'g'ri javob berilgan savollar</h3>
         <ol>
             {% for answer in result.answers.all %}
                 {% if not answer.selected_answer or not answer.selected_answer.is_correct %}
@@ -290,15 +301,10 @@
                 {% endif %}
             {% empty %}
                 <div class="no-errors-msg">
-                    <i class="fas fa-check-circle"></i> Tabriklaymiz! Barcha javoblar to‘g‘ri topshirildi.
+                    <i class="fas fa-check-circle"></i> Tabriklaymiz! Barcha javoblar to'g'ri topshirildi.
                 </div>
             {% endfor %}
         </ol>
-    </div>
-
-    <!-- ORQAGA QAYTISH -->
-    <div class="btn-back-row">
-        <a href="{% url 'student_quiz_list' %}" class="btn-back"><i class="fas fa-arrow-left" style="margin-right: 6px;"></i> Chiqish jurnali</a>
     </div>
 {% endblock %}
 

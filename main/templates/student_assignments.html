@@ -1,7 +1,7 @@
 {% extends 'basestudent.html' %}
 {% load custom_filters %}
 
-{% block title %}Topshiriqlarim - Student Profili{% endblock %}
+{% block title %}Topshiriqlarim{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -20,45 +20,7 @@
         letter-spacing: -0.5px;
     }
 
-    /* Kiber Qidiruv Paneli (Header ichiga joylashadi) */
-    .search-form {
-        display: none; /* JS yuklangandan keyin headerda ko'rinadi */
-        position: relative;
-    }
-    .search-input {
-        padding: 10px 16px;
-        font-size: 13px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px 0 0 12px;
-        outline: none;
-        width: 25vw;
-        background-color: rgba(255, 255, 255, 0.02);
-        color: #ffffff;
-        margin-left: 20px;
-        border-right: none;
-        transition: 0.3s;
-    }
-    .search-input:focus {
-        border-color: #00f2fe;
-        background: rgba(255, 255, 255, 0.06);
-        box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
-    }
-    .search-btn {
-        background-color: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-left: none;
-        padding: 10px 18px;
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 13px;
-        border-radius: 0 12px 12px 0;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-    .search-btn:hover {
-        background-color: rgba(0, 242, 254, 0.1);
-        color: #00f2fe;
-        border-color: rgba(0, 242, 254, 0.2);
-    }
+
 
     /* 📊 JADVALNING O'ZI MUSTAQIL SKROL BO'LISHI UCHUN */
     .jadval-container {
@@ -69,21 +31,29 @@
         -webkit-backdrop-filter: blur(20px);
         border-radius: 24px;
         padding: 0 24px 24px 24px;
-        max-height: calc(100vh - 210px);
-        overflow-y: auto;
+        max-height: calc(100vh - 300px);
+        min-height: 300px;
+        overflow-y: auto !important;
+        overflow-x: auto !important;
     }
 
     /* Skrolbarga chiroyli kiber dizayn */
     .jadval-container::-webkit-scrollbar {
-        width: 4px;
+        width: 6px;
+        height: 6px;
     }
     .jadval-container::-webkit-scrollbar-thumb {
-        background: rgba(0, 242, 254, 0.2);
-        border-radius: 4px;
+        background: rgba(0, 242, 254, 0.12);
+        border-radius: 10px;
+    }
+    .jadval-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 242, 254, 0.3);
     }
 
     table {
-        width: 100%;
+        width: max-content !important;
+        min-width: 100% !important;
+        white-space: nowrap;
         border-collapse: collapse;
         text-align: left;
     }
@@ -270,8 +240,7 @@
         body .content {
             overflow: auto !important;
         }
-        .search-form { margin-right: 15px; }
-        .search-input { width: 140px; margin-left: 10px; }
+
         .jadval-container {
             max-height: none;
             overflow: visible;
@@ -299,17 +268,27 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             text-align: right; font-weight: 600;
+            gap: 12px;
         }
         td:last-child { border-bottom: none; padding-top: 14px; justify-content: center; }
         td::before {
             content: attr(data-label); font-weight: 700; color: #00f2fe;
             text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;
             text-align: left; padding-right: 15px;
+            flex-shrink: 0;
         }
         td[data-label="No"]::before, td:last-child::before { display: none; }
         td[data-label="No"] {
             font-size: 14px; color: #4facfe; border-bottom: 1px solid rgba(0, 242, 254, 0.15);
             padding-bottom: 6px; justify-content: center;
+        }
+        .td-val {
+            display: block;
+            max-width: 70%;
+            word-break: break-word;
+            text-align: right;
+            flex-grow: 1;
+            min-width: 0;
         }
     }
 </style>
@@ -322,14 +301,14 @@
         <div class="loading-subtext">Fayl tizimga yuklanmoqda, iltimos sahifani yopmang yoki qayta yuklamang.</div>
     </div>
 
-    <form class="search-form" id="dynamic-search-form" onsubmit="event.preventDefault();">
-        <label>
-            <input type="text" class="search-input" id="top-search" placeholder="Topshiriq nomi bo'yicha...">
-        </label>
-        <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
-    </form>
-
-    <h2 class="sarlavha">Topshiriqlarim</h2>
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">Topshiriqlarim</h2>
+        <!-- QIDIRUV FORMASI -->
+        <form class="search-form" id="dynamic-search-form" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
+            <input type="text" class="search-input" id="top-search" placeholder="Topshiriq nomi bo'yicha..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
 
     <div class="jadval-container">
         <table id="top-table">
@@ -347,25 +326,36 @@
             <tbody>
                 {% for assignment in assignments %}
                     <tr>
-                        <td data-label="No">{{ forloop.counter }}</td>
-                        <td data-label="Topshiriq nomi" style="font-weight: 700; color: #ffffff; text-align: left;">{{ assignment.title }}</td>
-                        <td data-label="Guruh"><span style="color: #4facfe; font-weight: 600;">{{ assignment.group.name }}</span></td>
-                        <td data-label="O'qituvchi">{{ assignment.teacher.get_full_name }}</td>
-                        <td data-label="Muddati" style="color: rgba(255,255,255,0.6);">{{ assignment.deadline|date:"Y-m-d H:i" }}</td>
-                        <td data-label="Fayli"><a href="{{ assignment.file.url }}" target="_blank" class="download-link"><i class="fas fa-download" style="font-size: 12px; margin-right: 4px;"></i> Yuklab olish</a></td>
+                        <td data-label="No"><span>{{ forloop.counter }}</span></td>
+                        <td data-label="Topshiriq nomi" style="font-weight: 700; color: #ffffff; text-align: left;"><span class="td-val">{{ assignment.title }}</span></td>
+                        <td data-label="Guruh"><span class="td-val" style="color: #4facfe; font-weight: 600;">{{ assignment.group.name }}</span></td>
+                        <td data-label="O'qituvchi"><span class="td-val">{{ assignment.teacher.get_full_name }}</span></td>
+                        <td data-label="Muddati" style="color: rgba(255,255,255,0.6);"><span class="td-val">{{ assignment.deadline|date:"d.m.Y H:i" }}</span></td>
+                        <td data-label="Fayli">
+                            {% if assignment.file %}
+                                <a href="{{ assignment.file.url }}" target="_blank" class="download-link td-val"><i class="fas fa-download" style="font-size: 12px; margin-right: 4px;"></i> Yuklab olish</a>
+                            {% else %}
+                                <span class="td-val" style="color: rgba(255,255,255,0.3)">Fayl yo'q</span>
+                            {% endif %}
+                        </td>
                         <td>
                           {% with submission=submissions|get_item:assignment.id %}
                             {% if assignment.id in expired_ids %}
-                              <span style="color: #ff0055; font-weight: 800;"><i class="fas fa-exclamation-circle"></i> Muddati o‘tgan</span>
+                              <span style="color: #ff0055; font-weight: 800;"><i class="fas fa-exclamation-circle"></i> Muddati o'tgan</span>
                             {% else %}
                               {% if submission %}
                                 {% if submission.grade != None %}
                                   <span style="color: #00ffaa; font-weight: 800;"><i class="fas fa-check-circle"></i> Ball: {{ submission.grade }}</span>
+                                  {% if submission.feedback %}
+                                    <div style="font-size: 11px; color: #4facfe; margin-top: 4px; font-style: italic; white-space: normal; line-height: 1.3;">
+                                      Izoh: {{ submission.feedback }}
+                                    </div>
+                                  {% endif %}
                                 {% else %}
                                   <button class="open-modal"
                                           data-assignment-id="{{ assignment.id }}"
                                           data-title="{{ assignment.title }}"
-                                          data-file-url="{{ submission.file.url }}">
+                                          data-file-url="{% if submission.file %}{{ submission.file.url }}{% endif %}">
                                     Qayta yuklash
                                   </button>
                                 {% endif %}
@@ -393,7 +383,7 @@
             <h3 id="modalTitle">Topshiriqni yuklash</h3>
 
             <div id="uploadedFileSection" style="margin-bottom: 15px; display: none; color: white; background: rgba(255,255,255,0.02); padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
-                <p style="font-size: 13px;"><i class="fas fa-file-alt" style="color: #4facfe; margin-right: 6px;"></i> Yuklangan fayl: <a href="#" id="uploadedFileLink" target="_blank" style="color: #00f2fe; font-weight: 600; text-decoration: none;">Faylni ko‘rish</a></p>
+                <p style="font-size: 13px;"><i class="fas fa-file-alt" style="color: #4facfe; margin-right: 6px;"></i> Yuklangan fayl: <a href="#" id="uploadedFileLink" target="_blank" style="color: #00f2fe; font-weight: 600; text-decoration: none;">Faylni ko'rish</a></p>
             </div>
 
             <form id="uploadForm" method="post" enctype="multipart/form-data">
@@ -408,15 +398,7 @@
 {% block extra_js %}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // --- 🔍 QIDIRUV PANELINI HEADERGA KO'CHIRISH TIZIMI ---
-        const header = document.querySelector('.header');
-        const userProfile = document.querySelector('.user-profile');
-        const searchForm = document.getElementById('dynamic-search-form');
 
-        if (header && userProfile && searchForm) {
-            header.insertBefore(searchForm, userProfile);
-            searchForm.style.display = 'flex';
-        }
 
         // --- 📊 JADVAL QIDIRUV MANTIQI ---
         const searchInput = document.getElementById("top-search");

@@ -1,52 +1,55 @@
 {% extends 'baseadmin.html' %}
 {% load static %}
 
-{% block title %}Guruh To'lovlari{% endblock %}
-
-{% block header_search %}
-<!-- GURUH QIDIRUV FORMASI -->
-<form class="search-form" onsubmit="event.preventDefault();" style="display: flex; align-items: center; margin-left: 20px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px;">
-    <input type="text" class="search-input" placeholder="Guruhlarni qidirish..." style="background: transparent; border: none; outline: none; color: white; font-size: 13px; width: 100%; padding: 6px 0;">
-    <button type="submit" class="search-btn" style="background: none; border: none; color: rgba(255, 255, 255, 0.4); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
-</form>
-{% endblock %}
+{% block title %}Guruh to'lovlari | VLE Tizimi{% endblock %}
 
 {% block content %}
-<h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 25px;">Guruhlar uchun belgilangan to'lovlar</h2>
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0;">Guruhlar uchun belgilangan to'lovlar</h2>
+    <!-- GURUH QIDIRUV FORMASI -->
+    <form class="search-form" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px;">
+        <input type="text" class="search-input" placeholder="Guruh nomi bo'yicha qidirish..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+        <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+    </form>
+</div>
 
 {% if groups %}
-<div class="jadval-container" style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 12px; width: 100%; overflow-x: auto;">
+<div class="jadval-container" style="flex-grow: 1; overflow-y: auto; overflow-x: auto; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
     <table class="group-table" style="width: 100%; border-collapse: collapse; text-align: left;">
         <thead>
-            <tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); background: #080d1a; position: sticky; top: 0; z-index: 10;">
                 <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">№</th>
-                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Guruh nomi</th>
-                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Yaratilgan vaqt</th>
-                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Kurs davomiyligi</th>
-                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Har oygi to‘lov</th>
-                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Umumiy summa</th>
-                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Tahrirlash</th>
-                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">O'quvchilar</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">GURUH NOMI</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">YARATILGAN VAQTI</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">KURS DAVOMIYLIGI</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">OYLIK TO'LOV</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">UMUMIY TO'LOV</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">TAHRIRLASH</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">O'QUVCHILAR</th>
             </tr>
         </thead>
         <tbody id="group-body">
             {% for group in groups %}
             <tr>
                 <td data-label="№" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
-                <td data-label="Guruh nomi" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ group.name }}</td>
-                <td data-label="Yaratilgan vaqt" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ group.created_at|date:"H:i | d-m-Y" }}</td>
-                <td data-label="Kurs davomiyligi" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #00ffaa; font-weight: 600;">{{ group.payment_info.course_duration_months }} oy</td>
-                <td data-label="Har oygi to‘lov" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #00f2fe; font-weight: 700;">{{ group.payment_info.monthly_fee }} so'm</td>
-                <td data-label="Umumiy summa" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #ff0055; font-weight: 700;">{{ group.payment_info.total_fee }} so'm</td>
-                <td data-label="Tahrirlash" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><a href="{% url 'add_group_payment' group.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">Tahrir</a></td>
-                <td data-label="O'quvchilar" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><a href="{% url 'group_students' group.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(0, 255, 170, 0.05); border: 1px solid rgba(0, 255, 170, 0.2); color: #00ffaa; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-users"></i> O'quvchilar</a></td>
+                <td data-label="GURUH NOMI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ group.name }}</td>
+                <td data-label="YARATILGAN VAQTI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ group.created_at|date:"d.m.Y H:i" }}</td>
+                <td data-label="KURS DAVOMIYLIGI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #00ffaa; font-weight: 600;">{{ group.payment_info.course_duration_months }} oy</td>
+                <td data-label="OYLIK TO'LOV" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #00f2fe; font-weight: 700;">{{ group.payment_info.monthly_fee }} so'm</td>
+                <td data-label="UMUMIY TO'LOV" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #ff0055; font-weight: 700;">{{ group.payment_info.total_fee }} so'm</td>
+                <td data-label="TAHRIRLASH" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><a href="{% url 'add_group_payment' group.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-edit" style="margin-right: 4px;"></i> Tahrirlash</a></td>
+                <td data-label="O'QUVCHILAR" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><a href="{% url 'group_students' group.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(0, 255, 170, 0.05); border: 1px solid rgba(0, 255, 170, 0.2); color: #00ffaa; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-users" style="margin-right: 4px;"></i> O'quvchilar</a></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% else %}
-    <p style="color: rgba(255,255,255,0.4); font-style: italic; padding: 10px;">To'lov ma'lumotlari mavjud emas.</p>
+<div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 40px 20px; text-align: center; margin-top: 20px;">
+    <i class="fas fa-money-check-alt" style="font-size: 36px; color: rgba(255, 255, 255, 0.2); margin-bottom: 15px; display: block;"></i>
+    <h4 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Guruh to'lovlari topilmadi</h4>
+    <p style="color: rgba(255, 255, 255, 0.4); font-size: 13px; margin: 0;">Tizimda guruh to'lovlari bo'yicha ma'lumotlar mavjud emas.</p>
+</div>
 {% endif %}
 {% endblock %}
 

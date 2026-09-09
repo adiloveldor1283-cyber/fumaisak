@@ -2,7 +2,7 @@
 {% load custom_tags %}
 {% load static %}
 
-{% block title %}O'qituvchi Bosh Sahifasi - Dashboard{% endblock %}
+{% block title %}Bosh sahifa{% endblock %}
 
 {% block extra_css %}
     <style>
@@ -73,7 +73,193 @@
             .right-panel { width: 100%; height: auto; overflow: visible; }
             .left-panel { width: 100%; overflow-y: visible !important; }
         }
+
+        /* --- 📊 ALL 4 PROGRESS BARS IN DARK BLUE --- */
+        .progress {
+            background: #0284c7 !important;
+            box-shadow: 0 0 12px rgba(2, 132, 199, 0.2) !important;
+        }
+        .progress span {
+            color: #ffffff !important;
+        }
+
+        /* --- ☀️ LIGHT MODE OVERRIDES FOR TEACHER HOME --- */
+        body.light-mode .karta {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+        }
+        body.light-mode .karta .matn {
+            color: #64748b !important;
+        }
+        body.light-mode .karta .pul {
+            color: #0f172a !important;
+        }
+        body.light-mode .karta .ikonka {
+            background: rgba(2, 132, 199, 0.05) !important;
+            border-color: rgba(2, 132, 199, 0.15) !important;
+            color: #0284c7 !important;
+        }
+        
+        body.light-mode .left-panel,
+        body.light-mode .right-panel {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04) !important;
+        }
+        body.light-mode .skill-title {
+            color: #0f172a !important;
+        }
+        body.light-mode .skill-name {
+            color: #64748b !important;
+        }
+        body.light-mode .progress-bar {
+            background: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        body.light-mode .search-input-user::placeholder { color: rgba(16, 15, 15, 0.3); }
+        body.light-mode .filter-box h3 {
+            color: #0f172a !important;
+            border-left-color: #0284c7 !important;
+        }
+        body.light-mode .filter-controls label {
+            color: #64748b !important;
+        }
+        body.light-mode .filter-controls select,
+        body.light-mode .search-input-user {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        body.light-mode .filter-controls select:focus,
+        body.light-mode .search-input-user:focus {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15) !important;
+        }
+        body.light-mode th {
+            background: #f8fafc !important;
+            color: #64748b !important;
+            border-bottom-color: #e2e8f0 !important;
+        }
+        body.light-mode td {
+            color: #334155 !important;
+            border-bottom-color: #e2e8f0 !important;
+        }
+        body.light-mode tr td[style*="color: #ffffff"],
+        body.light-mode tr td[style*="color: white"] {
+            color: #0f172a !important;
+        }
+        body.light-mode tr td[style*="color: #00ffaa"] {
+            color: #16a34a !important;
+        }
+        body.light-mode tr:hover td {
+            background: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+        body.light-mode tr:hover td[style*="color: #ffffff"],
+        body.light-mode tr:hover td[style*="color: white"] {
+            color: #0f172a !important;
+        }
+
+        /* Early Warning Panel Light Mode Overrides */
+        body.light-mode .warning-panel {
+            background: #fef2f2 !important;
+            border-color: rgba(239, 68, 68, 0.25) !important;
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.03) !important;
+        }
+        body.light-mode .warning-panel h3 {
+            color: #b91c1c !important;
+        }
+        body.light-mode .warning-panel div > div {
+            background: #ffffff !important;
+            border-color: #fca5a5 !important;
+        }
+        body.light-mode .warning-panel h4 {
+            color: #0f172a !important;
+        }
+        body.light-mode .warning-panel span {
+            color: #475569 !important;
+        }
+        body.light-mode .warning-panel ul {
+            color: #b91c1c !important;
+        }
+        body.light-mode .warning-panel div[style*="background: rgba(255,79,79,0.1)"] {
+            background: rgba(239, 68, 68, 0.08) !important;
+            border-color: rgba(239, 68, 68, 0.2) !important;
+            color: #b91c1c !important;
+        }
     </style>
+{% endblock %}
+
+{% block announcements %}
+    {% if always_show_announcements or one_time_announcements or warning_students %}
+        <div style="display: flex; gap: 20px; margin-bottom: 25px; align-items: flex-start; flex-wrap: wrap; width: 100%;">
+            <!-- Chap tomon: Tizim e'lonlari -->
+            {% if always_show_announcements or one_time_announcements %}
+                <div style="flex: 1.2; min-width: 320px; display: flex; flex-direction: column; gap: 10px;">
+                    {% if always_show_announcements %}
+                        <div class="system-announcements-container" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                            {% for announce in always_show_announcements %}
+                                <div class="announcement-banner always-show" style="background: rgba(255, 128, 0, 0.08); border: 1px solid rgba(255, 128, 0, 0.25); border-radius: 12px; padding: 12px 18px; display: flex; align-items: center; gap: 14px; position: relative; box-shadow: 0 4px 15px rgba(255, 128, 0, 0.05);">
+                                    <div style="background: rgba(255, 128, 0, 0.15); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: #ff9f43; font-size: 16px; flex-shrink: 0;">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div style="flex-grow: 1;">
+                                        <h4 style="margin: 0 0 3px 0; color: #ff9f43; font-size: 13px; font-weight: 700;">{{ announce.title }}</h4>
+                                        <p style="margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 12px; line-height: 1.4;">{{ announce.message }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if one_time_announcements %}
+                        <div class="system-one-time-announcements" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                            {% for announce in one_time_announcements %}
+                                <div class="announcement-banner one-time" id="announce-{{ announce.id }}" style="background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 12px; padding: 12px 18px; display: flex; align-items: center; gap: 14px; position: relative; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.05); transition: opacity 0.4s ease, transform 0.4s ease;">
+                                    <div style="background: rgba(0, 242, 254, 0.15); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: #00f2fe; font-size: 16px; flex-shrink: 0;">
+                                        <i class="fas fa-bullhorn"></i>
+                                    </div>
+                                    <div style="flex-grow: 1; padding-right: 25px;">
+                                        <h4 style="margin: 0 0 3px 0; color: #00f2fe; font-size: 13px; font-weight: 700;">{{ announce.title }}</h4>
+                                        <p style="margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 12px; line-height: 1.4;">{{ announce.message }}</p>
+                                    </div>
+                                    <button onclick="dismissAnnouncement({{ announce.id }})" style="position: absolute; top: 12px; right: 14px; background: none; border: none; color: rgba(255, 255, 255, 0.4); cursor: pointer; font-size: 14px; transition: color 0.2s;" onmouseover="this.style.color='#ff3366'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+            
+            <!-- O'ng tomon: Ko'rsatkichlari Pasayayotgan O'quvchilar -->
+            {% if warning_students %}
+                <div class="warning-panel" style="flex: 1; min-width: 300px; background: rgba(255, 79, 79, 0.05); border: 1px solid rgba(255, 79, 79, 0.15); border-radius: 20px; padding: 16px; box-shadow: 0 10px 25px rgba(255, 79, 79, 0.05); display: flex; flex-direction: column;">
+                    <h3 style="font-size: 13.5px; font-weight: 800; color: #ff4f4f; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; margin-top: 0; flex-shrink: 0;"><i class="fas fa-exclamation-triangle"></i> Pasayayotgan O'quvchilar</h3>
+                    <div style="display: flex; flex-direction: column; gap: 10px; max-height: 180px; overflow-y: auto; padding-right: 6px; flex-grow: 1;">
+                        {% for item in warning_students %}
+                        <div style="background: rgba(11, 15, 25, 0.3); border: 1px solid rgba(255,255,255,0.03); border-radius: 10px; padding: 10px; display: flex; align-items: flex-start; gap: 8px;">
+                            <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(255,79,79,0.1); border: 1px solid rgba(255,79,79,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #ff4f4f; font-weight: 800; font-size: 11px;">
+                                {{ item.student.first_name|slice:":1" }}{{ item.student.last_name|slice:":1" }}
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <h4 style="font-size: 12.5px; font-weight: 700; color: #ffffff; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ item.student.get_full_name }}</h4>
+                                <span style="font-size: 10.5px; color: rgba(255,255,255,0.4); display: block; margin-top: 1px;">Guruh: {{ item.groups }}</span>
+                                <ul style="margin: 4px 0 0 0; padding-left: 14px; font-size: 11px; color: #ff7070; font-weight: 600;">
+                                    {% for reason in item.reasons %}
+                                    <li style="margin-bottom: 1px;">{{ reason }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -87,14 +273,14 @@
         </div>
         <div class="karta">
             <div>
-                <div class="matn">Yaxshi o‘zlashtirganlar</div>
+                <div class="matn">Yaxshi o'zlashtirganlar</div>
                 <div class="pul" style="color: #00ffaa;">{{ good_students_count }}</div>
             </div>
             <div class="ikonka" style="color: #00ffaa; border-color: rgba(0,255,170,0.2); background: rgba(0,255,170,0.05);"><i class="fas fa-user-graduate"></i></div>
         </div>
         <div class="karta">
             <div>
-                <div class="matn">O‘rtacha o‘zlashtirganlar</div>
+                <div class="matn">O'rtacha o'zlashtirganlar</div>
                 <div class="pul" style="color: #ffc107;">{{ average_students_count }}</div>
             </div>
             <div class="ikonka" style="color: #ffc107; border-color: rgba(255,193,7,0.2); background: rgba(255,193,7,0.05);"><i class="fas fa-user-graduate"></i></div>
@@ -113,7 +299,7 @@
             {% if has_assignments %}
                 <div class="skill-title-panel">
                     <div class="skill-title">Bajarilgan topshiriqlar</div>
-                    <div class="skill-name">Ushbu foiz ko‘rsatkichida o‘quvchilarning muvaffaqiyatli bajargan topshiriqlari aks ettirilgan.</div>
+                    <div class="skill-name">Ushbu foiz ko'rsatkichida o'quvchilarning muvaffaqiyatli bajargan topshiriqlari aks ettirilgan.</div>
                     <div class="progress-bar">
                         <div class="progress" data-value="{{ assignment_completion_percent }}">
                             <span></span>
@@ -123,7 +309,7 @@
 
                 <div class="skill-title-panel">
                     <div class="skill-title">Bajarilmagan topshiriqlar</div>
-                    <div class="skill-name">Ushbu foiz ko‘rsatkichida o‘quvchilarning hali bajarmagan topshiriqlari aks ettirilgan.</div>
+                    <div class="skill-name">Ushbu foiz ko'rsatkichida o'quvchilarning hali bajarmagan topshiriqlari aks ettirilgan.</div>
                     <div class="progress-bar">
                         <div class="progress" data-value="{{ assignment_missing_percent }}" style="background: linear-gradient(135deg, #ff0055, #ff5085); box-shadow: 0 0 15px rgba(255, 0, 85, 0.2);">
                             <span></span>
@@ -140,7 +326,7 @@
             {% if has_quizzes %}
                 <div class="skill-title-panel">
                     <div class="skill-title">Topshirilgan testlar</div>
-                    <div class="skill-name">Ushbu foiz ko‘rsatkichda o‘quvchi tomonidan muvaffaqiyatli topshirilgan testlar aks ettirilgan.</div>
+                    <div class="skill-name">Ushbu foiz ko'rsatkichda o'quvchi tomonidan muvaffaqiyatli topshirilgan testlar aks ettirilgan.</div>
                     <div class="progress-bar">
                         <div class="progress" data-value="{{ quiz_completion_percent }}">
                             <span></span>
@@ -150,7 +336,7 @@
 
                 <div class="skill-title-panel">
                     <div class="skill-title">Topshirilmagan testlar</div>
-                    <div class="skill-name">Ushbu foiz ko‘rsatkichda hali bajarilmagan yoki yakunlanmagan testlar ko‘rsatilmoqda.</div>
+                    <div class="skill-name">Ushbu foiz ko'rsatkichda hali bajarilmagan yoki yakunlanmagan testlar ko'rsatilmoqda.</div>
                     <div class="progress-bar">
                         <div class="progress" data-value="{{ quiz_missing_percent }}" style="background: linear-gradient(135deg, #ff0055, #ff5085); box-shadow: 0 0 15px rgba(255, 0, 85, 0.2);">
                             <span></span>
@@ -167,13 +353,13 @@
 
         <div class="right-panel">
             <div class="filter-box">
-                <h3>O‘quvchilar darajasi</h3>
+                <h3>O'quvchilar darajasi</h3>
                 <div class="filter-controls">
                     <label for="darajaFilter">Saralash:</label>
                     <select id="darajaFilter" onchange="filterByDaraja()">
                         <option value="Barchasi">Barchasi</option>
                         <option value="Yuqori daraja">Yuqori daraja</option>
-                        <option value="O'rtacha daraja">O‘rtacha daraja</option>
+                        <option value="O'rtacha daraja">O'rtacha daraja</option>
                         <option value="Boshlang'ich daraja">Boshlang'ich daraja</option>
                     </select>
                 </div>
@@ -197,7 +383,7 @@
                                 <td style="text-align: right; font-weight: 700; color: #00ffaa;">{{ student_levels|get_item:student.id }}</td>
                             </tr>
                         {% empty %}
-                            <tr><td colspan="3" style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic;">O‘quvchilar topilmadi.</td></tr>
+                            <tr><td colspan="3" style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic;">O'quvchilar topilmadi.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

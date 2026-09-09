@@ -1,170 +1,688 @@
 {% extends 'baseadmin.html' %}
 {% load static %}
 
-{% block title %}Dashboard | Boshqaruv paneli{% endblock %}
+{% block title %}Dashboard | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Default / Dark theme */
+    #yearSelector option {
+        background-color: #0c101d !important;
+        color: #ffffff !important;
+    }
+    /* Light theme */
+    html.light-theme #yearSelector option {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-    <h2 class="sarlavha" style="font-size: 24px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Boshqaruv paneli (Dashboard)</h2>
-    <div style="font-size: 13.5px; color: rgba(255, 255, 255, 0.4); font-weight: 600; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 8px 16px; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
-        <i class="fas fa-calendar-day" style="color: #00f2fe;"></i> <span id="current-date">Bugun: {% now "d-m-Y" %}</span>
+    <h2 class="sarlavha" style="font-size: 24px; font-weight: 800; color: var(--text-primary); border-left: 4px solid var(--accent-primary); padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Boshqaruv paneli (Dashboard)</h2>
+    <div style="font-size: 13.5px; color: var(--text-secondary); font-weight: 600; background: var(--bg-card); border: 1px solid var(--border-card); padding: 8px 16px; border-radius: 10px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+        <i class="fas fa-calendar-day" style="color: var(--accent-primary);"></i> <span id="current-date">Bugun: {% now "d.m.Y" %}</span>
     </div>
 </div>
 
 <!-- STATISTIKA KARTALARI -->
 <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 35px;">
+    {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_groups' in request.user.subadmin_permissions %}
     <!-- Guruhlar -->
-    <div class="stat-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 15px 30px rgba(0,0,0,0.15); transition: 0.3s; position: relative; overflow: hidden; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='#00f2fe'; this.style.boxShadow='0 20px 40px rgba(0, 242, 254, 0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255, 255, 255, 0.04)'; this.style.boxShadow='0 15px 30px rgba(0,0,0,0.15)';">
+    <div class="stat-card" onclick="window.location.href='{% url 'all_groups_admin' %}'" style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 20px; padding: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.3s; position: relative; overflow: hidden; cursor: pointer;">
         <div style="z-index: 2;">
-            <span style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px;">Guruhlar</span>
-            <h3 style="font-size: 28px; font-weight: 800; color: #ffffff; margin-top: 5px; letter-spacing: -1px;">{{ total_groups }}</h3>
+            <span style="font-size: 12px; font-weight: 700; color: var(--stat-card-muted); text-transform: uppercase; letter-spacing: 0.5px;">Guruhlar</span>
+            <h3 style="font-size: 28px; font-weight: 800; color: var(--stat-card-text); margin-top: 5px; letter-spacing: -1px;">{{ total_groups }}</h3>
         </div>
-        <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.2); display: flex; align-items: center; justify-content: center; z-index: 2;">
-            <i class="fas fa-layer-group" style="font-size: 20px; color: #00f2fe;"></i>
+        <div style="width: 50px; height: 50px; border-radius: 12px; background: var(--bg-accent-guruh); border: 1px solid var(--border-accent-guruh); display: flex; align-items: center; justify-content: center; z-index: 2;">
+            <i class="fas fa-layer-group" style="font-size: 20px; color: var(--accent-guruh);"></i>
         </div>
-        <div style="position: absolute; bottom: -20px; right: -20px; font-size: 80px; color: rgba(0, 242, 254, 0.02); pointer-events: none; z-index: 1;"><i class="fas fa-layer-group"></i></div>
+        <div style="position: absolute; bottom: -20px; right: -20px; font-size: 80px; color: var(--bg-accent-guruh); pointer-events: none; z-index: 1;"><i class="fas fa-layer-group"></i></div>
     </div>
+    {% endif %}
 
+    {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_students' in request.user.subadmin_permissions %}
     <!-- O'quvchilar -->
-    <div class="stat-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 15px 30px rgba(0,0,0,0.15); transition: 0.3s; position: relative; overflow: hidden; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='#00ffaa'; this.style.boxShadow='0 20px 40px rgba(0, 255, 170, 0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255, 255, 255, 0.04)'; this.style.boxShadow='0 15px 30px rgba(0,0,0,0.15)';">
+    <div class="stat-card" onclick="window.location.href='{% url 'students_list_admin' %}'" style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 20px; padding: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.3s; position: relative; overflow: hidden; cursor: pointer;">
         <div style="z-index: 2;">
-            <span style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px;">O'quvchilar</span>
-            <h3 style="font-size: 28px; font-weight: 800; color: #ffffff; margin-top: 5px; letter-spacing: -1px;">{{ total_students }}</h3>
+            <span style="font-size: 12px; font-weight: 700; color: var(--stat-card-muted); text-transform: uppercase; letter-spacing: 0.5px;">O'quvchilar</span>
+            <h3 style="font-size: 28px; font-weight: 800; color: var(--stat-card-text); margin-top: 5px; letter-spacing: -1px;">{{ total_students }}</h3>
         </div>
-        <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.2); display: flex; align-items: center; justify-content: center; z-index: 2;">
-            <i class="fas fa-user-graduate" style="font-size: 20px; color: #00ffaa;"></i>
+        <div style="width: 50px; height: 50px; border-radius: 12px; background: var(--bg-accent-student); border: 1px solid var(--border-accent-student); display: flex; align-items: center; justify-content: center; z-index: 2;">
+            <i class="fas fa-user-graduate" style="font-size: 20px; color: var(--accent-student);"></i>
         </div>
-        <div style="position: absolute; bottom: -20px; right: -20px; font-size: 80px; color: rgba(0, 255, 170, 0.02); pointer-events: none; z-index: 1;"><i class="fas fa-user-graduate"></i></div>
+        <div style="position: absolute; bottom: -20px; right: -20px; font-size: 80px; color: var(--bg-accent-student); pointer-events: none; z-index: 1;"><i class="fas fa-user-graduate"></i></div>
     </div>
+    {% endif %}
 
+    {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_teachers' in request.user.subadmin_permissions %}
     <!-- O'qituvchilar -->
-    <div class="stat-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 15px 30px rgba(0,0,0,0.15); transition: 0.3s; position: relative; overflow: hidden; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='#9b51e0'; this.style.boxShadow='0 20px 40px rgba(155, 81, 224, 0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255, 255, 255, 0.04)'; this.style.boxShadow='0 15px 30px rgba(0,0,0,0.15)';">
+    <div class="stat-card" onclick="window.location.href='{% url 'teachers_list_admin' %}'" style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 20px; padding: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.3s; position: relative; overflow: hidden; cursor: pointer;">
         <div style="z-index: 2;">
-            <span style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px;">O'qituvchilar</span>
-            <h3 style="font-size: 28px; font-weight: 800; color: #ffffff; margin-top: 5px; letter-spacing: -1px;">{{ total_teachers }}</h3>
+            <span style="font-size: 12px; font-weight: 700; color: var(--stat-card-muted); text-transform: uppercase; letter-spacing: 0.5px;">O'qituvchilar</span>
+            <h3 style="font-size: 28px; font-weight: 800; color: var(--stat-card-text); margin-top: 5px; letter-spacing: -1px;">{{ total_teachers }}</h3>
         </div>
-        <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(155, 81, 224, 0.1); border: 1px solid rgba(155, 81, 224, 0.2); display: flex; align-items: center; justify-content: center; z-index: 2;">
-            <i class="fas fa-chalkboard-teacher" style="font-size: 20px; color: #9b51e0;"></i>
+        <div style="width: 50px; height: 50px; border-radius: 12px; background: var(--bg-accent-teacher); border: 1px solid var(--border-accent-teacher); display: flex; align-items: center; justify-content: center; z-index: 2;">
+            <i class="fas fa-chalkboard-teacher" style="font-size: 20px; color: var(--accent-teacher);"></i>
         </div>
-        <div style="position: absolute; bottom: -20px; right: -20px; font-size: 80px; color: rgba(155, 81, 224, 0.02); pointer-events: none; z-index: 1;"><i class="fas fa-chalkboard-teacher"></i></div>
+        <div style="position: absolute; bottom: -20px; right: -20px; font-size: 80px; color: var(--bg-accent-teacher); pointer-events: none; z-index: 1;"><i class="fas fa-chalkboard-teacher"></i></div>
     </div>
+    {% endif %}
 
+    {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_payments' in request.user.subadmin_permissions %}
     <!-- Moliya / Daromad -->
-    <div class="stat-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 15px 30px rgba(0,0,0,0.15); transition: 0.3s; position: relative; overflow: hidden; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='#ff0055'; this.style.boxShadow='0 20px 40px rgba(255, 0, 85, 0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255, 255, 255, 0.04)'; this.style.boxShadow='0 15px 30px rgba(0,0,0,0.15)';">
+    <div class="stat-card" onclick="window.location.href='{% url 'admin_all_payments' %}'" style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 20px; padding: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.3s; position: relative; overflow: hidden; cursor: pointer;">
         <div style="z-index: 2;">
-            <span style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px;">Jami to'lovlar</span>
-            <h3 style="font-size: 22px; font-weight: 800; color: #ffffff; margin-top: 10px; letter-spacing: -0.5px;">{{ total_payments }} so'm</h3>
+            <span style="font-size: 12px; font-weight: 700; color: var(--stat-card-muted); text-transform: uppercase; letter-spacing: 0.5px;">Jami to'lovlar</span>
+            <h3 style="font-size: 22px; font-weight: 800; color: var(--stat-card-text); margin-top: 10px; letter-spacing: -0.5px;">{{ total_payments }} so'm</h3>
         </div>
-        <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.2); display: flex; align-items: center; justify-content: center; z-index: 2;">
-            <i class="fas fa-wallet" style="font-size: 20px; color: #ff0055;"></i>
+        <div style="width: 50px; height: 50px; border-radius: 12px; background: var(--bg-accent-finance); border: 1px solid var(--border-accent-finance); display: flex; align-items: center; justify-content: center; z-index: 2;">
+            <i class="fas fa-wallet" style="font-size: 20px; color: var(--accent-finance);"></i>
         </div>
-        <div style="position: absolute; bottom: -20px; right: -20px; font-size: 80px; color: rgba(255, 0, 85, 0.02); pointer-events: none; z-index: 1;"><i class="fas fa-wallet"></i></div>
+        <div style="position: absolute; bottom: -20px; right: -20px; font-size: 80px; color: var(--bg-accent-finance); pointer-events: none; z-index: 1;"><i class="fas fa-wallet"></i></div>
+    </div>
+    {% endif %}
+
+    {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff %}
+    <!-- Faol Seanslar -->
+    <div class="stat-card" onclick="window.location.href='{% url 'admin_sessions' %}'" style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 20px; padding: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.3s; position: relative; overflow: hidden; cursor: pointer;">
+        <div style="z-index: 2;">
+            <span style="font-size: 12px; font-weight: 700; color: var(--stat-card-muted); text-transform: uppercase; letter-spacing: 0.5px;">Faol seanslar</span>
+            <h3 style="font-size: 28px; font-weight: 800; color: var(--accent-session); margin-top: 5px; letter-spacing: -1px;">{{ active_sessions_count }}</h3>
+        </div>
+        <div style="width: 50px; height: 50px; border-radius: 12px; background: var(--bg-accent-session); border: 1px solid var(--border-accent-session); display: flex; align-items: center; justify-content: center; z-index: 2;">
+            <i class="fas fa-users-cog" style="font-size: 20px; color: var(--accent-session);"></i>
+        </div>
+        <div style="position: absolute; bottom: -20px; right: -20px; font-size: 80px; color: var(--bg-accent-session); pointer-events: none; z-index: 1;"><i class="fas fa-users-cog"></i></div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- MOLIYAVIY DIAGRAMMALAR (CHARTS) -->
+{% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_payments' in request.user.subadmin_permissions %}
+<div class="charts-grid" style="display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 25px; margin-bottom: 35px;">
+    <!-- Oylik daromad grafigi -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 8px;"><i class="fas fa-chart-line" style="color: var(--accent-guruh);"></i> Oylik tushumlar dinamikasi</h3>
+            <select id="yearSelector" style="padding: 6px 12px; font-size: 13px; border: 1px solid var(--border-input); border-radius: 8px; background: var(--bg-input); color: var(--text-input); outline: none; cursor: pointer; font-weight: 700; transition: 0.3s;">
+            </select>
+        </div>
+        <div style="position: relative; height: 260px; width: 100%;">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+    <!-- Guruhlar ulushi grafigi -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+        <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-chart-pie" style="color: var(--accent-finance);"></i> Guruhlar to'lov ulushi</h3>
+        <div style="position: relative; height: 260px; width: 100%;">
+            <canvas id="groupShareChart"></canvas>
+        </div>
     </div>
 </div>
+{% endif %}
+
+<!-- QO'SHIMCHA ANALITIK DIAGRAMMALAR -->
+{% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_students' in request.user.subadmin_permissions %}
+<div class="charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; margin-bottom: 35px;">
+    <!-- O'quvchilar o'sish sur'ati -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+        <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-user-plus" style="color: var(--accent-student);"></i> O'quvchilar o'sish sur'ati (Oxirgi 6 oy)</h3>
+        <div style="position: relative; height: 260px; width: 100%;">
+            <canvas id="growthChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Davomat tahlili -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+        <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-user-check" style="color: var(--accent-teacher);"></i> Davomat ko'rsatkichi (Oxirgi 1 hafta)</h3>
+        <div style="position: relative; height: 260px; width: 100%;">
+            <canvas id="attendanceRateChart"></canvas>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+    /* Premium CSS-based Card Hovers */
+    .stat-card {
+        transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px) !important;
+        border-color: var(--accent-guruh) !important;
+        box-shadow: var(--shadow-stat-group-hover) !important;
+    }
+    .stats-grid .stat-card:nth-child(2):hover {
+        border-color: var(--accent-student) !important;
+        box-shadow: var(--shadow-stat-student-hover) !important;
+    }
+    .stats-grid .stat-card:nth-child(3):hover {
+        border-color: var(--accent-teacher) !important;
+        box-shadow: var(--shadow-stat-teacher-hover) !important;
+    }
+    .stats-grid .stat-card:nth-child(4):hover {
+        border-color: var(--accent-finance) !important;
+        box-shadow: var(--shadow-stat-finance-hover) !important;
+    }
+    .stats-grid .stat-card:nth-child(5):hover {
+        border-color: var(--accent-session) !important;
+        box-shadow: var(--shadow-stat-student-hover) !important;
+    }
+
+    /* Custom scrollbar for warning panel */
+    .warning-panel-admin div::-webkit-scrollbar {
+        width: 6px;
+    }
+    .warning-panel-admin div::-webkit-scrollbar-track {
+        background: var(--bg-primary);
+        border-radius: 10px;
+    }
+    .warning-panel-admin div::-webkit-scrollbar-thumb {
+        background: var(--border-warning-panel);
+        border-radius: 10px;
+    }
+    .warning-panel-admin div::-webkit-scrollbar-thumb:hover {
+        background: var(--text-warning-title);
+    }
+
+    /* Responsive Media Queries to prevent horizontal scroll */
+    @media (max-width: 1024px) {
+        /* Stack charts vertically */
+        .charts-grid {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+        }
+        /* Stack main layout sections vertically */
+        .content-row {
+            flex-direction: column !important;
+            gap: 20px !important;
+        }
+        .content-row > div {
+            width: 100% !important;
+            flex: none !important;
+        }
+    }
+</style>
+
+{% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_students' in request.user.subadmin_permissions %}
+<!-- ⚠️ EARLY WARNING SYSTEM PANEL (ADMIN VIEW - LOADED DYNAMICALLY) -->
+<div class="warning-panel-admin" id="warning-panel-container" style="background: var(--bg-warning-panel); border: 1px solid var(--border-warning-panel); border-radius: 20px; padding: 24px; margin-bottom: 35px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; margin-top: 0; flex-shrink: 0; width: 100%;">
+        <h3 style="font-size: 16px; font-weight: 800; color: var(--text-warning-title); margin: 0; display: flex; align-items: center; gap: 8px;"><i class="fas fa-exclamation-triangle"></i> Tizim ogohlantirishi: O'zlashtirish ko'rsatkichlari pasaygan o'quvchilar (Jami: <span id="warning-total-count">0</span>)</h3>
+        <div style="position: relative; width: 280px;">
+            <input type="text" id="warningSearchInput" placeholder="Ism, guruh yoki fan bo'yicha qidirish..." style="width: 100%; padding: 7px 12px 7px 32px; font-size: 12.5px; border: 1px solid var(--warning-search-border); border-radius: 8px; background: var(--warning-search-bg); color: var(--warning-search-text); outline: none; transition: 0.3s;" onkeyup="filterWarningStudents()">
+            <i class="fas fa-search" style="position: absolute; left: 10px; top: 10px; font-size: 11px; color: var(--warning-search-icon);"></i>
+        </div>
+    </div>
+    <div id="warning-panel-loading" style="text-align: center; padding: 30px; font-style: italic; color: var(--text-secondary);"><i class="fas fa-spinner fa-spin" style="margin-right: 8px; color: var(--text-warning-title);"></i> Ogohlantirishlar yuklanmoqda...</div>
+    <div id="warning-students-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; max-height: 350px; overflow-y: auto; padding-right: 8px; width: 100%;">
+        <!-- Loaded via AJAX -->
+    </div>
+</div>
+{% endif %}
 
 <!-- ASOSIY BO'LIMLAR (IKKI USTUN) -->
 <div class="content-row" style="display: flex; gap: 25px; flex-wrap: wrap; margin-bottom: 35px;">
     <!-- Chap ustun: So'nggi to'lovlar -->
+    {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_payments' in request.user.subadmin_permissions %}
     <div style="flex: 1.5; min-width: 320px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3 style="font-size: 17px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 8px;"><i class="fas fa-credit-card" style="color: #ff0055;"></i> So'nggi to'lovlar</h3>
-            <a href="{% url 'student_list' %}" style="font-size: 12.5px; color: #00f2fe; text-decoration: none; font-weight: 700; transition: 0.3s;" onmouseover="this.style.textShadow='0 0 8px rgba(0,242,254,0.4)';" onmouseout="this.style.textShadow='none';">Barchasi <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 3px;"></i></a>
+            <h3 style="font-size: 17px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px;"><i class="fas fa-credit-card" style="color: var(--accent-finance);"></i> So'nggi to'lovlar</h3>
+            <a href="{% url 'student_list' %}" style="font-size: 12.5px; color: var(--accent-primary); text-decoration: none; font-weight: 700; transition: 0.3s;">Barchasi <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 3px;"></i></a>
         </div>
         
-        <div class="jadval-container" style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 12px; overflow-x: auto; box-shadow: 0 15px 30px rgba(0,0,0,0.15);">
+        <div class="jadval-container" style="border: 1px solid var(--border-card); border-radius: 20px; background: var(--bg-card); padding: 12px; overflow-x: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
             {% if recent_payments %}
             <table style="width: 100%; border-collapse: collapse; text-align: left;">
                 <thead>
                     <tr>
-                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">O'quvchi</th>
-                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Guruh</th>
-                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Oy</th>
-                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Summa</th>
-                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Vaqti</th>
+                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--border-card); background: var(--table-header-bg);">O'quvchi</th>
+                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--border-card); background: var(--table-header-bg);">Guruh</th>
+                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--border-card); background: var(--table-header-bg);">Oy</th>
+                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--border-card); background: var(--table-header-bg);">Summa</th>
+                        <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--border-card); background: var(--table-header-bg);">Sana</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for p in recent_payments %}
                     <tr>
-                        <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(255,255,255,0.02); font-weight: 700; color: #ffffff;">{{ p.student.get_full_name|default:p.student.username }}</td>
-                        <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(255,255,255,0.02); color: rgba(255,255,255,0.7);">{{ p.group.name }}</td>
-                        <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(255,255,255,0.02); color: #00f2fe; font-weight: 600;">{{ p.month }}</td>
-                        <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(255,255,255,0.02); color: #00ffaa; font-weight: 700;">{{ p.amount_paid }} so'm</td>
-                        <td style="padding: 12px 16px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.02); font-family: monospace; color: rgba(255,255,255,0.5);">{{ p.paid_at|date:"d-m H:i" }}</td>
+                        <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid var(--table-border); font-weight: 700; color: var(--text-primary);">{{ p.student.get_full_name|default:p.student.username }}</td>
+                        <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid var(--table-border); color: var(--text-secondary);">{{ p.group.name }}</td>
+                        <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid var(--table-border); color: var(--accent-primary); font-weight: 600;">{{ p.month }}</td>
+                        <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid var(--table-border); color: var(--accent-student); font-weight: 700;">{{ p.amount_paid }} so'm</td>
+                        <td style="padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--table-border); font-family: monospace; color: var(--text-muted);">{{ p.paid_at|date:"d.m.Y H:i" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
             {% else %}
-            <p style="padding: 20px; font-style: italic; color: rgba(255,255,255,0.4); text-align: center;">Hozircha hech qanday to'lovlar mavjud emas.</p>
+            <p style="padding: 20px; font-style: italic; color: var(--text-muted); text-align: center; margin: 0;">Hozircha to'lovlar mavjud emas.</p>
             {% endif %}
         </div>
     </div>
+    {% endif %}
 
     <!-- O'ng ustun: Yangi a'zolar -->
+    {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_students' in request.user.subadmin_permissions %}
     <div style="flex: 1; min-width: 280px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3 style="font-size: 17px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 8px;"><i class="fas fa-user-plus" style="color: #00ffaa;"></i> Yangi o'quvchilar</h3>
-            <a href="{% url 'students_list_admin' %}" style="font-size: 12.5px; color: #00f2fe; text-decoration: none; font-weight: 700; transition: 0.3s;" onmouseover="this.style.textShadow='0 0 8px rgba(0,242,254,0.4)';" onmouseout="this.style.textShadow='none';">Barchasi <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 3px;"></i></a>
+            <h3 style="font-size: 17px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px;"><i class="fas fa-user-plus" style="color: var(--accent-student);"></i> Yangi o'quvchilar</h3>
+            <a href="{% url 'students_list_admin' %}" style="font-size: 12.5px; color: var(--accent-primary); text-decoration: none; font-weight: 700; transition: 0.3s;">Barchasi <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 3px;"></i></a>
         </div>
 
-        <div style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.15);">
+        <div style="border: 1px solid var(--border-card); border-radius: 20px; background: var(--bg-card); padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
             {% if recent_students %}
                 {% for student in recent_students %}
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 12px; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px; border-bottom: 1px solid var(--table-border); padding-bottom: 12px; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(0, 255, 170, 0.05); border: 1px solid rgba(0, 255, 170, 0.2); display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-user-graduate" style="color: #00ffaa; font-size: 14px;"></i>
+                        <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--bg-accent-student); border: 1px solid var(--border-accent-student); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user-graduate" style="color: var(--accent-student); font-size: 14px;"></i>
                         </div>
                         <div>
-                            <h4 style="font-size: 13.5px; font-weight: 700; color: #ffffff; margin: 0;">{{ student.get_full_name|default:student.username }}</h4>
-                            <span style="font-size: 11px; color: rgba(255,255,255,0.4); display: block; margin-top: 2px;"><i class="fas fa-phone-alt" style="font-size: 10px; color: #00f2fe; margin-right: 4px;"></i>{{ student.phone_number }}</span>
+                            <h4 style="font-size: 13.5px; font-weight: 700; color: var(--text-primary); margin: 0;">{{ student.get_full_name|default:student.username }}</h4>
+                            <span style="font-size: 11px; color: var(--text-secondary); display: block; margin-top: 2px;"><i class="fas fa-phone-alt" style="font-size: 10px; color: var(--accent-primary); margin-right: 4px;"></i>{{ student.phone_number }}</span>
                         </div>
                     </div>
-                    <span style="font-size: 11px; font-family: monospace; color: rgba(255,255,255,0.4); text-align: right;">{{ student.joined_at|date:"d.m.Y" }}</span>
+                    <span style="font-size: 11px; font-family: monospace; color: var(--text-muted); text-align: right;">{{ student.joined_at|date:"d.m.Y" }}</span>
                 </div>
                 {% endfor %}
             {% else %}
-                <p style="font-style: italic; color: rgba(255,255,255,0.4); text-align: center; padding: 10px;">Yangi o'quvchilar yo'q.</p>
+                <p style="font-style: italic; color: var(--text-muted); text-align: center; padding: 10px; margin: 0;">Hozircha yangi o'quvchilar mavjud emas.</p>
             {% endif %}
         </div>
     </div>
+    {% endif %}
 </div>
 
+{% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_assignments' in request.user.subadmin_permissions %}
 <!-- SO'NGGI TOPSHIRIQ KARTASI -->
 <div style="margin-bottom: 30px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h3 style="font-size: 17px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 8px;"><i class="fas fa-tasks" style="color: #9b51e0;"></i> So'nggi topshiriqlar</h3>
-        <a href="{% url 'admin_assignment_list' %}" style="font-size: 12.5px; color: #00f2fe; text-decoration: none; font-weight: 700; transition: 0.3s;" onmouseover="this.style.textShadow='0 0 8px rgba(0,242,254,0.4)';" onmouseout="this.style.textShadow='none';">Barchasi <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 3px;"></i></a>
+        <h3 style="font-size: 17px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px;"><i class="fas fa-tasks" style="color: var(--accent-teacher);"></i> So'nggi topshiriqlar</h3>
+        <a href="{% url 'admin_assignment_list' %}" style="font-size: 12.5px; color: var(--accent-primary); text-decoration: none; font-weight: 700; transition: 0.3s;">Barchasi <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 3px;"></i></a>
     </div>
 
-    <div class="jadval-container" style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 12px; overflow-x: auto; box-shadow: 0 15px 30px rgba(0,0,0,0.15);">
+    <div class="jadval-container" style="border: 1px solid var(--border-card); border-radius: 20px; background: var(--bg-card); padding: 12px; overflow-x: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
         {% if recent_assignments %}
         <table style="width: 100%; border-collapse: collapse; text-align: left;">
             <thead>
                 <tr>
-                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Sarlavha</th>
-                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Guruh</th>
-                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Maksimal Ball</th>
-                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Muddati (Deadline)</th>
-                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Yuklangan vaqti</th>
+                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--border-card); background: var(--table-header-bg);">Sarlavha</th>
+                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--border-card); background: var(--table-header-bg);">Guruh</th>
+                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--border-card); background: var(--table-header-bg);">Maksimal ball</th>
+                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--border-card); background: var(--table-header-bg);">Topshiriq muddati</th>
+                    <th style="padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--border-card); background: var(--table-header-bg);">Yaratilgan sana</th>
                 </tr>
             </thead>
             <tbody>
                 {% for a in recent_assignments %}
                 <tr>
-                    <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(255,255,255,0.02); font-weight: 700; color: #ffffff;">{{ a.title }}</td>
-                    <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(255,255,255,0.02); color: rgba(255,255,255,0.75);">{{ a.group.name }}</td>
-                    <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid rgba(255,255,255,0.02); color: #00f2fe; font-weight: 700;">{{ a.max_score }} ball</td>
-                    <td style="padding: 12px 16px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.02); font-family: monospace; color: #ff0055; font-weight: 600;">{{ a.deadline|date:"d-m-Y H:i" }}</td>
-                    <td style="padding: 12px 16px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.02); font-family: monospace; color: rgba(255,255,255,0.5);">{{ a.created_at|date:"d-m-Y H:i" }}</td>
+                    <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid var(--table-border); font-weight: 700; color: var(--text-primary);">{{ a.title }}</td>
+                    <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid var(--table-border); color: var(--text-secondary);">{{ a.group.name }}</td>
+                    <td style="padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid var(--table-border); color: var(--accent-primary); font-weight: 700;">{{ a.max_score }} ball</td>
+                    <td style="padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--table-border); font-family: monospace; color: var(--accent-finance); font-weight: 600;">{{ a.deadline|date:"d.m.Y H:i" }}</td>
+                    <td style="padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--table-border); font-family: monospace; color: var(--text-muted);">{{ a.created_at|date:"d.m.Y H:i" }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {% else %}
-        <p style="padding: 20px; font-style: italic; color: rgba(255,255,255,0.4); text-align: center;">Hozircha hech qanday topshiriqlar yuklanmagan.</p>
+        <p style="padding: 20px; font-style: italic; color: var(--text-muted); text-align: center; margin: 0;">Hozircha faol topshiriqlar mavjud emas.</p>
         {% endif %}
     </div>
 </div>
+{{ growth_months|json_script:"growth-months-data" }}
+{{ growth_counts|json_script:"growth-counts-data" }}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let warningStudentsData = [];
+
+function filterWarningStudents() {
+    const query = document.getElementById('warningSearchInput').value.toLowerCase().trim();
+    const cards = document.querySelectorAll('.warning-student-card');
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (text.includes(query)) {
+            card.style.display = 'flex';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    const totalSpan = document.getElementById('warning-total-count');
+    if (query === '') {
+        totalSpan.textContent = warningStudentsData.length;
+    } else {
+        totalSpan.textContent = visibleCount + ' (topildi)';
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    let revenueChartInstance = null;
+    let groupShareChartInstance = null;
+
+    const yearSelector = document.getElementById('yearSelector');
+
+    // Fetch and load warning students dynamically via AJAX
+    function loadWarningStudents() {
+        const panelContainer = document.getElementById('warning-panel-container');
+        const loadingEl = document.getElementById('warning-panel-loading');
+        const gridEl = document.getElementById('warning-students-grid');
+        const totalSpan = document.getElementById('warning-total-count');
+
+        if (!panelContainer || !gridEl) return;
+
+        // Briefly display warning panel container while loading
+        panelContainer.style.display = 'block';
+
+        fetch("{% url 'admin_warning_students_api' %}")
+            .then(response => response.json())
+            .then(data => {
+                const students = data.warning_students || [];
+                warningStudentsData = students; // Save globally
+                
+                if (students.length === 0) {
+                    // Hide the warning panel container if there are no warning students
+                    panelContainer.style.display = 'none';
+                    return;
+                }
+
+                if (loadingEl) loadingEl.remove();
+
+                totalSpan.textContent = students.length;
+
+                let html = '';
+                students.forEach(item => {
+                    const firstChar = item.student ? item.student.charAt(0) : '?';
+                    let reasonsHtml = '';
+                    item.reasons.forEach(reason => {
+                        reasonsHtml += `<li style="margin-bottom: 2px;">${reason}</li>`;
+                    });
+
+                    html += `
+                    <div class="warning-student-card" style="background: var(--bg-warning-card); border: 1px solid var(--border-warning-card); border-radius: 16px; padding: 16px; display: flex; align-items: flex-start; gap: 12px; transition: 0.3s;" onmouseover="this.style.borderColor='var(--warning-search-border)';" onmouseout="this.style.borderColor='var(--border-warning-card)';">
+                        <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--bg-warning-panel); border: 1px solid var(--warning-search-border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--text-warning-title); font-weight: 800; font-size: 13.5px;">
+                            ${firstChar}
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.student}</h4>
+                            <div style="display: flex; flex-direction: column; gap: 3px; margin-top: 6px; font-size: 11.5px; color: var(--text-secondary);">
+                                <span><strong style="color: var(--text-primary);">Guruh:</strong> ${item.group}</span>
+                                <span><strong style="color: var(--text-primary);">Fan:</strong> ${item.subject}</span>
+                                <span><strong style="color: var(--text-primary);">O'qituvchi:</strong> ${item.teacher}</span>
+                            </div>
+                            <ul style="margin: 8px 0 0 0; padding-left: 16px; font-size: 11.5px; color: var(--text-warning-title); font-weight: 600; line-height: 1.4;">
+                                ${reasonsHtml}
+                            </ul>
+                        </div>
+                    </div>
+                    `;
+                });
+
+                gridEl.innerHTML = html;
+            })
+            .catch(err => {
+                console.error("Failed to load warning students:", err);
+                if (panelContainer) panelContainer.style.display = 'none';
+            });
+    }
+
+    function loadCharts(year) {
+        const revenueChartEl = document.getElementById('revenueChart');
+        const groupShareChartEl = document.getElementById('groupShareChart');
+        if (!revenueChartEl || !groupShareChartEl) return;
+
+        let url = "{% url 'admin_financial_stats_api' %}";
+        if (year) {
+            url += `?year=${year}`;
+        }
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                // Populate Year Dropdown if empty
+                const yearSelector = document.getElementById('yearSelector');
+                if (yearSelector && yearSelector.options.length === 0) {
+                    const isLightMode = document.documentElement.classList.contains('light-theme');
+                    data.available_years.forEach(yr => {
+                        const opt = document.createElement('option');
+                        opt.value = yr;
+                        opt.textContent = `${yr}-yil`;
+                        if (yr === data.selected_year) {
+                            opt.selected = true;
+                        }
+                        opt.style.backgroundColor = isLightMode ? '#ffffff' : '#0c101d';
+                        opt.style.color = isLightMode ? '#0f172a' : '#ffffff';
+                        yearSelector.appendChild(opt);
+                    });
+
+                    yearSelector.addEventListener('change', function() {
+                        loadCharts(this.value);
+                    });
+                }
+
+                // Check light theme state dynamically
+                const isLight = document.documentElement.classList.contains('light-theme') || document.body.classList.contains('light-theme');
+                const accentColor = isLight ? '#0284c7' : '#00f2fe';
+                const bgColor = isLight ? 'rgba(2, 132, 199, 0.08)' : 'rgba(0, 242, 254, 0.1)';
+                const gridColor = isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)';
+                const textColor = isLight ? '#64748b' : 'rgba(255, 255, 255, 0.6)';
+
+                // 1. Revenue line chart
+                const monthlyData = data.monthly_revenue;
+                const revenueLabels = monthlyData.map(item => item.month);
+                const revenueValues = monthlyData.map(item => item.total);
+
+                const ctx1 = document.getElementById('revenueChart').getContext('2d');
+                
+                if (revenueChartInstance) {
+                    revenueChartInstance.destroy();
+                }
+
+                revenueChartInstance = new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: revenueLabels,
+                        datasets: [{
+                            label: "Oylik to'lov (so'm)",
+                            data: revenueValues,
+                            borderColor: accentColor,
+                            backgroundColor: bgColor,
+                            borderWidth: 3,
+                            pointBackgroundColor: accentColor,
+                            pointBorderColor: '#ffffff',
+                            pointHoverRadius: 7,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                grid: { color: gridColor },
+                                ticks: { color: textColor, font: { weight: '600' } }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: textColor, font: { weight: '600' } }
+                            }
+                        }
+                    }
+                });
+
+                // 2. Group share doughnut chart
+                const groupData = data.group_payments;
+                const groupLabels = groupData.map(item => item.group_name);
+                const groupValues = groupData.map(item => item.total);
+
+                const chartColors = isLight ? [
+                    '#0284c7', '#ef4444', '#10b981', '#8b5cf6', '#f59e0b',
+                    '#3b82f6', '#14b8a6', '#ec4899', '#f97316', '#06b6d4'
+                ] : [
+                    '#00f2fe', '#ff0055', '#00ffaa', '#9b51e0', '#ff9f43',
+                    '#4facfe', '#00ff87', '#f36', '#ffb000', '#ec008c'
+                ];
+                const chartBorder = isLight ? '#ffffff' : '#0c101d';
+
+                const ctx2 = document.getElementById('groupShareChart').getContext('2d');
+
+                if (groupShareChartInstance) {
+                    groupShareChartInstance.destroy();
+                }
+
+                groupShareChartInstance = new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: groupLabels,
+                        datasets: [{
+                            data: groupValues,
+                            backgroundColor: chartColors.slice(0, groupValues.length),
+                            borderColor: chartBorder,
+                            borderWidth: 2,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: isLight ? '#475569' : 'rgba(255, 255, 255, 0.7)',
+                                    font: { size: 11, weight: '700' },
+                                    boxWidth: 12,
+                                    padding: 15
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+    }
+
+    loadCharts();
+    loadWarningStudents();
+
+    // 3. Student growth chart (Bar chart)
+    const isLightModeLocal = document.documentElement.classList.contains('light-theme') || document.body.classList.contains('light-theme');
+    const gridColorLocal = isLightModeLocal ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)';
+    const textColorLocal = isLightModeLocal ? '#64748b' : 'rgba(255, 255, 255, 0.6)';
+
+    const growthMonths = JSON.parse(document.getElementById('growth-months-data').textContent);
+    const growthCounts = JSON.parse(document.getElementById('growth-counts-data').textContent);
+    
+    const ctxGrowth = document.getElementById('growthChart');
+    if (ctxGrowth) {
+        const ctxG = ctxGrowth.getContext('2d');
+        const gradient = ctxG.createLinearGradient(0, 0, 0, 220);
+        if (isLightModeLocal) {
+            gradient.addColorStop(0, '#0284c7');
+            gradient.addColorStop(1, 'rgba(2, 132, 199, 0.08)');
+        } else {
+            gradient.addColorStop(0, '#00f2fe');
+            gradient.addColorStop(1, 'rgba(0, 242, 254, 0.05)');
+        }
+
+        new Chart(ctxG, {
+            type: 'bar',
+            data: {
+                labels: growthMonths,
+                datasets: [{
+                    label: "Yangi o'quvchilar soni",
+                    data: growthCounts,
+                    backgroundColor: gradient,
+                    borderColor: isLightModeLocal ? '#0284c7' : '#00f2fe',
+                    borderWidth: 1.5,
+                    borderRadius: 8,
+                    maxBarThickness: 28,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        grid: { 
+                            color: gridColorLocal,
+                            drawBorder: false
+                        },
+                        ticks: { color: textColorLocal, font: { weight: '600', size: 10 } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: textColorLocal, font: { weight: '600', size: 10 } }
+                    }
+                }
+            }
+        });
+    }
+
+    // 4. Attendance Rate Chart (Doughnut Chart)
+    const attPresent = {{ att_present }};
+    const attAbsent = {{ att_absent }};
+    const ctxAtt = document.getElementById('attendanceRateChart');
+    if (ctxAtt) {
+        if (attPresent === 0 && attAbsent === 0) {
+            const parent = ctxAtt.parentElement;
+            ctxAtt.style.display = 'none';
+            const emptyNotice = document.createElement('div');
+            emptyNotice.style.cssText = 'height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); text-align: center; gap: 10px;';
+            emptyNotice.innerHTML = '<i class="fas fa-calendar-times" style="font-size: 32px; opacity: 0.5;"></i><span style="font-size: 13px; font-weight: 600;">Oxirgi 1 haftada davomat kiritilmagan</span>';
+            parent.appendChild(emptyNotice);
+        } else {
+            new Chart(ctxAtt.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Kelganlar', 'Kelmaganlar'],
+                    datasets: [{
+                        data: [attPresent, attAbsent],
+                        backgroundColor: isLightModeLocal ? ['#10b981', '#ef4444'] : ['#00ffaa', '#ff0055'],
+                        borderColor: isLightModeLocal ? '#ffffff' : '#0c101d',
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: isLightModeLocal ? '#475569' : 'rgba(255, 255, 255, 0.7)',
+                                font: { size: 11, weight: '700' },
+                                boxWidth: 12,
+                                padding: 15
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // Re-render charts on dynamic theme switch
+    document.addEventListener('themeChanged', function() {
+        const yearSelector = document.getElementById('yearSelector');
+        const activeYear = yearSelector ? yearSelector.value : '';
+        loadCharts(activeYear);
+    });
+});
+</script>
 {% endblock %}

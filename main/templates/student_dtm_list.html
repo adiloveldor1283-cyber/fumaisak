@@ -1,0 +1,461 @@
+{% extends 'basestudent.html' %}
+
+{% block title %}DTM imtihonlarim{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .sarlavha {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #ffffff;
+            border-left: 4px solid #00f2fe;
+            padding-left: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .jadval-container {
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 24px;
+            background: rgba(11, 15, 25, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            max-height: calc(100vh - 160px);
+            overflow-y: auto;
+            padding: 24px;
+        }
+        .jadval-container::-webkit-scrollbar {
+            width: 5px;
+        }
+        .jadval-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.2);
+            border-radius: 4px;
+        }
+
+        .exam-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .exam-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .exam-card:hover {
+            border-color: rgba(0, 242, 254, 0.3);
+            box-shadow: 0 12px 35px rgba(0, 242, 254, 0.08);
+            transform: translateY(-3px);
+        }
+
+        .card-top {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .badge-status {
+            align-self: flex-start;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge-completed {
+            background: rgba(0, 255, 170, 0.1);
+            color: #00ffaa;
+            border: 1px solid rgba(0, 255, 170, 0.25);
+        }
+        .badge-registered {
+            background: rgba(0, 242, 254, 0.1);
+            color: #00f2fe;
+            border: 1px solid rgba(0, 242, 254, 0.25);
+        }
+        .badge-open {
+            background: rgba(255, 159, 67, 0.1);
+            color: #ff9f43;
+            border: 1px solid rgba(255, 159, 67, 0.25);
+        }
+        .badge-expired {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .exam-title {
+            color: #ffffff;
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.35;
+            margin: 0;
+        }
+
+        .exam-meta-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 12.5px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.5;
+        }
+        .exam-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .exam-meta i {
+            width: 14px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Middle Info Blocks */
+        .score-display {
+            background: rgba(0, 255, 170, 0.04);
+            border: 1px solid rgba(0, 255, 170, 0.2);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .score-label {
+            font-size: 12px;
+            color: rgba(0, 255, 170, 0.8);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .score-number {
+            font-size: 26px;
+            font-weight: 800;
+            color: #00ffaa;
+            line-height: 1;
+        }
+        .score-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 12.5px;
+            color: rgba(255, 255, 255, 0.7);
+            border-top: 1px dashed rgba(0, 255, 170, 0.2);
+            padding-top: 10px;
+        }
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .score-subject {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .score-val {
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .reg-info-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 12.5px;
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .reg-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .reg-label {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .reg-val {
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .booklet-badge {
+            margin-top: 4px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.08);
+            padding-top: 8px;
+            color: #ff9f43;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Bottom Action / Status Blocks */
+        .card-footer {
+            margin-top: auto;
+        }
+        .card-footer-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+        }
+        .status-completed {
+            background: rgba(0, 255, 170, 0.08);
+            border: 1px solid rgba(0, 255, 170, 0.2);
+            color: #00ffaa;
+        }
+        .card-footer-note {
+            background: rgba(0, 242, 254, 0.05);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 12px;
+            text-align: center;
+            color: #00f2fe;
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-dtm {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+            cursor: pointer;
+            border: 1px solid transparent;
+            width: 100%;
+            text-align: center;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* --- KUN REJIMI (LIGHT MODE) OVERRIDES --- */
+        body.light-mode .sarlavha {
+            color: #0f172a !important;
+            border-left-color: #0284c7 !important;
+        }
+        body.light-mode .jadval-container {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .exam-card {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02) !important;
+        }
+        body.light-mode .exam-card:hover {
+            border-color: #cbd5e1 !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+        }
+        body.light-mode .exam-title {
+            color: #0f172a !important;
+        }
+        body.light-mode .exam-meta-wrap {
+            color: #64748b !important;
+        }
+        body.light-mode .exam-meta i {
+            color: #94a3b8 !important;
+        }
+
+        /* Light Mode Middle Blocks */
+        body.light-mode .score-display {
+            background: rgba(16, 185, 129, 0.05) !important;
+            border: 1px solid rgba(16, 185, 129, 0.25) !important;
+        }
+        body.light-mode .score-label {
+            color: #059669 !important;
+        }
+        body.light-mode .score-number {
+            color: #15803d !important;
+        }
+        body.light-mode .score-breakdown {
+            border-top-color: rgba(16, 185, 129, 0.25) !important;
+        }
+        body.light-mode .score-subject {
+            color: #475569 !important;
+        }
+        body.light-mode .score-val {
+            color: #0f172a !important;
+        }
+
+        body.light-mode .reg-info-box {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #334155 !important;
+        }
+        body.light-mode .reg-label {
+            color: #64748b !important;
+        }
+        body.light-mode .reg-val {
+            color: #0f172a !important;
+        }
+        body.light-mode .booklet-badge {
+            border-top-color: #e2e8f0 !important;
+            color: #b45309 !important;
+        }
+
+        /* Light Mode Bottom Blocks */
+        body.light-mode .status-completed {
+            background: rgba(16, 185, 129, 0.08) !important;
+            border: 1px solid rgba(16, 185, 129, 0.25) !important;
+            color: #15803d !important;
+        }
+        body.light-mode .card-footer-note {
+            background: rgba(2, 132, 199, 0.06) !important;
+            border: 1px solid rgba(2, 132, 199, 0.2) !important;
+            color: #0284c7 !important;
+        }
+        body.light-mode .btn-primary {
+            background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+            color: #ffffff !important;
+        }
+        body.light-mode .btn-secondary {
+            background: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+            color: #475569 !important;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h2 class="sarlavha">Mock Imtihonlar (DTM)</h2>
+
+    <div class="jadval-container">
+        <div class="exam-grid">
+            {% for item in exams_data %}
+                <div class="exam-card">
+                    <div class="card-top">
+                        <!-- Status Badges -->
+                        {% if item.status == 'completed' %}
+                            <span class="badge-status badge-completed"><i class="fas fa-check-circle"></i> Natija tayyor</span>
+                        {% elif item.status == 'registered' %}
+                            <span class="badge-status badge-registered"><i class="fas fa-user-check"></i> Ro'yxatdan o'tilgan</span>
+                        {% elif item.status == 'not_registered' %}
+                            <span class="badge-status badge-open"><i class="fas fa-door-open"></i> Yozilish ochiq</span>
+                        {% else %}
+                            <span class="badge-status badge-expired"><i class="fas fa-hourglass-end"></i> Muddati tugagan</span>
+                        {% endif %}
+
+                        <h3 class="exam-title">{{ item.exam.title }}</h3>
+                        
+                        <div class="exam-meta-wrap">
+                            <div class="exam-meta"><i class="far fa-calendar-alt"></i> <span><b>Imtihon sanasi:</b> {{ item.exam.exam_date|date:"d.m.Y H:i" }}</span></div>
+                            <div class="exam-meta"><i class="far fa-clock"></i> <span><b>Yozilish muddati:</b> {{ item.exam.registration_deadline|date:"d.m.Y H:i" }}</span></div>
+                        </div>
+
+                        <!-- Card Middle Content -->
+                        {% if item.status == 'completed' %}
+                            <div class="score-display">
+                                <div class="score-header">
+                                    <span class="score-label">To'plangan ball</span>
+                                    <span class="score-number">{{ item.result.total_score }}</span>
+                                </div>
+                                <div class="score-breakdown">
+                                    <div class="score-item">
+                                        <span class="score-subject">1-blok ({{ item.registration.block1_subject }}):</span>
+                                        <span class="score-val">{{ item.result.score_block1 }} ball</span>
+                                    </div>
+                                    <div class="score-item">
+                                        <span class="score-subject">2-blok ({{ item.registration.block2_subject }}):</span>
+                                        <span class="score-val">{{ item.result.score_block2 }} ball</span>
+                                    </div>
+                                    {% if item.registration.take_compulsory %}
+                                        <div class="score-item">
+                                            <span class="score-subject">Majburiy fanlar:</span>
+                                            <span class="score-val">{{ item.result.score_compulsory }} ball</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% elif item.status == 'registered' %}
+                            <div class="reg-info-box">
+                                <div class="reg-info-row">
+                                    <span class="reg-label">1-blok:</span>
+                                    <span class="reg-val">{{ item.registration.block1_subject }}</span>
+                                </div>
+                                <div class="reg-info-row">
+                                    <span class="reg-label">2-blok:</span>
+                                    <span class="reg-val">{{ item.registration.block2_subject }}</span>
+                                </div>
+                                <div class="reg-info-row">
+                                    <span class="reg-label">Majburiy:</span>
+                                    <span class="reg-val">{% if item.registration.take_compulsory %}Topshiradi{% else %}Ozod etilgan (sertifikat){% endif %}</span>
+                                </div>
+                                {% if item.booklet_number %}
+                                    <div class="booklet-badge">
+                                        <span><i class="fas fa-id-card"></i> Kitobcha raqamingiz:</span>
+                                        <b>{{ item.booklet_number }}</b>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-footer">
+                        {% if item.status == 'not_registered' %}
+                            <a href="{% url 'student_dtm_register' item.exam.id %}" class="btn-dtm btn-primary"><i class="fas fa-edit"></i> Ro'yxatdan o'tish</a>
+                        {% elif item.status == 'registered' %}
+                            <div class="card-footer-note">
+                                <i class="fas fa-info-circle" style="font-size: 14px; flex-shrink: 0;"></i>
+                                <span>Imtihon kuni nazoratchi sizga qog'oz shaklidagi kitobcha va javoblar varag'ini taqdim etadi.</span>
+                            </div>
+                        {% elif item.status == 'completed' %}
+                            <div class="card-footer-status status-completed">
+                                <i class="fas fa-check-circle"></i> Imtihon topshirildi
+                            </div>
+                        {% else %}
+                            <button disabled class="btn-dtm btn-secondary" style="opacity: 0.5; cursor: not-allowed;"><i class="fas fa-times-circle"></i> Muddati o'tgan</button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <p style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; grid-column: 1/-1; padding: 40px 0;">Hozircha faol DTM imtihonlari mavjud emas.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

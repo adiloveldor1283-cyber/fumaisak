@@ -1,0 +1,257 @@
+{% extends 'baseadmin.html' %}
+{% load static %}
+
+{% block title %}Virtual hamyonlar | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .konteyner {
+        overflow-y: auto !important;
+        display: flex;
+        flex-direction: column;
+    }
+    .wallet-card {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 18px;
+        padding: 20px;
+        backdrop-filter: blur(15px);
+        margin-bottom: 25px;
+    }
+    
+    .jadval-container {
+        width: 100%;
+        overflow-x: auto !important;
+        overflow-y: auto !important;
+        max-height: calc(100vh - 220px);
+        min-height: 300px;
+    }
+    .jadval-container thead tr {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: #0f172a;
+        border-bottom: 2px solid rgba(255,255,255,0.08);
+    }
+    body.light-mode .jadval-container thead tr {
+        background: #ffffff;
+        border-bottom: 2px solid #cbd5e1;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th {
+        padding: 12px 16px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.4);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        white-space: nowrap;
+    }
+    td {
+        padding: 12px 16px;
+        font-size: 13.5px;
+        border-bottom: 1px solid rgba(255,255,255,0.02);
+        white-space: nowrap;
+    }
+    
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(7, 10, 18, 0.8);
+        backdrop-filter: blur(8px);
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .modal-content {
+        display: block !important;
+        background: #0f172a;
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        border-radius: 20px;
+        width: 100%;
+        max-width: 450px;
+        padding: 25px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    
+    /* Light Mode */
+    body.light-mode .wallet-card {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+    }
+    body.light-mode .modal-content {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a;
+    }
+    body.light-mode td {
+        color: #0f172a !important;
+        border-bottom-color: #e2e8f0 !important;
+    }
+    body.light-mode th {
+        color: #64748b !important;
+        border-bottom-color: #cbd5e1 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Sarlavha va Qidiruv -->
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0;">O'quvchilar virtual hamyonlari</h2>
+    
+    <input type="text" id="wallet-search" placeholder="Ism yoki telefon raqami bo'yicha qidirish..." style="padding: 10px 16px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; outline: none; width: 280px;">
+</div>
+
+<!-- Students list with balances -->
+    <div class="jadval-container" style="flex-grow: 1; margin-bottom: 20px; overflow-y: auto; overflow-x: auto; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); background: #080d1a; position: sticky; top: 0; z-index: 10;">
+                    <th>FOYDALANUVCHI</th>
+                    <th>TELEFON RAQAMI</th>
+                    <th>JORIY BALANS</th>
+                    <th>QO'SHILGAN SANA</th>
+                    <th>AMALLAR</th>
+                </tr>
+            </thead>
+            <tbody id="student-wallets-table">
+                {% for student in students %}
+                <tr class="student-wallet-row" data-name="{{ student.first_name }} {{ student.last_name }} {{ student.username }}" data-phone="{{ student.phone_number }}">
+                    <td style="font-weight: 700; color: #ffffff;">{{ student.first_name }} {{ student.last_name }} ({{ student.username }})</td>
+                    <td style="font-family: monospace;">{{ student.phone_number }}</td>
+                    <td style="color: #00ffaa; font-weight: 800; font-size: 15px;">{{ student.balance }} UZS</td>
+                    <td>{{ student.joined_at|date:"d.m.Y" }}</td>
+                    <td>
+                        <button onclick="openTopUpModal('{{ student.id }}', '{{ student.first_name }} {{ student.last_name }}')" style="padding: 6px 12px; background: rgba(0, 255, 170, 0.08); border: 1px solid rgba(0, 255, 170, 0.2); color: #00ffaa; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: 0.3s;" onmouseover="this.style.background='#00ffaa'; this.style.color='#000000';"><i class="fas fa-plus"></i> Balansni to'ldirish</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+<!-- Transactions log history -->
+<div class="wallet-card">
+    <h3 style="font-size: 14px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 10px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px;">Oxirgi virtual tranzaksiyalar</h3>
+    {% if recent_transactions %}
+        <div class="jadval-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>O'QUVCHI</th>
+                        <th>TRANZAKSIYA TURI</th>
+                        <th>SUMMA</th>
+                        <th>TAVSIF</th>
+                        <th>VAQTI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tx in recent_transactions %}
+                    <tr>
+                        <td style="font-weight: 700; color: #ffffff;">{{ tx.student.first_name }} {{ tx.student.last_name }}</td>
+                        <td>
+                            {% if tx.transaction_type == 'top_up' %}
+                                <span style="color: #00ffaa; font-weight: 700;">Balansni to'ldirish</span>
+                            {% else %}
+                                <span style="color: #ffaa00; font-weight: 700;">Guruh to'lovi</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if tx.amount > 0 %}
+                                <span style="color: #00ffaa; font-weight: 800;">+{{ tx.amount }} UZS</span>
+                            {% else %}
+                                <span style="color: #ff4f4f; font-weight: 800;">{{ tx.amount }} UZS</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ tx.description|default:"-" }}</td>
+                        <td style="font-family: monospace;">{{ tx.created_at|date:"d.m.Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 25px 15px; color: rgba(255,255,255,0.4);">
+            <i class="fas fa-receipt" style="font-size: 26px; margin-bottom: 8px; opacity: 0.5; display: block;"></i>
+            Hozircha virtual tranzaksiyalar mavjud emas.
+        </div>
+    {% endif %}
+</div>
+
+<!-- Modal: Top-up Wallet Form -->
+<div id="topUpModal" class="modal">
+    <div class="modal-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+            <h4 style="font-size: 15px; font-weight: 800; color: white;">Hamyon balansini to'ldirish</h4>
+            <button onclick="closeTopUpModal()" style="background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; font-size: 20px;"><i class="fas fa-times"></i></button>
+        </div>
+        <form method="POST" action="{% url 'admin_top_up_wallet' %}">
+            {% csrf_token %}
+            <input type="hidden" name="student_id" id="modal-student-id">
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 5px;">O'quvchi</label>
+                <div id="modal-student-name" style="padding: 10px 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; font-weight: 700; color: white;"></div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label for="modal-amount" style="display: block; font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 5px;">To'ldirish summasi (so'm) *</label>
+                <input type="number" name="amount" id="modal-amount" placeholder="Masalan: 50000" required style="width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; outline: none; font-weight: 700;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="modal-desc" style="display: block; font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 5px;">Kvitansiya / Izoh (ixtiyoriy)</label>
+                <input type="text" name="description" id="modal-desc" placeholder="Masalan: Naqd pul orqali to'ldirildi..." style="width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; outline: none;">
+            </div>
+            
+            <button type="submit" style="width: 100%; padding: 12px 20px; background: linear-gradient(135deg, #00ffaa, #00f2fe); border: none; border-radius: 10px; color: #070a12; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 12px; letter-spacing: 0.5px;"><i class="fas fa-check-circle" style="margin-right: 6px;"></i> Balansni to'ldirish</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Search Live Filter
+    const searchInput = document.getElementById('wallet-search');
+    const rows = document.querySelectorAll('.student-wallet-row');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const query = searchInput.value.toLowerCase().trim();
+            rows.forEach(row => {
+                const name = row.getAttribute('data-name').toLowerCase();
+                const phone = row.getAttribute('data-phone').toLowerCase();
+                
+                if (name.includes(query) || phone.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    function openTopUpModal(studentId, studentName) {
+        document.getElementById('modal-student-id').value = studentId;
+        document.getElementById('modal-student-name').textContent = studentName;
+        document.getElementById('topUpModal').style.display = 'flex';
+    }
+
+    function closeTopUpModal() {
+        document.getElementById('topUpModal').style.display = 'none';
+    }
+</script>
+{% endblock %}

@@ -518,7 +518,7 @@
     <div class="sidebar collapsed" id="sidebar">
         <div class="toggle-container">
             <img src="{{ global_image }}" alt="Logatip photo">
-            <div class="brand">FUMAISAK</div>
+            <div class="brand">{{ site_name|default:"Tizim" }}</div>
             <button class="toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
         </div>
 
@@ -530,7 +530,13 @@
             {% endif %}
             <div style="display: flex; flex-direction: column;">
                 <span class="span">Admin</span>
-                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">{{ user.username }}</span>
+                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">
+                    {% if user.first_name or user.last_name %}
+                        {{ user.first_name }} {{ user.last_name }}
+                    {% else %}
+                        {{ user.username }}
+                    {% endif %}
+                </span>
             </div>
         </div>
 
@@ -561,15 +567,18 @@
                 </a>
                 <div class="dropdown-panel" id="profile-panel">
                     <a href="{% url 'admin:index' %}" class="dropdown-item"><i class="fas fa-cogs"></i> Django Admin</a>
-                    <a href="{% url 'login' %}" class="dropdown-item" style="color: #ff808b;"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
+                    <a href="{% url 'logout' %}" class="dropdown-item" style="color: #ff808b;"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
                 </div>
             </div>
         </div>
-
         <div class="konteyner">
-            <div class="sarlavha-qatori">
-                <h2 class="sarlavha">{{ group.name }} guruhidagi o'qituvchilar dars jadvali</h2>
-                <a href="{% url 'all_group_schedules' %}" class="btn-otish"><i class="fas fa-arrow-left"></i> Orqaga</a>
+            <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <a href="{% url 'all_group_schedules' %}" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #ffffff; transition: 0.3s; cursor: pointer; text-decoration: none;" onmouseover="this.style.background='rgba(0, 242, 254, 0.1)'; this.style.borderColor='rgba(0, 242, 254, 0.3)'; this.style.color='#00f2fe';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.08)'; this.style.color='#ffffff';" title="Orqaga">
+                        <i class="fas fa-chevron-left" style="font-size: 16px;"></i>
+                    </a>
+                    <h2 class="sarlavha" style="margin: 0;">{{ group.name }} guruhidagi o'qituvchilar dars jadvali</h2>
+                </div>
             </div>
 
             <div class="jadval-container">

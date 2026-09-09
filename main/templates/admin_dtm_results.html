@@ -1,0 +1,215 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %}DTM natijalari | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .sarlavha {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #ffffff;
+            border-left: 4px solid #00f2fe;
+            padding-left: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .jadval-container {
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-height: calc(100vh - 240px);
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th {
+            padding: 16px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            position: sticky;
+            top: 0;
+            background: #080d1a;
+            z-index: 2;
+        }
+        td {
+            padding: 14px 18px;
+            font-size: 13.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.8);
+            vertical-align: middle;
+        }
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+            color: #ffffff;
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-weight: 800;
+            font-size: 13px;
+        }
+        .rank-1 {
+            background: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+        .rank-2 {
+            background: rgba(192, 192, 192, 0.15);
+            color: #c0c0c0;
+            border: 1px solid rgba(192, 192, 192, 0.3);
+        }
+        .rank-3 {
+            background: rgba(205, 127, 50, 0.15);
+            color: #cd7f32;
+            border: 1px solid rgba(205, 127, 50, 0.3);
+        }
+        .rank-other {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr { display: block; }
+            thead { display: none; }
+            tr {
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 16px;
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            }
+            td:last-child { border-bottom: none; }
+            td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: rgba(255, 255, 255, 0.4);
+                font-size: 11px;
+                text-transform: uppercase;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+        <a href="{% url 'admin_dtm_list' %}" class="back-arrow-btn" title="Orqaga">
+            <i class="fas fa-chevron-left" style="font-size: 16px;"></i>
+        </a>
+        <h2 class="sarlavha" style="margin-bottom: 0;">Imtihon natijalari (Reyting): {{ exam.title }}</h2>
+    </div>
+
+    <div class="jadval-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 70px; text-align: center;">O'RIN</th>
+                    <th>F.I.SH (GURUH)</th>
+                    <th>FANLAR</th>
+                    <th style="text-align: center;">1-BLOK BALLI</th>
+                    <th style="text-align: center;">2-BLOK BALLI</th>
+                    <th style="text-align: center;">MAJBURIY FANLAR BALLI</th>
+                    <th style="text-align: center; color: #00ffaa;">JAMI BALL</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in results %}
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <td data-label="O'RIN" style="text-align: center;">
+                            {% if forloop.counter == 1 %}
+                                <span class="rank-badge rank-1"><i class="fas fa-crown"></i></span>
+                            {% elif forloop.counter == 2 %}
+                                <span class="rank-badge rank-2">2</span>
+                            {% elif forloop.counter == 3 %}
+                                <span class="rank-badge rank-3">3</span>
+                            {% else %}
+                                <span class="rank-badge rank-other">{{ forloop.counter }}</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="F.I.SH (GURUH)" style="font-weight: 700; color: #ffffff;">
+                            {{ res.registration.student.get_full_name }}
+                            <div style="font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 500; margin-top: 2px;">
+                                Guruh: {{ res.registration.student.student_groups.all|join:", " }}
+                            </div>
+                        </td>
+                        <td data-label="FANLAR" style="font-size: 12.5px; color: rgba(255,255,255,0.7);">
+                            1-blok: {{ res.registration.block1_subject }} <br>
+                            2-blok: {{ res.registration.block2_subject }}
+                        </td>
+                        <td data-label="1-BLOK BALLI" style="text-align: center; font-family: monospace; font-weight: 700; color: #00ffaa;">
+                            {{ res.score_block1 }} ball
+                        </td>
+                        <td data-label="2-BLOK BALLI" style="text-align: center; font-family: monospace; font-weight: 700; color: #00f2fe;">
+                            {{ res.score_block2 }} ball
+                        </td>
+                        <td data-label="MAJBURIY FANLAR BALLI" style="text-align: center; font-family: monospace; color: #ffd700;">
+                            {% if res.registration.take_compulsory %}
+                                {{ res.score_compulsory }} ball
+                            {% else %}
+                                <span style="color: rgba(255,255,255,0.25); font-style: italic;">Ozod etilgan</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="JAMI BALL" style="text-align: center; font-family: monospace; font-size: 16px; font-weight: 800; color: #00ffaa; text-shadow: 0 0 10px rgba(0, 255, 170, 0.2);">
+                            {{ res.total_score }} ball
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: rgba(255,255,255,0.3); padding: 40px 20px;">
+                            <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 40px 20px; text-align: center;">
+                                <i class="fas fa-trophy" style="font-size: 36px; color: rgba(255,255,255,0.2); margin-bottom: 15px; display: inline-block;"></i>
+                                <h4 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Natijalar mavjud emas</h4>
+                                <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin: 0;">Ushbu imtihon bo'yicha hali natijalar kiritilmagan.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

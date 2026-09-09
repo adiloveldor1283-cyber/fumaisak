@@ -1,15 +1,9 @@
 {% extends 'baseteacher.html' %}
 {% load static %}
 
-{% block title %}Baholash - O'qituvchi Paneli{% endblock %}
+{% block title %}Topshiriqlarni baholash{% endblock %}
 
-{% block header_search %}
-<!-- QIDIRUV FORMASI -->
-<form class="search-form" onsubmit="event.preventDefault()">
-    <input type="text" class="search-input" placeholder="Familiya bo'yicha qidiruv..." id="qidiruv">
-    <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
-</form>
-{% endblock %}
+
 
 {% block extra_css %}
 <style>
@@ -43,77 +37,88 @@
         display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
     }
 
-    /* --- 🔍 QIDIRUV PANELI - SPLIT DESIGN --- */
-    .search-form {
-        display: flex;
-        position: relative;
-    }
-    .search-input {
-        padding: 10px 16px;
-        font-size: 13px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px 0 0 12px;
-        outline: none;
-        width: 25vw;
-        background-color: rgba(255, 255, 255, 0.02);
-        color: #ffffff;
-        margin-left: 20px;
-        border-right: none;
-        transition: 0.3s;
-    }
-    .search-input:focus {
-        border-color: #00f2fe;
-        background: rgba(255, 255, 255, 0.06);
-        box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
-    }
-    .search-btn {
-        background-color: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-left: none;
-        padding: 10px 18px;
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 13px;
-        border-radius: 0 12px 12px 0;
-        cursor: pointer;
-        transition: 0.3s;
-        display: flex;
+    /* --- 🔙 ORTGA QAYTISH STRELKASI (HEADER) --- */
+    .btn-back-icon {
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-    }
-    .search-btn:hover {
-        background-color: rgba(0, 242, 254, 0.1);
+        width: 38px;
+        height: 38px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
         color: #00f2fe;
-        border-color: rgba(0, 242, 254, 0.2);
+        text-decoration: none;
+        font-size: 15px;
+        transition: 0.25s ease;
+        flex-shrink: 0;
+    }
+    .btn-back-icon:hover {
+        background: rgba(0, 242, 254, 0.12);
+        border-color: rgba(0, 242, 254, 0.3);
+        color: #ffffff;
+        transform: translateX(-3px);
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+    }
+    body.light-mode .btn-back-icon {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        color: #0284c7 !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    }
+    body.light-mode .btn-back-icon:hover {
+        background: #f1f5f9 !important;
+        border-color: #94a3b8 !important;
+        color: #0369a1 !important;
+    }
+
+    .sarlavha {
+        font-size: 20px;
+        font-weight: 800;
+        margin: 0;
+        color: #ffffff;
+        border-left: 4px solid #00f2fe;
+        padding-left: 12px;
+        letter-spacing: -0.5px;
+    }
+    body.light-mode .sarlavha {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
     }
 
     /* --- 📊 ICHKI MUSTAQIL SKROL BO'LUVCHI JADVAL KONTEYNERI (DESKTOP) --- */
     .jadval-container {
         flex-grow: 1;
-        overflow-y: auto;
+        overflow-y: auto !important;
+        overflow-x: auto !important;
         border: 1px solid rgba(255, 255, 255, 0.04);
         border-radius: 20px;
         background: #0c101d; /* Solid to'q fon glitchlarning oldini oladi */
         box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        max-height: calc(100vh - 210px);
+        max-height: calc(100vh - 200px);
+        min-height: 300px;
     }
 
     /* Skrolbar dizayni */
     .jadval-container::-webkit-scrollbar {
-        width: 4px;
+        width: 6px;
+        height: 6px;
     }
     .jadval-container::-webkit-scrollbar-track {
         background: transparent;
     }
     .jadval-container::-webkit-scrollbar-thumb {
-        background: rgba(0, 242, 254, 0.2);
-        border-radius: 4px;
+        background: rgba(0, 242, 254, 0.12);
+        border-radius: 10px;
     }
     .jadval-container::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 242, 254, 0.4);
+        background: rgba(0, 242, 254, 0.3);
     }
 
     table {
-        width: 100%;
+        width: max-content !important;
+        min-width: 100% !important;
+        white-space: nowrap;
         border-collapse: separate;
         border-spacing: 0;
         text-align: left;
@@ -261,6 +266,15 @@
 {% endblock %}
 
 {% block content %}
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="{% url 'teacher_deadline' %}" class="btn-back-icon" title="Topshiriqlar paneliga qaytish">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h2 class="sarlavha">Topshiriq: {{ assignment.title }} ({{ assignment.group.name }})</h2>
+        </div>
+    </div>
+
     <div class="assignment-meta-grid">
         <div class="kiber-karta">
             <div class="matn-qismi">
@@ -285,6 +299,16 @@
             </div>
             <div class="ikonka-qutisi" style="color: #00ffaa; border-color: rgba(0,255,170,0.2);"><i class="fas fa-star"></i></div>
         </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 0 20px 0; flex-wrap: wrap; gap: 15px;">
+        <h3 style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;"><i class="fas fa-list" style="color: #00f2fe;"></i> Topshirganlar ro'yxati</h3>
+        
+        <!-- SUBMISSIONS SEARCH FORM -->
+        <form class="search-form" onsubmit="event.preventDefault()">
+            <input type="text" class="search-input" placeholder="Familiya bo'yicha qidiruv..." id="qidiruv">
+            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+        </form>
     </div>
 
     <!-- JADVAL KONTENYNERI (TO'LIQ CHEKSIZ RO'YXAT) -->
@@ -317,7 +341,7 @@
                         {% endif %}
                     </td>
                     <td data-label="Fayl" style="text-align: center;">
-                        {% if item.submission %}
+                        {% if item.submission and item.submission.file %}
                             <a class="btn-otish" href="{{ item.submission.file.url }}" target="_blank"><i class="fas fa-eye"></i></a>
                         {% else %}
                             <span style="color: rgba(255,255,255,0.2);">—</span>
@@ -336,7 +360,7 @@
                     </td>
                     <td data-label="Baholash" style="text-align: center;">
                         {% if item.submission %}
-                            <button class="btn-otish" onclick="openModal('{{ item.student.id }}', '{{ item.student.get_full_name }}', '{{ item.submission.file.url }}', '{{ item.submission.grade|default:'' }}')"><i class="fas fa-marker" style="margin-right: 6px;"></i>Baholash</button>
+                            <button class="btn-otish" onclick="openModal('{{ item.student.id }}', '{{ item.student.get_full_name }}', '{% if item.submission.file %}{{ item.submission.file.url }}{% endif %}', '{{ item.submission.grade|default:'' }}', '{{ item.submission.feedback|default:''|escapejs }}')"><i class="fas fa-marker" style="margin-right: 6px;"></i>Baholash</button>
                         {% else %}
                             <span style="color: rgba(255,255,255,0.2);">—</span>
                         {% endif %}
@@ -345,11 +369,6 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
-
-    <!-- PASHTI PANEL (ORTGA QAYTISH TUGMASI) -->
-    <div class="chiqish_sahifa">
-        <a href="{% url 'teacher_deadline' %}" class="btn-otish"><i class="fas fa-arrow-left" style="margin-right: 8px;"></i>Orqaga qaytish</a>
     </div>
 
     <!-- Baholash modal oynasi -->
@@ -361,7 +380,7 @@
         </div>
         <form method="post" action="{% url 'grade_assignment' %}" class="grade-form">
           {% csrf_token %}
-          <p><strong>O‘quvchi:</strong> <span class="student-name" style="font-weight: 700; color: #ffffff;"></span></p>
+          <p><strong>O'quvchi:</strong> <span class="student-name" style="font-weight: 700; color: #ffffff;"></span></p>
           <input type="hidden" name="student_id" class="student-id">
           <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
 
@@ -371,6 +390,9 @@
 
           <p><strong>Ball (0 - {{ assignment.max_score }}):</strong></p>
           <input type="number" name="score" class="score-input" min="0" max="{{ assignment.max_score }}" required>
+
+          <p style="margin-top: 15px;"><strong>Izoh (Feedback):</strong></p>
+          <textarea name="feedback" class="feedback-input score-input" style="height: 80px; resize: vertical;" placeholder="O'quvchiga izoh yozing..."></textarea>
 
           <div style="margin-top: 25px; display: flex; gap: 12px;">
               <button type="submit" class="btn-save">Saqlash</button>
@@ -423,11 +445,12 @@
     });
 
     /* --- 🎭 MODAL OYNA INTERFAOL ACTIONLARI --- */
-    function openModal(studentId, studentName, fileUrl, score) {
+    function openModal(studentId, studentName, fileUrl, score, feedback) {
         document.querySelector('.student-id').value = studentId;
         document.querySelector('.student-name').innerText = studentName;
         document.querySelector('.file-link').href = fileUrl;
         document.querySelector('.score-input').value = score || '';
+        document.querySelector('.feedback-input').value = feedback || '';
         document.querySelector('.grade-modal-overlay').style.display = 'flex';
     }
 

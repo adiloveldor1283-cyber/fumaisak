@@ -1,7 +1,7 @@
 {% extends 'basestudent.html' %}
 {% load custom_filters %}
 
-{% block title %}Profil Sozlamalari - Student Profili{% endblock %}
+{% block title %}Profil sozlamalari{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -139,61 +139,7 @@
         box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
 
-    /* --- 🖥️ MODERN TOP MESSAGE NOTIFICATION TOASTS --- */
-    .modal-backdropp {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5);
-        backdrop-filter: blur(4px);
-        z-index: 1998;
-    }
-    .top-modall {
-        position: fixed;
-        top: -200px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%;
-        max-width: 480px;
-        background: linear-gradient(135deg, #00b09b, #96c93d);
-        color: white;
-        padding: 16px 20px;
-        z-index: 1999;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        border-radius: 16px;
-        border: 1px solid rgba(255,255,255,0.1);
-        transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .top-modall.error {
-        background: linear-gradient(135deg, #ff0055, #ff5085);
-        box-shadow: 0 20px 40px rgba(255, 0, 85, 0.25);
-    }
-    .top-modall.show {
-        top: 30px;
-    }
-    .modal-contentt {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .modall-message {
-        font-size: 13.5px;
-        font-weight: 600;
-        line-height: 1.5;
-    }
-    .close-modall-btn {
-        background: rgba(255, 255, 255, 0.2);
-        border: none;
-        font-size: 11px;
-        color: white;
-        cursor: pointer;
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+        
 
     /* --- 📱 MOBIL QURILMALAR MEDIA REJIMI --- */
     @media (max-width: 768px) {
@@ -219,31 +165,16 @@
 {% endblock %}
 
 {% block content %}
-    <!-- MESSAGES TOP DIALOGS (SUCCESS / ERROR TOAST) -->
-    {% if messages %}
-        {% for message in messages %}
-            {% if 'passwordd_img' in message.tags or 'passwordd' in message.tags %}
-                <div id="modal-backdropp" class="modal-backdropp"></div>
-                <div id="top-modall" class="top-modall show {% if 'passwordd' in message.tags and 'error' in message.tags %}error{% endif %}">
-                    <div class="modal-contentt">
-                        <span class="modall-message">
-                            {% if 'error' in message.tags %}<i class="fas fa-times-circle" style="margin-right: 8px;"></i>{% else %}<i class="fas fa-check-circle" style="margin-right: 8px;"></i>{% endif %}
-                            {{ message }}
-                        </span>
-                        <button class="close-modall-btn" onclick="closeTopModall()">✖</button>
-                    </div>
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
+    
 
     <div class="profil-konteyner">
         <h2>Profil sozlamalari</h2>
 
         <!-- TABS CONTROL CONTAINER -->
         <div class="profil-tablar">
-            <button class="profil-tab-btn aktiv-tab" onclick="ochTab(event, 'parol')"><i class="fas fa-lock"></i>Parolni o‘zgartirish</button>
+            <button class="profil-tab-btn aktiv-tab" onclick="ochTab(event, 'parol')"><i class="fas fa-lock"></i>Parolni o'zgartirish</button>
             <button class="profil-tab-btn" onclick="ochTab(event, 'rasm')"><i class="fas fa-image"></i>Rasmni saqlash</button>
+            <button class="profil-tab-btn" onclick="ochTab(event, 'telegram')"><i class="fab fa-telegram-plane"></i>Telegram ulanishi</button>
         </div>
 
         <!-- Parol o'zgartirish bo'limi -->
@@ -284,6 +215,51 @@
                 <button type="submit" class="profil-btn">Rasmni saqlash</button>
             </form>
         </div>
+
+        <!-- Telegram ulanishi bo'limi -->
+        <div id="telegram" class="profil-tarkib">
+            {% if not student.telegram_chat_id %}
+            <div style="text-align: center; padding: 20px 0;">
+                <div style="width: 60px; height: 60px; background: rgba(0, 242, 254, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 28px; color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.25);">
+                    <i class="fab fa-telegram-plane"></i>
+                </div>
+                <h4 style="color: white; font-size: 16px; margin-bottom: 8px;">Telegram bildirishnomalarini yoqish</h4>
+                
+                <div style="text-align: left; max-width: 400px; margin: 0 auto 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.65);">
+                    <span style="font-weight: 700; color: white;">Bog'lash yo'riqnomasi:</span>
+                    <ol style="margin: 8px 0 0 18px; padding: 0;">
+                        <li>Telegramda <a href="https://t.me/lms_tizim_bot" target="_blank" style="color: #00f2fe; text-decoration: underline; font-weight: 700;">@lms_tizim_bot</a> ni ochib, <b>Start</b> bosing.</li>
+                        <li>Bot sizdan ulanish kodini kiritishni so'raydi.</li>
+                        <li>Pastdagi <b>"Kod shakllantirish"</b> tugmasini bosib, 6 xonali kod oling va botga yuboring.</li>
+                    </ol>
+                </div>
+
+                <button type="button" onclick="generateOtpCode(this)" class="profil-btn" style="padding: 12px 35px; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);">
+                    Kod shakllantirish
+                </button>
+
+                <div id="otp-display-container" style="display: none; max-width: 320px; margin: 25px auto 0; padding: 15px; border-radius: 12px; background: rgba(0, 242, 254, 0.03); border: 1px dashed rgba(0, 242, 254, 0.3); box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                    <div style="font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Sizning ulanish kodingiz:</div>
+                    <div id="otp-code-val" style="font-size: 36px; font-weight: 900; color: #00f2fe; margin: 10px 0; letter-spacing: 6px; font-family: monospace;">000000</div>
+                    <div id="otp-countdown" style="font-size: 12px; color: #00ffaa; font-weight: 700;">Amal qilish muddati: 60 soniya</div>
+                </div>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 20px 0;">
+                <div style="width: 60px; height: 60px; background: rgba(0, 255, 170, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 28px; color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.25); box-shadow: 0 0 15px rgba(0, 255, 170, 0.15);">
+                    <i class="fab fa-telegram-plane"></i>
+                </div>
+                <h4 style="color: white; font-size: 16px; margin-bottom: 8px;">Telegram bot ulandi</h4>
+                <p style="color: rgba(255,255,255,0.5); font-size: 13px; line-height: 1.5; margin-bottom: 20px;">Sizning profilingiz Telegram hisobingizga muvaffaqiyatli ulangan va bildirishnomalar yoqilgan.</p>
+                <form method="POST" action="{% url 'disconnect_telegram' %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="profil-btn" style="background: rgba(255, 74, 90, 0.1); border: 1px solid rgba(255, 74, 90, 0.3); color: #ff4a5a; box-shadow: none; padding: 12px 30px;">
+                        Ulanishni uzish
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}
 
@@ -309,14 +285,73 @@
         }
     }
 
-    function closeTopModall() {
-        document.getElementById('modal-backdropp')?.remove();
-        document.getElementById('top-modall')?.remove();
+    let otpInterval = null;
+    function generateOtpCode(btn) {
+        if (otpInterval) clearInterval(otpInterval);
+        
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "Yuklanmoqda...";
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+        
+        fetch('/student/telegram/generate-otp/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            btn.textContent = "Kodni yangilash";
+            btn.disabled = false;
+            if (data.status === 'success') {
+                document.getElementById('otp-display-container').style.display = 'block';
+                document.getElementById('otp-code-val').textContent = data.otp_code;
+                
+                let timeLeft = data.expires_in || 60;
+                const countdownEl = document.getElementById('otp-countdown');
+                countdownEl.style.color = '#00ffaa';
+                countdownEl.textContent = `Amal qilish muddati: ${timeLeft} soniya`;
+                
+                otpInterval = setInterval(() => {
+                    timeLeft--;
+                    if (timeLeft <= 10) {
+                        countdownEl.style.color = '#ff4a5a';
+                    }
+                    if (timeLeft <= 0) {
+                        clearInterval(otpInterval);
+                        countdownEl.textContent = "Kod muddati tugadi. Iltimos kodni yangilang.";
+                        document.getElementById('otp-code-val').style.color = 'rgba(255,255,255,0.2)';
+                    } else {
+                        countdownEl.textContent = `Amal qilish muddati: ${timeLeft} soniya`;
+                    }
+                }, 1000);
+            } else {
+                alert(data.message || "Kod olishda xatolik yuz berdi.");
+            }
+        })
+        .catch(err => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+            alert("Xatolik: " + err.message);
+        });
     }
-
-    // Tizim bildirishnomasi 5 soniyadan keyin avtomatik yopiladi
-    window.addEventListener('load', function () {
-        setTimeout(closeTopModall, 5000);
-    });
 </script>
 {% endblock %}

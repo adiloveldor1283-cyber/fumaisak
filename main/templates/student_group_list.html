@@ -1,6 +1,6 @@
 {% extends 'basestudent.html' %}
 
-{% block title %}Guruhlarim - Student Profili{% endblock %}
+{% block title %}Guruhlarim{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -15,41 +15,68 @@
         letter-spacing: -0.5px;
     }
 
-    /* Glassmorphic Table Container Card */
     .jadval-container {
-        background: rgba(255, 255, 255, 0.01);
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        box-shadow: 0 40px 80px rgba(0,0,0,0.2);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border-radius: 24px;
-        padding: 24px;
-    }
+            flex-grow: 1;
+            overflow-y: auto !important;
+            overflow-x: auto !important;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-height: calc(100vh - 300px);
+            min-height: 300px;
+        }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
-    }
-    th {
-        padding: 14px 16px;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.4);
-        letter-spacing: 0.5px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    td {
-        padding: 16px 16px;
-        font-size: 14px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-        color: rgba(255, 255, 255, 0.85);
-    }
-    tr:hover td {
-        background: rgba(255, 255, 255, 0.01);
-        color: #ffffff;
-    }
+        /* Skrolbar dizayni */
+        .jadval-container::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .jadval-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .jadval-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.12);
+            border-radius: 10px;
+        }
+        .jadval-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 242, 254, 0.3);
+        }
+
+        table {
+            width: max-content !important;
+            min-width: 100% !important;
+            white-space: nowrap;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th {
+            padding: 16px 18px;
+            font-size: 13.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            position: sticky; /* Tepa qismi qotib turadi */
+            top: 0;
+            background: #080d1a;
+            z-index: 2;
+        }
+        td {
+            padding: 14px 18px;
+            font-size: 13.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.8);
+            vertical-align: middle;
+        }
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+            color: #ffffff;
+        }
+
 
     /* --- 📱 MOBIL REJIM UCHUN VERTIKAL FORMAT (CARD LAYOUT) --- */
     @media (max-width: 768px) {
@@ -112,6 +139,192 @@
             padding-right: 15px;
         }
     }
+
+    .btn-otish {
+        display: inline-block;
+        padding: 8px 16px;
+        background: rgba(0, 242, 254, 0.07);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        color: #00f2fe;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: 0.3s;
+        text-align: center;
+        cursor: pointer;
+    }
+    .btn-otish:hover {
+        background: rgba(0, 242, 254, 0.15);
+        color: #ffffff;
+        box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+        border-color: rgba(0, 242, 254, 0.4);
+    }
+
+    /* --- KUN REJIMI (LIGHT MODE) OVERRIDES --- */
+    body.light-mode {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+    }
+    body.light-mode .cyber-bg {
+        opacity: 0.01;
+    }
+    body.light-mode .main {
+        background: #f1f5f9 !important;
+    }
+    body.light-mode .sidebar {
+        background: #e2e8f0 !important;
+        border-right: 1px solid #cbd5e1 !important;
+        color: #1e293b !important;
+    }
+    body.light-mode .sidebar .toggle-container {
+        border-bottom: 1px solid #cbd5e1 !important;
+    }
+    body.light-mode .sidebar .brand {
+        background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+    }
+    body.light-mode .sidebar ul li a {
+        color: #475569 !important;
+    }
+    body.light-mode .sidebar ul li:hover {
+        background: #cbd5e1 !important;
+    }
+    body.light-mode .sidebar ul li:hover a i, 
+    body.light-mode .sidebar ul li:hover a span {
+        color: #0f172a !important;
+    }
+    body.light-mode .sidebar ul li.active {
+        background: #cbd5e1 !important;
+        border-left: 3px solid #0284c7 !important;
+    }
+    body.light-mode .sidebar ul li.active a i,
+    body.light-mode .sidebar ul li.active a span {
+        color: #0f172a !important;
+    }
+    body.light-mode .sidebar .user-info {
+        border-bottom: 1px solid #cbd5e1 !important;
+    }
+    body.light-mode .sidebar .user-info span {
+        color: #334155 !important;
+    }
+    body.light-mode .sidebar .span {
+        color: #0284c7 !important;
+    }
+    body.light-mode .header {
+        background: #e2e8f0 !important;
+        border-bottom: 1px solid #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    body.light-mode .header h1,
+    body.light-mode .username-display,
+    body.light-mode .bell-icon {
+        color: #0f172a !important;
+    }
+    body.light-mode .toggle-btn,
+    body.light-mode .toggle-main {
+        color: #0f172a !important;
+    }
+    body.light-mode .dropdown-panel {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+    }
+    body.light-mode .dropdown-item {
+        color: #334155 !important;
+    }
+    body.light-mode .dropdown-item:hover {
+        background: #f1f5f9 !important;
+    }
+    body.light-mode .dropdown-panel strong {
+        color: #0284c7 !important;
+    }
+    body.light-mode .dropdown-panel span,
+    body.light-mode .dropdown-panel div {
+        color: #334155 !important;
+    }
+    body.light-mode .dropdown-item i {
+        color: #0284c7 !important;
+    }
+    body.light-mode .dropdown-panel hr {
+        border-top-color: #e2e8f0 !important;
+    }
+    body.light-mode #bell-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid #cbd5e1 !important;
+        background: #ffffff !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+        transition: all 0.3s ease;
+    }
+    body.light-mode #bell-btn i {
+        color: #0f172a !important;
+        font-size: 15px !important;
+        margin: 0 !important;
+    }
+    body.light-mode #bell-btn:hover {
+        border-color: #0284c7 !important;
+        background: #f1f5f9 !important;
+    }
+    body.light-mode #bell-btn:hover i {
+        color: #0284c7 !important;
+    }
+
+    /* Page specific elements */
+    body.light-mode .sarlavha {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
+    }
+    body.light-mode .jadval-container {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04) !important;
+    }
+    body.light-mode th {
+        background: #f8fafc !important;
+        color: #64748b !important;
+        border-bottom-color: #e2e8f0 !important;
+    }
+    body.light-mode td {
+        color: #334155 !important;
+        border-bottom-color: #f1f5f9 !important;
+    }
+    body.light-mode td span {
+        color: #334155 !important;
+    }
+    body.light-mode tr:hover td {
+        background: #f8fafc !important;
+        color: #0284c7 !important;
+    }
+    body.light-mode tr:hover td span {
+        color: #0284c7 !important;
+    }
+    body.light-mode .btn-otish {
+        background: #0284c7 !important;
+        color: #ffffff !important;
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+    }
+
+
+    @media (max-width: 768px) {
+        body.light-mode tr {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02) !important;
+        }
+        body.light-mode td {
+            border-bottom-color: #f1f5f9 !important;
+        }
+        body.light-mode td::before {
+            color: #0284c7 !important;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -124,16 +337,23 @@
                 <tr>
                     <th>Guruh nomi</th>
                     <th>Guruh tashkil etilgan sana</th>
-                    <th>Guruhga qo‘shilgan vaqt</th>
+                    <th>Guruhga qo'shilgan vaqt</th>
                     <th>Guruh o'qituvchisi</th>
+                    <th style="width: 120px; text-align: center;">Amallar</th>
                 </tr>
             </thead>
             <tbody>
                 {% for membership in memberships %}
                     <tr>
-                        <td data-label="Guruh nomi" style="font-weight: 700; color: #00f2fe;">{{ membership.group.name }}</td>
-                        <td data-label="Tashkil etilgan sana">{{ membership.group.created_at|date:"Y-m-d H:i" }}</td>
-                        <td data-label="Qo‘shilgan vaqt">{{ membership.joined_at|date:"Y-m-d H:i" }}</td>
+                        <td data-label="Guruh nomi" style="font-weight: 700; color: #ffffff;">{{ membership.group.name }}</td>
+                        <td data-label="Tashkil etilgan sana">
+                            {{ membership.group.created_at|date:"d.m.Y" }}
+                            <span style="margin-left: 12px;">{{ membership.group.created_at|date:"H:i" }}</span>
+                        </td>
+                        <td data-label="Qo'shilgan vaqt">
+                            {{ membership.joined_at|date:"d.m.Y" }}
+                            <span style="margin-left: 12px;">{{ membership.joined_at|date:"H:i" }}</span>
+                        </td>
                         <td data-label="O'qituvchi">
                             {% for teacher in membership.group.teachers.all %}
                                 <span style="color: rgba(255,255,255,0.95);">{{ teacher.get_full_name }}</span>{% if not forloop.last %}, {% endif %}
@@ -141,10 +361,13 @@
                                 <span style="color: rgba(255,255,255,0.4); font-style: italic;">O'qituvchi topilmadi</span>
                             {% endfor %}
                         </td>
+                        <td data-label="Amallar" style="text-align: center;">
+                            <a href="{% url 'student_group_detail' group_id=membership.group.id %}" class="btn-otish">Kirish</a>
+                        </td>
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="4" style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; padding: 40px 0;">Siz hech qanday guruhga biriktirilmagansiz.</td>
+                        <td colspan="5" style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; padding: 40px 0;">Siz hech qanday guruhga biriktirilmagansiz.</td>
                     </tr>
                 {% endfor %}
             </tbody>

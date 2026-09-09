@@ -1,10 +1,334 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'basestudent.html' %}
+{% load static %}
 
-</body>
-</html>
+{% block title %}Mening fanlarim{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- LIGHT MODE AND OVERLAYS --- */
+    body.light-mode .sarlavha {
+        color: #0f172a !important;
+    }
+    body.light-mode .search-filter-container input {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    body.light-mode .search-filter-container i {
+        color: #64748b !important;
+    }
+    body.light-mode .subject-section {
+        background: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03) !important;
+    }
+    body.light-mode .subject-section h3 {
+        color: #0f172a !important;
+    }
+    body.light-mode .subject-section span {
+        color: #64748b !important;
+    }
+    body.light-mode .subject-section p {
+        color: #334155 !important;
+    }
+    body.light-mode .subject-section h4 {
+        color: #64748b !important;
+    }
+    body.light-mode .subject-section div[style*="color: #ffffff;"],
+    body.light-mode .subject-section div[style*="color:#ffffff;"],
+    body.light-mode .subject-section div[style*="color: #ffffff"],
+    body.light-mode .subject-section div[style*="color:#ffffff"] {
+        color: #0f172a !important;
+    }
+    body.light-mode .subject-section div[style*="color: rgba(255,255,255,0.4)"],
+    body.light-mode .subject-section div[style*="color:rgba(255,255,255,0.4)"] {
+        color: #64748b !important;
+    }
+    body.light-mode .material-item {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+    }
+    body.light-mode .material-item:hover {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+    }
+    body.light-mode .material-title {
+        color: #0f172a !important;
+    }
+    body.light-mode .book-item {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+    }
+    body.light-mode .book-item:hover {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+    }
+    body.light-mode .book-item span[style*="color: #ffffff"],
+    body.light-mode .book-item span[style*="color:#ffffff"] {
+        color: #0f172a !important;
+    }
+    body.light-mode div[style*="background: rgba(255, 255, 255, 0.01)"] {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        color: #64748b !important;
+    }
+    
+    /* PDF Viewer Modal overrides */
+    body.light-mode #pdfViewerModal {
+        background: rgba(15, 23, 42, 0.4) !important;
+    }
+    body.light-mode #pdfViewerModal .modal-card {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+    }
+    body.light-mode #pdfViewerModal .modal-card h3 {
+        color: #0f172a !important;
+    }
+    body.light-mode #pdfViewerModal .modal-card button {
+        color: #64748b !important;
+    }
+    body.light-mode #pdfViewerModal .modal-card button:hover {
+        color: #ef4444 !important;
+    }
+    body.light-mode #pdfViewerModal .modal-card > div:first-child {
+        border-bottom-color: #e2e8f0 !important;
+        background: #f8fafc !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px;">Mening fanlarim</h2>
+</div>
+
+{% if subjects_data %}
+<!-- 🔍 QIDIRUV VA FILTRLASH BLOCKI -->
+<div class="search-filter-container" style="display: flex; gap: 15px; margin-bottom: 25px; align-items: center; flex-wrap: wrap; width: 100%;">
+    <div style="position: relative; flex: 1; min-width: 280px;">
+        <i class="fas fa-search" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); font-size: 14px;"></i>
+        <input type="text" id="materialSearchInput" oninput="filterMaterials()" placeholder="Materiallarni nomi bo'yicha qidirish..." style="width: 100%; padding: 12px 16px 12px 44px; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; background: rgba(255,255,255,0.01); color: white; outline: none; font-size: 14px; transition: 0.3s;" onfocus="this.style.borderColor='#00f2fe'; this.style.boxShadow='0 0 10px rgba(0, 242, 254, 0.15)'" onblur="this.style.borderColor='rgba(255,255,255,0.06)'; this.style.boxShadow='none'">
+    </div>
+
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 25px; width: 100%;">
+    {% for item in subjects_data %}
+        <div class="subject-section" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 24px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+            <!-- Upper row: Info and Teachers -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <!-- Subject Details -->
+                <div style="flex: 2; min-width: 280px;">
+                    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
+                        <div style="background: rgba(0, 242, 254, 0.1); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; color: #00f2fe; font-size: 20px; flex-shrink: 0; box-shadow: 0 0 15px rgba(0, 242, 254, 0.15);">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0;">{{ item.subject.name }}</h3>
+                            <span style="color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 700; text-transform: uppercase;">{{ item.group.name }}</span>
+                        </div>
+                    </div>
+                    <p style="color: rgba(255,255,255,0.75); font-size: 13.5px; line-height: 1.6; margin: 0;">
+                        {{ item.subject.description|default:"Ushbu fan bo'yicha tavsif yozilmagan." }}
+                    </p>
+                </div>
+
+                <!-- Teachers -->
+                <div style="flex: 1; min-width: 220px;">
+                    <h4 style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">O'qituvchilar</h4>
+                    {% if item.teachers %}
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            {% for teacher in item.teachers %}
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    {% if teacher.profile_image %}
+                                        <img src="{{ teacher.profile_image.url }}" alt="teacher" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1);">
+                                    {% else %}
+                                        <div style="width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700;">{{ teacher.first_name|first }}</div>
+                                    {% endif %}
+                                    <div>
+                                        <div style="color: #ffffff; font-size: 13px; font-weight: 700;">{{ teacher.first_name }} {{ teacher.last_name }}</div>
+                                        <div style="color: rgba(255,255,255,0.4); font-size: 10.5px;"><i class="fas fa-phone" style="margin-right: 4px; font-size: 9px;"></i> {{ teacher.phone_number }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <span style="color: rgba(255,255,255,0.4); font-style: italic; font-size: 12px;">O'qituvchi biriktirilmagan</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Lower row: Materials Spacious Grid -->
+            <div>
+                <h4 style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">Dars Materiallari</h4>
+                {% if item.materials %}
+                    <div class="materials-list-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; width: 100%;">
+                        {% for material in item.materials %}
+                            <div class="material-item" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(0, 242, 254, 0.2)';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.04)';">
+                                <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; margin-right: 10px;">
+                                    <i class="material-icon fas fa-file-alt" style="color: #4facfe; font-size: 13px; flex-shrink: 0;"></i>
+                                    <span class="material-title" style="color: #ffffff; font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ material.title }}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <!-- PDF ko'rish tugmasi -->
+                                    <a href="javascript:void(0);" onclick="openPdfViewer('{{ material.file.url }}', '{{ material.title }}')" class="material-view-link" style="color: #00ffaa; font-size: 13px; text-decoration: none; font-weight: 800; display: none; align-items: center; gap: 4px;" title="Ko'rish">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ material.file.url }}" download class="material-download-link" style="color: #00f2fe; font-size: 13px; text-decoration: none; font-weight: 800; display: flex; align-items: center; gap: 4px;" onmouseover="this.style.textShadow='0 0 8px rgba(0, 242, 254, 0.4)'" onmouseout="this.style.textShadow='none'" title="Yuklab olish">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <div class="materials-empty-state" style="display: none; padding: 15px; text-align: center; color: rgba(255,255,255,0.3); font-size: 12.5px; font-style: italic; grid-column: 1 / -1;">
+                            Qidiruv bo'yicha materiallar topilmadi.
+                        </div>
+                    </div>
+                {% else %}
+                    <div style="background: rgba(255, 255, 255, 0.01); border: 1px dashed rgba(255,255,255,0.08); border-radius: 12px; padding: 15px; text-align: center; color: rgba(255,255,255,0.3); font-size: 12px; font-style: italic;">
+                        Ushbu fanga hali materiallar yuklanmagan.
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Lower row: Books Grid -->
+            <div style="margin-top: 20px; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 15px;">
+                <h4 style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">Elektron darsliklar & Kitoblar</h4>
+                {% if item.books %}
+                    <div class="books-list-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; width: 100%;">
+                        {% for book in item.books %}
+                            <div class="book-item" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(0, 255, 170, 0.2)';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.04)';">
+                                <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; margin-right: 10px;">
+                                    <i class="fas fa-book" style="color: #00ffaa; font-size: 13px; flex-shrink: 0;"></i>
+                                    <span style="color: #ffffff; font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ book.title }}">{{ book.title }}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <!-- 3D Varaqalab ko'rish -->
+                                    <a href="{% url 'student_book_flipbook' book.id %}" target="_blank" class="book-view-link" style="color: #00ffaa; font-size: 13px; text-decoration: none; font-weight: 800; display: flex; align-items: center; gap: 4px;" title="Varaqalab ko'rish">
+                                        <i class="fas fa-book-open"></i> <span style="font-size: 10.5px; font-weight: 700; text-transform: uppercase;">O'qish</span>
+                                    </a>
+                                    <!-- Yuklab olish -->
+                                    <a href="{{ book.file.url }}" download class="book-download-link" style="color: #00f2fe; font-size: 13px; text-decoration: none; font-weight: 800; display: flex; align-items: center; gap: 4px;" title="Yuklab olish">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="background: rgba(255, 255, 255, 0.01); border: 1px dashed rgba(255,255,255,0.08); border-radius: 12px; padding: 15px; text-align: center; color: rgba(255,255,255,0.3); font-size: 12px; font-style: italic;">
+                        Ushbu fanga hali elektron darsliklar yuklanmagan.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state-card" style="text-align: center; padding: 50px 30px; background: rgba(255, 255, 255, 0.01); border: 1px dashed rgba(255, 255, 255, 0.08); border-radius: 20px; width: 100%; max-width: 600px; margin: 50px auto 0 auto;">
+    <i class="fas fa-book-open" style="font-size: 48px; color: rgba(0, 242, 254, 0.2); margin-bottom: 20px;"></i>
+    <h3 style="font-size: 18px; font-weight: 800; color: #ffffff; margin-bottom: 8px;">Guruh yoki fanlar topilmadi</h3>
+    <p style="color: rgba(255,255,255,0.4); font-size: 13.5px; line-height: 1.5;">Siz hali hech qanday guruhga a'zo emassiz yoki guruhlaringizga fanlar biriktirilmagan. Iltimos, administrator bilan bog'laning.</p>
+</div>
+{% endif %}
+
+<!-- 🖥️ PDF VIEW MODAL -->
+<div id="pdfViewerModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000; background: rgba(7, 10, 18, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); align-items: center; justify-content: center; padding: 20px;">
+    <div class="modal-card" style="background: #0f172a; border: 1px solid rgba(0, 242, 254, 0.25); width: 100%; max-width: 900px; height: 90%; border-radius: 24px; display: flex; flex-direction: column; box-shadow: 0 25px 50px rgba(0,0,0,0.5); overflow: hidden; position: relative;">
+        <!-- Modal Header -->
+        <div style="padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01);">
+            <h3 id="pdfViewerTitle" style="color: white; margin: 0; font-size: 16px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%;">PDF Viewer</h3>
+            <button onclick="closePdfViewer()" style="background: none; border: none; color: rgba(255,255,255,0.6); cursor: pointer; font-size: 20px; transition: 0.2s;" onmouseover="this.style.color='#ff0055'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <!-- Modal Body (Iframe) -->
+        <div style="flex: 1; width: 100%; height: 100%; background: #ffffff;">
+            <iframe id="pdfViewerIframe" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const items = document.querySelectorAll('.material-item');
+        items.forEach(item => {
+            const downloadLink = item.querySelector('.material-download-link');
+            if (!downloadLink) return;
+            const url = downloadLink.getAttribute('href').toLowerCase();
+            let type = 'handout';
+            let iconClass = 'fas fa-file-alt';
+            let color = '#4facfe';
+
+            if (url.endsWith('.pdf') || url.includes('.pdf?') || url.endsWith('.epub') || url.endsWith('.mobi')) {
+                type = 'book';
+                iconClass = 'fas fa-book-open';
+                color = '#00ffaa';
+                
+                // PDF bo'lsa, "Ko'rish" tugmasini ko'rsatamiz
+                if (url.endsWith('.pdf') || url.includes('.pdf?')) {
+                    const viewBtn = item.querySelector('.material-view-link');
+                    if (viewBtn) viewBtn.style.display = 'inline-flex';
+                }
+            } else if (url.endsWith('.mp4') || url.endsWith('.avi') || url.endsWith('.mkv') || url.endsWith('.mov')) {
+                type = 'video';
+                iconClass = 'fas fa-video';
+                color = '#ff0055';
+            }
+
+            item.setAttribute('data-type', type);
+            const iconEl = item.querySelector('.material-icon');
+            if (iconEl) {
+                iconEl.className = iconClass;
+                iconEl.style.color = color;
+            }
+        });
+    });
+
+    function filterMaterials() {
+        const query = document.getElementById('materialSearchInput').value.toLowerCase();
+        
+        document.querySelectorAll('.material-item').forEach(item => {
+            const title = item.querySelector('.material-title').textContent.toLowerCase();
+            const matchesQuery = title.includes(query);
+            
+            if (matchesQuery) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        // Guruhlarda material qolmagan bo'lsa empty-state chiqarish
+        document.querySelectorAll('.subject-section').forEach(card => {
+            const container = card.querySelector('.materials-list-container');
+            if (!container) return;
+            const total = container.querySelectorAll('.material-item').length;
+            const hidden = container.querySelectorAll('.material-item[style*="display: none"]').length;
+            const emptyEl = container.querySelector('.materials-empty-state');
+            
+            if (emptyEl) {
+                if (total === hidden) {
+                    emptyEl.style.display = 'block';
+                } else {
+                    emptyEl.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    function openPdfViewer(url, title) {
+        document.getElementById('pdfViewerTitle').textContent = title;
+        document.getElementById('pdfViewerIframe').src = url;
+        document.getElementById('pdfViewerModal').style.display = 'flex';
+    }
+
+    function closePdfViewer() {
+        document.getElementById('pdfViewerIframe').src = '';
+        document.getElementById('pdfViewerModal').style.display = 'none';
+    }
+</script>
+{% endblock %}

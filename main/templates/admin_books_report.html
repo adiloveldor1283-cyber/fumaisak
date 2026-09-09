@@ -1,0 +1,200 @@
+{% extends 'baseadmin.html' %}
+{% load static %}
+
+{% block title %}Elektron kitoblar hisoboti | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .konteyner {
+        overflow-y: auto !important;
+        display: flex;
+        flex-direction: column;
+    }
+    .jadval-container {
+        width: 100%;
+        overflow-x: auto !important;
+        overflow-y: auto !important;
+        max-height: calc(100vh - 220px);
+    }
+    table {
+        width: max-content !important;
+        min-width: 100% !important;
+        white-space: nowrap;
+    }
+    
+    .stats-card {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 16px;
+        padding: 16px 24px;
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
+        backdrop-filter: blur(10px);
+        margin-bottom: 25px;
+    }
+    
+    .badge-group {
+        display: inline-block;
+        padding: 4px 8px;
+        background: rgba(0, 242, 254, 0.1);
+        border: 1px solid rgba(0, 242, 254, 0.25);
+        color: #00f2fe;
+        border-radius: 6px;
+        font-size: 11.5px;
+        font-weight: 700;
+        margin-right: 5px;
+    }
+    
+    body.light-mode .stats-card {
+        background: #ffffff;
+        border-color: #cbd5e1;
+    }
+    body.light-mode .badge-group {
+        background: rgba(2, 132, 199, 0.1);
+        border-color: rgba(2, 132, 199, 0.25);
+        color: #0284c7;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00ffaa; padding-left: 12px; letter-spacing: -0.5px; margin: 0;">Elektron kitoblar hisoboti</h2>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <!-- QIDIRUV FORMASI -->
+        <form class="search-form" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 320px;">
+            <input type="text" class="search-input" placeholder="Kitob, fan, o'qituvchi yoki guruh bo'yicha qidirish..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
+</div>
+
+<!-- Stats Counter -->
+<div class="stats-card">
+    <div style="background: rgba(0, 255, 170, 0.1); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #00ffaa; font-size: 20px; box-shadow: 0 0 15px rgba(0, 255, 170, 0.15);">
+        <i class="fas fa-book"></i>
+    </div>
+    <div>
+        <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px;">Jami kitoblar</div>
+        <div style="font-size: 20px; font-weight: 800; color: #ffffff;" id="total-books-count">{{ report_data|length }} ta</div>
+    </div>
+</div>
+
+{% if report_data %}
+<div class="jadval-container" style="flex-grow: 1; overflow-y: auto; overflow-x: auto; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+    <table class="group-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); background: #080d1a; position: sticky; top: 0; z-index: 10;">
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">№</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">KITOB NOMI</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FAN NOMI</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">GURUHLAR</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">MAS'UL (O'QITUVCHI)</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">YUKLANGAN SANA</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">AMALLAR</th>
+            </tr>
+        </thead>
+        <tbody id="books-body">
+            {% for item in report_data %}
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.01)'" onmouseout="this.style.background='transparent'">
+                <!-- № -->
+                <td style="padding: 16px 20px; font-size: 14px; color: #00ffaa; font-weight: 700;">{{ forloop.counter }}</td>
+                
+                <!-- KITOB NOMI -->
+                <td style="padding: 16px 20px; font-size: 14px; color: #ffffff; font-weight: 700;">
+                    <div style="display: flex; flex-direction: column;">
+                        <span>{{ item.book.title }}</span>
+                        <span style="font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 400; margin-top: 2px;">{{ item.book.description|default:"Tavsif yo'q" }}</span>
+                    </div>
+                </td>
+                
+                <!-- FAN NOMI -->
+                <td style="padding: 16px 20px; font-size: 14px; color: rgba(255,255,255,0.85); font-weight: 600;">{{ item.book.subject.name }}</td>
+                
+                <!-- GURUHLAR -->
+                <td style="padding: 16px 20px; font-size: 13px; color: #ffffff; max-width: 250px; overflow: hidden; text-overflow: ellipsis;">
+                    {% if item.groups %}
+                        {% for g in item.groups %}
+                            <span class="badge-group">{{ g.name }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span style="color: rgba(255,255,255,0.3); font-style: italic; font-size: 12px;">Guruh biriktirilmagan</span>
+                    {% endif %}
+                </td>
+                
+                <!-- YUKLOVCHI -->
+                <td style="padding: 16px 20px; font-size: 14px; color: rgba(255,255,255,0.85);">
+                    {% if item.book.uploaded_by %}
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 26px; height: 26px; border-radius: 50%; background: rgba(0, 255, 170, 0.1); color: #00ffaa; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">
+                                {{ item.book.uploaded_by.first_name|first|default:item.book.uploaded_by.username|first }}
+                            </div>
+                            <div>
+                                <span style="font-weight: 700;">{{ item.book.uploaded_by.first_name }} {{ item.book.uploaded_by.last_name }}</span>
+                                <span style="font-size: 10px; color: rgba(255,255,255,0.4); display: block;">{{ item.book.uploaded_by.get_role_display|default:item.book.uploaded_by.role }}</span>
+                            </div>
+                        </div>
+                    {% else %}
+                        <span style="color: rgba(255,255,255,0.3); font-style: italic;">Noma'lum</span>
+                    {% endif %}
+                </td>
+                
+                <!-- YUKLANGAN VAQTI -->
+                <td style="padding: 16px 20px; font-size: 13.5px; color: rgba(255,255,255,0.5); font-family: monospace;">{{ item.book.created_at|date:"d.m.Y H:i" }}</td>
+                
+                <!-- AMALLAR -->
+                <td style="padding: 16px 20px; font-size: 14px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <a href="{% url 'student_book_flipbook' item.book.id %}" target="_blank" class="btn-otish" style="display: inline-block; padding: 6px 12px; background: rgba(0, 255, 170, 0.07); border: 1px solid rgba(0, 255, 170, 0.2); color: #00ffaa; text-decoration: none; border-radius: 8px; font-size: 12.5px; font-weight: 600; transition: 0.3s;" title="3D ko'rish"><i class="fas fa-book-open"></i> O'qish</a>
+                        <a href="{{ item.book.file.url }}" download style="color: #00f2fe; font-size: 16px;" title="Yuklab olish"><i class="fas fa-download"></i></a>
+                        <a href="{% url 'delete_book_admin' item.book.id %}" onclick="return confirm('Ushbu kitobni o\'chirmoqchimisiz?');" style="color: rgba(255,79,79,0.6); font-size: 16px; transition: color 0.2s;" onmouseover="this.style.color='#ff4f4f'" onmouseout="this.style.color='rgba(255,79,79,0.6)'" title="O'chirish"><i class="fas fa-trash-alt"></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div style="text-align: center; padding: 50px 30px; background: rgba(255, 255, 255, 0.01); border: 1px dashed rgba(255, 255, 255, 0.08); border-radius: 20px; width: 100%; max-width: 600px; margin: 50px auto 0 auto;">
+    <i class="fas fa-book-open" style="font-size: 48px; color: rgba(0, 255, 170, 0.2); margin-bottom: 20px;"></i>
+    <h3 style="font-size: 18px; font-weight: 800; color: #ffffff; margin-bottom: 8px;">Hozircha elektron kitoblar mavjud emas</h3>
+    <p style="color: rgba(255,255,255,0.4); font-size: 13.5px; line-height: 1.5; margin: 0;">Tizimda hozircha o'qituvchilar yoki ma'muriyat tomonidan elektron kitoblar biriktirilmagan.</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Live search filter by book title, subject, teacher name, and group badges
+    const searchInput = document.querySelector('.search-input');
+    const rows = document.querySelectorAll('#books-body tr');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase().trim();
+            rows.forEach(row => {
+                const title = row.children[1].textContent.toLowerCase();
+                const subject = row.children[2].textContent.toLowerCase();
+                const groups = row.children[3].textContent.toLowerCase();
+                const teacher = row.children[4].textContent.toLowerCase();
+                
+                const matches = title.includes(query) || 
+                                subject.includes(query) || 
+                                groups.includes(query) || 
+                                teacher.includes(query);
+                                
+                row.style.display = matches ? '' : 'none';
+            });
+            
+            // Recalculate visible count
+            let visibleCount = 0;
+            rows.forEach(row => {
+                if (row.style.display !== 'none') visibleCount++;
+            });
+            document.getElementById('total-books-count').textContent = visibleCount + ' ta';
+        });
+    }
+</script>
+{% endblock %}

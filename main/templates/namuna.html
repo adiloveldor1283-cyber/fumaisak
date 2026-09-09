@@ -377,13 +377,17 @@
     }
 
     </style>
+    <!-- KaTeX Math Rendering -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
 </head>
 <body>
     <div class="sidebar collapsed" id="sidebar">
         <div class="toggle-container">
             <img src="{% static 'imgs/fuma.jpg' %}" alt="Logatip photo">
-            <div class="brand">FUMAISAK</div>
+            <div class="brand">{{ site_name|default:"Tizim" }}</div>
             <button class="toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
         </div>
 
@@ -398,7 +402,7 @@
                     {% if teacher.role == "teacher" %}
                         O'qituvchi
                     {% elif teacher.role == "student" %}
-                        O‘quvchi
+                        O'quvchi
                     {% else %}
                         {{ teacher.role }}
                     {% endif %}
@@ -433,7 +437,7 @@
                 <div class="dropdown-panel" id="bell-panel">
                     <div class="dropdown-item">Yangi bildirishnoma</div>
                     <div class="dropdown-item">Eslatmalar</div>
-                    <div class="dropdown-item">Barchasini ko‘rish</div>
+                    <div class="dropdown-item">Barchasini ko'rish</div>
                 </div>
 
                 <a href="javascript:void(0);" id="profile-btn">
@@ -445,7 +449,7 @@
                 </a>
                 <div class="dropdown-panel" id="profile-panel">
                     <a href="{% url 'teacher_profile' %}" class="dropdown-item"><i class="fas fa-user"></i> Profilim</a>
-                    <a href="{% url 'login' %}" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
+                    <a href="{% url 'logout' %}" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
                 </div>
             </div>
         </div>
@@ -482,7 +486,7 @@
                         </td>
                         <td>
                             {% if item.submission %}
-                                <a href="{{ item.submission.file.url }}" target="_blank">Ko‘rish</a>
+                                <a href="{{ item.submission.file.url }}" target="_blank">Ko'rish</a>
                             {% else %}
                                 —
                             {% endif %}
@@ -517,7 +521,7 @@
             <h3>Baholash</h3>
             <form method="post" action="{% url 'grade_assignment' %}">
                 {% csrf_token %}
-                <p><strong>O‘quvchi:</strong> <span id="modalStudentName"></span></p>
+                <p><strong>O'quvchi:</strong> <span id="modalStudentName"></span></p>
                 <input type="hidden" name="student_id" id="modalStudentId">
                 <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
                 <p><strong>Topshiriq fayli:</strong> <a href="#" id="modalFileLink" target="_blank">Yuklab olish</a></p>

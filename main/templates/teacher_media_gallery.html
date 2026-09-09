@@ -1,0 +1,695 @@
+{% extends 'baseteacher.html' %}
+{% load static %}
+
+{% block title %}Video darslar{% endblock %}
+
+{% block extra_css %}
+    <style>
+        /* --- 🔍 QIDIRUV PANELI - SPLIT DESIGN --- */
+        .search-form {
+            display: flex;
+            position: relative;
+        }
+        .search-input {
+            padding: 10px 16px;
+            font-size: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px 0 0 12px;
+            outline: none;
+            width: 25vw;
+            background-color: rgba(255, 255, 255, 0.02);
+            color: #ffffff;
+            margin-left: 20px;
+            border-right: none;
+            transition: 0.3s;
+        }
+        .search-input:focus {
+            border-color: #00f2fe;
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
+        }
+        .search-btn {
+            background-color: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: none;
+            padding: 10px 18px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            border-radius: 0 12px 12px 0;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .search-btn:hover {
+            background-color: rgba(0, 242, 254, 0.1);
+            color: #00f2fe;
+            border-color: rgba(0, 242, 254, 0.2);
+        }
+
+        .sarlavha {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #ffffff;
+            border-left: 4px solid #00f2fe;
+            padding-left: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .guruhlar-qatori {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            margin-bottom: 25px;
+        }
+
+        .guruh-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 800;
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.2);
+        }
+        .guruh-btn:hover {
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .hr-joy {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            margin: 25px 0;
+        }
+
+        .jadval-container {
+            flex-grow: 1;
+            overflow-y: auto !important;
+            overflow-x: auto !important;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-height: calc(100vh - 300px);
+            min-height: 300px;
+        }
+
+        .jadval-container::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .jadval-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .jadval-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.12);
+            border-radius: 10px;
+        }
+        .jadval-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 242, 254, 0.3);
+        }
+
+        table {
+            width: max-content !important;
+            min-width: 100% !important;
+            white-space: nowrap;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th {
+            padding: 16px 18px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            position: sticky;
+            top: 0;
+            background: #080d1a;
+            z-index: 2;
+        }
+        td {
+            padding: 14px 18px;
+            font-size: 13.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.8);
+            vertical-align: middle;
+        }
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+            color: #ffffff;
+        }
+
+        .btn-otish, .edit-assignment-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(0, 242, 254, 0.07);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            color: #00f2fe;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.3s;
+            text-align: center;
+            cursor: pointer;
+        }
+        .btn-otish:hover, .edit-assignment-btn:hover {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        }
+
+        .btn-delete {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255, 0, 85, 0.07);
+            border: 1px solid rgba(255, 0, 85, 0.2);
+            color: #ff0055;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.3s;
+            text-align: center;
+            cursor: pointer;
+        }
+        .btn-delete:hover {
+            background: #ff0055;
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+        }
+
+        /* --- 👾 MODAL OYNALAR (CYBER GLASS) --- */
+        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(7, 10, 18, 0.8); backdrop-filter: blur(10px); z-index: 1998; }
+        .custom-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 550px; background: #0c101d; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); z-index: 1999; padding: 30px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 12px; }
+        .modal-header h3 { font-size: 18px; font-weight: 800; color: #ffffff; }
+        .close-modal { background: rgba(255, 255, 255, 0.05); border: none; font-size: 14px; cursor: pointer; color: #ffffff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .close-modal:hover { background: rgba(255, 0, 85, 0.2); color: #ff0055; }
+        .modal-content label { display: block; margin-top: 15px; color: rgba(255, 255, 255, 0.4); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .modal-content input, .modal-content select { width: 100%; padding: 12px 16px; margin-top: 6px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; box-sizing: border-box; background-color: rgba(255, 255, 255, 0.01); color: white; outline: none; transition: 0.3s; }
+        .modal-content input:focus, .modal-content select:focus { border-color: #00f2fe; background: rgba(255, 255, 255, 0.04); box-shadow: 0 0 12px rgba(0, 242, 254, 0.15); }
+        .modal-content button[type="submit"] { margin-top: 25px; padding: 12px; width: 100%; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; border: none; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.3s; box-shadow: 0 5px 15px rgba(0, 242, 254, 0.2); }
+        .modal-content button[type="submit"]:hover { box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); }
+
+        /* --- ☀️ LIGHT MODE OVERRIDES --- */
+        body.light-mode .guruh-btn,
+        body.light-mode .edit-assignment-btn,
+        body.light-mode .btn-otish {
+            background: #0284c7 !important;
+            border-color: #0284c7 !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15) !important;
+        }
+        body.light-mode .guruh-btn:hover,
+        body.light-mode .edit-assignment-btn:hover,
+        body.light-mode .btn-otish:hover {
+            background: #0369a1 !important;
+            border-color: #0369a1 !important;
+            color: #ffffff !important;
+            box-shadow: none !important;
+        }
+        body.light-mode .btn-delete {
+            background: #dc2626 !important;
+            border-color: #dc2626 !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15) !important;
+        }
+        body.light-mode .btn-delete:hover {
+            background: #b91c1c !important;
+            border-color: #b91c1c !important;
+            color: #ffffff !important;
+            box-shadow: none !important;
+        }
+
+        .source-tab-btn {
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .source-tab-btn.active {
+            background: rgba(0, 242, 254, 0.15);
+            border-color: #00f2fe;
+            color: #00f2fe;
+        }
+
+        /* --- 📱 MOBIL REJIMDA RESPONSIVE MANTIQLARI --- */
+        @media (max-width: 768px) {
+            .konteyner {
+                height: auto !important;
+                overflow: visible !important;
+                padding: 15px !important;
+            }
+            .sarlavha {
+                font-size: 18px;
+            }
+            .guruhlar-qatori {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+            .guruh-btn {
+                width: 100%;
+                text-align: center;
+                box-sizing: border-box;
+            }
+            .search-input {
+                width: 130px;
+                margin-left: 10px;
+                padding: 8px 12px;
+            }
+            .search-btn {
+                padding: 8px 14px;
+            }
+
+            .jadval-container {
+                border: none;
+                background: transparent;
+                box-shadow: none;
+                overflow: visible;
+                max-height: none;
+            }
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead {
+                display: none;
+            }
+            tbody tr {
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 16px;
+                padding: 16px;
+                margin-bottom: 16px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+            tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+                text-align: right;
+                font-size: 13px;
+            }
+            tbody td[data-label="Ko'rish"],
+            tbody td[data-label="Tahrirlash"],
+            tbody td[data-label="O'chirish"] {
+                justify-content: center;
+                padding: 6px 0;
+                border-bottom: none;
+            }
+            tbody td::before {
+                content: attr(data-label);
+                float: left;
+                font-weight: 700;
+                color: rgba(255, 255, 255, 0.4);
+                text-transform: uppercase;
+                font-size: 11px;
+                letter-spacing: 0.5px;
+            }
+            tbody td[data-label="No"]::before,
+            tbody td[data-label="Ko'rish"]::before,
+            tbody td[data-label="Tahrirlash"]::before,
+            tbody td[data-label="O'chirish"]::before {
+                display: none;
+            }
+            tbody td[data-label="No"] {
+                font-size: 14px;
+                color: #4facfe;
+                border-bottom: 1px solid rgba(0, 242, 254, 0.15);
+                padding-bottom: 6px;
+                justify-content: center;
+            }
+            .btn-otish, .edit-assignment-btn, .btn-delete {
+                width: 100%;
+                padding: 10px;
+                text-align: center;
+                box-sizing: border-box;
+            }
+            .custom-modal {
+                padding: 20px;
+                width: 95%;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">Video darslar va Havolalar</h2>
+        <!-- QIDIRUV FORMASI -->
+        <form class="search-form" onsubmit="event.preventDefault()" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
+            <input type="text" class="search-input" placeholder="Mavzu bo'yicha qidiruv..." id="video-title-search" style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
+    
+    <div class="guruhlar-qatori">
+        <a href="javascript:void(0);" onclick="openAddModal()" class="guruh-btn"><i class="fas fa-plus" style="margin-right: 8px;"></i>Video yuklash</a>
+    </div>
+
+    <!-- Yangi Video yuklash modal oynasi -->
+    <div id="addVideoModal" class="custom-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Video dars yuklash</h3>
+                <button class="close-modal" onclick="closeAddModal()">✖</button>
+            </div>
+            <form method="post" enctype="multipart/form-data" action="{% url 'teacher_media_gallery' %}" onsubmit="return validateForm(this)">
+                {% csrf_token %}
+                <label>Sarlavha:</label>
+                <input type="text" name="title" placeholder="Dars mavzusini kiriting" required>
+
+                <label>Tavsif (ixtiyoriy):</label>
+                <textarea name="description" placeholder="Dars bo'yicha qisqacha ma'lumot..." style="width: 100%; padding: 12px 16px; margin-top: 6px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; background-color: rgba(255, 255, 255, 0.01); color: white; outline: none; transition: 0.3s; height: 80px;"></textarea>
+
+                <label>Guruh:</label>
+                <select name="group_id" required>
+                    {% for group in groups %}
+                        <option value="{{ group.id }}">{{ group.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <label>Video fayl (ixtiyoriy):</label>
+                <input type="file" name="video_file" accept="video/*">
+
+                <label>YouTube havola (ixtiyoriy):</label>
+                <input type="url" name="youtube_link" placeholder="https://www.youtube.com/watch?v=...">
+
+                <button type="submit">Yuklash</button>
+            </form>
+        </div>
+    </div>
+    <div id="addModalBackdrop" class="modal-backdrop"></div>
+
+    <!-- Tahrirlash Modal oynasi -->
+    <div id="editVideoModal" class="custom-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Video darsni tahrirlash</h3>
+                <button class="close-modal" onclick="closeEditModal()">✖</button>
+            </div>
+            <form id="editForm" method="post" enctype="multipart/form-data" onsubmit="return validateForm(this)">
+                {% csrf_token %}
+                <label>Sarlavha:</label>
+                <input type="text" name="title" id="editTitle" required>
+
+                <label>Tavsif (ixtiyoriy):</label>
+                <textarea name="description" id="editDescription" style="width: 100%; padding: 12px 16px; margin-top: 6px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; background-color: rgba(255, 255, 255, 0.01); color: white; outline: none; transition: 0.3s; height: 80px;"></textarea>
+
+                <label>Guruh:</label>
+                <select name="group_id" id="editGroup" required>
+                    {% for group in groups %}
+                        <option value="{{ group.id }}">{{ group.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <label>Video fayl (almashtirish uchun ixtiyoriy):</label>
+                <input type="file" name="video_file" accept="video/*">
+
+                <label>YouTube havola (ixtiyoriy):</label>
+                <input type="url" name="youtube_link" id="editYoutubeLink" placeholder="https://www.youtube.com/watch?v=...">
+
+                <button type="submit">Saqlash</button>
+            </form>
+        </div>
+    </div>
+    <div id="editModalBackdrop" class="modal-backdrop"></div>
+
+    <!-- Premium Video Tomosha Qilish Modali -->
+    <div id="videoPlayModal" class="custom-modal" style="max-width: 800px; display: none;">
+        <div class="modal-content" style="padding: 0;">
+            <div class="modal-header" style="padding: 20px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 15px;">
+                <div style="display: flex; align-items: center; gap: 10px; min-width: 0; max-width: 60%;">
+                    <i class="fas fa-play-circle" style="color: #00f2fe; font-size: 18px; flex-shrink: 0;"></i>
+                    <h3 id="videoPlayTitle" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">Video Dars</h3>
+                </div>
+                <div id="videoSourceTabs" style="display: none; align-items: center; gap: 8px;">
+                    <button type="button" id="tabNative" class="source-tab-btn active" onclick="switchVideoSource('native')"><i class="fas fa-file-video"></i> Fayl</button>
+                    <button type="button" id="tabYoutube" class="source-tab-btn" onclick="switchVideoSource('youtube')"><i class="fab fa-youtube"></i> YouTube</button>
+                </div>
+                <button class="close-modal" onclick="closePlayModal()">✖</button>
+            </div>
+            <div class="modal-body" style="display: flex; justify-content: center; align-items: center; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 0 0 20px 20px; overflow: hidden; position: relative;">
+                <video id="nativePlayer" controls style="width: 100%; height: 100%; display: none;"></video>
+                <iframe id="youtubePlayer" style="width: 100%; height: 100%; border: none; display: none;" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            </div>
+        </div>
+    </div>
+    <div id="playModalBackdrop" class="modal-backdrop"></div>
+
+    <hr class="hr-joy">
+
+    <h2 class="sarlavha">Yuklangan video darslar ro'yxati</h2>
+    <div class="jadval-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;">No</th>
+                    <th>Sarlavha</th>
+                    <th>Guruh</th>
+                    <th>Turi</th>
+                    <th>Yuklangan sana</th>
+                    <th style="width: 120px; text-align: center;">Ko'rish</th>
+                    <th style="width: 120px; text-align: center;">Tahrirlash</th>
+                    <th style="width: 120px; text-align: center;">O'chirish</th>
+                </tr>
+            </thead>
+            <tbody id="jadval-qatorlari">
+                {% for video in videos %}
+                    <tr>
+                        <td data-label="No">{{ forloop.counter }}</td>
+                        <td data-label="Sarlavha" style="font-weight: 700; color: #ffffff;">{{ video.title }}</td>
+                        <td data-label="Guruh">{{ video.group.name }}</td>
+                        <td data-label="Turi">
+                            {% if video.video_file %}
+                                <span style="color: #00ffaa;"><i class="fas fa-file-video" style="margin-right: 6px;"></i>Fayl</span>
+                            {% endif %}
+                            {% if video.video_file and video.youtube_link %}
+                                <span style="color: rgba(255,255,255,0.4)">/</span>
+                            {% endif %}
+                            {% if video.youtube_link %}
+                                <span style="color: #ff0055;"><i class="fab fa-youtube" style="margin-right: 6px;"></i>YouTube</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Yuklangan sana" style="color: #4facfe; font-family: monospace;">
+                            {{ video.created_at|date:"d.m.Y" }}
+                            <span style="margin-left: 12px;">{{ video.created_at|date:"H:i" }}</span>
+                        </td>
+                        <td data-label="Ko'rish" style="text-align: center;">
+                            <a href="javascript:void(0);" class="btn-otish" onclick="playVideo('{{ video.title|escapejs }}', '{% if video.video_file %}{{ video.video_file.url }}{% endif %}', '{{ video.get_youtube_embed|default:'' }}')">
+                                <i class="fas fa-play" style="margin-right: 6px;"></i>Ko'rish
+                            </a>
+                        </td>
+                        <td data-label="Tahrirlash" style="text-align: center;">
+                            <a href="javascript:void(0);" class="edit-assignment-btn" onclick="openEditModal('{{ video.id }}', '{{ video.title|escapejs }}', '{{ video.description|escapejs }}', '{{ video.group.id }}', '{{ video.youtube_link|default:'' }}')"><i class="fas fa-edit" style="margin-right: 6px;"></i>Tahrirlash</a>
+                        </td>
+                        <td data-label="O'chirish" style="text-align: center;">
+                            <a href="{% url 'teacher_delete_video' video.id %}" class="btn-delete" onclick="return confirm('Haqiqatan ham bu video darsni o\'chirmoqchisiz?')"><i class="fas fa-trash-alt" style="margin-right: 6px;"></i>O'chirish</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; padding: 30px 0;">Hozircha hech qanday video dars yuklanmagan.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        function openAddModal() {
+            document.getElementById('addVideoModal').style.display = 'block';
+            document.getElementById('addModalBackdrop').style.display = 'block';
+        }
+
+        function closeAddModal() {
+            document.getElementById('addVideoModal').style.display = 'none';
+            document.getElementById('addModalBackdrop').style.display = 'none';
+        }
+
+        function openEditModal(id, title, desc, groupId, youtubeLink) {
+            const editModal = document.getElementById('editVideoModal');
+            const editBackdrop = document.getElementById('editModalBackdrop');
+            const editForm = document.getElementById('editForm');
+
+            editForm.action = `/teacher/media/edit/${id}/`;
+            document.getElementById('editTitle').value = title;
+            document.getElementById('editDescription').value = desc;
+            document.getElementById('editGroup').value = groupId;
+            document.getElementById('editYoutubeLink').value = youtubeLink;
+
+            editModal.style.display = 'block';
+            editBackdrop.style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editVideoModal').style.display = 'none';
+            document.getElementById('editModalBackdrop').style.display = 'none';
+        }
+
+        let currentLocalUrl = '';
+        let currentYoutubeUrl = '';
+
+        function playVideo(title, localUrl, youtubeUrl) {
+            const playModal = document.getElementById('videoPlayModal');
+            const backdrop = document.getElementById('playModalBackdrop');
+            const titleEl = document.getElementById('videoPlayTitle');
+            const nativePlayer = document.getElementById('nativePlayer');
+            const youtubePlayer = document.getElementById('youtubePlayer');
+            const tabsContainer = document.getElementById('videoSourceTabs');
+
+            currentLocalUrl = localUrl || '';
+            currentYoutubeUrl = youtubeUrl || '';
+
+            titleEl.textContent = title;
+            
+            // Reset players
+            nativePlayer.style.display = 'none';
+            nativePlayer.src = '';
+            youtubePlayer.style.display = 'none';
+            youtubePlayer.src = '';
+
+            if (currentLocalUrl && currentYoutubeUrl) {
+                tabsContainer.style.display = 'flex';
+                switchVideoSource('youtube');
+            } else {
+                tabsContainer.style.display = 'none';
+                if (currentYoutubeUrl) {
+                    switchVideoSource('youtube');
+                } else if (currentLocalUrl) {
+                    switchVideoSource('native');
+                }
+            }
+
+            playModal.style.display = 'block';
+            backdrop.style.display = 'block';
+        }
+
+        function switchVideoSource(source) {
+            const nativePlayer = document.getElementById('nativePlayer');
+            const youtubePlayer = document.getElementById('youtubePlayer');
+            const tabNative = document.getElementById('tabNative');
+            const tabYoutube = document.getElementById('tabYoutube');
+
+            if (source === 'native') {
+                youtubePlayer.src = '';
+                youtubePlayer.style.display = 'none';
+                
+                if (tabYoutube) tabYoutube.classList.remove('active');
+                if (tabNative) tabNative.classList.add('active');
+
+                nativePlayer.src = currentLocalUrl;
+                nativePlayer.style.display = 'block';
+                nativePlayer.load();
+                nativePlayer.play().catch(() => {});
+            } else {
+                nativePlayer.pause();
+                nativePlayer.src = '';
+                nativePlayer.style.display = 'none';
+
+                if (tabNative) tabNative.classList.remove('active');
+                if (tabYoutube) tabYoutube.classList.add('active');
+
+                let ytUrl = currentYoutubeUrl;
+                if (ytUrl && !ytUrl.includes('autoplay=')) {
+                    ytUrl += (ytUrl.includes('?') ? '&' : '?') + 'autoplay=1';
+                }
+                youtubePlayer.src = ytUrl;
+                youtubePlayer.style.display = 'block';
+            }
+        }
+
+        function closePlayModal() {
+            document.getElementById('videoPlayModal').style.display = 'none';
+            document.getElementById('playModalBackdrop').style.display = 'none';
+            
+            // Stop playing
+            const nativePlayer = document.getElementById('nativePlayer');
+            nativePlayer.pause();
+            nativePlayer.src = '';
+            
+            const youtubePlayer = document.getElementById('youtubePlayer');
+            youtubePlayer.src = '';
+        }
+
+        function validateForm(form) {
+            const fileInput = form.querySelector('input[name="video_file"]');
+            const urlInput = form.querySelector('input[name="youtube_link"]');
+            
+            // Edit modalda edit_file tanlanmagan bo'lishi mumkin, shuning uchun faqat toza upload bo'lsa yoki form talabi bo'lsa
+            const isEdit = form.id === 'editForm';
+
+            if (!isEdit && !fileInput.files.length && !urlInput.value.trim()) {
+                alert("Iltimos, video fayl yuklang yoki YouTube havola kiriting!");
+                return false;
+            }
+            return true;
+        }
+
+        // Close modal clicking outside
+        window.addEventListener("click", (e) => {
+            if (e.target === document.getElementById('addModalBackdrop')) closeAddModal();
+            if (e.target === document.getElementById('editModalBackdrop')) closeEditModal();
+            if (e.target === document.getElementById('playModalBackdrop')) closePlayModal();
+        });
+
+        // Search Filter
+        const tableRows = document.querySelectorAll('#jadval-qatorlari tr');
+        function updateRowNumbers() {
+            let visibleIndex = 1;
+            tableRows.forEach(row => {
+                if (row.style.display !== "none" && row.cells.length > 1) {
+                    const firstCell = row.querySelector("td");
+                    if (firstCell) firstCell.textContent = visibleIndex++;
+                }
+            });
+        }
+
+        document.getElementById('video-title-search')?.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase().trim();
+
+            tableRows.forEach(row => {
+                const titleCell = row.cells[1];
+                if (titleCell) {
+                    const titleText = titleCell.textContent.toLowerCase().trim();
+                    if (titleText.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+            updateRowNumbers();
+        });
+    </script>
+{% endblock %}

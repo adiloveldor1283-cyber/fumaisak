@@ -1,0 +1,491 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %}Savollar bazasi (DTM) | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .sarlavha {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #ffffff;
+            border-left: 4px solid #00f2fe;
+            padding-left: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .filter-card {
+            background: rgba(11, 15, 25, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+        }
+        .form-control {
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            font-size: 13px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .form-control:focus {
+            border-color: #00f2fe;
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .form-control option {
+            background-color: #0c101d;
+            color: #ffffff;
+        }
+        body.light-mode .form-control option {
+            background-color: #ffffff;
+            color: #0f172a;
+        }
+
+        .btn-filter {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border: none;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+        .btn-filter:hover {
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+        }
+
+        .btn-clear {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            font-weight: 700;
+            text-decoration: none;
+            text-align: center;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+        .btn-clear:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+        }
+
+        .questions-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            transition: 0.2s;
+        }
+        .question-card:hover {
+            border-color: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .question-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .meta-tag {
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .meta-tag.subject {
+            background: rgba(0, 242, 254, 0.08);
+            color: #00f2fe;
+            border-color: rgba(0, 242, 254, 0.15);
+        }
+        .meta-tag.difficulty {
+            background: rgba(255, 159, 67, 0.08);
+            color: #ff9f43;
+            border-color: rgba(255, 159, 67, 0.15);
+        }
+        .meta-tag.compulsory {
+            background: rgba(255, 215, 0, 0.08);
+            color: #ffd700;
+            border-color: rgba(255, 215, 0, 0.15);
+        }
+
+        .options-list {
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px;
+        }
+
+        .option-item {
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.75);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .option-item.correct {
+            background: rgba(0, 255, 170, 0.05);
+            border-color: rgba(0, 255, 170, 0.2);
+            color: #00ffaa;
+            font-weight: 700;
+        }
+
+        .actions-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .btn-edit {
+            background: rgba(255, 159, 67, 0.08);
+            border-color: rgba(255, 159, 67, 0.2);
+            color: #ff9f43;
+        }
+        .btn-edit:hover {
+            background: #ff9f43;
+            color: #070a12;
+        }
+        .btn-delete {
+            background: rgba(255, 79, 79, 0.08);
+            border-color: rgba(255, 79, 79, 0.2);
+            color: #ff4f4f;
+        }
+        .btn-delete:hover {
+            background: #ff4f4f;
+            color: #ffffff;
+        }
+
+        /* Pagination style */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+            margin-bottom: 50px;
+        }
+        .page-link {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+        .page-link:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+        }
+        .page-link.active {
+            background: #00f2fe;
+            color: #070a12;
+            border-color: transparent;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="{% url 'admin_dtm_list' %}" class="back-arrow-btn" title="Orqaga">
+                <i class="fas fa-chevron-left" style="font-size: 16px;"></i>
+            </a>
+            <h2 class="sarlavha" style="margin-bottom: 0;">Savollar bazasi (DTM)</h2>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{% url 'admin_dtm_question_add' %}" class="btn-filter" style="padding: 10px 18px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;"><i class="fas fa-edit"></i> Qo'lda savol qo'shish</a>
+            <a href="{% url 'admin_dtm_upload_ai' %}" class="btn-filter" style="background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; font-weight: 800; border: none; padding: 10px 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;"><i class="fas fa-robot"></i> AI orqali kiritish</a>
+        </div>
+    </div>
+
+    <!-- 🔍 Filtri -->
+    <div class="filter-card">
+        <form method="GET" class="filter-grid">
+            <div class="form-group">
+                <label for="subject">Fan</label>
+                <select name="subject" id="subject" class="form-control">
+                    <option value="">Barchasi</option>
+                    {% for sub in subjects %}
+                        <option value="{{ sub }}" {% if subject_filter == sub %}selected{% endif %}>{{ sub }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="difficulty">Qiyinlik darajasi</label>
+                <select name="difficulty" id="difficulty" class="form-control">
+                    <option value="">Barchasi</option>
+                    <option value="3" {% if difficulty_filter == '3' %}selected{% endif %}>Oson (3)</option>
+                    <option value="2" {% if difficulty_filter == '2' %}selected{% endif %}>O'rtacha (2)</option>
+                    <option value="1" {% if difficulty_filter == '1' %}selected{% endif %}>Qiyin (1)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="is_compulsory">Turi</label>
+                <select name="is_compulsory" id="is_compulsory" class="form-control">
+                    <option value="">Barchasi</option>
+                    <option value="true" {% if compulsory_filter == 'true' %}selected{% endif %}>Majburiy fan</option>
+                    <option value="false" {% if compulsory_filter == 'false' %}selected{% endif %}>Mutaxassislik (Blok)</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn-filter"><i class="fas fa-filter"></i> Filtrlash</button>
+                <a href="{% url 'admin_dtm_questions_list' %}" class="btn-clear"><i class="fas fa-undo"></i> Tozalash</a>
+            </div>
+        </form>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.2); color: #00ffaa; padding: 12px 20px; border-radius: 12px; margin-bottom: 20px; font-size: 13.5px;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- 📝 Savollar Ro'yxati -->
+    <div class="questions-container">
+        {% for question in page_obj %}
+            <div class="question-card">
+                <div class="question-meta">
+                    <span class="meta-tag subject">{{ question.subject }}</span>
+                    <span class="meta-tag difficulty">
+                        {% if question.difficulty == 1 %}Qiyin (1){% elif question.difficulty == 2 %}O'rtacha (2){% else %}Oson (3){% endif %}
+                    </span>
+                    {% if question.is_compulsory %}
+                        <span class="meta-tag compulsory">Majburiy</span>
+                    {% endif %}
+                    <span class="meta-tag" style="font-family: monospace;">ID: #{{ question.id }}</span>
+                </div>
+
+                <div class="actions-bar">
+                    <a href="{% url 'admin_dtm_question_edit' question.id %}" class="btn-action btn-edit"><i class="fas fa-edit"></i> Tahrirlash</a>
+                    <a href="{% url 'admin_dtm_question_delete' question.id %}" class="btn-action btn-delete" onclick="return confirm('Haqiqatan ham ushbu savolni o\'chirmoqchimisiz?')"><i class="fas fa-trash-alt"></i> O'chirish</a>
+                </div>
+
+                <div class="question-text-box" style="color: #ffffff; font-size: 15px; font-weight: 600; line-height: 1.6; padding-right: 220px; margin-top: 8px;">
+                    {{ question.text }}
+                </div>
+
+                <div class="options-list">
+                    {% for ans in question.answers.all %}
+                        <div class="option-item {% if ans.is_correct %}correct{% endif %}">
+                            <span style="font-weight: 700; color: {% if ans.is_correct %}#00ffaa{% else %}rgba(255,255,255,0.3){% endif %}; flex-shrink: 0;">
+                                {% if forloop.counter == 1 %}A){% elif forloop.counter == 2 %}B){% elif forloop.counter == 3 %}C){% else %}D){% endif %}
+                            </span>
+                            <span class="option-text">{{ ans.text }}</span>
+                            {% if ans.is_correct %}
+                                <i class="fas fa-check-circle" style="margin-left: auto; flex-shrink: 0;"></i>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% empty %}
+            <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 40px 20px; text-align: center;">
+                <i class="fas fa-question-circle" style="font-size: 36px; color: rgba(255,255,255,0.2); margin-bottom: 15px; display: inline-block;"></i>
+                <h4 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Savollar topilmadi</h4>
+                <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin: 0;">Belgilangan parametrlar bo'yicha savollar mavjud emas.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- 📊 Pagination -->
+    {% if page_obj.has_other_pages %}
+        <div class="pagination-container">
+            {% if page_obj.has_previous %}
+                <a href="?page=1&subject={{ subject_filter }}&difficulty={{ difficulty_filter }}&is_compulsory={{ compulsory_filter }}" class="page-link">&laquo; Birinchi</a>
+                <a href="?page={{ page_obj.previous_page_number }}&subject={{ subject_filter }}&difficulty={{ difficulty_filter }}&is_compulsory={{ compulsory_filter }}" class="page-link">Oldingi</a>
+            {% endif %}
+
+            <span style="color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 700;">
+                Sahifa {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&subject={{ subject_filter }}&difficulty={{ difficulty_filter }}&is_compulsory={{ compulsory_filter }}" class="page-link">Keyingi</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}&subject={{ subject_filter }}&difficulty={{ difficulty_filter }}&is_compulsory={{ compulsory_filter }}" class="page-link">Oxirgi &raquo;</a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<!-- KaTeX 2D Math Rendering with Fallback Assets & Auto-Fix -->
+<script>
+(function() {
+    function loadStyle(url, fallbackUrl) {
+        return new Promise((resolve) => {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = url;
+            link.onload = () => resolve(true);
+            link.onerror = () => {
+                if (fallbackUrl) {
+                    const fallbackLink = document.createElement('link');
+                    fallbackLink.rel = 'stylesheet';
+                    fallbackLink.href = fallbackUrl;
+                    fallbackLink.onload = () => resolve(true);
+                    fallbackLink.onerror = () => resolve(false);
+                    document.head.appendChild(fallbackLink);
+                } else {
+                    resolve(false);
+                }
+            };
+            document.head.appendChild(link);
+        });
+    }
+
+    function loadScript(url, fallbackUrl) {
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = url;
+            script.onload = () => resolve(true);
+            script.onerror = () => {
+                if (fallbackUrl) {
+                    const fallbackScript = document.createElement('script');
+                    fallbackScript.src = fallbackUrl;
+                    fallbackScript.onload = () => resolve(true);
+                    fallbackScript.onerror = () => resolve(false);
+                    document.head.appendChild(fallbackScript);
+                } else {
+                    resolve(false);
+                }
+            };
+            document.head.appendChild(script);
+        });
+    }
+
+    function fixUnclosedMathDelimiters(text) {
+        if (!text) return text;
+        
+        // Fix odd $$ block delimiters
+        let doubleDollarCount = (text.match(/\$\$/g) || []).length;
+        if (doubleDollarCount % 2 !== 0) {
+            text += '$$';
+        }
+        
+        // Fix odd single $ inline delimiters
+        let tempText = text.replace(/\$\$/g, 'BLOCKMATH');
+        let singleDollarCount = (tempText.match(/\$/g) || []).length;
+        if (singleDollarCount % 2 !== 0) {
+            text += '$';
+        }
+        
+        return text;
+    }
+
+    async function initKaTeX() {
+        await loadStyle(
+            'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css',
+            'https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css'
+        );
+        await loadScript(
+            'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js',
+            'https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js'
+        );
+        await loadScript(
+            'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/contrib/auto-render.min.js',
+            'https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js'
+        );
+
+        renderQuestionsMath();
+    }
+
+    function renderQuestionsMath() {
+        document.querySelectorAll('.question-text-box, .option-text').forEach(el => {
+            let html = el.innerHTML;
+
+            // Replace diagram image placeholders
+            html = html.replace(/\[DIAGRAM_IMAGE:([^\]]+)\]/g, function(match, filename) {
+                return `<div style="margin-top: 12px;"><img src="/media/dtm_images/${filename}" style="max-height: 160px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.3);"></div>`;
+            });
+
+            // Fix any unclosed math delimiters in saved text
+            html = fixUnclosedMathDelimiters(html);
+
+            el.innerHTML = html;
+
+            if (typeof renderMathInElement === "function") {
+                try {
+                    renderMathInElement(el, {
+                        delimiters: [
+                            {left: "$$", right: "$$", display: true},
+                            {left: "$", right: "$", display: false},
+                            {left: "\\(", right: "\\)", display: false},
+                            {left: "\\[", right: "\\]", display: true}
+                        ],
+                        throwOnError: false
+                    });
+                } catch(e) {
+                    console.error("KaTeX render error:", e);
+                }
+            }
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initKaTeX);
+    } else {
+        initKaTeX();
+    }
+})();
+</script>
+{% endblock %}

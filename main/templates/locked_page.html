@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sahifa vaqtincha yopiq | {{ site_name|default:"Tizim" }}</title>
+    <link rel="icon" type="image/png" href="{% url 'circular_favicon' %}">
+    <link rel="shortcut icon" type="image/png" href="{% url 'circular_favicon' %}">
+    <link rel="apple-touch-icon" href="{% url 'circular_favicon' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #070a12;
+            --card-bg: rgba(11, 15, 25, 0.6);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --accent: #ff0055;
+            --accent-glow: rgba(255, 0, 85, 0.2);
+            --accent-blue: #00f2fe;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Abstract glowing backgrounds */
+        .glow-sphere {
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            top: 20%;
+            left: 15%;
+            filter: blur(50px);
+            z-index: 1;
+        }
+
+        .glow-sphere-blue {
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.08) 0%, transparent 70%);
+            bottom: 10%;
+            right: 10%;
+            filter: blur(60px);
+            z-index: 1;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 50px 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 10;
+            position: relative;
+            transform: translateY(0);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .icon-container {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: rgba(255, 0, 85, 0.05);
+            border: 1px solid rgba(255, 0, 85, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        .icon-container i {
+            font-size: 42px;
+            color: var(--accent);
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff, rgba(255, 255, 255, 0.8));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 35px;
+            font-weight: 500;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            text-decoration: none;
+            padding: 14px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 242, 254, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 242, 254, 0.3);
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="glow-sphere"></div>
+    <div class="glow-sphere-blue"></div>
+
+    <div class="card">
+        <div class="icon-container">
+            <i class="fas fa-screwdriver-wrench"></i>
+        </div>
+        <h1>Texnik xizmat ko'rsatish</h1>
+        <p>Ushbu sahifada jiddiy xatolik aniqlandi va tizim xavfsizligi hamda ma'lumotlar yaxlitligini ta'minlash maqsadida sahifa vaqtinchalik yopildi. Tizim adminlari bu haqida xabardor qilindi va muammoni bartaraf etishmoqda.</p>
+        <a href="/" class="btn"><i class="fas fa-home"></i> Bosh sahifaga qaytish</a>
+        
+        <div class="footer">
+            <i class="fas fa-shield-halved"></i> Avtomatik Xavfsizlik Lockdown Tizimi
+        </div>
+    </div>
+</body>
+</html>

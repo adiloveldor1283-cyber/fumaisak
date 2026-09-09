@@ -1,6 +1,6 @@
 {% extends 'basestudent.html' %}
 
-{% block title %}Mustaqil AI Quiz Dashboard - Student Profili{% endblock %}
+{% block title %}Mustaqil AI testlar{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -413,15 +413,6 @@
         <h2 class="content-title">Mustaqil <span>AI Quiz Test</span></h2>
     </div>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="toast {% if message.tags == 'error' %}toast-error{% endif %}">
-                <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
     <!-- Statistika Kartalari -->
     <div class="kartalar">
         <div class="karta">
@@ -459,31 +450,51 @@
         <!-- Test yaratish -->
         <div class="glass-card">
             <h3><i class="fas fa-cog"></i> Yangi test sozlamalari</h3>
-            <form method="post" id="quizGeneratorForm">
+
+            {% if today_quiz_created %}
+                <div style="background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 14px; padding: 16px; margin-bottom: 20px; text-align: center;">
+                    <i class="fas fa-calendar-check" style="font-size: 24px; color: #00f2fe; margin-bottom: 8px;"></i>
+                    <h4 style="font-size: 14px; font-weight: 800; color: #ffffff; margin-bottom: 4px;">Bugun AI testingizni yaratgansiz!</h4>
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.4; margin-bottom: 12px;">Kunlik AI test bajarish limitingiz yetdi (1 kunda 1 marta). Yangi test yaratish uchun ertaga qayta kiring.</p>
+                    {% if today_quiz %}
+                        {% if today_quiz.is_completed %}
+                            <a href="{% url 'ai_quiz_results' today_quiz.id %}" class="btn-action" style="display: inline-flex; justify-content: center; width: auto; margin: 0; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; font-weight: 800; padding: 8px 16px;">
+                                <i class="fas fa-eye"></i> Bugungi test natijasini ko'rish
+                            </a>
+                        {% else %}
+                            <a href="{% url 'ai_quiz_take' today_quiz.id %}" class="btn-action" style="display: inline-flex; justify-content: center; width: auto; margin: 0; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; font-weight: 800; padding: 8px 16px;">
+                                <i class="fas fa-play"></i> Bugungi testni boshlash
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <form method="post" id="quizGeneratorForm" {% if today_quiz_created %}style="opacity: 0.5; pointer-events: none;"{% endif %}>
                 {% csrf_token %}
 
                 <div class="form-group">
                     <label for="custom_category">Mavzuni yozing, AI shunga moslab test tuzib beradi *</label>
-                    <input type="text" class="form-control" id="custom_category" name="custom_category" placeholder="Masalan: Present Simple, Trigonometriya..." autocomplete="off" required>
+                    <input type="text" class="form-control" id="custom_category" name="custom_category" placeholder="Masalan: Present Simple, Trigonometriya..." autocomplete="off" required {% if today_quiz_created %}disabled{% endif %}>
                 </div>
 
                 <div class="form-group">
                     <label>Testlar soni</label>
                     <div class="level-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr !important;">
                         <div class="level-item">
-                            <input type="radio" name="num_questions" value="5" id="num5" checked>
+                            <input type="radio" name="num_questions" value="5" id="num5" checked {% if today_quiz_created %}disabled{% endif %}>
                             <label class="level-label" for="num5">5 ta</label>
                         </div>
                         <div class="level-item">
-                            <input type="radio" name="num_questions" value="10" id="num10">
+                            <input type="radio" name="num_questions" value="10" id="num10" {% if today_quiz_created %}disabled{% endif %}>
                             <label class="level-label" for="num10">10 ta</label>
                         </div>
                         <div class="level-item">
-                            <input type="radio" name="num_questions" value="15" id="num15">
+                            <input type="radio" name="num_questions" value="15" id="num15" {% if today_quiz_created %}disabled{% endif %}>
                             <label class="level-label" for="num15">15 ta</label>
                         </div>
                         <div class="level-item">
-                            <input type="radio" name="num_questions" value="20" id="num20">
+                            <input type="radio" name="num_questions" value="20" id="num20" {% if today_quiz_created %}disabled{% endif %}>
                             <label class="level-label" for="num20">20 ta</label>
                         </div>
                     </div>
@@ -493,22 +504,22 @@
                     <label>Qiyinchilik darajasi</label>
                     <div class="level-grid">
                         <div class="level-item">
-                            <input type="radio" name="level" value="beginner" id="lvl1" checked>
+                            <input type="radio" name="level" value="beginner" id="lvl1" checked {% if today_quiz_created %}disabled{% endif %}>
                             <label class="level-label" for="lvl1">A1-A2 (Past)</label>
                         </div>
                         <div class="level-item">
-                            <input type="radio" name="level" value="intermediate" id="lvl2">
+                            <input type="radio" name="level" value="intermediate" id="lvl2" {% if today_quiz_created %}disabled{% endif %}>
                             <label class="level-label" for="lvl2">B1-B2 (O'rta)</label>
                         </div>
                         <div class="level-item">
-                            <input type="radio" name="level" value="advanced" id="lvl3">
+                            <input type="radio" name="level" value="advanced" id="lvl3" {% if today_quiz_created %}disabled{% endif %}>
                             <label class="level-label" for="lvl3">C1-C2 (Yuqori)</label>
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-generate">
-                    <i class="fas fa-magic"></i> AI orqali test yaratish
+                <button type="submit" class="btn-generate" {% if today_quiz_created %}disabled style="cursor: not-allowed; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); box-shadow: none;"{% endif %}>
+                    <i class="fas {% if today_quiz_created %}fa-lock{% else %}fa-magic{% endif %}"></i> {% if today_quiz_created %}Bugun test yaratilgan{% else %}AI orqali test yaratish{% endif %}
                 </button>
             </form>
         </div>

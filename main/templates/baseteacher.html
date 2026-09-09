@@ -3,12 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}O'qituvchi paneli{% endblock %}</title>
+    <title>{% block title %}O'qituvchi paneli{% endblock %} | {{ site_name|default:"Tizim" }}</title>
+    <link rel="icon" type="image/png" href="{% url 'circular_favicon' %}">
+    <link rel="shortcut icon" type="image/png" href="{% url 'circular_favicon' %}">
+    <link rel="apple-touch-icon" href="{% url 'circular_favicon' %}">
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
+        :root {
+            --bg-ticker: rgba(0, 242, 254, 0.03);
+            --border-ticker: rgba(0, 242, 254, 0.1);
+            --text-ticker: rgba(255, 255, 255, 0.85);
+            --text-muted: rgba(255, 255, 255, 0.3);
+            --accent-primary: #00f2fe;
+            --accent-bg-glow: rgba(0, 242, 254, 0.1);
+            --accent-border-glow: rgba(0, 242, 254, 0.2);
+        }
+        body.light-mode {
+            --bg-ticker: rgba(2, 132, 199, 0.05);
+            --border-ticker: rgba(2, 132, 199, 0.15);
+            --text-ticker: #334155;
+            --text-muted: #94a3b8;
+            --accent-primary: #0284c7;
+            --accent-bg-glow: rgba(2, 132, 199, 0.08);
+            --accent-border-glow: rgba(2, 132, 199, 0.2);
+        }
+
+        /* Announcement Ticker styles */
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-100%); }
+        }
+        @keyframes pulse-dot-anim {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+        .pulse-dot {
+            animation: pulse-dot-anim 2s infinite ease-in-out;
+        }
+        .ticker-container {
+            flex-grow: 1;
+            margin: 0 30px;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: var(--bg-ticker);
+            border: 1px solid var(--border-ticker);
+            border-radius: 30px;
+            height: 38px;
+            padding: 0 15px;
+            max-width: 600px;
+            min-width: 0;
+        }
+        .ticker-badge {
+            background: var(--accent-bg-glow);
+            border: 1px solid var(--accent-border-glow);
+            border-radius: 20px;
+            padding: 2px 10px;
+            color: var(--accent-primary);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+        .ticker-scroll-wrapper {
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .ticker-content {
+            display: inline-block;
+            white-space: nowrap;
+            padding-left: 100%;
+            animation: ticker-scroll 35s linear infinite;
+        }
+        .ticker-content:hover {
+            animation-play-state: paused;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .ticker-container {
+                margin: 0 10px;
+                height: 32px;
+                padding: 0 10px;
+            }
+            .ticker-badge-text {
+                display: none;
+            }
+            .ticker-badge {
+                margin-right: 8px;
+                padding: 2px 6px;
+            }
+            .ticker-content {
+                font-size: 11px !important;
+            }
+            .sarlavha-qatori {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 10px !important;
+            }
+            .sarlavha-qatori .search-form {
+                width: 100% !important;
+            }
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -22,6 +135,28 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
+        }
+
+        /* Global premium, barely visible scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.12);
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 242, 254, 0.3);
+        }
+        /* Firefox uchun bilinar-bilinmas scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 242, 254, 0.12) transparent;
         }
 
         /* Cyberpunk Orqa Fon Chiziqlari */
@@ -68,7 +203,8 @@
             border: 2px solid rgba(0, 242, 254, 0.2);
         }
         .toggle-btn {
-            margin-left: 30px;
+            margin-left: auto;
+            margin-right: 15px;
             background: none;
             border: none;
             color: white;
@@ -81,10 +217,13 @@
         .brand {
             font-size: 20px;
             font-weight: bold;
-            margin-left: 15px;
+            margin-left: 12px;
             background: linear-gradient(135deg, #00f2fe, #4facfe);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .sidebar.collapsed .brand, .sidebar.collapsed .toggle-btn { display: none; }
         .user-info {
@@ -139,8 +278,19 @@
             font-weight: 700;
             color: #00f2fe !important;
         }
-        .sidebar.collapsed .user-info span { display: none; }
-        .sidebar ul { margin-top: 10px; list-style: none; padding: 8px; flex-grow: 1; }
+        .sidebar.collapsed .user-info { display: none; }
+        .sidebar ul {
+            margin-top: 10px;
+            list-style: none;
+            padding: 8px;
+            flex-grow: 1;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+        .sidebar ul::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
         .sidebar ul li { display: flex; align-items: center; border-radius: 12px; transition: 0.3s; cursor: pointer; margin-bottom: 4px; }
         .sidebar ul li:hover { background: rgba(255, 255, 255, 0.03); }
         .sidebar ul li:hover a i, .sidebar ul li:hover a span { color: #00f2fe; }
@@ -150,7 +300,17 @@
         .sidebar.collapsed ul li a span { display: none; }
 
         /* Main & Header Layout */
-        .main { flex-grow: 1; display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 1; flex: 1; }
+        .main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-width: 0; /* ⬅️ JUDA MUHIM: Flex konteyner bolalari sig'may qolganda ekranni surib yubormasligi uchun */
+    overflow-x: hidden;
+}
         .header {
             color: white;
             background: rgba(11, 15, 25, 0.4);
@@ -213,38 +373,1114 @@
         .dropdown-item:last-child { border-bottom: none; }
 
         /* Umumiy Kontenyer (Hamma sahifa uchun bir xil joylashuv) */
-        .konteyner {
+       .konteyner {
             background-color: transparent;
             padding: 30px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
             height: calc(100vh - 69px);
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
+            min-width: 0; /* ⬅️ JUDA MUHIM: Ekran sig'imini ushlab turadi */
+            width: 100%;
+        }
+
+        /* Yuqoridagi orqaga chiqish strelkasi */
+        .back-arrow-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            color: #00f2fe;
+            transition: 0.3s;
+            text-decoration: none;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .back-arrow-btn:hover {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+            transform: translateY(-1px);
+        }
+        .back-arrow-btn i {
+            font-size: 16px;
         }
 
         /* Sidebar uchun Responsive Base qismi */
         @media (max-width: 768px) {
             body { overflow: auto; }
-            .sidebar { position: absolute; height: 100%; transform: translateX(-100%); z-index: 1005; background: rgba(11, 15, 25, 0.96); }
+            body.sidebar-open { overflow: hidden !important; height: 100vh !important; }
+            .sidebar { position: fixed !important; height: 100vh !important; transform: translateX(-100%); z-index: 1005; background: rgba(11, 15, 25, 0.96); }
             .sidebar.show { transform: translateX(0); }
             .sidebar.collapsed { width: 250px; }
             .main .toggle-main { display: inline-block; }
+            .sidebar.collapsed.show .user-info { display: flex !important; }
             .sidebar.collapsed.show .brand, .sidebar.collapsed.show .toggle-btn, .sidebar.collapsed.show .user-info span, .sidebar.collapsed.show ul li a span { display: inline !important; }
             #bell-panel { right: 10px; width: calc(100vw - 20px); max-width: 320px; }
             #profile-panel { right: 10px; width: 180px; }
         }
+
+        /* --- GLOBAL KUN REJIMI (LIGHT MODE) OVERRIDES --- */
+        body.light-mode {
+            background: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+        body.light-mode .cyber-bg {
+            opacity: 0.01;
+        }
+        body.light-mode .main {
+            background: #f1f5f9 !important;
+        }
+        body.light-mode .sidebar {
+            background: #e2e8f0 !important;
+            border-right: 1px solid #cbd5e1 !important;
+            color: #1e293b !important;
+        }
+        body.light-mode .sidebar .toggle-container {
+            border-bottom: 1px solid #cbd5e1 !important;
+        }
+        body.light-mode .sidebar .brand {
+            background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+        }
+        body.light-mode .sidebar ul li a {
+            color: #475569 !important;
+        }
+        body.light-mode .sidebar ul li:hover {
+            background: #cbd5e1 !important;
+        }
+        body.light-mode .sidebar ul li:hover a i, 
+        body.light-mode .sidebar ul li:hover a span {
+            color: #0f172a !important;
+        }
+        body.light-mode .sidebar ul li.active {
+            background: #cbd5e1 !important;
+            border-left: 3px solid #0284c7 !important;
+        }
+        body.light-mode .sidebar ul li.active a i,
+        body.light-mode .sidebar ul li.active a span {
+            color: #0f172a !important;
+        }
+        body.light-mode .sidebar .user-info {
+            border-bottom: 1px solid #cbd5e1 !important;
+        }
+        body.light-mode .sidebar .user-info span {
+            color: #334155 !important;
+        }
+        body.light-mode .sidebar .span {
+            color: #0284c7 !important;
+        }
+        body.light-mode .header {
+            background: #e2e8f0 !important;
+            border-bottom: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        body.light-mode .header h1,
+        body.light-mode .username-display,
+        body.light-mode .bell-icon {
+            color: #0f172a !important;
+        }
+        body.light-mode .toggle-btn,
+        body.light-mode .toggle-main {
+            color: #0f172a !important;
+        }
+        body.light-mode .dropdown-panel {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+        }
+        body.light-mode .dropdown-item {
+            color: #334155 !important;
+        }
+        body.light-mode .dropdown-item:hover {
+            background: #f1f5f9 !important;
+        }
+        body.light-mode .dropdown-panel strong {
+            color: #0284c7 !important;
+        }
+        body.light-mode .dropdown-panel span,
+        body.light-mode .dropdown-panel div {
+            color: #334155 !important;
+        }
+        body.light-mode .dropdown-item i {
+            color: #0284c7 !important;
+        }
+        body.light-mode .dropdown-panel hr {
+            border-top-color: #e2e8f0 !important;
+        }
+        body.light-mode #bell-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid #cbd5e1 !important;
+            background: #ffffff !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+            transition: all 0.3s ease;
+        }
+        body.light-mode #bell-btn i {
+            color: #0f172a !important;
+            font-size: 15px !important;
+            margin: 0 !important;
+        }
+        body.light-mode #bell-btn:hover {
+            border-color: #0284c7 !important;
+            background: #f1f5f9 !important;
+        }
+        body.light-mode #bell-btn:hover i {
+            color: #0284c7 !important;
+        }
+        body.light-mode #themeToggleBtn {
+            color: #0f172a !important;
+        }
+
+        /* --- 🎨 DINAMIK INLINE COLOR OVERRIDES FOR LIGHT MODE --- */
+        body.light-mode [style*="color: #ffffff"],
+        body.light-mode [style*="color:#ffffff"],
+        body.light-mode [style*="color: #fff"],
+        body.light-mode [style*="color:#fff"],
+        body.light-mode [style*="color: rgba(255, 255, 255"],
+        body.light-mode [style*="color:rgba(255,255,255"] {
+            color: #0f172a !important;
+        }
+        body.light-mode [style*="color: #00f2fe"],
+        body.light-mode [style*="color:#00f2fe"],
+        body.light-mode [style*="color: #4facfe"],
+        body.light-mode [style*="color:#4facfe"],
+        body.light-mode [style*="color: #38bdf8"],
+        body.light-mode [style*="color: #00e5ff"] {
+            color: #0284c7 !important;
+        }
+        body.light-mode [style*="color: #00ffaa"],
+        body.light-mode [style*="color:#00ffaa"],
+        body.light-mode [style*="color: #00ff66"],
+        body.light-mode [style*="color: #22c55e"] {
+            color: #15803d !important;
+        }
+        body.light-mode [style*="color: #ffc107"],
+        body.light-mode [style*="color:#ffc107"],
+        body.light-mode [style*="color: #ffd700"] {
+            color: #b45309 !important;
+        }
+        body.light-mode [style*="color: #ff0055"],
+        body.light-mode [style*="color:#ff0055"],
+        body.light-mode [style*="color: #ff808b"] {
+            color: #dc2626 !important;
+        }
+        body.light-mode [style*="border-color: #00f2fe"],
+        body.light-mode [style*="border-color: #4facfe"],
+        body.light-mode [style*="border: 1px solid rgba(0, 242, 254"] {
+            border-color: rgba(2, 132, 199, 0.3) !important;
+        }
+        body.light-mode [style*="border-left: 3px solid #4facfe"],
+        body.light-mode [style*="border-left: 4px solid #00f2fe"],
+        body.light-mode [style*="border-left: 2px solid #00f2fe"] {
+            border-left-color: #0284c7 !important;
+        }
+        body.light-mode [style*="background: rgba(0, 242, 254, 0.08)"] {
+            background-color: rgba(2, 132, 199, 0.08) !important;
+        }
+        body.light-mode [style*="background: rgba(0, 242, 254, 0.07)"] {
+            background-color: rgba(2, 132, 199, 0.06) !important;
+        }
+        body.light-mode [style*="background: rgba(255, 255, 255, 0.02)"],
+        body.light-mode [style*="background: rgba(255, 255, 255, 0.01)"],
+        body.light-mode [style*="background: rgba(11, 15, 25, 0.4)"],
+        body.light-mode [style*="background: rgba(11, 15, 25, 0.3)"],
+        body.light-mode [style*="background:rgba(11, 15, 25, 0.3)"],
+        body.light-mode [style*="background:rgba(11, 15, 25, 0.4)"] {
+            background-color: #ffffff !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        /* Common light-mode elements across all pages */
+        body.light-mode h2,
+        body.light-mode h3,
+        body.light-mode h4,
+        body.light-mode .sarlavha {
+            color: #0f172a !important;
+        }
+        body.light-mode .sarlavha {
+            border-left-color: #0284c7 !important;
+        }
+        body.light-mode .jadval-container {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04) !important;
+        }
+        body.light-mode th {
+            background: #f8fafc !important;
+            color: #64748b !important;
+            border-bottom-color: #e2e8f0 !important;
+        }
+        body.light-mode td {
+            color: #334155 !important;
+            border-bottom-color: #f1f5f9 !important;
+        }
+        body.light-mode tr:hover td {
+            background: #f8fafc !important;
+            color: #0284c7 !important;
+        }
+        body.light-mode td span {
+            color: #334155 !important;
+        }
+        body.light-mode tr:hover td span {
+            color: #0284c7 !important;
+        }
+        body.light-mode .btn-otish,
+        body.light-mode .btn-secondary {
+            background: #0284c7 !important;
+            border-color: #0284c7 !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15) !important;
+        }
+        body.light-mode .btn-otish:hover,
+        body.light-mode .btn-secondary:hover {
+            background: #0369a1 !important;
+            color: #ffffff !important;
+            border-color: #0369a1 !important;
+        }
+        body.light-mode .back-arrow-btn {
+            background: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+            color: #0284c7 !important;
+        }
+        body.light-mode .back-arrow-btn:hover {
+            background: #0284c7 !important;
+            color: #ffffff !important;
+            border-color: #0284c7 !important;
+        }
+        body.light-mode .chiqish a {
+            background: rgba(239, 68, 68, 0.06) !important;
+            border: 1px solid rgba(239, 68, 68, 0.2) !important;
+            color: #dc2626 !important;
+        }
+        body.light-mode .chiqish a:hover {
+            background: #dc2626 !important;
+            color: #ffffff !important;
+        }
+
+        /* Stats cards on dashboard */
+        body.light-mode .karta {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .karta .matn,
+        body.light-mode .karta .matn-qismi span.kichik-tizim {
+            color: #64748b !important;
+        }
+        body.light-mode .karta .pul,
+        body.light-mode .karta .matn-qismi span.katta-qiymat {
+            color: #0f172a !important;
+        }
+        body.light-mode .karta .ikonka i,
+        body.light-mode .karta .ikonka-qutisi i {
+            color: #0284c7 !important;
+        }
+
+        /* Schedule / Timetable elements */
+        body.light-mode #jadval {
+            border: 1px solid #cbd5e1 !important;
+        }
+        body.light-mode #jadval th {
+            background-color: #f8fafc !important;
+            color: #334155 !important;
+            border: 1px solid #cbd5e1 !important;
+            font-weight: 800 !important;
+        }
+        body.light-mode #jadval td {
+            background-color: #ffffff !important;
+            color: #334155 !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        body.light-mode #jadval tr:nth-child(even) td:not(.guruh-ustuni) {
+            background-color: #f8fafc !important;
+        }
+        body.light-mode #jadval td:not(.guruh-ustuni):hover {
+            background-color: #f1f5f9 !important;
+        }
+        body.light-mode th.today {
+            background-color: rgba(2, 132, 199, 0.12) !important;
+            color: #0284c7 !important;
+            border: 1.5px solid #0284c7 !important;
+            text-shadow: none !important;
+        }
+        body.light-mode th.today small {
+            color: #0369a1 !important;
+        }
+        body.light-mode .guruh-ustuni {
+            background-color: #e2e8f0 !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        body.light-mode .dars-yoq {
+            color: #94a3b8 !important;
+        }
+        body.light-mode td div {
+            background: rgba(2, 132, 199, 0.05) !important;
+            border: 1px solid rgba(2, 132, 199, 0.15) !important;
+            border-radius: 8px !important;
+            padding: 6px 10px !important;
+            margin: 4px 0 !important;
+            color: #0284c7 !important;
+            font-weight: 700 !important;
+            text-align: center !important;
+        }
+
+        /* --- 🔘 GLOBAL BUTTON LIGHT MODE OVERRIDES --- */
+        body.light-mode button:not(#themeToggleBtn):not(.toggle-main):not(.toggle-btn):not(.tab-btn):not(.profil-tab-btn):not(.open-modal):not([type="submit"]):not(.btn-regenerate) {
+            background: #f1f5f9 !important;
+            color: #0f172a !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        body.light-mode button:not(#themeToggleBtn):not(.toggle-main):not(.toggle-btn):not(.tab-btn):not(.profil-tab-btn):not(.open-modal):not([type="submit"]):not(.btn-regenerate):hover {
+            background: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        /* Cards, panels, inputs, profile, forms */
+        body.light-mode .card,
+        body.light-mode .panel,
+        body.light-mode .left-panel,
+        body.light-mode .right-panel,
+        body.light-mode .profile-card,
+        body.light-mode .form-card,
+        body.light-mode .quiz-card,
+        body.light-mode .assignment-card,
+        body.light-mode .profil-konteyner,
+        body.light-mode .glass-card,
+        body.light-mode .kiber-karta {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+        }
+        body.light-mode .card *,
+        body.light-mode .panel *,
+        body.light-mode .profile-card *,
+        body.light-mode .form-card *,
+        body.light-mode .profil-konteyner *,
+        body.light-mode .glass-card *,
+        body.light-mode .kiber-karta * {
+            color: #334155;
+        }
+        body.light-mode .card h3,
+        body.light-mode .panel h3,
+        body.light-mode .profile-card h2,
+        body.light-mode .profile-card h3,
+        body.light-mode .profil-konteyner h2,
+        body.light-mode .glass-card h3,
+        body.light-mode .kiber-karta h3 {
+            color: #0f172a !important;
+        }
+        body.light-mode label {
+            color: #475569 !important;
+            font-weight: 600;
+        }
+        body.light-mode input[type="text"],
+        body.light-mode input[type="password"],
+        body.light-mode input[type="email"],
+        body.light-mode select,
+        body.light-mode textarea,
+        body.light-mode .search-input,
+        body.light-mode .form-control {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        body.light-mode .search-btn {
+            background: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #334155 !important;
+            box-shadow: none !important;
+        }
+        body.light-mode input:focus,
+        body.light-mode select:focus,
+        body.light-mode textarea:focus,
+        body.light-mode .search-input:focus,
+        body.light-mode .form-control:focus {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15) !important;
+        }
+        body.light-mode .btn-primary,
+        body.light-mode button[type="submit"]:not(.search-btn),
+        body.light-mode .profil-btn,
+        body.light-mode .btn-generate {
+            background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+            color: #ffffff !important;
+            border: none !important;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode .btn-primary:hover,
+        body.light-mode button[type="submit"]:not(.search-btn):hover,
+        body.light-mode .profil-btn:hover,
+        body.light-mode .btn-generate:hover {
+            background: linear-gradient(135deg, #0369a1, #075985) !important;
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3) !important;
+            color: #ffffff !important;
+        }
+
+        /* Profile settings page */
+        body.light-mode .profil-tablar {
+            border-bottom-color: #cbd5e1 !important;
+        }
+        body.light-mode .profil-tab-btn.aktiv-tab::after {
+            background: #0284c7 !important;
+            box-shadow: none !important;
+        }
+        body.light-mode .profil-konteyner label {
+            color: #64748b !important;
+        }
+        body.light-mode .form_input input[type="password"],
+        body.light-mode input[type="file"] {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        body.light-mode .form_input input[type="password"]:focus {
+            border-color: #0284c7 !important;
+            background: #ffffff !important;
+            box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15) !important;
+        }
+        body.light-mode img.profil-rasm {
+            border-color: #cbd5e1 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+        }
+        body.light-mode .modal-contentt {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+        }
+        body.light-mode .modall-message {
+            color: #0f172a !important;
+        }
+        body.light-mode .close-modall-btn {
+            background: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #334155 !important;
+        }
+        body.light-mode .close-modall-btn:hover {
+            background: #e2e8f0 !important;
+        }
+
+        /* Mobile view responsive cards in light mode */
+        @media (max-width: 768px) {
+            body.light-mode tr {
+                background: #ffffff !important;
+                border: 1px solid #e2e8f0 !important;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.02) !important;
+            }
+            body.light-mode td {
+                border-bottom-color: #f1f5f9 !important;
+            }
+            body.light-mode td::before {
+                color: #0284c7 !important;
+            }
+            
+            /* Spacing adjustments for mobile header items */
+            .user-profile {
+                gap: 10px !important;
+                padding-right: 5px !important;
+            }
+            #themeToggleBtn {
+                margin-right: 0 !important;
+            }
+            .search-input {
+                width: 110px !important;
+                margin-left: 15px !important;
+
+                padding: 8px 10px !important;
+                font-size: 11.5px !important;
+            }
+            .search-btn {
+                padding: 8px 10px !important;
+                font-size: 11.5px !important;
+            }
+        }
+
+        /* --- 🚨 PROFILE PANEL LOGOUT COLOR FORCE --- */
+        body.light-mode #profile-panel a[href*="logout"],
+        body.light-mode #profile-panel a[href*="logout"] i {
+            color: #dc2626 !important;
+        }
+        body.light-mode #profile-panel a[href*="logout"]:hover,
+        body.light-mode #profile-panel a[href*="logout"]:hover i {
+            color: #b91c1c !important;
+            background-color: rgba(220, 38, 38, 0.05) !important;
+        }
+
+        /* --- 🌑 THEME TOGGLE BUTTON LIGHT MODE --- */
+        body.light-mode #themeToggleBtn,
+        body.light-mode #themeToggleBtn i {
+            color: #0f172a !important;
+        }
+
+        /* --- 🔍 GLOBAL SEARCH BAR (UNIFIED PILL CAPSULE) --- */
+        .search-form {
+            display: flex !important;
+            align-items: center !important;
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 12px !important;
+            padding: 4px 14px !important;
+            transition: 0.3s !important;
+            width: 270px;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+        }
+        .search-form:focus-within {
+            border-color: #00f2fe !important;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.2) !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+        .search-form .search-input,
+        .search-input {
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            color: #ffffff !important;
+            font-size: 13px !important;
+            width: 100% !important;
+            padding: 6px 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            height: auto !important;
+        }
+        .search-form .search-input:focus,
+        .search-input:focus {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            background: transparent !important;
+        }
+        .search-form .search-btn,
+        .search-btn {
+            background: none !important;
+            border: none !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+            cursor: pointer !important;
+            font-size: 13px !important;
+            transition: 0.3s !important;
+            padding: 0 0 0 8px !important;
+            margin: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            width: auto !important;
+            height: auto !important;
+        }
+        .search-form .search-btn:hover,
+        .search-btn:hover {
+            color: #00f2fe !important;
+            background: none !important;
+            border: none !important;
+        }
+
+        /* LIGHT MODE SEARCH */
+        body.light-mode .search-form {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .search-form:focus-within {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode .search-form .search-input,
+        body.light-mode .search-input {
+            color: #0f172a !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            border-radius: 0 !important;
+        }
+        body.light-mode .search-form .search-input:focus,
+        body.light-mode .search-input:focus {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            background: transparent !important;
+        }
+        body.light-mode .search-form .search-btn,
+        body.light-mode .search-btn {
+            color: #64748b !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+        body.light-mode .search-form .search-btn:hover,
+        body.light-mode .search-btn:hover {
+            color: #0284c7 !important;
+            background: transparent !important;
+            border: none !important;
+        }
+
+        /* --- 📊 PROGRESS BAR SPAN OUTSIDE OVERRIDE --- */
+        body.light-mode .progress span[style*="left: 100%"],
+        body.light-mode .progress span[style*="position: absolute"] {
+            color: #0284c7 !important;
+        }
+
+        /* --- 📅 GROUP DETAILS PAGE (GROUP_DETAIL) LIGHT MODE OVERRIDES --- */
+        body.light-mode .tabs-nav {
+            border-bottom-color: #cbd5e1 !important;
+        }
+        body.light-mode .tab-btn {
+            color: #475569 !important;
+        }
+        body.light-mode .tab-btn:hover {
+            background: rgba(0, 0, 0, 0.03) !important;
+            color: #0f172a !important;
+        }
+        body.light-mode .tab-btn.active {
+            color: #0284c7 !important;
+            background: rgba(2, 132, 199, 0.07) !important;
+            border-color: rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode .lesson-card {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04) !important;
+            padding: 24px !important;
+            border-radius: 20px !important;
+            margin-bottom: 25px !important;
+        }
+        body.light-mode .lesson-card h3 {
+            color: #0f172a !important;
+            border-bottom-color: #e2e8f0 !important;
+        }
+        body.light-mode .lesson-card label {
+            color: #64748b !important;
+        }
+        body.light-mode .chiqish_sahifa {
+            margin-bottom: 30px !important;
+        }
+
+        /* --- 📝 QUIZ CREATION & EDIT PAGES LIGHT MODE OVERRIDES --- */
+        body.light-mode fieldset.question-item,
+        body.light-mode .savollar-bloki {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04) !important;
+        }
+        body.light-mode legend {
+            color: #0284c7 !important;
+            border-bottom-color: #e2e8f0 !important;
+        }
+        body.light-mode .question-block label,
+        body.light-mode .savol label {
+            color: #64748b !important;
+        }
+        body.light-mode .javob {
+            color: #0f172a !important;
+        }
+        body.light-mode .answer-option input[type="text"],
+        body.light-mode .javob input[type="text"],
+        body.light-mode .question-input {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        body.light-mode .answer-option input[type="text"]:focus,
+        body.light-mode .javob input[type="text"]:focus,
+        body.light-mode .question-input:focus {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15) !important;
+            background-color: #ffffff !important;
+        }
+        body.light-mode .button-test {
+            background: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #334155 !important;
+            box-shadow: none !important;
+        }
+        body.light-mode .button-test:hover {
+            background: #cbd5e1 !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        body.light-mode button[type="submit"].button-test,
+        body.light-mode .guruh-btn {
+            background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode button[type="submit"].button-test:hover,
+        body.light-mode .guruh-btn:hover {
+            background: linear-gradient(135deg, #0369a1, #075985) !important;
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3) !important;
+            color: #ffffff !important;
+        }
+        body.light-mode hr.chiziq,
+        body.light-mode hr.hr-joy {
+            border-top-color: #cbd5e1 !important;
+        }
+
+        /* --- 👾 MODAL OYNALAR (CYBER GLASS) LIGHT MODE OVERRIDES --- */
+        body.light-mode .modal-backdrop,
+        body.light-mode .modal-backdropp,
+        body.light-mode .grade-modal-overlay {
+            background: rgba(15, 23, 42, 0.4) !important;
+            backdrop-filter: blur(10px) !important;
+        }
+        body.light-mode .custom-modal,
+        body.light-mode .grade-modal {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1) !important;
+        }
+        body.light-mode .modal-header {
+            border-bottom-color: #e2e8f0 !important;
+        }
+        body.light-mode .modal-header h3,
+        body.light-mode .grade-modal-title {
+            color: #0f172a !important;
+            border-left-color: #0284c7 !important;
+        }
+        body.light-mode .close-modal {
+            background: #f1f5f9 !important;
+            color: #475569 !important;
+        }
+        body.light-mode .close-modal:hover {
+            background: rgba(239, 68, 68, 0.1) !important;
+            color: #dc2626 !important;
+        }
+        body.light-mode .modal-content label,
+        body.light-mode .grade-modal p strong {
+            color: #64748b !important;
+        }
+        body.light-mode .grade-modal p {
+            color: #334155 !important;
+        }
+        body.light-mode .grade-modal span.student-name {
+            color: #0f172a !important;
+        }
+        body.light-mode .modal-content input,
+        body.light-mode .modal-content select,
+        body.light-mode .score-input {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        body.light-mode .modal-content input:focus,
+        body.light-mode .modal-content select:focus,
+        body.light-mode .score-input:focus {
+            border-color: #0284c7 !important;
+            background: #ffffff !important;
+            box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15) !important;
+        }
+        body.light-mode .modal-content button[type="submit"],
+        body.light-mode .btn-save {
+            background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode .modal-content button[type="submit"]:hover,
+        body.light-mode .btn-save:hover {
+            background: linear-gradient(135deg, #0369a1, #075985) !important;
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3) !important;
+            color: #ffffff !important;
+        }
+        body.light-mode .btn-cancel {
+            background: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #334155 !important;
+        }
+        body.light-mode .btn-cancel:hover {
+            background: rgba(239, 68, 68, 0.05) !important;
+            border-color: #dc2626 !important;
+            color: #dc2626 !important;
+        }
+
+        /* --- 🍞 GLOBAL PREMIUM TOAST NOTIFICATIONS --- */
+        .global-toasts-container {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 380px;
+            width: 90%;
+            pointer-events: none;
+        }
+        .global-toast {
+            pointer-events: auto;
+            background: rgba(13, 20, 35, 0.85);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #ffffff;
+            padding: 14px 18px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: 0.3s;
+        }
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13.5px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        .toast-content i {
+            font-size: 16px;
+        }
+        .toast-content i.text-success { color: #00ffaa; text-shadow: 0 0 10px rgba(0, 255, 170, 0.3); }
+        .toast-content i.text-error { color: #ff0055; text-shadow: 0 0 10px rgba(255, 0, 85, 0.3); }
+        .toast-content i.text-warning { color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+        
+        .toast-close-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.2s;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .toast-close-btn:hover {
+            color: #ff0055;
+        }
+
+        /* Light Mode overrides for Toasts */
+        body.light-mode .global-toast {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08) !important;
+        }
+        body.light-mode .toast-close-btn {
+            color: #64748b !important;
+        }
+        body.light-mode .toast-close-btn:hover {
+            color: #dc2626 !important;
+        }
+
+        /* --- 📅 TEACHER ATTENDANCE JOURNAL PAGE LIGHT MODE OVERRIDES --- */
+        body.light-mode th.sticky-col {
+            background: #f8fafc !important;
+            border-right: 1px solid #e2e8f0 !important;
+        }
+        body.light-mode td.sticky-col {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border-right: 1px solid #e2e8f0 !important;
+        }
+        body.light-mode tr:hover td.sticky-col {
+            background: #f1f5f9 !important;
+        }
+        body.light-mode td .fa-minus {
+            color: #cbd5e1 !important;
+        }
+        body.light-mode .sahifalash button {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #475569 !important;
+        }
+        body.light-mode .sahifalash button:hover:not(:disabled) {
+            background: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+        body.light-mode .sahifalash button.faol {
+            background: rgba(2, 132, 199, 0.07) !important;
+            border-color: rgba(2, 132, 199, 0.3) !important;
+            color: #0284c7 !important;
+        }
+
+        /* --- 📅 DARS JADVALI (TEACHER_DARS_TABLE) LIGHT MODE OVERRIDES --- */
+        body.light-mode .hafta-sur_bir,
+        body.light-mode .hafta-sur_ikki {
+            background: rgba(2, 132, 199, 0.06) !important;
+            border: 1px solid rgba(2, 132, 199, 0.2) !important;
+            color: #0284c7 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+        }
+        body.light-mode .hafta-sur_bir:hover,
+        body.light-mode .hafta-sur_ikki:hover {
+            background: #0284c7 !important;
+            color: #ffffff !important;
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode th.today {
+            background-color: rgba(2, 132, 199, 0.12) !important;
+            color: #0284c7 !important;
+            border: 1.5px solid #0284c7 !important;
+            text-shadow: none !important;
+        }
+        body.light-mode th.today small {
+            color: #0369a1 !important;
+        }
+        body.light-mode .guruh-ustuni {
+            background-color: #e2e8f0 !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        body.light-mode .dars-yoq {
+            color: #94a3b8 !important;
+        }
+        body.light-mode td div {
+            background: rgba(2, 132, 199, 0.05) !important;
+            border: 1px solid rgba(2, 132, 199, 0.15) !important;
+            border-radius: 8px !important;
+            padding: 6px 10px !important;
+            margin: 4px 0 !important;
+            color: #0284c7 !important;
+            font-weight: 700 !important;
+            text-align: center !important;
+        }
+        body.light-mode td div[style*="color: #ffffff"],
+        body.light-mode td div[style*="color:#ffffff"] {
+            color: #0284c7 !important;
+        }
+        body.light-mode td hr[style*="border-top"] {
+            border-top-color: #cbd5e1 !important;
+        }
+        body.light-mode th small[style*="color: rgba(255,255,255,0.3)"] {
+            color: #64748b !important;
+        }
+
+        /* Today's column highlight in Desktop Grid */
+        td.today-td {
+            background: rgba(0, 242, 254, 0.03) !important;
+        }
+        body.light-mode td.today-td {
+            background: rgba(2, 132, 199, 0.16) !important;
+        }
+
+        /* Global Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(7, 10, 18, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(0, 242, 254, 0.1);
+            border-radius: 50%;
+            border-top-color: #00f2fe;
+            animation: spin 1s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+        .loading-subtext {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* Light Mode Overrides for Global Loading Overlay */
+        body.light-mode .loading-overlay {
+            background: rgba(241, 245, 249, 0.9) !important;
+        }
+        body.light-mode .loading-text {
+            color: #0f172a !important;
+        }
+        body.light-mode .loading-subtext {
+            color: #475569 !important;
+        }
+
+        /* Centering toasts on mobile screens */
+        @media (max-width: 768px) {
+            .global-toasts-container {
+                left: 50% !important;
+                right: auto !important;
+                transform: translateX(-50%) !important;
+                top: 20px !important;
+                width: 90% !important;
+                max-width: none !important;
+            }
+        }
     </style>
 
     {% block extra_css %}{% endblock %}
+
+    <!-- Force fixed header and container scrolling on mobile for all teacher pages -->
+    <style>
+        @media (max-width: 768px) {
+            body {
+                overflow: hidden !important;
+            }
+            body .konteyner {
+                height: calc(100vh - 69px) !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+    </style>
+    <!-- KaTeX Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
 </head>
 <body>
+    <script>
+        if (localStorage.getItem('teacher_theme') === 'light') {
+            document.body.classList.add('light-mode');
+        }
+    </script>
+
     <div class="cyber-bg"></div>
 
     <div class="sidebar collapsed" id="sidebar">
         <div class="toggle-container">
             <img src="{{ global_image }}" alt="Logatip photo">
-            <div class="brand">FUMAISAK</div>
+            <div class="brand">{{ site_name|default:"Tizim" }}</div>
             <button class="toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
         </div>
 
@@ -269,12 +1505,16 @@
         </div>
 
         <ul>
-            <li><a href="{% url 'teacher_home' %}"><i class="fas fa-home"></i><span> Dashboard</span></a></li>
-            <li><a href="{% url 'teacher_students_list' %}"><i class="fas fa-user-graduate"></i><span> O'quvchilarim</span></a></li>
-            <li><a href="{% url 'teacher_group_list' %}"><i class="fas fa-list"></i><span>Guruhlarim</span></a></li>
-            <li><a href="{% url 'teacher_schedule' %}"><i class="fas fa-calendar-alt"></i><span>Dars jadval</span></a></li>
-            <li><a href="{% url 'create_quiz' %}"><i class="fas fa-clipboard-check"></i><span>Onlayn test</span></a></li>
-            <li><a href="{% url 'teacher_deadline' %}"><i class="fas fa-clipboard-list"></i><span> Topshiriqlarim</span></a></li>
+            <li class="{% if request.resolver_match.url_name == 'teacher_home' %}active{% endif %}"><a href="{% url 'teacher_home' %}"><i class="fas fa-home"></i><span> Dashboard</span></a></li>
+            <li class="{% if request.resolver_match.url_name == 'teacher_students_list' %}active{% endif %}"><a href="{% url 'teacher_students_list' %}"><i class="fas fa-user-graduate"></i><span> O'quvchilarim</span></a></li>
+            <li class="{% if request.resolver_match.url_name in 'teacher_group_list group_detail' %}active{% endif %}"><a href="{% url 'teacher_group_list' %}"><i class="fas fa-list"></i><span>Guruhlarim</span></a></li>
+            <li class="{% if request.resolver_match.url_name in 'teacher_subjects delete_subject_material_teacher delete_book_teacher' %}active{% endif %}"><a href="{% url 'teacher_subjects' %}"><i class="fas fa-book"></i><span> Fanlarim</span></a></li>
+            <li class="{% if request.resolver_match.url_name == 'teacher_schedule' %}active{% endif %}"><a href="{% url 'teacher_schedule' %}"><i class="fas fa-calendar-alt"></i><span>Dars jadval</span></a></li>
+            <li class="{% if request.resolver_match.url_name in 'teacher_attendance_groups submit_attendance teacher_group_attendance export_attendance_excel export_grades_excel export_grades_pdf' %}active{% endif %}"><a href="{% url 'teacher_attendance_groups' %}"><i class="fas fa-user-check"></i><span> Davomat olish</span></a></li>
+            <li class="{% if request.resolver_match.url_name in 'create_quiz add_questions quiz_detail quiz_results' %}active{% endif %}"><a href="{% url 'create_quiz' %}"><i class="fas fa-clipboard-check"></i><span>Onlayn test</span></a></li>
+            <li class="{% if request.resolver_match.url_name in 'teacher_deadline edit_assignment teacher_assignment_submissions grade_assignment' %}active{% endif %}"><a href="{% url 'teacher_deadline' %}"><i class="fas fa-clipboard-list"></i><span> Topshiriqlarim</span></a></li>
+            <li class="{% if request.resolver_match.url_name == 'quick_grade' %}active{% endif %}"><a href="{% url 'quick_grade' %}"><i class="fas fa-star"></i><span> Tezkor baholash</span></a></li>
+            <li class="{% if request.resolver_match.url_name == 'teacher_media_gallery' %}active{% endif %}"><a href="{% url 'teacher_media_gallery' %}"><i class="fas fa-video"></i><span> Videodarslar</span></a></li>
         </ul>
     </div>
 
@@ -282,9 +1522,31 @@
         <div class="header">
             <button class="toggle-main" id="mainToggle"><i class="fas fa-bars"></i></button>
 
-            {% block header_search %}{% endblock %}
+            <!-- Tizim e'lonlari uchun ticker -->
+            {% if always_show_announcements or one_time_announcements %}
+            <div class="ticker-container">
+                <div class="ticker-badge">
+                    <span class="pulse-dot" style="width: 6px; height: 6px; background-color: var(--accent-primary); border-radius: 50%; display: inline-block;"></span> <span class="ticker-badge-text">E'lonlar</span>
+                </div>
+                <div class="ticker-scroll-wrapper">
+                    <div class="ticker-content" style="color: var(--text-ticker); font-size: 13px; font-weight: 500;">
+                        {% for announce in always_show_announcements %}
+                            <span style="margin-right: 60px; font-weight: 700; color: #ff9f43;"><i class="fas fa-exclamation-triangle" style="margin-right: 6px;"></i> {{ announce.title }}: <span style="font-weight: 500; color: var(--text-ticker);">{{ announce.message }}</span></span>
+                        {% endfor %}
+                        {% for announce in one_time_announcements %}
+                            <span style="margin-right: 60px; font-weight: 700; color: var(--accent-primary);"><i class="fas fa-bullhorn" style="margin-right: 6px;"></i> {{ announce.title }}: <span style="font-weight: 500; color: var(--text-ticker);">{{ announce.message }}</span></span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
             <div class="user-profile">
+                <!-- Theme Toggle Button -->
+                <button id="themeToggleBtn" onclick="toggleTheme()" style="background: none; border: none; font-size: 19px; color: rgba(255, 255, 255, 0.7); cursor: pointer; transition: 0.3s; margin-right: 8px; display: inline-flex; align-items: center; justify-content: center;" onmouseover="this.style.color='#00f2fe'" onmouseout="if(!document.body.classList.contains('light-mode')) { this.style.color='rgba(255,255,255,0.7)' } else { this.style.color='#0f172a' }">
+                    <i class="fas fa-sun" id="themeIcon"></i>
+                </button>
+
                 <a href="javascript:void(0);" id="bell-btn">
                     <i class="fa fa-bell"></i>
                     {% if teacher_notif_count > 0 %}
@@ -313,7 +1575,7 @@
                     {% else %}
                         <div class="dropdown-item" style="text-align: center; color: rgba(255,255,255,0.3); padding: 20px 0; font-style: italic; font-size: 13px;">
                             <i class="far fa-bell-slash" style="display: block; font-size: 20px; margin-bottom: 8px; color: rgba(255,255,255,0.15);"></i>
-                            Bildirishnoma yo‘q
+                            Bildirishnoma yo'q
                         </div>
                     {% endif %}
                 </div>
@@ -327,13 +1589,45 @@
                 </a>
                 <div class="dropdown-panel" id="profile-panel">
                     <a href="{% url 'teacher_profile' %}" class="dropdown-item"><i class="fas fa-user"></i> Profilim</a>
-                    <a href="{% url 'login' %}" class="dropdown-item" style="color: #ff808b;"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
+                    <a href="{% url 'logout' %}" class="dropdown-item" style="color: #ff808b;"><i class="fas fa-sign-out-alt"></i> Chiqish</a>
                 </div>
             </div>
         </div>
 
         <div class="konteyner">
             {% block content %}{% endblock %}
+
+            <!-- FLOATING TOAST MESSAGE NOTIFICATIONS -->
+            {% if messages %}
+                <div class="global-toasts-container">
+                    {% for message in messages %}
+                        <div class="global-toast">
+                            <div class="toast-content">
+                                {% if 'success' in message.tags or 'password_img' in message.tags or 'video_toast' in message.tags %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% elif 'error' in message.tags or 'password' in message.tags %}
+                                    <i class="fas fa-exclamation-circle text-error"></i>
+                                {% elif 'warning' in message.tags %}
+                                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-info-circle text-info"></i>
+                                {% endif %}
+                                <span>{{ message }}</span>
+                            </div>
+                            <button class="toast-close-btn" onclick="this.parentElement.remove()">✖</button>
+                        </div>
+                    {% endfor %}
+                </div>
+                <script>
+                    setTimeout(() => {
+                        document.querySelectorAll('.global-toast').forEach(el => {
+                            el.style.opacity = '0';
+                            el.style.transform = 'translateX(50px)';
+                            setTimeout(() => el.remove(), 300);
+                        });
+                    }, 4500);
+                </script>
+            {% endif %}
         </div>
     </div>
 
@@ -345,6 +1639,11 @@
         function toggleSidebar() {
             if (window.innerWidth <= 768) {
                 sidebar.classList.toggle('show');
+                if (sidebar.classList.contains('show')) {
+                    document.body.classList.add('sidebar-open');
+                } else {
+                    document.body.classList.remove('sidebar-open');
+                }
             } else {
                 sidebar.classList.toggle('collapsed');
             }
@@ -356,6 +1655,30 @@
         window.addEventListener('resize', () => {
             if (window.innerWidth > 768) {
                 sidebar.classList.remove('show');
+                document.body.classList.remove('sidebar-open');
+            }
+        });
+
+        // Global horizontal scroll handler for tables using mouse wheel
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.jadval-container, .table-responsive, .group-table').forEach(container => {
+                container.addEventListener('wheel', (e) => {
+                    if (e.deltaY !== 0 && container.scrollWidth > container.clientWidth) {
+                        container.scrollLeft += e.deltaY * 1.2;
+                    }
+                }, { passive: true });
+            });
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function (e) {
+            if (window.innerWidth <= 768 && sidebar.classList.contains('show')) {
+                if (!e.target.closest('#sidebar') && 
+                    !e.target.closest('#sidebarToggle') && 
+                    !e.target.closest('#mainToggle')) {
+                    sidebar.classList.remove('show');
+                    document.body.classList.remove('sidebar-open');
+                }
             }
         });
 
@@ -384,15 +1707,129 @@
             const menuLinks = document.querySelectorAll(".sidebar ul li a");
 
             menuLinks.forEach(link => {
+                // Agar server allaqachon active bergan bo'lsa, saqlab qolamiz
+                if (link.parentElement.classList.contains("active")) {
+                    return;
+                }
                 const href = link.getAttribute("href");
-                if (currentPath === href || (href !== '/' && currentPath.startsWith(href))) {
+                const isAttendanceActive = href.includes('/attendance') && currentPath.includes('/attendance');
+                const isQuizActive = href.includes('/quiz') && currentPath.includes('/quiz');
+                const isDeadlineActive = href.includes('/deadline') && currentPath.includes('/deadline');
+                const isExactMatch = currentPath === href;
+                const isPrefixMatch = href !== '/' && currentPath.startsWith(href);
+
+                if (isExactMatch || isPrefixMatch || isAttendanceActive || isQuizActive || isDeadlineActive) {
                     link.parentElement.classList.add("active");
                 } else {
                     link.parentElement.classList.remove("active");
                 }
             });
         });
+
+        // 3 soatlik faolsizlik taymeri (Auto-logout on 3 hours inactivity)
+        (function() {
+            let inactivityTime = function () {
+                let time;
+                window.onload = resetTimer;
+                document.onmousemove = resetTimer;
+                document.onkeypress = resetTimer;
+                document.onclick = resetTimer;
+                document.onscroll = resetTimer;
+
+                function logoutUser() {
+                    window.location.href = "{% url 'logout' %}";
+                }
+
+                function resetTimer() {
+                    clearTimeout(time);
+                    time = setTimeout(logoutUser, 10800000); // 3 hours = 10,800,000 ms
+                }
+            };
+            inactivityTime();
+        })();
+
+        // --- 🌓 THEME TOGGLE FUNCTIONALITY ---
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('light-mode');
+            const isLight = body.classList.contains('light-mode');
+            localStorage.setItem('teacher_theme', isLight ? 'light' : 'dark');
+            updateThemeUI(isLight);
+        }
+
+        function updateThemeUI(isLight) {
+            const themeIcon = document.getElementById('themeIcon');
+            const themeBtn = document.getElementById('themeToggleBtn');
+            if (isLight) {
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+                if (themeBtn) {
+                    themeBtn.style.color = '#0f172a';
+                }
+            } else {
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                }
+                if (themeBtn) {
+                    themeBtn.style.color = 'rgba(255, 255, 255, 0.7)';
+                }
+            }
+        }
+
+        // Initialize UI theme state on DOM load
+        document.addEventListener('DOMContentLoaded', () => {
+            const isLight = document.body.classList.contains('light-mode');
+            updateThemeUI(isLight);
+
+            // Auto-hide global toast notifications after 5 seconds
+            setTimeout(() => {
+                const toasts = document.querySelectorAll('.global-toast');
+                toasts.forEach(toast => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(50px) scale(0.95)';
+                    setTimeout(() => toast.remove(), 300);
+                });
+            }, 5000);
+
+            // Global form submission loading overlay trigger
+            document.addEventListener('submit', function(e) {
+                const form = e.target;
+                
+                // Skip search forms, modals that don't submit, or specific forms marked to skip
+                if (form.classList.contains('search-form') || 
+                    form.id === 'paymentSearchForm' || 
+                    form.getAttribute('data-no-loader') === 'true') {
+                    return;
+                }
+                
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) {
+                    const textEl = document.getElementById('loadingText');
+                    const subtextEl = document.getElementById('loadingSubtext');
+                    
+                    if (form.enctype === 'multipart/form-data') {
+                        if (textEl) textEl.innerText = "Fayl tizimga yuklanmoqda...";
+                        if (subtextEl) subtextEl.innerText = "Fayl serverga yuklanmoqda, iltimos sahifani yopmang yoki qayta yuklamang.";
+                    } else {
+                        if (textEl) textEl.innerText = "Ma'lumotlar saqlanmoqda...";
+                        if (subtextEl) subtextEl.innerText = "Tizim ma'lumotlarni saqlamoqda, iltimos kuting.";
+                    }
+                    
+                    overlay.style.display = 'flex';
+                }
+            });
+        });
     </script>
+
+    <!-- Global Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Ma'lumotlar yuklanmoqda...</div>
+        <div class="loading-subtext" id="loadingSubtext">Iltimos kuting, sahifani yopmang yoki qayta yuklamang.</div>
+    </div>
 
     {% block extra_js %}{% endblock %}
 </body>

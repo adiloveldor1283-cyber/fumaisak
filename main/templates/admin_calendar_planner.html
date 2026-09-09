@@ -1,0 +1,511 @@
+{% extends "baseadmin.html" %}
+{% load static %}
+
+{% block title %}Taqvim rejasi | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+<!-- FullCalendar 6.1.8 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<style>
+    /* Premium Cyberpunk / Glassmorphic Styles for FullCalendar */
+    .planner-container {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 20px;
+        height: calc(100vh - 120px);
+        padding: 20px;
+        overflow: hidden;
+    }
+
+    @media (max-width: 1024px) {
+        .planner-container {
+            grid-template-columns: 1fr;
+            height: auto;
+            overflow: auto;
+        }
+    }
+
+    .calendar-card {
+        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(16px);
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        overflow: hidden;
+    }
+
+    .sidebar-card {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(0, 242, 254, 0.1);
+        backdrop-filter: blur(16px);
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        height: 100%;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        overflow-y: auto;
+    }
+
+    /* FullCalendar custom styling to match dark neon dashboard */
+    .fc {
+        font-family: inherit;
+        color: #ffffff;
+        height: 100%;
+    }
+
+    .fc .fc-toolbar {
+        margin-bottom: 15px;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.25rem !important;
+        font-weight: 700;
+        background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 30px rgba(0, 242, 254, 0.2);
+    }
+
+    .fc .fc-button-primary {
+        background: rgba(0, 242, 254, 0.1);
+        border: 1px solid rgba(0, 242, 254, 0.3);
+        color: #00f2fe;
+        font-weight: 600;
+        text-transform: capitalize;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .fc .fc-button-primary:hover {
+        background: #00f2fe;
+        color: #070a12;
+        border-color: #00f2fe;
+        box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+    }
+
+    .fc .fc-button-primary:disabled {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.3);
+    }
+
+    .fc-theme-standard td, .fc-theme-standard th {
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .fc-theme-standard .fc-scrollgrid {
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .fc .fc-col-header-cell-cushion {
+        color: #94a3b8;
+        font-weight: 600;
+        padding: 8px 4px !important;
+        text-decoration: none;
+    }
+
+    .fc .fc-timegrid-slot-label-cushion {
+        color: #64748b;
+        font-size: 0.8rem;
+    }
+
+    .fc .fc-timegrid-axis-cushion {
+        color: #64748b;
+    }
+
+    /* Event Design */
+    .fc-v-event {
+        background: linear-gradient(135deg, rgba(0, 242, 254, 0.2) 0%, rgba(79, 172, 254, 0.2) 100%) !important;
+        border: 1px solid #00f2fe !important;
+        border-radius: 8px !important;
+        padding: 4px 6px !important;
+        box-shadow: 0 4px 12px rgba(0, 242, 254, 0.1) !important;
+        cursor: grab;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .fc-v-event:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.3) !important;
+    }
+
+    .fc-v-event .fc-event-main {
+        color: #ffffff !important;
+        font-size: 0.85rem !important;
+        font-weight: 600;
+    }
+
+    .fc-v-event .fc-event-time {
+        font-size: 0.75rem !important;
+        color: #00f2fe !important;
+        margin-bottom: 2px;
+    }
+
+    /* Current time indicator */
+    .fc .fc-timegrid-now-indicator-line {
+        border-color: #ff007f !important;
+        border-width: 2px !important;
+    }
+
+    .fc .fc-timegrid-now-indicator-arrow {
+        border-left-color: #ff007f !important;
+    }
+
+    /* Guide Sidebar elements */
+    .guide-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #00f2fe;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+        padding-bottom: 8px;
+    }
+
+    .guide-item {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 0.85rem;
+        color: #94a3b8;
+        line-height: 1.4;
+    }
+
+    .guide-item strong {
+        color: #ffffff;
+    }
+
+    .teacher-badge {
+        display: inline-block;
+        background: rgba(0, 242, 254, 0.08);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        color: #00f2fe;
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-top: 4px;
+    }
+
+    /* Toast Notification styles */
+    .toast-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .custom-toast {
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        min-width: 300px;
+        transform: translateY(100px);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .custom-toast.show {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .custom-toast.success {
+        border-left: 4px solid #00f2fe;
+    }
+
+    .custom-toast.error {
+        border-left: 4px solid #ff4a5a;
+    }
+
+    .custom-toast i {
+        font-size: 1.1rem;
+    }
+
+    .custom-toast.success i {
+        color: #00f2fe;
+    }
+
+    .custom-toast.error i {
+        color: #ff4a5a;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="planner-container">
+    <!-- Main Calendar Card -->
+    <div class="calendar-card">
+        <div class="calendar-wrapper" style="width: 100%; height: 100%; overflow-x: auto; overflow-y: hidden; position: relative;">
+            <div id="calendar" style="min-width: 950px; height: 100%;"></div>
+        </div>
+    </div>
+
+    <!-- Sidebar Panel -->
+    <div class="sidebar-card">
+        <!-- Calendar Filters -->
+        <div class="guide-title">
+            <i class="fa-solid fa-filter"></i>
+            <span>Darslarni filtrlash</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 5px;">
+            <div>
+                <label style="display: block; font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Guruh bo'yicha:</label>
+                <select id="groupFilter" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(0, 242, 254, 0.2); color: white; outline: none; font-size: 0.85rem; cursor: pointer; font-weight: 600;">
+                    <option value="all">Barcha guruhlar</option>
+                    {% for group in groups %}
+                        <option value="{{ group.id }}">{{ group.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">O'qituvchi bo'yicha:</label>
+                <select id="teacherFilter" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(0, 242, 254, 0.2); color: white; outline: none; font-size: 0.85rem; cursor: pointer; font-weight: 600;">
+                    <option value="all">Barcha o'qituvchilar</option>
+                    {% for teacher in teachers %}
+                        <option value="{{ teacher.id }}">{{ teacher.first_name }} {{ teacher.last_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+
+        <div class="guide-title">
+            <i class="fa-solid fa-chalkboard-user"></i>
+            <span>Guruhlar ro'yxati</span>
+        </div>
+
+        <div class="guide-item" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+            {% for group in groups %}
+            <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px;">
+                <div style="font-weight: 600; color: white;">{{ group.name }}</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Fan: {{ group.subject.name|default:"-" }}</div>
+            </div>
+            {% empty %}
+            <div style="font-size: 0.75rem; color: #64748b;">Hech qanday guruh topilmadi.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Custom Toast Notification System
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `custom-toast ${type}`;
+        
+        const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+        toast.innerHTML = `
+            <i class="fa-solid ${icon}"></i>
+            <span>${message}</span>
+        `;
+        
+        container.appendChild(toast);
+        
+        // Trigger show animation
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 50);
+        
+        // Auto remove
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            height: '100%',
+            // Fix calendar view to our mock week (Monday 2026-08-03 to Sunday 2026-08-09)
+            initialDate: '2026-08-03',
+            headerToolbar: {
+                left: 'title',
+                center: '',
+                right: '' // Navigation disabled to lock views on the planning week
+            },
+            dayHeaderContent: function(arg) {
+                const dayMap = {
+                    0: 'Yakshanba',
+                    1: 'Dushanba',
+                    2: 'Seshanba',
+                    3: 'Chorshanba',
+                    4: 'Payshanba',
+                    5: 'Juma',
+                    6: 'Shanba'
+                };
+                return dayMap[arg.date.getDay()];
+            },
+            hiddenDays: [0], // Hide Sundays
+            slotMinTime: '07:00:00',
+            slotMaxTime: '22:00:00',
+            allDaySlot: false,
+            slotDuration: '00:15:00',
+            slotLabelInterval: '01:00',
+            editable: true,
+            droppable: true,
+            eventOverlap: false,
+            events: function(info, successCallback, failureCallback) {
+                fetch('/adminpanel/api/calendar-schedules/')
+                .then(response => response.json())
+                .then(events => {
+                    const selectedGroupId = document.getElementById('groupFilter').value;
+                    const selectedTeacherId = document.getElementById('teacherFilter').value;
+                    
+                    let filtered = events;
+                    if (selectedGroupId && selectedGroupId !== 'all') {
+                        filtered = filtered.filter(e => e.extendedProps && e.extendedProps.group_id == selectedGroupId);
+                    }
+                    if (selectedTeacherId && selectedTeacherId !== 'all') {
+                        filtered = filtered.filter(e => e.extendedProps && e.extendedProps.teacher_id == selectedTeacherId);
+                    }
+                    successCallback(filtered);
+                })
+                .catch(error => failureCallback(error));
+            },
+            
+            // Edit/Delete event handler on click
+            eventClick: function(info) {
+                if (confirm(`Haqiqatan ham "${info.event.title}" dars jadvalini o'chirmoqchimisiz?`)) {
+                    const csrftoken = getCookie('csrftoken');
+                    fetch('/adminpanel/api/delete-schedule/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ schedule_id: info.event.id })
+                    })
+                    .then(response => response.json().then(data => {
+                        if (!response.ok) {
+                            throw new Error(data.message || 'O\'chirishda xatolik yuz berdi');
+                        }
+                        return data;
+                    }))
+                    .then(data => {
+                        showToast(data.message, 'success');
+                        info.event.remove();
+                    })
+                    .catch(error => {
+                        showToast(error.message, 'error');
+                    });
+                }
+            },
+            
+            // Drag and drop event handlers
+            eventDrop: function(info) {
+                updateScheduleTime(info);
+            },
+            eventResize: function(info) {
+                updateScheduleTime(info);
+            }
+        });
+
+        calendar.render();
+
+        // Listen for filter changes
+        document.getElementById('groupFilter').addEventListener('change', () => calendar.refetchEvents());
+        document.getElementById('teacherFilter').addEventListener('change', () => calendar.refetchEvents());
+
+        function updateScheduleTime(info) {
+            const event = info.event;
+            
+            // Prepare payload
+            const payload = {
+                schedule_id: event.id,
+                start: formatDateISO(event.start),
+                end: formatDateISO(event.end)
+            };
+
+            // Send CSRF Token
+            const csrftoken = getCookie('csrftoken');
+
+            fetch('/adminpanel/api/update-schedule-drag/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                return response.json().then(data => {
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Xatolik yuz berdi');
+                    }
+                    return data;
+                });
+            })
+            .then(data => {
+                showToast(data.message || 'Dars jadvali muvaffaqiyatli yangilandi.', 'success');
+            })
+            .catch(error => {
+                showToast(error.message, 'error');
+                info.revert(); // Revert drag/resize operation
+            });
+        }
+
+        // Helper to format Date object into local ISO String
+        function formatDateISO(date) {
+            const pad = (n) => n < 10 ? '0' + n : n;
+            const year = date.getFullYear();
+            const month = pad(date.getMonth() + 1);
+            const day = pad(date.getDate());
+            const hours = pad(date.getHours());
+            const minutes = pad(date.getMinutes());
+            const seconds = pad(date.getSeconds());
+            return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+        }
+
+        // Helper to get Django CSRF Cookie
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock %}

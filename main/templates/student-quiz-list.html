@@ -1,6 +1,6 @@
 {% extends 'basestudent.html' %}
 
-{% block title %}Onlayn testlar - Student Profili{% endblock %}
+{% block title %}Onlayn testlar{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -20,105 +20,67 @@
         letter-spacing: -0.5px;
     }
 
-    /* Kiber Qidiruv Paneli (Header ichiga joylashadi) */
-    .search-form {
-        display: none; /* JS yuklangandan keyin headerda ko'rinadi */
-        position: relative;
-    }
-    .search-input {
-        padding: 10px 16px;
-        font-size: 13px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px 0 0 12px;
-        outline: none;
-        width: 25vw;
-        background-color: rgba(255, 255, 255, 0.02);
-        color: #ffffff;
-        margin-left: 20px;
-        border-right: none;
-        transition: 0.3s;
-    }
-    .search-input:focus {
-        border-color: #00f2fe;
-        background: rgba(255, 255, 255, 0.06);
-        box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
-    }
-    .search-btn {
-        background-color: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-left: none;
-        padding: 10px 18px;
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 13px;
-        border-radius: 0 12px 12px 0;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-    .search-btn:hover {
-        background-color: rgba(0, 242, 254, 0.1);
-        color: #00f2fe;
-        border-color: rgba(0, 242, 254, 0.2);
-    }
+
 
     /* 📊 JADVALNING O'ZI MUSTAQIL SKROL BO'LISHI UCHUN */
     .jadval-container {
-        background: rgba(11, 15, 25, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        box-shadow: 0 40px 80px rgba(0,0,0,0.2);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-radius: 24px;
+            flex-grow: 1;
+            overflow-y: auto; /* Faqat shu konteyner pastga skrol bo'ladi */
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-height: calc(100vh - 140px); /* Ekrandan chiqib ketmasligi uchun chegara */
+        }
 
-        /* 🛠️ FIX: Tepadagi padding 0 qilindi, matn sizib chiqmasligi uchun */
-        padding: 0 24px 24px 24px;
+        /* Skrolbar dizayni */
+        .jadval-container::-webkit-scrollbar {
+            width: 1px;
 
-        /* Ekran balandligiga moslab mustaqil skrol ochish */
-        max-height: calc(100vh - 210px);
-        overflow-y: auto;
-    }
+        }
+        .jadval-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .jadval-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.2);
+            border-radius: 4px;
+        }
+        .jadval-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 242, 254, 0.4);
+        }
 
-    /* Skrolbarga chiroyli kiber dizayn */
-    .jadval-container::-webkit-scrollbar {
-        width: 4px;
-    }
-    .jadval-container::-webkit-scrollbar-thumb {
-        background: rgba(0, 242, 254, 0.2);
-        border-radius: 4px;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th {
+            padding: 16px 18px;
+            font-size: 13.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            position: sticky; /* Tepa qismi qotib turadi */
+            top: 0;
+            background: #080d1a;
+            z-index: 2;
+        }
+        td {
+            padding: 14px 18px;
+            font-size: 13.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.8);
+            vertical-align: middle;
+        }
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+            color: #ffffff;
+        }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
-    }
-
-    /* 🛠️ FIX: Sarlavha mutloq to'siq (Shield) vazifasini bajaradi */
-    th {
-        /* Tepadagi bo'shliq vizual buzilmasligi uchun th ichiga olindi */
-        padding: 24px 16px 14px 16px;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.4);
-        letter-spacing: 0.5px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-
-        position: sticky;
-        top: 0;
-        background: #0b0f19 !important; /* To'liq to'q va shaffof bo'lmagan fon rang */
-        background-clip: padding-box;
-        z-index: 100;
-    }
-    td {
-        padding: 16px 16px;
-        font-size: 14px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-        color: rgba(255, 255, 255, 0.85);
-    }
-    tr:hover td {
-        background: rgba(255, 255, 255, 0.01);
-        color: #ffffff;
-    }
 
     /* Action button style */
     .btn-otish {
@@ -139,59 +101,7 @@
         color: #070a12;
     }
 
-    /* --- 🔔 PREMIUM TOP MODAL NOTIFICATION --- */
-    .modal-backdropp {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(4px);
-        z-index: 1998;
-    }
-    .top-modall {
-        position: fixed;
-        top: -200px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%;
-        max-width: 480px;
-        background: linear-gradient(135deg, #00b09b, #96c93d);
-        color: white;
-        padding: 16px 20px;
-        z-index: 1999;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        border-radius: 16px;
-        border: 1px solid rgba(255,255,255,0.1);
-        transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .top-modall.show {
-        top: 30px;
-    }
-    .modal-contentt {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 15px;
-    }
-    .modall-message {
-        font-size: 13.5px;
-        font-weight: 600;
-        line-height: 1.5;
-    }
-    .close-modall-btn {
-        background: rgba(255, 255, 255, 0.15);
-        border: none;
-        font-size: 12px;
-        color: white;
-        cursor: pointer;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: 0.2s;
-    }
+        
 
     /* --- 📱 MOBIL REJIMDA RESET --- */
     @media (max-width: 768px) {
@@ -225,17 +135,27 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             text-align: right; font-weight: 600;
+            gap: 12px;
         }
         td:last-child { border-bottom: none; padding-top: 14px; justify-content: center; }
         td::before {
             content: attr(data-label); font-weight: 700; color: #00f2fe;
             text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;
             text-align: left; padding-right: 15px;
+            flex-shrink: 0;
         }
         td[data-label="No"]::before, td:last-child::before { display: none; }
         td[data-label="No"] {
             font-size: 14px; color: #4facfe; border-bottom: 1px solid rgba(0, 242, 254, 0.15);
             padding-bottom: 6px; justify-content: center;
+        }
+        .td-val {
+            display: block;
+            max-width: 70%;
+            word-break: break-word;
+            text-align: right;
+            flex-grow: 1;
+            min-width: 0;
         }
     }
 </style>
@@ -243,29 +163,14 @@
 
 {% block content %}
     <!-- Test qidiruv formasi -->
-    <form class="search-form" id="quizSearchForm" onsubmit="event.preventDefault();">
-        <label>
-            <input type="text" class="search-input" id="quiz-search" placeholder="Test nomini yozing...">
-        </label>
-        <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
-    </form>
-
-    <!-- MESSAGES MODAL PANEL -->
-    {% if messages %}
-        {% for message in messages %}
-            {% if 'quiz-info' in message.tags %}
-                <div id="modal-backdropp" class="modal-backdropp"></div>
-                <div id="top-modall" class="top-modall show">
-                    <div class="modal-contentt">
-                        <span class="modall-message"><i class="fas fa-info-circle" style="margin-right: 8px;"></i> {{ message }}</span>
-                        <button class="close-modall-btn" onclick="closeTopModall()">✖</button>
-                    </div>
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-
-    <h2 class="sarlavha">Onlayn testlar</h2>
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">Onlayn testlar</h2>
+        <!-- QIDIRUV FORMASI -->
+        <form class="search-form" id="quizSearchForm" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
+            <input type="text" class="search-input" id="quiz-search" placeholder="Test nomini yozing..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
 
     <div class="jadval-container">
         <table id="quiz-table">
@@ -286,29 +191,29 @@
             <tbody>
                 {% for item in quiz_data %}
                     <tr>
-                        <td data-label="No">{{ forloop.counter }}</td>
-                        <td data-label="Test nomi" style="font-weight: 700; color: #ffffff; text-align: left;">{{ item.quiz.title }}</td>
-                        <td data-label="Guruh"><span style="color: #4facfe; font-weight: 600;">{{ item.quiz.group.name }}</span></td>
-                        <td data-label="Yaratilgan sana">{{ item.quiz.created_at|date:"d.m.Y" }}</td>
-                        <td data-label="Savollar soni">{{ item.total_questions }} ta</td>
-                        <td data-label="Maksimal ball" style="color: #ffc107;">{{ item.quiz.max_score }} ball</td>
-                        <td data-label="Taymer" style="color: #ff808b;"><i class="far fa-clock" style="font-size: 12px; margin-right: 2px;"></i> {{ item.quiz.time_limit }} daqiqa</td>
+                        <td data-label="No"><span>{{ forloop.counter }}</span></td>
+                        <td data-label="Test nomi" style="font-weight: 700; color: #ffffff; text-align: left;"><span class="td-val">{{ item.quiz.title }}</span></td>
+                        <td data-label="Guruh"><span class="td-val" style="color: #4facfe; font-weight: 600;">{{ item.quiz.group.name }}</span></td>
+                        <td data-label="Yaratilgan sana"><span class="td-val">{{ item.quiz.created_at|date:"d.m.Y" }}</span></td>
+                        <td data-label="Savollar soni"><span class="td-val">{{ item.total_questions }}</span></td>
+                        <td data-label="Maksimal ball" style="color: #ffc107;"><span class="td-val">{{ item.quiz.max_score }}</span></td>
+                        <td data-label="Taymer" style="color: #ff808b;"><span class="td-val"><i class="far fa-clock" style="font-size: 12px; margin-right: 2px;"></i> {{ item.quiz.time_limit }} daqiqa</span></td>
                         <td data-label="To'g'ri javoblar">
                             {% if item.correct_count is not None %}
-                                <span style="color: #00ffaa; font-weight: 700;">{{ item.correct_count }} ta</span>
+                                <span class="td-val" style="color: #00ffaa; font-weight: 700;">{{ item.correct_count }}</span>
                             {% else %}
-                                <span style="color: rgba(255,255,255,0.35);">–</span>
+                                <span class="td-val" style="color: rgba(255,255,255,0.35);">–</span>
                             {% endif %}
                         </td>
                         <td data-label="To'plangan ball">
                             {% if item.score is not None %}
-                                <span style="color: #00ffaa; font-weight: 700;">{{ item.score }} ball</span>
+                                <span class="td-val" style="color: #00ffaa; font-weight: 700;">{{ item.score }}</span>
                             {% else %}
-                                <span style="color: rgba(255,255,255,0.35);">–</span>
+                                <span class="td-val" style="color: rgba(255,255,255,0.35);">–</span>
                             {% endif %}
                         </td>
                         <td>
-                            <a class="btn-otish" href="{% url 'start_quiz' item.quiz.id %}"><i class="fas fa-play" style="font-size: 11px; margin-right: 4px;"></i> Boshlash</a>
+                            <a class="btn-otish td-val" href="{% url 'start_quiz' item.quiz.id %}"><i class="fas fa-play" style="font-size: 11px; margin-right: 4px;"></i> Boshlash</a>
                         </td>
                     </tr>
                 {% empty %}
@@ -325,14 +230,7 @@
 <script>
     /* --- 🔍 QIDIRUV PANELINI HEADERGA KO'CHIRISH VA JONLI QIDIRUV --- */
     document.addEventListener("DOMContentLoaded", function () {
-        const header = document.querySelector('.header');
-        const userProfile = document.querySelector('.user-profile');
-        const searchForm = document.getElementById('quizSearchForm');
 
-        if (header && userProfile && searchForm) {
-            header.insertBefore(searchForm, userProfile);
-            searchForm.style.display = 'flex';
-        }
 
         const searchInput = document.getElementById("quiz-search");
         const table = document.getElementById("quiz-table");
@@ -349,13 +247,6 @@
         }
     });
 
-    function closeTopModall() {
-        document.getElementById('modal-backdropp')?.remove();
-        document.getElementById('top-modall')?.remove();
-    }
-
-    window.addEventListener('load', function () {
-        setTimeout(closeTopModall, 5000);
-    });
+    
 </script>
 {% endblock %}

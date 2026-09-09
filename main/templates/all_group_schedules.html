@@ -1,61 +1,248 @@
 {% extends 'baseadmin.html' %}
 {% load static %}
 
-{% block title %}Dars jadvali{% endblock %}
+{% block title %}Dars jadvallari | VLE Tizimi{% endblock %}
 
 {% block content %}
-<h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 25px;">Barcha guruhlarning dars jadvali</h2>
+<div class="schedule-page-container" style="padding: 10px 0 40px 0;">
+    <!-- Page Header & Stats -->
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 30px;">
+        <div>
+            <h2 class="sarlavha" style="font-size: 24px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 14px; letter-spacing: -0.5px; margin-bottom: 6px;">
+                <i class="fas fa-calendar-alt" style="color: #00f2fe; margin-right: 8px;"></i> Barcha guruhlarning dars jadvallari
+            </h2>
+            <p style="font-size: 13.5px; color: rgba(255, 255, 255, 0.5); margin: 0; padding-left: 18px;">
+                O'quv markazidagi barcha guruhlar dars vaqtlari, xonalar va o'qituvchilar jadvallari
+            </p>
+        </div>
 
-{% for group, schedules in group_schedules.items %}
-    <h4 class="guruh-nomi" style="font-size: 15px; font-weight: 800; color: #00f2fe; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-graduation-cap" style="font-size: 14px;"></i> {{ group.name }}</h4>
-    <div class="jadval-container" style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 12px; width: 100%; overflow-x: auto; margin-bottom: 25px;">
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-                <tr>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Hafta kuni</th>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Boshlanish</th>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">Tugash</th>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">O'chirish</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sched in schedules %}
-                    <tr data-day="{{ sched.day }}">
-                        <td data-label="Hafta kuni" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ sched.get_day_display }}</td>
-                        <td data-label="Boshlanish" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: #00ffaa;">{{ sched.start_time|time:"H:i" }}</td>
-                        <td data-label="Tugash" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: #ff0055;">{{ sched.end_time|time:"H:i" }}</td>
-                        <td data-label="O'chirish" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
-                            <button class="btn-delete" onclick="openDeleteModal('{{ group.id }}', '{{ sched.day }}', '{{ sched.get_day_display }}', '{{ sched.start_time|time:"H:i" }}', '{{ sched.end_time|time:"H:i" }}')" style="background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.3); color: #ff0055; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; transition: 0.3s; display: inline-block;">
-                                <i class="fas fa-trash-alt"></i> O'chirish
-                            </button>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <div style="background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.2); padding: 8px 16px; border-radius: 12px; color: #00f2fe; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-layer-group"></i> {{ group_schedules|length }} ta guruh
+            </div>
+        </div>
     </div>
-{% empty %}
-    <p style="color: rgba(255,255,255,0.4); font-style: italic; text-align: center; padding: 30px;">Jadval mavjud emas.</p>
-{% endfor %}
 
-<!-- Custom Delete Modal (Dastlab ko‘rinmas) -->
-<div id="customModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 10, 18, 0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2005;">
-    <div class="modal-content" style="background: #0c101d; border: 1px solid rgba(0, 242, 254, 0.2); box-shadow: 0 0 30px rgba(0, 242, 254, 0.15); border-radius: 20px; max-width: 440px; width: 90%; padding: 30px; position: relative; line-height: 1.6;">
-        <h3 style="font-size: 18px; font-weight: 800; color: #ffffff; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 10px;">Dars jadvalini o‘chirmoqchimisiz?</h3>
-        <ul style="list-style: none; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 14px; margin-bottom: 20px; font-size: 13.5px;">
-            <li style="margin-bottom: 8px;"><strong>Hafta kuni:</strong> <span id="modalDayName" style="color: #ffffff; font-weight: 700;"></span></li>
-            <li style="margin-bottom: 8px;"><strong>Boshlanish:</strong> <span id="modalStartTime" style="color: #00ffaa; font-family: monospace; font-weight: 700;"></span></li>
-            <li style="margin-bottom: 8px;"><strong>Tugash:</strong> <span id="modalEndTime" style="color: #ff0055; font-family: monospace; font-weight: 700;"></span></li>
-        </ul>
+    <!-- Filter & Search Control Bar -->
+    <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); border-radius: 16px; padding: 18px 24px; margin-bottom: 32px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; flex: 1; min-width: 280px;">
+            <div style="position: relative; flex: 1; min-width: 200px;">
+                <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); font-size: 13px;"></i>
+                <input type="text" id="groupSearchInput" onkeyup="filterGroups()" placeholder="Guruh nomi bo'yicha qidirish..." style="width: 100%; padding: 10px 14px 10px 38px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: #ffffff; font-size: 13px; outline: none; transition: all 0.3s;">
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,0.5);"><i class="fas fa-filter"></i> Hafta kuni:</span>
+                <select id="dayFilterSelect" onchange="filterGroups()" style="padding: 10px 14px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: #ffffff; font-size: 13px; outline: none; cursor: pointer;">
+                    <option value="all">Barcha kunlar</option>
+                    <option value="monday">Dushanba</option>
+                    <option value="tuesday">Seshanba</option>
+                    <option value="wednesday">Chorshanba</option>
+                    <option value="thursday">Payshanba</option>
+                    <option value="friday">Juma</option>
+                    <option value="saturday">Shanba</option>
+                </select>
+            </div>
+        </div>
+
+        <button onclick="resetFilters()" style="padding: 9px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: rgba(255, 255, 255, 0.7); font-size: 12.5px; font-weight: 600; cursor: pointer; transition: 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';">
+            <i class="fas fa-sync-alt" style="margin-right: 4px;"></i> Qayta o'rnatish
+        </button>
+    </div>
+
+    <!-- Group Schedule Cards Container -->
+    <div id="scheduleGroupsList" style="display: flex; flex-direction: column; gap: 32px;">
+        {% for group, schedules in group_schedules.items %}
+            <div class="group-schedule-card" data-group-name="{{ group.name|lower }}" style="background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 20px; backdrop-filter: blur(16px); box-shadow: 0 15px 35px rgba(0,0,0,0.25); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s;">
+                
+                <!-- Group Header -->
+                <div style="padding: 20px 24px; background: rgba(255, 255, 255, 0.02); border-bottom: 1px solid rgba(255, 255, 255, 0.06); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                    <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(79, 172, 254, 0.2)); border: 1px solid rgba(0, 242, 254, 0.4); display: flex; align-items: center; justify-content: center; color: #00f2fe; font-size: 20px; box-shadow: 0 0 15px rgba(0, 242, 254, 0.15);">
+                            {% if 'matem' in group.name|lower or group.subject and 'matem' in group.subject.name|lower %}
+                                <i class="fas fa-calculator" title="Matematika"></i>
+                            {% elif 'ingliz' in group.name|lower or 'english' in group.name|lower or group.subject and 'ingliz' in group.subject.name|lower %}
+                                <i class="fas fa-language" title="Ingliz tili"></i>
+                            {% elif 'fizik' in group.name|lower or group.subject and 'fizik' in group.subject.name|lower %}
+                                <i class="fas fa-atom" title="Fizika"></i>
+                            {% elif 'kimyo' in group.name|lower or group.subject and 'kimyo' in group.subject.name|lower %}
+                                <i class="fas fa-flask" title="Kimyo"></i>
+                            {% elif 'biolog' in group.name|lower or group.subject and 'biolog' in group.subject.name|lower %}
+                                <i class="fas fa-dna" title="Biologiya"></i>
+                            {% elif 'tarix' in group.name|lower or group.subject and 'tarix' in group.subject.name|lower %}
+                                <i class="fas fa-landmark" title="Tarix"></i>
+                            {% elif 'ona tili' in group.name|lower or 'adabiyot' in group.name|lower or group.subject and 'ona tili' in group.subject.name|lower %}
+                                <i class="fas fa-book" title="Ona tili"></i>
+                            {% elif 'it' in group.name|lower or 'dastur' in group.name|lower or 'informatik' in group.name|lower or group.subject and 'it' in group.subject.name|lower %}
+                                <i class="fas fa-laptop-code" title="Dasturlash / IT"></i>
+                            {% else %}
+                                <i class="fas fa-graduation-cap" title="Fan"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h3 style="font-size: 17px; font-weight: 800; color: #ffffff; margin: 0 0 4px 0; letter-spacing: 0.3px; display: flex; align-items: center; gap: 10px;">
+                                {{ group.name }}
+                                {% if group.subject %}
+                                    <span style="font-size: 11px; font-weight: 700; background: rgba(0, 242, 254, 0.12); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); padding: 2px 10px; border-radius: 20px; text-transform: uppercase;">
+                                        {{ group.subject.name }}
+                                    </span>
+                                {% endif %}
+                            </h3>
+                            <div style="display: flex; align-items: center; gap: 14px; font-size: 12.5px; color: rgba(255, 255, 255, 0.5);">
+                                <span><i class="fas fa-chalkboard-teacher" style="color: #4facfe; margin-right: 4px;"></i> O'qituvchi: 
+                                    {% if group.teachers.all %}
+                                        {% for t in group.teachers.all %}
+                                            <strong style="color: rgba(255,255,255,0.85);">{{ t.first_name }} {{ t.last_name }}</strong>{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <em style="color: rgba(255,255,255,0.4);">Biriktirilmagan</em>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'edit_group_teacher_schedule' group_id=group.id %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(79, 172, 254, 0.15)); border: 1px solid rgba(0, 242, 254, 0.4); color: #00f2fe; text-decoration: none; border-radius: 12px; font-size: 13px; font-weight: 700; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.1);" onmouseover="this.style.background='linear-gradient(135deg, rgba(0, 242, 254, 0.3), rgba(79, 172, 254, 0.3))'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(79, 172, 254, 0.15))'; this.style.transform='translateY(0)';">
+                        <i class="fas fa-edit"></i> Jadvalni tahrirlash
+                    </a>
+                </div>
+
+                <!-- Schedules Content -->
+                <div style="padding: 20px 24px;">
+                    {% if schedules %}
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: separate; border-spacing: 0 8px; text-align: left;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding: 10px 16px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.8px;">HAFTA KUNI</th>
+                                        <th style="padding: 10px 16px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.8px;">DARS VAQTI (BOSHLANISHI - TUGASHI)</th>
+                                        <th style="padding: 10px 16px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.8px;">O'QITUVCHI</th>
+                                        <th style="padding: 10px 16px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.8px; text-align: right;">AMALLAR</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for sched in schedules %}
+                                        <tr class="schedule-row" data-day="{{ sched.day }}" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 12px; transition: background 0.2s;">
+                                            <!-- Day Badge -->
+                                            <td style="padding: 14px 16px; border-top-left-radius: 12px; border-bottom-left-radius: 12px;">
+                                                {% if sched.day == 'monday' %}
+                                                    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; font-size: 12.5px; font-weight: 700;">
+                                                        <i class="fas fa-calendar-day"></i> {{ sched.get_day_display }}
+                                                    </span>
+                                                {% elif sched.day == 'tuesday' %}
+                                                    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); color: #c084fc; font-size: 12.5px; font-weight: 700;">
+                                                        <i class="fas fa-calendar-day"></i> {{ sched.get_day_display }}
+                                                    </span>
+                                                {% elif sched.day == 'wednesday' %}
+                                                    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); color: #22d3ee; font-size: 12.5px; font-weight: 700;">
+                                                        <i class="fas fa-calendar-day"></i> {{ sched.get_day_display }}
+                                                    </span>
+                                                {% elif sched.day == 'thursday' %}
+                                                    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; background: rgba(249, 115, 22, 0.15); border: 1px solid rgba(249, 115, 22, 0.3); color: #fb923c; font-size: 12.5px; font-weight: 700;">
+                                                        <i class="fas fa-calendar-day"></i> {{ sched.get_day_display }}
+                                                    </span>
+                                                {% elif sched.day == 'friday' %}
+                                                    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); color: #4ade80; font-size: 12.5px; font-weight: 700;">
+                                                        <i class="fas fa-calendar-day"></i> {{ sched.get_day_display }}
+                                                    </span>
+                                                {% else %}
+                                                    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; background: rgba(236, 72, 153, 0.15); border: 1px solid rgba(236, 72, 153, 0.3); color: #f472b6; font-size: 12.5px; font-weight: 700;">
+                                                        <i class="fas fa-calendar-day"></i> {{ sched.get_day_display }}
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+
+                                            <!-- Time Range Pill -->
+                                            <td style="padding: 14px 16px;">
+                                                <div style="display: inline-flex; align-items: center; gap: 8px; font-family: monospace; font-size: 14px; font-weight: 700; color: #ffffff; background: rgba(0, 0, 0, 0.4); padding: 5px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08);">
+                                                    <i class="far fa-clock" style="color: #00ffaa;"></i>
+                                                    <span style="color: #00ffaa;">{{ sched.start_time|time:"H:i" }}</span>
+                                                    <span style="color: rgba(255,255,255,0.4);">-</span>
+                                                    <span style="color: #ff3366;">{{ sched.end_time|time:"H:i" }}</span>
+                                                </div>
+                                            </td>
+
+                                            <!-- Teacher Info -->
+                                            <td style="padding: 14px 16px; font-size: 13px; color: rgba(255, 255, 255, 0.85);">
+                                                {% if sched.teacher %}
+                                                    <span style="display: inline-flex; align-items: center; gap: 6px;">
+                                                        <i class="fas fa-user-tie" style="color: rgba(255,255,255,0.4);"></i>
+                                                        <strong>{{ sched.teacher.first_name }} {{ sched.teacher.last_name }}</strong>
+                                                    </span>
+                                                {% else %}
+                                                    <span style="color: rgba(255,255,255,0.4); font-style: italic;">Ko'rsatilmagan</span>
+                                                {% endif %}
+                                            </td>
+
+                                            <!-- Actions -->
+                                            <td style="padding: 14px 16px; text-align: right; border-top-right-radius: 12px; border-bottom-right-radius: 12px;">
+                                                <button class="btn-delete" onclick="openDeleteModal('{{ group.id }}', '{{ sched.day }}', '{{ sched.get_day_display }}', '{{ sched.start_time|time:"H:i" }}', '{{ sched.end_time|time:"H:i" }}')" style="background: rgba(255, 51, 102, 0.1); border: 1px solid rgba(255, 51, 102, 0.3); color: #ff3366; padding: 7px 14px; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px;" onmouseover="this.style.background='rgba(255, 51, 102, 0.25)'; this.style.color='#ffffff';" onmouseout="this.style.background='rgba(255, 51, 102, 0.1)'; this.style.color='#ff3366';">
+                                                    <i class="fas fa-trash-alt"></i> O'chirish
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div style="text-align: center; padding: 32px 16px; background: rgba(0, 0, 0, 0.2); border-radius: 14px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+                            <i class="fas fa-calendar-times" style="font-size: 32px; color: rgba(255,255,255,0.2); margin-bottom: 12px; display: block;"></i>
+                            <h4 style="font-size: 14.5px; font-weight: 700; color: rgba(255,255,255,0.6); margin: 0 0 6px 0;">Hozircha dars jadvali biriktirilmagan</h4>
+                            <p style="font-size: 12.5px; color: rgba(255,255,255,0.4); margin: 0 0 16px 0;">Ushbu guruh uchun dars kunlari va vaqtlarini qo'shish uchun tahrirlash tugmasini bosing.</p>
+                            <a href="{% url 'edit_group_teacher_schedule' group_id=group.id %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; text-decoration: none; border-radius: 10px; font-size: 12.5px; font-weight: 700;">
+                                <i class="fas fa-plus-circle"></i> Jadval Yaratish
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <div style="text-align: center; padding: 60px 20px; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;">
+                <i class="fas fa-folder-open" style="font-size: 48px; color: rgba(255,255,255,0.2); margin-bottom: 16px; display: block;"></i>
+                <h3 style="font-size: 18px; font-weight: 800; color: rgba(255,255,255,0.8); margin-bottom: 8px;">Hech qanday guruh topilmadi</h3>
+                <p style="font-size: 13.5px; color: rgba(255,255,255,0.4); margin-bottom: 20px;">Tizimda hali guruhlar yaratilmagan yoki qidiruv natijasi bo'yicha hech narsa mos kelmadi.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Custom Delete Modal -->
+<div id="customModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 10, 18, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 2005;">
+    <div class="modal-content" style="background: #0c101d; border: 1px solid rgba(255, 51, 102, 0.3); box-shadow: 0 0 40px rgba(255, 51, 102, 0.2); border-radius: 22px; max-width: 440px; width: 90%; padding: 30px; position: relative;">
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(255, 51, 102, 0.15); border: 1px solid rgba(255, 51, 102, 0.3); color: #ff3366; font-size: 22px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 style="font-size: 19px; font-weight: 800; color: #ffffff; margin: 0 0 6px 0;">Dars Jadvalini O'chirish</h3>
+            <p style="font-size: 13px; color: rgba(255, 255, 255, 0.5); margin: 0;">Ushbu dars vaqtini o'chirishni tasdiqlaysizmi?</p>
+        </div>
+
+        <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 14px; padding: 16px; margin-bottom: 24px; font-size: 13.5px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 8px;">
+                <span style="color: rgba(255,255,255,0.5);">Hafta kuni:</span>
+                <strong id="modalDayName" style="color: #ffffff;"></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 8px;">
+                <span style="color: rgba(255,255,255,0.5);">Boshlanish vaqti:</span>
+                <strong id="modalStartTime" style="color: #00ffaa; font-family: monospace;"></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: rgba(255,255,255,0.5);">Tugash vaqti:</span>
+                <strong id="modalEndTime" style="color: #ff3366; font-family: monospace;"></strong>
+            </div>
+        </div>
+
         <form method="post" action="{% url 'delete_schedule' %}">
             {% csrf_token %}
             <input type="hidden" name="group_id" id="modalGroupId">
             <input type="hidden" name="day" id="modalDay">
             <input type="hidden" name="start_time" id="modalStartTimeInput">
 
-            <div class="modal-buttons" style="display: flex; gap: 12px; justify-content: space-between;">
-                <button type="button" class="btn-modal-cancel" onclick="closeModal()" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ffffff; border-radius: 12px; font-weight: 800; font-size: 13.5px; cursor: pointer; transition: 0.3s;">Bekor qilish</button>
-                <button type="submit" class="btn-modal-delete" style="flex: 1; padding: 12px; background: #ff0055; border: none; color: #ffffff; border-radius: 12px; font-weight: 800; font-size: 13.5px; cursor: pointer; transition: 0.3s;">O'chirish</button>
+            <div style="display: flex; gap: 12px;">
+                <button type="button" onclick="closeModal()" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #ffffff; border-radius: 12px; font-weight: 700; font-size: 13.5px; cursor: pointer; transition: 0.3s;">Bekor qilish</button>
+                <button type="submit" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #ff3366, #ff0055); border: none; color: #ffffff; border-radius: 12px; font-weight: 700; font-size: 13.5px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3);">O'chirish</button>
             </div>
         </form>
     </div>
@@ -64,25 +251,67 @@
 
 {% block extra_js %}
 <script>
-    // Day sorting logic
     document.addEventListener("DOMContentLoaded", function () {
         const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
+        // Sort schedules inside each group card by day order
         document.querySelectorAll("table").forEach(table => {
             const tbody = table.querySelector("tbody");
             if (tbody) {
-                const rows = Array.from(tbody.querySelectorAll("tr"));
-
+                const rows = Array.from(tbody.querySelectorAll("tr.schedule-row"));
                 rows.sort((a, b) => {
                     const dayA = a.getAttribute("data-day");
                     const dayB = b.getAttribute("data-day");
                     return dayOrder.indexOf(dayA) - dayOrder.indexOf(dayB);
                 });
-
                 rows.forEach(row => tbody.appendChild(row));
             }
         });
     });
+
+    // Interactive Group Search & Day Filter
+    function filterGroups() {
+        const searchText = document.getElementById('groupSearchInput').value.toLowerCase().trim();
+        const selectedDay = document.getElementById('dayFilterSelect').value;
+
+        const groupCards = document.querySelectorAll('.group-schedule-card');
+
+        groupCards.forEach(card => {
+            const groupName = card.getAttribute('data-group-name') || '';
+            const matchesSearch = groupName.includes(searchText);
+
+            let matchesDay = true;
+            if (selectedDay !== 'all') {
+                const rows = card.querySelectorAll('.schedule-row');
+                let foundDay = false;
+                rows.forEach(row => {
+                    if (row.getAttribute('data-day') === selectedDay) {
+                        foundDay = true;
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                matchesDay = foundDay;
+            } else {
+                // Show all rows
+                const rows = card.querySelectorAll('.schedule-row');
+                rows.forEach(row => row.style.display = '');
+            }
+
+            if (matchesSearch && matchesDay) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function resetFilters() {
+        document.getElementById('groupSearchInput').value = '';
+        document.getElementById('dayFilterSelect').value = 'all';
+        filterGroups();
+    }
 
     function openDeleteModal(groupId, day, dayName, startTime, endTime) {
         document.getElementById('modalGroupId').value = groupId;

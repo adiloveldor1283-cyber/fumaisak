@@ -1,0 +1,370 @@
+{% extends "baseadmin.html" %}
+
+{% block title %}Qarzdorlar ro'yxati | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .konteyner {
+        overflow-y: auto !important;
+        display: flex;
+        flex-direction: column;
+    }
+    .jadval-container {
+        width: 100%;
+        overflow-x: auto !important;
+        overflow-y: auto !important;
+        max-height: calc(100vh - 320px);
+    }
+    table {
+        width: max-content !important;
+        min-width: 100% !important;
+        white-space: nowrap;
+    }
+    .filter-form {
+        display: flex;
+        gap: 20px;
+        align-items: flex-end;
+    }
+    @media (max-width: 768px) {
+        .filter-form {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+        }
+        .filter-form > div {
+            width: 100% !important;
+        }
+        .sarlavha-panel {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 15px;
+        }
+        .sarlavha-panel > div {
+            width: 100%;
+        }
+        .action-buttons {
+            width: 100%;
+            flex-direction: column;
+        }
+        .action-buttons button {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="padding: 10px; display: flex; flex-direction: column; width: 100%;">
+    
+    <!-- Sarlavha paneli va Tezkor Tugmalar -->
+    <div class="sarlavha-panel" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-shrink: 0;">
+        <div>
+            <h2 style="color: #ffffff; font-size: 24px; font-weight: 800; margin-bottom: 4px; letter-spacing: 0.5px;">Qarzdorlar ro'yxati</h2>
+            <p style="color: rgba(255,255,255,0.5); font-size: 13.5px; font-weight: 500;">Joriy yoki tanlangan oy bo'yicha to'lov qilmaganlar va ularni ogohlantirish</p>
+        </div>
+        <div class="action-buttons" style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <!-- Barcha bog'langanlarga Telegram yuborish -->
+            <button onclick="sendBulkTelegramReminders()" id="bulk-tg-btn" style="display: flex; align-items: center; gap: 8px; background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.05);" onmouseover="this.style.background='rgba(0, 242, 254, 0.15)';" onmouseout="this.style.background='rgba(0, 242, 254, 0.05)';">
+                <i class="fab fa-telegram-plane"></i> Barcha bog'langanlarga Telegram eslatma yuborish
+            </button>
+            <!-- CSV yuklab olish -->
+            <button onclick="downloadDebtorsExcel()" style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #00f2fe; padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.05);" onmouseover="this.style.background='rgba(0, 242, 254, 0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.03)';">
+                <i class="fas fa-file-excel"></i> Excel (.csv) yuklab olish
+            </button>
+        </div>
+    </div>
+
+    <!-- FILTRLASH PANELI -->
+    <div style="background: rgba(11, 15, 25, 0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px 24px; margin-bottom: 20px; flex-shrink: 0;">
+        <form method="GET" id="filterForm" class="filter-form">
+            <!-- Oy tanlash -->
+            <div style="flex: 1;">
+                <label for="month" style="display: block; color: rgba(255,255,255,0.5); font-size: 11.5px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">To'lov oyi</label>
+                <select name="month" id="month" onchange="this.form.submit()" style="width: 100%; padding: 11px 16px; border-radius: 10px; background: #0c101d; border: 1px solid rgba(255,255,255,0.08); color: #ffffff; font-size: 14px; font-weight: 600; outline: none; cursor: pointer;">
+                    {% for m in months %}
+                        <option value="{{ m }}" {% if m == selected_month %}selected{% endif %}>{{ m }} oyi</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Guruh tanlash -->
+            <div style="flex: 1.5;">
+                <label for="group" style="display: block; color: rgba(255,255,255,0.5); font-size: 11.5px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Guruh bo'yicha</label>
+                <select name="group" id="group" onchange="this.form.submit()" style="width: 100%; padding: 11px 16px; border-radius: 10px; background: #0c101d; border: 1px solid rgba(255,255,255,0.08); color: #ffffff; font-size: 14px; font-weight: 600; outline: none; cursor: pointer;">
+                    <option value="all" {% if selected_group_id == 'all' %}selected{% endif %}>Barcha guruhlar</option>
+                    {% for g in groups %}
+                        <option value="{{ g.id }}" {% if selected_group_id == g.id|stringformat:"s" %}selected{% endif %}>{{ g.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- O'quvchi qidiruv -->
+            <div style="flex: 2;">
+                <label for="debtor-search" style="display: block; color: rgba(255,255,255,0.5); font-size: 11.5px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">O'quvchi ismi yoki telefon raqami</label>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <input type="text" id="debtor-search" placeholder="Ism, familiya yoki tel bo'yicha..." style="width: 100%; padding: 11px 16px 11px 40px; border-radius: 10px; background: #0c101d; border: 1px solid rgba(255,255,255,0.08); color: #ffffff; font-size: 14px; font-weight: 600; outline: none; transition: 0.3s; box-shadow: none;">
+                    <i class="fas fa-search" style="position: absolute; left: 15px; color: rgba(255,255,255,0.3); font-size: 14px;"></i>
+                </div>
+            </div>
+
+            <!-- Tozalash -->
+            <div style="flex-shrink: 0;">
+                <a href="{% url 'debtors_list' %}" style="display: inline-block; padding: 11px 20px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.6); text-decoration: none; font-size: 14px; font-weight: 600; text-align: center; transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#ffffff';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.color='rgba(255,255,255,0.6)';">Filtrni tozalash</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- JADVAL QISMI -->
+    <div class="jadval-container" style="flex-grow: 1; overflow-y: auto; overflow-x: auto; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); background: #080d1a; position: sticky; top: 0; z-index: 10;">
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">O'QUVCHI</th>
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">TELEFON RAQAMI</th>
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">GURUH</th>
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">KURS NARXI</th>
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">TO'LAGAN</th>
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">QARZ MIQDORI</th>
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; text-align: center;">AMALLAR</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if debtors %}
+                    {% for debt in debtors %}
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.01)';" onmouseout="this.style.background='none';">
+                            <td style="padding: 18px 20px; font-weight: 700; color: #ffffff; font-size: 14.5px;">
+                                {{ debt.student_name }}
+                            </td>
+                            <td style="padding: 18px 20px; font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,0.85);">
+                                <a href="tel:{{ debt.student.phone_number }}" style="color: rgba(255,255,255,0.85); text-decoration: none; transition: 0.2s;" onmouseover="this.style.color='#00f2fe';" onmouseout="this.style.color='rgba(255,255,255,0.85)';">
+                                    <i class="fas fa-phone-alt" style="margin-right: 6px; font-size: 12px; color: #4facfe;"></i> {{ debt.student.phone_number }}
+                                </a>
+                            </td>
+                            <td style="padding: 18px 20px; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.85);">
+                                <span style="background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.15); color: #00f2fe; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 700;">{{ debt.group.name }}</span>
+                            </td>
+                            <td style="padding: 18px 20px; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.65);">
+                                {{ debt.monthly_fee|floatformat:0 }} so'm
+                            </td>
+                            <td style="padding: 18px 20px; font-size: 14px; font-weight: 600; color: #00ffaa;">
+                                {{ debt.total_paid|floatformat:0 }} so'm
+                            </td>
+                            <td style="padding: 18px 20px; font-size: 15px; font-weight: 800; color: #ff808b; text-shadow: 0 0 10px rgba(255, 128, 139, 0.25);">
+                                {{ debt.debt_amount|floatformat:0 }} so'm
+                            </td>
+                            <td style="padding: 18px 20px; text-align: center;">
+                                <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                                    <!-- Telegram eslatma yuborish -->
+                                    {% if debt.student.telegram_chat_id %}
+                                    <button onclick="sendTelegramBotReminder({{ debt.student.id }}, '{{ debt.raw_message|escapejs }}', this)" title="Bot orqali to'g'ridan-to'g'ri eslatish" style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(0, 242, 254, 0.2)';" onmouseout="this.style.background='rgba(0, 242, 254, 0.1)';">
+                                        <i class="fas fa-robot" style="font-size: 14px;"></i>
+                                    </button>
+                                    {% else %}
+                                    <a href="{{ debt.telegram_url }}" target="_blank" title="Telegram orqali ulashish" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #8892b0; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)';" onmouseout="this.style.background='rgba(255,255,255,0.03)';">
+                                        <i class="fab fa-telegram-plane" style="font-size: 14px;"></i>
+                                    </a>
+                                    {% endif %}
+                                    <!-- Xabarni nusxalash -->
+                                    <button onclick="copyEslatmaText('{{ debt.raw_message|escapejs }}')" title="Xabar matnini nusxalash" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #00ffaa; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(0, 255, 170, 0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.03)';">
+                                        <i class="far fa-copy" style="font-size: 14px;"></i>
+                                    </button>
+                                    <!-- To'lov kiritish -->
+                                    <a href="{% url 'student_payment' group_id=debt.group.id student_id=debt.student.id %}" title="To'lov kiritish" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #ff9f43; border-radius: 8px; padding: 0 10px; height: 34px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 12px; font-weight: 700; gap: 4px; transition: 0.2s;" onmouseover="this.style.background='rgba(255, 159, 103, 0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.03)';">
+                                        <i class="fas fa-plus"></i> To'lov
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" style="padding: 40px; text-align: center; color: rgba(255,255,255,0.3); font-style: italic; font-size: 14px;">
+                            <i class="fas fa-check-circle" style="font-size: 32px; display: block; margin-bottom: 12px; color: rgba(0, 255, 170, 0.15);"></i>
+                            Ushbu oy va guruh bo'yicha hech qanday qarzdorlik aniqlanmadi. Hamma to'lovlar amalga oshirilgan!
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("debtor-search");
+        if (searchInput) {
+            searchInput.addEventListener("input", function () {
+                const searchTerm = this.value.toLowerCase().trim();
+                const rows = document.querySelectorAll("tbody tr");
+                
+                rows.forEach(row => {
+                    // Check if it's the "No debtors found" row
+                    if (row.cells.length === 1 && row.cells[0].getAttribute("colspan") === "7") {
+                        return;
+                    }
+                    
+                    const nameCell = row.cells[0];
+                    const phoneCell = row.cells[1];
+                    const nameText = nameCell ? nameCell.textContent.toLowerCase() : "";
+                    const phoneText = phoneCell ? phoneCell.textContent.toLowerCase() : "";
+                    
+                    if (nameText.includes(searchTerm) || phoneText.replace(/[^0-9]/g, '').includes(searchTerm.replace(/[^0-9]/g, ''))) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            });
+        }
+    });
+
+    function copyEslatmaText(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            showToastAlert("Eslatma matni nusxalandi!");
+        }, function(err) {
+            console.error('Nusxalashda xato: ', err);
+        });
+    }
+
+    function sendTelegramBotReminder(studentId, message, buttonEl) {
+        return new Promise((resolve, reject) => {
+            // Disable button to prevent double submits and show animation
+            const originalHTML = buttonEl.innerHTML;
+            buttonEl.disabled = true;
+            buttonEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 14px;"></i>';
+            
+            const csrftoken = getCookie('csrftoken');
+            
+            fetch('/adminpanel/api/send-debt-reminder/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    message: message
+                })
+            })
+            .then(response => response.json().then(data => {
+                if (!response.ok) {
+                    throw new Error(data.message || "Xabar yuborib bo'lmadi");
+                }
+                return data;
+            }))
+            .then(data => {
+                showToastAlert(data.message || "Eslatma muvaffaqiyatli jo'natildi!");
+                // Green check animation
+                buttonEl.innerHTML = '<i class="fas fa-check" style="font-size: 14px; color: #00ffaa;"></i>';
+                setTimeout(() => {
+                    buttonEl.innerHTML = originalHTML;
+                    buttonEl.disabled = false;
+                }, 3000);
+                resolve(true);
+            })
+            .catch(err => {
+                showToastAlert("Xato: " + err.message, true);
+                buttonEl.innerHTML = originalHTML;
+                buttonEl.disabled = false;
+                resolve(false);
+            });
+        });
+    }
+
+    async function sendBulkTelegramReminders() {
+        const buttons = Array.from(document.querySelectorAll('button[onclick^="sendTelegramBotReminder"]'));
+        if (buttons.length === 0) {
+            alert("Telegram ulab qo'yilgan qarzdor talabalar topilmadi.");
+            return;
+        }
+        
+        if (!confirm(`Tizimdagi jami ${buttons.length} ta Telegrami bog'langan qarzdorga avtomatik eslatma yuborilsinmi?`)) {
+            return;
+        }
+        
+        const bulkBtn = document.getElementById('bulk-tg-btn');
+        const originalText = bulkBtn.innerHTML;
+        bulkBtn.disabled = true;
+        bulkBtn.style.opacity = '0.6';
+        
+        let successCount = 0;
+        
+        for (let i = 0; i < buttons.length; i++) {
+            const btn = buttons[i];
+            btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Extract arguments safely from the onclick attribute text
+            const onclickStr = btn.getAttribute('onclick');
+            // Safe evaluation of the button arguments to get clean studentId and message
+            const argsStr = onclickStr.substring(onclickStr.indexOf('(') + 1, onclickStr.lastIndexOf(','));
+            const parts = argsStr.split(',');
+            const studentId = parts[0].trim();
+            // strip the quotes around the message string
+            let message = parts.slice(1).join(',').trim();
+            if (message.startsWith("'") && message.endsWith("'")) {
+                message = message.substring(1, message.length - 1);
+            }
+            message = message.replace(/\\'/g, "'").replace(/\\"/g, '"');
+            
+            bulkBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Yuborilmoqda (${i + 1}/${buttons.length})...`;
+            
+            const success = await sendTelegramBotReminder(studentId, message, btn);
+            if (success) successCount++;
+            
+            // Short delay to avoid hitting rate limits
+            await new Promise(r => setTimeout(r, 600));
+        }
+        
+        alert(`Barcha xabarlar jo'natildi! Muvaffaqiyatli: ${successCount}/${buttons.length}`);
+        bulkBtn.innerHTML = originalText;
+        bulkBtn.disabled = false;
+        bulkBtn.style.opacity = '1';
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function showToastAlert(msg, isError = false) {
+        const toast = document.createElement('div');
+        toast.style.position = 'fixed';
+        toast.style.bottom = '20px';
+        toast.style.right = '20px';
+        toast.style.background = isError ? 'rgba(255, 74, 90, 0.95)' : 'rgba(0, 242, 254, 0.95)';
+        toast.style.color = isError ? '#ffffff' : '#070a12';
+        toast.style.padding = '12px 24px';
+        toast.style.borderRadius = '10px';
+        toast.style.fontWeight = '700';
+        toast.style.fontSize = '14px';
+        toast.style.zIndex = '9999';
+        toast.style.boxShadow = isError ? '0 0 15px rgba(255, 74, 90, 0.4)' : '0 0 15px rgba(0, 242, 254, 0.4)';
+        toast.style.transition = 'all 0.3s ease';
+        toast.innerHTML = (isError ? '<i class="fas fa-circle-xmark"></i> ' : '<i class="fas fa-check-circle"></i> ') + msg;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(10px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 2500);
+    }
+
+    function downloadDebtorsExcel() {
+        const month = document.getElementById('month').value;
+        const group = document.getElementById('group').value;
+        window.location.href = "{% url 'export_debtors_csv' %}?month=" + encodeURIComponent(month) + "&group=" + encodeURIComponent(group);
+    }
+</script>
+{% endblock %}

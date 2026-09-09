@@ -1,0 +1,480 @@
+{% extends 'baseadmin.html' %}
+{% load static %}
+
+{% block title %}{{ group.name }} davomat jurnali | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sarlavha {
+        font-size: 22px;
+        font-weight: 800;
+        color: #ffffff;
+        border-left: 4px solid #00f2fe;
+        padding-left: 12px;
+        letter-spacing: -0.5px;
+    }
+
+    /* --- 📊 CHEKSIZ & QULAY SKROL BO'LUVCHI JADVAL KONTEYNERI --- */
+    .jadval-container {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0 !important;
+        overflow-x: auto !important;
+        overflow-y: auto !important;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        max-height: calc(100vh - 220px);
+        position: relative;
+        scroll-behavior: smooth;
+    }
+
+    .jadval-container table {
+        width: max-content !important;
+        min-width: 100% !important;
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    .jadval-container tr {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        transition: background-color 0.2s ease;
+    }
+
+    .jadval-container tr:hover {
+        background-color: rgba(255, 255, 255, 0.015);
+    }
+
+    .jadval-container th {
+        padding: 14px 10px !important;
+        background-color: #080d1a;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* Custom Always-Visible Glowing Scrollbar */
+    .jadval-container::-webkit-scrollbar {
+        height: 10px;
+        width: 8px;
+    }
+    .jadval-container::-webkit-scrollbar-track {
+        background: rgba(8, 13, 26, 0.8);
+        border-radius: 10px;
+    }
+    .jadval-container::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+    }
+    .jadval-container::-webkit-scrollbar-thumb:hover {
+        background: #00f2fe;
+    }
+
+    /* Yopishqoq Ustunlar (Sticky Columns) */
+    .sticky-col-name {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 4 !important;
+        min-width: 180px !important;
+        max-width: 220px !important;
+        box-shadow: 5px 0 15px rgba(0,0,0,0.4) !important;
+    }
+
+    th.sticky-col-name {
+        background-color: #080d1a !important;
+        border-bottom: 2px solid rgba(0, 242, 254, 0.3) !important;
+        padding: 14px 18px !important;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    td.sticky-col-name {
+        background-color: #0c1120 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+        font-weight: 700;
+        color: #ffffff;
+        padding: 12px 18px !important;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    tr:hover td.sticky-col-name {
+        background-color: #141b2d !important;
+    }
+
+    /* Badges */
+    .attendance-cell {
+        text-align: center;
+        padding: 8px 10px !important;
+        min-width: 75px;
+    }
+    .attendance-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 12.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+        user-select: none;
+        white-space: nowrap;
+    }
+    .attendance-badge.present {
+        background: rgba(0, 255, 170, 0.12);
+        color: #00ffaa;
+        border: 1px solid rgba(0, 255, 170, 0.3);
+    }
+    .attendance-badge.present:hover {
+        background: rgba(0, 255, 170, 0.25);
+    }
+    .attendance-badge.absent {
+        background: rgba(255, 51, 102, 0.12);
+        color: #ff5588;
+        border: 1px solid rgba(255, 51, 102, 0.3);
+    }
+    .attendance-badge.absent:hover {
+        background: rgba(255, 51, 102, 0.25);
+    }
+    .attendance-badge.none {
+        background: rgba(255, 255, 255, 0.03);
+        color: rgba(255, 255, 255, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Ixcham Rejim (Compact Mode) */
+    .compact-mode .attendance-cell {
+        min-width: 45px !important;
+        padding: 6px 4px !important;
+    }
+    .compact-mode .attendance-badge {
+        padding: 4px 6px;
+        font-size: 11px;
+        border-radius: 6px;
+    }
+    .compact-mode .badge-text {
+        display: none;
+    }
+    .compact-mode td.sticky-col-name {
+        padding: 8px 12px !important;
+        font-size: 13px;
+    }
+    .compact-mode th.sticky-col-name {
+        padding: 10px 12px !important;
+        font-size: 12px;
+    }
+
+    /* Control Bar Header */
+    .control-header-bar {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 14px 20px;
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .btn-scroll {
+        padding: 7px 14px;
+        background: rgba(0, 242, 254, 0.1);
+        border: 1px solid rgba(0, 242, 254, 0.3);
+        color: #00f2fe;
+        border-radius: 8px;
+        font-size: 12.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-scroll:hover {
+        background: rgba(0, 242, 254, 0.25);
+        transform: translateY(-1px);
+    }
+
+    .filter-pill {
+        padding: 6px 14px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.7);
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .filter-pill.active, .filter-pill:hover {
+        background: rgba(0, 242, 254, 0.15);
+        color: #00f2fe;
+        border-color: rgba(0, 242, 254, 0.4);
+    }
+
+    /* --- ☀️ LIGHT THEME OVERRIDES --- */
+    html.light-theme .sarlavha {
+        color: #0f172a !important;
+    }
+    html.light-theme .sarlavha-qatori p {
+        color: #64748b !important;
+    }
+    html.light-theme .control-header-bar {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    }
+    html.light-theme .control-header-bar span {
+        color: #475569 !important;
+    }
+    html.light-theme .filter-pill {
+        background: #f1f5f9 !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #475569 !important;
+    }
+    html.light-theme .filter-pill:hover {
+        background: #e2e8f0 !important;
+        color: #0f172a !important;
+        border-color: #cbd5e1 !important;
+    }
+    html.light-theme .filter-pill.active {
+        background: rgba(2, 132, 199, 0.1) !important;
+        color: #0284c7 !important;
+        border-color: rgba(2, 132, 199, 0.3) !important;
+    }
+    html.light-theme .btn-scroll {
+        background: rgba(2, 132, 199, 0.08) !important;
+        border: 1px solid rgba(2, 132, 199, 0.2) !important;
+        color: #0284c7 !important;
+    }
+    html.light-theme .btn-scroll:hover {
+        background: rgba(2, 132, 199, 0.18) !important;
+        color: #025a87 !important;
+    }
+    html.light-theme .jadval-container {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+    }
+    html.light-theme .jadval-container tr {
+        border-bottom: 1px solid #f1f5f9 !important;
+    }
+    html.light-theme .jadval-container tr:hover {
+        background-color: #f8fafc !important;
+    }
+    html.light-theme .jadval-container th {
+        background-color: #f8fafc !important;
+        border-bottom: 2px solid #e2e8f0 !important;
+        color: #475569 !important;
+    }
+    html.light-theme th.sticky-col-name {
+        background-color: #f8fafc !important;
+        border-bottom: 2px solid #e2e8f0 !important;
+        color: #475569 !important;
+    }
+    html.light-theme td.sticky-col-name {
+        background-color: #ffffff !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        color: #0f172a !important;
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.03) !important;
+    }
+    html.light-theme tr:hover td.sticky-col-name {
+        background-color: #f1f5f9 !important;
+    }
+    html.light-theme .jadval-container::-webkit-scrollbar-track {
+        background: #f1f5f9 !important;
+    }
+    html.light-theme .jadval-container::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #0284c7, #3b82f6) !important;
+        box-shadow: 0 0 5px rgba(59, 130, 246, 0.2) !important;
+    }
+    html.light-theme .attendance-badge.none {
+        background: #f1f5f9 !important;
+        color: #94a3b8 !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+    html.light-theme .back-arrow-btn {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #475569 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    }
+    html.light-theme .back-arrow-btn:hover {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="{% url 'admin_attendance_overview' %}" class="back-arrow-btn" title="Orqaga">
+                <i class="fas fa-chevron-left" style="font-size: 16px;"></i>
+            </a>
+            <div>
+                <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 4px; line-height: 1;">{{ group.name }} - davomat jurnali</h2>
+                <p style="color: rgba(255,255,255,0.4); font-size: 13.5px; margin-bottom: 0; padding-left: 16px;">Tahrirlash uchun katak ustiga bosing (Kelgan/Kelmadi AJAX orqali o'zgaradi)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🎛️ CONTROL & FILTER BAR -->
+    <div class="control-header-bar">
+        <!-- Date Filters -->
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-right: 4px;"><i class="fas fa-calendar-alt"></i> Ko'rinish:</span>
+            <a href="?range=7" class="filter-pill {% if range_val == '7' %}active{% endif %}" id="btnFilterRecent7" style="text-decoration: none;">Oxirgi 1 hafta</a>
+            <a href="?range=30" class="filter-pill {% if range_val == '30' %}active{% endif %}" id="btnFilterRecent30" style="text-decoration: none;">Oxirgi 30 kun</a>
+            <a href="?range=all" class="filter-pill {% if range_val == 'all' %}active{% endif %}" id="btnFilterAll" style="text-decoration: none;">Barcha darslar ({{ total_dates_count }})</a>
+        </div>
+
+        <!-- Scroll Controls & View Toggle -->
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button class="filter-pill" id="btnToggleCompact" onclick="toggleCompactMode()" title="Ixcham ko'rinishni yoqish/o'chirish">
+                <i class="fas fa-compress-alt"></i> <span id="compactText">Ixcham</span>
+            </button>
+            <div style="display: flex; gap: 6px;">
+                <button class="btn-scroll" onclick="scrollSchedule(-400)" title="Chapga skrol"><i class="fas fa-chevron-left"></i> Chapga</button>
+                <button class="btn-scroll" onclick="scrollSchedule(400)" title="O'ngga skrol">O'ngga <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="jadval-container" id="jadvalContainer">
+        <table>
+            <thead>
+                <tr>
+                    <th class="sticky-col-name">O'QUVCHI</th>
+                    {% for date in dates %}
+                        <th class="date-col" data-date="{{ date|date:'Y-m-d' }}" style="text-align: center; min-width: 75px; font-family: monospace; font-size: 12.5px; color: #00f2fe;" title="{{ date|date:'d.m.Y' }}">
+                            {{ date|date:"d.m" }}
+                        </th>
+                    {% empty %}
+                        <th style="text-align: center;">Dars kunlari</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody id="jadval-qatorlari">
+                {% for row in attendance_list %}
+                    <tr>
+                        <td class="sticky-col-name">{{ row.student.get_full_name }}</td>
+                        {% for cell in row.dates %}
+                            <td class="attendance-cell date-col" data-date="{{ cell.date|date:'Y-m-d' }}">
+                                <span class="attendance-badge {% if cell.status == 'present' %}present{% elif cell.status == 'absent' %}absent{% else %}none{% endif %}"
+                                      data-status="{{ cell.status|default:'none' }}"
+                                      onclick="toggleAttendance(this, {{ row.student.id }}, '{{ cell.date|date:'Y-m-d' }}')">
+                                    {% if cell.status == 'present' %}
+                                        <i class="fas fa-check"></i> <span class="badge-text">Kelgan</span>
+                                    {% elif cell.status == 'absent' %}
+                                        <i class="fas fa-times"></i> <span class="badge-text">Kelmadi</span>
+                                    {% else %}
+                                        <span>-</span>
+                                    {% endif %}
+                                </span>
+                            </td>
+                        {% empty %}
+                            <td style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic;">Hali davomat olinmagan.</td>
+                        {% endfor %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="{{ dates|length|add:1 }}" style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; padding: 40px 0;">Guruhda o'quvchilar mavjud emas.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        const jadvalContainer = document.getElementById("jadvalContainer");
+
+        function scrollSchedule(amount) {
+            if (jadvalContainer) {
+                jadvalContainer.scrollBy({ left: amount, behavior: 'smooth' });
+            }
+        }
+
+        if (jadvalContainer) {
+            jadvalContainer.addEventListener('wheel', (evt) => {
+                if (evt.deltaY !== 0) {
+                    evt.preventDefault();
+                    jadvalContainer.scrollLeft += evt.deltaY * 1.5;
+                }
+            }, { passive: false });
+        }
+
+        let isCompact = false;
+        function toggleCompactMode() {
+            isCompact = !isCompact;
+            const container = document.getElementById("jadvalContainer");
+            const compactText = document.getElementById("compactText");
+            const btn = document.getElementById("btnToggleCompact");
+
+            if (isCompact) {
+                container.classList.add("compact-mode");
+                compactText.innerText = "Kengaytirilgan";
+                btn.classList.add("active");
+            } else {
+                container.classList.remove("compact-mode");
+                compactText.innerText = "Ixcham";
+                btn.classList.remove("active");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (jadvalContainer) {
+                jadvalContainer.scrollLeft = jadvalContainer.scrollWidth;
+            }
+        });
+
+        function toggleAttendance(element, studentId, dateStr) {
+            let currentStatus = element.getAttribute('data-status');
+            let nextStatus = (currentStatus === 'present') ? 'absent' : 'present';
+
+            element.style.opacity = '0.5';
+
+            fetch("{% url 'admin_update_attendance_ajax' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    group_id: "{{ group.id }}",
+                    date: dateStr,
+                    status: nextStatus
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                element.style.opacity = '1';
+                if (data.success) {
+                    element.setAttribute('data-status', data.new_status);
+                    if (data.new_status === 'present') {
+                        element.className = 'attendance-badge present';
+                        element.innerHTML = '<i class="fas fa-check"></i> <span class="badge-text">Kelgan</span>';
+                    } else {
+                        element.className = 'attendance-badge absent';
+                        element.innerHTML = '<i class="fas fa-times"></i> <span class="badge-text">Kelmadi</span>';
+                    }
+                }
+            })
+            .catch(err => {
+                element.style.opacity = '1';
+                console.error(err);
+            });
+        }
+    </script>
+{% endblock %}

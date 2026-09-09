@@ -1,0 +1,1037 @@
+{% extends 'baseadmin.html' %}
+{% load static %}
+
+{% block title %}{% if question %}Savolni tahrirlash{% else %}Yangi savol qo'shish{% endif %} | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .sarlavha {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #ffffff;
+            border-left: 4px solid #00f2fe;
+            padding-left: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .form-card {
+            background: rgba(11, 15, 25, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 30px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .form-control:focus {
+            border-color: #00f2fe;
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.15);
+        }
+        .form-control option {
+            background-color: #0c101d;
+            color: #ffffff;
+        }
+        body.light-mode .form-control option {
+            background-color: #ffffff;
+            color: #0f172a;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .option-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .option-row input[type="radio"] {
+            width: 22px;
+            height: 22px;
+            accent-color: #00ffaa;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .btn-submit {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.2);
+            text-align: center;
+            display: inline-block;
+        }
+        .btn-submit:hover {
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-cancel {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            text-align: center;
+            transition: 0.3s;
+            display: inline-block;
+        }
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            .grid-3 { grid-template-columns: 1fr; gap: 15px; }
+            .form-card { padding: 20px; }
+        }
+
+        /* --- Math Editor Styles --- */
+        .math-tab-headers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            padding-bottom: 10px;
+        }
+        .math-tab-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.6);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .math-tab-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+        }
+        .math-tab-btn.active {
+            background: rgba(0, 242, 254, 0.12);
+            border-color: #00f2fe;
+            color: #00f2fe;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+        }
+        .math-tab-content {
+            display: none;
+        }
+        .math-tab-content.active-content {
+            display: block;
+        }
+        .math-buttons-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .greek-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .math-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            width: auto;
+            max-width: 100%;
+            height: 44px;
+            white-space: nowrap;
+            word-break: keep-all;
+            flex-shrink: 0;
+        }
+        .math-btn:hover {
+            background: rgba(0, 242, 254, 0.12);
+            border-color: #00f2fe;
+            color: #00f2fe;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+            transform: translateY(-1px);
+        }
+        math-field {
+            background: rgba(0, 0, 0, 0.35);
+            color: #ffffff;
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            border-radius: 14px;
+            padding: 14px;
+            font-size: 22px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        math-field:focus-within {
+            border-color: #00ffaa;
+            box-shadow: 0 0 15px rgba(0, 255, 170, 0.2);
+        }
+        .math-preview-box {
+            margin-top: 6px;
+            padding: 12px 16px;
+            background: rgba(0, 255, 170, 0.02);
+            border: 1px dashed rgba(0, 255, 170, 0.15);
+            border-radius: 12px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            word-break: break-word;
+        }
+        .math-preview-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(0, 255, 170, 0.6);
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 12px;
+        }
+
+    </style>
+{% endblock %}
+
+{% block content %}
+<!-- Visual JS Diagnostic Panel -->
+<div id="js-debug-panel" style="display:none; background: rgba(255, 77, 77, 0.15); border: 2px solid #ff4d4d; color: #ffb3b3; padding: 15px; margin-bottom: 20px; border-radius: 12px; font-family: monospace; font-size: 13px; z-index: 9999; position: relative;">
+    <h4 style="margin-top:0; color:#ff4d4d; font-weight:bold; display:flex; align-items:center; gap: 8px; font-size: 14px;">
+        <i class="fas fa-exclamation-triangle"></i> DIAGNOSTIKA (Muammolar aniqlandi):
+    </h4>
+    <pre id="js-debug-log" style="white-space: pre-wrap; margin:0; font-family: inherit; color: inherit;"></pre>
+</div>
+
+<script>
+(function() {
+    window.jsErrors = [];
+    window.addEventListener('error', function(e) {
+        const errorMsg = `[JS Error] ${e.message} at ${e.filename}:${e.lineno}:${e.colno}`;
+        window.jsErrors.push(errorMsg);
+        showDebugMessage(errorMsg);
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+        const errorMsg = `[Promise Rejection] ${e.reason}`;
+        window.jsErrors.push(errorMsg);
+        showDebugMessage(errorMsg);
+    });
+    
+    function showDebugMessage(msg) {
+        const panel = document.getElementById('js-debug-panel');
+        const log = document.getElementById('js-debug-log');
+        if (panel && log) {
+            panel.style.display = 'block';
+            log.textContent += msg + '\n';
+        }
+    }
+    window.logDebugInfo = showDebugMessage;
+})();
+</script>
+
+<script>
+(function() {
+    function loadStyle(url, fallbackUrl) {
+        return new Promise((resolve) => {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = url;
+            link.onload = () => resolve(true);
+            link.onerror = () => {
+                window.logDebugInfo(`CSS yuklashda xato: ${url}. Zaxiraga o'tilmoqda...`);
+                if (fallbackUrl) {
+                    const fallbackLink = document.createElement('link');
+                    fallbackLink.rel = 'stylesheet';
+                    fallbackLink.href = fallbackUrl;
+                    fallbackLink.onload = () => resolve(true);
+                    fallbackLink.onerror = () => {
+                        window.logDebugInfo(`Zaxira CSS ham yuklanmadi: ${fallbackUrl}`);
+                        resolve(false);
+                    };
+                    document.head.appendChild(fallbackLink);
+                } else {
+                    resolve(false);
+                }
+            };
+            document.head.appendChild(link);
+        });
+    }
+
+    function loadScript(url, fallbackUrl) {
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = url;
+            script.onload = () => resolve(true);
+            script.onerror = () => {
+                window.logDebugInfo(`Script yuklashda xato: ${url}. Zaxiraga o'tilmoqda...`);
+                if (fallbackUrl) {
+                    const fallbackScript = document.createElement('script');
+                    fallbackScript.src = fallbackUrl;
+                    fallbackScript.onload = () => resolve(true);
+                    fallbackScript.onerror = () => {
+                        window.logDebugInfo(`Zaxira Script ham yuklanmadi: ${fallbackUrl}`);
+                        resolve(false);
+                    };
+                    document.head.appendChild(fallbackScript);
+                } else {
+                    resolve(false);
+                }
+            };
+            document.head.appendChild(script);
+        });
+    }
+
+    // Start loading sequentially
+    async function loadAssets() {
+        // 1. KaTeX CSS
+        await loadStyle(
+            'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css',
+            'https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css'
+        );
+
+        // 2. KaTeX JS
+        const katexLoaded = await loadScript(
+            'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js',
+            'https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js'
+        );
+        if (!katexLoaded) {
+            window.logDebugInfo("KaTeX yuklanmadi! Matematik formulalar panelida xatolik yuz berishi mumkin.");
+        }
+
+        // 3. KaTeX Auto-render
+        await loadScript(
+            'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/contrib/auto-render.min.js',
+            'https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js'
+        );
+
+        // 4. MathLive JS
+        const mathliveLoaded = await loadScript(
+            'https://unpkg.com/mathlive',
+            'https://cdn.jsdelivr.net/npm/mathlive@0.98.6/dist/mathlive.min.js'
+        );
+        if (!mathliveLoaded) {
+            window.logDebugInfo("MathLive yuklanmadi! Vizual formula maydoni ishlamasligi mumkin.");
+        } else {
+            // Force math-field upgrade check
+            if (typeof customElements !== "undefined" && customElements.upgrade && document.getElementById('visual-math-editor')) {
+                customElements.upgrade(document.getElementById('visual-math-editor'));
+            }
+        }
+    }
+
+    loadAssets();
+})();
+</script>
+
+
+
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+        <a href="{% url 'admin_dtm_questions_list' %}" class="back-arrow-btn" title="Orqaga">
+            <i class="fas fa-chevron-left" style="font-size: 16px;"></i>
+        </a>
+        <h2 class="sarlavha" style="margin-bottom: 0;">{% if question %}Savolni tahrirlash (DTM #{{ question.id }}){% else %}Yangi savol qo'shish (DTM){% endif %}</h2>
+    </div>
+
+    <div class="form-card">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Upgrade Matematik Formulalar Paneli & Workspace -->
+            <div class="math-toolbar-card" style="margin-bottom: 25px; padding: 20px; background: rgba(11, 15, 25, 0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px;">
+                <div style="font-size: 14px; font-weight: 800; color: #00f2fe; text-transform: uppercase; margin-bottom: 20px; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;">
+                    <i class="fas fa-calculator"></i> Matematik Formulalar Paneli
+                    <span id="active-field-indicator" style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: none; margin-left: auto;">(Formulani kiritish uchun quyidagi maydonlardan birini tanlang)</span>
+                </div>
+                
+                <!-- Tab Headers -->
+                <div class="math-tab-headers" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 10px;">
+                    <button type="button" class="math-tab-btn active" data-tab="tab-basic">Asosiy</button>
+                    <button type="button" class="math-tab-btn" data-tab="tab-brackets">Qavslar</button>
+                    <button type="button" class="math-tab-btn" data-tab="tab-integrals">Integrallar</button>
+                    <button type="button" class="math-tab-btn" data-tab="tab-greek">Grek harflari</button>
+                    <button type="button" class="math-tab-btn" data-tab="tab-operators">Amallar</button>
+                    <button type="button" class="math-tab-btn" data-tab="tab-arrows">Strelkalar</button>
+                    <button type="button" class="math-tab-btn" data-tab="tab-sets">To'plamlar</button>
+                    <button type="button" class="math-tab-btn" data-tab="tab-matrices">Matritsalar</button>
+                    <button type="button" class="math-tab-btn" data-tab="tab-functions">Funksiyalar</button>
+                    <button type="button" class="math-tab-btn" data-tab="tab-style">Rang/O'lcham</button>
+                </div>
+
+                <!-- Tab Contents -->
+                <!-- Basic -->
+                <div id="tab-basic" class="math-tab-content active-content">
+                    <div class="math-buttons-grid">
+                        <button type="button" class="math-btn" data-insert="\frac{#?}{#?}" data-display="\frac{a}{b}" title="Kasr"></button>
+                        <button type="button" class="math-btn" data-insert="\sqrt{#?}" data-display="\sqrt{x}" title="Kvadrat ildiz"></button>
+                        <button type="button" class="math-btn" data-insert="\sqrt[#?]{#?}" data-display="\sqrt[n]{x}" title="N-darajali ildiz"></button>
+                        <button type="button" class="math-btn" data-insert="#?^{#?}" data-display="{x}^{y}" title="Daraja"></button>
+                        <button type="button" class="math-btn" data-insert="#?_{#?}" data-display="{x}_{y}" title="Indeks"></button>
+                        <button type="button" class="math-btn" data-insert="#?_{#?}^{#?}" data-display="{x}_{a}^{b}" title="Indeks va Daraja"></button>
+                        <button type="button" class="math-btn" data-insert="\log_{#?}{#?}" data-display="\log_{a}{x}" title="Logarifm"></button>
+                        <button type="button" class="math-btn" data-insert="\ln{#?}" data-display="\ln{x}" title="Natural logarifm"></button>
+                        <button type="button" class="math-btn" data-insert="\lim_{#? \to #?}{#?}" data-display="\lim_{x \to 0}{y}" title="Limit"></button>
+                        <button type="button" class="math-btn" data-insert="\vec{#?}" data-display="\vec{p}" title="Vektor"></button>
+                        <button type="button" class="math-btn" data-insert="\overline{#?}" data-display="\overline{AB}" title="Chiziq tepada"></button>
+                        <button type="button" class="math-btn" data-insert="\underline{#?}" data-display="\underline{AB}" title="Chiziq pastda"></button>
+                    </div>
+                </div>
+
+                <!-- Brackets -->
+                <div id="tab-brackets" class="math-tab-content">
+                    <div class="math-buttons-grid">
+                        <button type="button" class="math-btn" data-insert="\left( #? \right)" data-display="(x)" title="Qavslar"></button>
+                        <button type="button" class="math-btn" data-insert="\left[ #? \right]" data-display="[x]" title="Kvadrat qavs"></button>
+                        <button type="button" class="math-btn" data-insert="\left\{ #? \right\}" data-display="\{x\}" title="Gulli qavs"></button>
+                        <button type="button" class="math-btn" data-insert="\left| #? \right|" data-display="|x|" title="Modul"></button>
+                        <button type="button" class="math-btn" data-insert="\left\| #? \right\|" data-display="\|x\|" title="Norma"></button>
+                        <button type="button" class="math-btn" data-insert="\left\langle #? \right\rangle" data-display="\langle x \rangle" title="Burchakli qavs"></button>
+                    </div>
+                </div>
+
+                <!-- Integrals -->
+                <div id="tab-integrals" class="math-tab-content">
+                    <div class="math-buttons-grid">
+                        <button type="button" class="math-btn" data-insert="\int_{#?}^{#?}{#?}" data-display="\int_{a}^{b}{f(x)}" title="Aniq integral"></button>
+                        <button type="button" class="math-btn" data-insert="\int{#?}" data-display="\int{f(x)}" title="Aniqmas integral"></button>
+                        <button type="button" class="math-btn" data-insert="\iint_{#?}{#?}" data-display="\iint_{D}{f(x,y)}" title="Ikkarra integral"></button>
+                        <button type="button" class="math-btn" data-insert="\iiint_{#?}{#?}" data-display="\iiint_{V}{f(x,y,z)}" title="Uchkarra integral"></button>
+                        <button type="button" class="math-btn" data-insert="\oint_{#?}{#?}" data-display="\oint_{C}{f(s)}" title="Egri chiziqli integral"></button>
+                        <button type="button" class="math-btn" data-insert="\sum_{#?}^{#?}{#?}" data-display="\sum_{i=1}^{n}{x_i}" title="Yig'indi (Sigma)"></button>
+                        <button type="button" class="math-btn" data-insert="\prod_{#?}^{#?}{#?}" data-display="\prod_{i=1}^{n}{x_i}" title="Ko'paytma (Pi)"></button>
+                    </div>
+                </div>
+
+                <!-- Greek -->
+                <div id="tab-greek" class="math-tab-content">
+                    <div class="math-buttons-grid greek-grid">
+                        <button type="button" class="math-btn" data-insert="\alpha" title="alfa"></button>
+                        <button type="button" class="math-btn" data-insert="\beta" title="beta"></button>
+                        <button type="button" class="math-btn" data-insert="\gamma" title="gamma"></button>
+                        <button type="button" class="math-btn" data-insert="\delta" title="delta"></button>
+                        <button type="button" class="math-btn" data-insert="\epsilon" title="epsilon"></button>
+                        <button type="button" class="math-btn" data-insert="\zeta" title="zeta"></button>
+                        <button type="button" class="math-btn" data-insert="\eta" title="eta"></button>
+                        <button type="button" class="math-btn" data-insert="\theta" title="teta"></button>
+                        <button type="button" class="math-btn" data-insert="\iota" title="iota"></button>
+                        <button type="button" class="math-btn" data-insert="\kappa" title="kappa"></button>
+                        <button type="button" class="math-btn" data-insert="\lambda" title="lambda"></button>
+                        <button type="button" class="math-btn" data-insert="\mu" title="mu"></button>
+                        <button type="button" class="math-btn" data-insert="\nu" title="nu"></button>
+                        <button type="button" class="math-btn" data-insert="\xi" title="ksi"></button>
+                        <button type="button" class="math-btn" data-insert="\pi" title="pi"></button>
+                        <button type="button" class="math-btn" data-insert="\rho" title="ro"></button>
+                        <button type="button" class="math-btn" data-insert="\sigma" title="sigma"></button>
+                        <button type="button" class="math-btn" data-insert="\tau" title="tau"></button>
+                        <button type="button" class="math-btn" data-insert="\upsilon" title="ipsilon"></button>
+                        <button type="button" class="math-btn" data-insert="\phi" title="fi"></button>
+                        <button type="button" class="math-btn" data-insert="\chi" title="khi"></button>
+                        <button type="button" class="math-btn" data-insert="\psi" title="psi"></button>
+                        <button type="button" class="math-btn" data-insert="\omega" title="omega"></button>
+                        <button type="button" class="math-btn" data-insert="\Gamma" title="Gamma"></button>
+                        <button type="button" class="math-btn" data-insert="\Delta" title="Delta"></button>
+                        <button type="button" class="math-btn" data-insert="\Theta" title="Teta"></button>
+                        <button type="button" class="math-btn" data-insert="\Lambda" title="Lambda"></button>
+                        <button type="button" class="math-btn" data-insert="\Xi" title="Ksi"></button>
+                        <button type="button" class="math-btn" data-insert="\Pi" title="Pi"></button>
+                        <button type="button" class="math-btn" data-insert="\Sigma" title="Sigma"></button>
+                        <button type="button" class="math-btn" data-insert="\Phi" title="Fi"></button>
+                        <button type="button" class="math-btn" data-insert="\Psi" title="Psi"></button>
+                        <button type="button" class="math-btn" data-insert="\Omega" title="Omega"></button>
+                    </div>
+                </div>
+
+                <!-- Operators -->
+                <div id="tab-operators" class="math-tab-content">
+                    <div class="math-buttons-grid">
+                        <button type="button" class="math-btn" data-insert="+" title="plus">+</button>
+                        <button type="button" class="math-btn" data-insert="-" title="minus">-</button>
+                        <button type="button" class="math-btn" data-insert="\pm" title="plus-minus"></button>
+                        <button type="button" class="math-btn" data-insert="\mp" title="minus-plus"></button>
+                        <button type="button" class="math-btn" data-insert="\cdot" title="ko'paytirish (nuqta)"></button>
+                        <button type="button" class="math-btn" data-insert="\times" title="ko'paytirish (krestik)"></button>
+                        <button type="button" class="math-btn" data-insert="\div" title="bo'lish"></button>
+                        <button type="button" class="math-btn" data-insert="=" title="teng">=</button>
+                        <button type="button" class="math-btn" data-insert="\neq" title="teng emas"></button>
+                        <button type="button" class="math-btn" data-insert="<" title="kichik">&lt;</button>
+                        <button type="button" class="math-btn" data-insert=">" title="katta">&gt;</button>
+                        <button type="button" class="math-btn" data-insert="\le" title="kichik yoki teng"></button>
+                        <button type="button" class="math-btn" data-insert="\ge" title="katta yoki teng"></button>
+                        <button type="button" class="math-btn" data-insert="\approx" title="taqriban teng"></button>
+                        <button type="button" class="math-btn" data-insert="\equiv" title="aynan teng"></button>
+                        <button type="button" class="math-btn" data-insert="\propto" title="proporsional"></button>
+                        <button type="button" class="math-btn" data-insert="\parallel" title="parallel"></button>
+                        <button type="button" class="math-btn" data-insert="\perp" title="perpendikulyar"></button>
+                        <button type="button" class="math-btn" data-insert="\infty" title="cheksizlik"></button>
+                        <button type="button" class="math-btn" data-insert="\degree" title="gradus"></button>
+                        <button type="button" class="math-btn" data-insert="\%" title="foiz">%</button>
+                    </div>
+                </div>
+
+                <!-- Arrows -->
+                <div id="tab-arrows" class="math-tab-content">
+                    <div class="math-buttons-grid">
+                        <button type="button" class="math-btn" data-insert="\rightarrow" title="o'ngga strelka"></button>
+                        <button type="button" class="math-btn" data-insert="\left\leftarrow" title="chapga strelka"></button>
+                        <button type="button" class="math-btn" data-insert="\leftrightarrow" title="ikki tomonga strelka"></button>
+                        <button type="button" class="math-btn" data-insert="\Rightarrow" title="o'ngga natija"></button>
+                        <button type="button" class="math-btn" data-insert="\Leftarrow" title="chapga natija"></button>
+                        <button type="button" class="math-btn" data-insert="\Leftrightarrow" title="ikki tomonga natija"></button>
+                        <button type="button" class="math-btn" data-insert="\uparrow" title="tepaga strelka"></button>
+                        <button type="button" class="math-btn" data-insert="\downarrow" title="pastga strelka"></button>
+                        <button type="button" class="math-btn" data-insert="\nearrow" title="tepa-o'ngga"></button>
+                        <button type="button" class="math-btn" data-insert="\searrow" title="past-o'ngga"></button>
+                        <button type="button" class="math-btn" data-insert="\swarrow" title="past-chapga"></button>
+                        <button type="button" class="math-btn" data-insert="\nwarrow" title="tepa-chapga"></button>
+                    </div>
+                </div>
+
+                <!-- Sets & Logic -->
+                <div id="tab-sets" class="math-tab-content">
+                    <div class="math-buttons-grid">
+                        <button type="button" class="math-btn" data-insert="\in" title="tegishli"></button>
+                        <button type="button" class="math-btn" data-insert="\notin" title="tegishli emas"></button>
+                        <button type="button" class="math-btn" data-insert="\subset" title="qism to'plam"></button>
+                        <button type="button" class="math-btn" data-insert="\subseteq" title="qism to'plam yoki teng"></button>
+                        <button type="button" class="math-btn" data-insert="\cap" title="kesishma"></button>
+                        <button type="button" class="math-btn" data-insert="\cup" title="birlashma"></button>
+                        <button type="button" class="math-btn" data-insert="\setminus" title="ayirma"></button>
+                        <button type="button" class="math-btn" data-insert="\emptyset" title="bo'sh to'plam"></button>
+                        <button type="button" class="math-btn" data-insert="\forall" title="barchasi uchun"></button>
+                        <button type="button" class="math-btn" data-insert="\exists" title="mavjud"></button>
+                        <button type="button" class="math-btn" data-insert="\neg" title="inkor"></button>
+                        <button type="button" class="math-btn" data-insert="\land" title="va (kon'yunksiya)"></button>
+                        <button type="button" class="math-btn" data-insert="\lor" title="yoki (diz'yunksiya)"></button>
+                        <button type="button" class="math-btn" data-insert="\mathbb{R}" data-display="\mathbb{R}" title="Haqiqiy sonlar"></button>
+                        <button type="button" class="math-btn" data-insert="\mathbb{N}" data-display="\mathbb{N}" title="Natural sonlar"></button>
+                        <button type="button" class="math-btn" data-insert="\mathbb{Z}" data-display="\mathbb{Z}" title="Butun sonlar"></button>
+                        <button type="button" class="math-btn" data-insert="\mathbb{Q}" data-display="\mathbb{Q}" title="Ratsional sonlar"></button>
+                    </div>
+                </div>
+
+                <!-- Matrices -->
+                <div id="tab-matrices" class="math-tab-content">
+                    <div class="math-buttons-grid">
+                        <button type="button" class="math-btn" data-insert="\begin{pmatrix} a & b \\ c & d \end{pmatrix}" data-display="\begin{pmatrix} a & b \\ c & d \end{pmatrix}" title="Matritsa 2x2"></button>
+                        <button type="button" class="math-btn" data-insert="\begin{pmatrix} a & b & c \\ d & e & f \\ g & h & i \end{pmatrix}" data-display="\begin{pmatrix} a & b & c \\ d & e & f \\ g & h & i \end{pmatrix}" title="Matritsa 3x3"></button>
+                        <button type="button" class="math-btn" data-insert="\begin{vmatrix} a & b \\ c & d \end{vmatrix}" data-display="\begin{vmatrix} a & b \\ c & d \end{vmatrix}" title="Determinant 2x2"></button>
+                        <button type="button" class="math-btn" data-insert="\begin{vmatrix} a & b & c \\ d & e & f \\ g & h & i \end{vmatrix}" data-display="\begin{vmatrix} a & b & c \\ d & e & f \\ g & h & i \end{vmatrix}" title="Determinant 3x3"></button>
+                        <button type="button" class="math-btn" data-insert="\begin{matrix} a & b \\ c & d \end{matrix}" data-display="\begin{matrix} a & b \\ c & d \end{matrix}" title="Qavssiz Matritsa"></button>
+                    </div>
+                </div>
+
+                <!-- Functions -->
+                <div id="tab-functions" class="math-tab-content">
+                    <div class="math-buttons-grid">
+                        <button type="button" class="math-btn" data-insert="\sin{#?}" data-display="\sin{x}" title="Sinus"></button>
+                        <button type="button" class="math-btn" data-insert="\cos{#?}" data-display="\cos{x}" title="Kosinus"></button>
+                        <button type="button" class="math-btn" data-insert="\tan{#?}" data-display="\tan{x}" title="Tangens"></button>
+                        <button type="button" class="math-btn" data-insert="\cot{#?}" data-display="\cot{x}" title="Kotangens"></button>
+                        <button type="button" class="math-btn" data-insert="\arcsin{#?}" data-display="\arcsin{x}" title="Arksinus"></button>
+                        <button type="button" class="math-btn" data-insert="\arccos{#?}" data-display="\arccos{x}" title="Arkkosinus"></button>
+                        <button type="button" class="math-btn" data-insert="\arctan{#?}" data-display="\arctan{x}" title="Arktangens"></button>
+                        <button type="button" class="math-btn" data-insert="\sinh{#?}" data-display="\sinh{x}" title="Giperbolik sinus"></button>
+                        <button type="button" class="math-btn" data-insert="\cosh{#?}" data-display="\cosh{x}" title="Giperbolik kosinus"></button>
+                    </div>
+                </div>
+
+                <!-- Style -->
+                <div id="tab-style" class="math-tab-content">
+                    <div class="math-buttons-grid">
+                        <button type="button" class="math-btn" data-insert="\color{red}{#?}" data-display="\color{red}{\text{qizil}}" title="Qizil matn"></button>
+                        <button type="button" class="math-btn" data-insert="\color{blue}{#?}" data-display="\color{blue}{\text{ko'k}}" title="Ko'k matn"></button>
+                        <button type="button" class="math-btn" data-insert="\color{green}{#?}" data-display="\color{green}{\text{yashil}}" title="Yashil matn"></button>
+                        <button type="button" class="math-btn" data-insert="\color{yellow}{#?}" data-display="\color{yellow}{\text{sariq}}" title="Sariq matn"></button>
+                        <button type="button" class="math-btn" data-insert="\tiny{#?}" data-display="\tiny{\text{tiny}}" title="Juda kichik"></button>
+                        <button type="button" class="math-btn" data-insert="\small{#?}" data-display="\small{\text{small}}" title="Kichik"></button>
+                        <button type="button" class="math-btn" data-insert="\large{#?}" data-display="\large{\text{large}}" title="Katta"></button>
+                        <button type="button" class="math-btn" data-insert="\Large{#?}" data-display="\Large{\text{Large}}" title="Juda katta"></button>
+                        <button type="button" class="math-btn" data-insert="\huge{#?}" data-display="\huge{\text{huge}}" title="Eng katta"></button>
+                    </div>
+                </div>
+
+                <!-- Workspace Section -->
+                <div style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 20px;">
+                    <div style="font-size: 12.5px; font-weight: 700; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
+                        Visual Formula Muharriri (Tugmalardan foydalaning yoki klaviaturada yozing):
+                    </div>
+                    
+                    <math-field id="visual-math-editor" style="width: 100%; min-height: 85px; font-size: 22px; border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 14px; padding: 14px; background: rgba(0, 0, 0, 0.3); color: #ffffff; margin-bottom: 12px; outline: none;"></math-field>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                        <div style="font-size: 13px; color: rgba(255,255,255,0.4); font-family: monospace; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 8px; flex-grow: 1; min-height: 34px; display: flex; align-items: center;">
+                            LaTeX kodi: &nbsp;<span id="latex-code-display" style="color: #00f2fe; font-weight: 600;"></span>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 600; margin: 0;">
+                                <input type="checkbox" id="math-block-mode" style="width: 18px; height: 18px; accent-color: #00f2fe;">
+                                Alohida qatorda ($$ ... $$)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Workspace Actions -->
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button type="button" id="btn-insert-math" style="padding: 10px 20px; background: linear-gradient(135deg, #00ffaa, #00ab6b); color: #070a12; border: none; border-radius: 10px; font-weight: 800; font-size: 13.5px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-arrow-down"></i> Matn maydoniga kiritish
+                        </button>
+                        <button type="button" id="btn-clear-math" style="padding: 10px 16px; background: rgba(255, 107, 107, 0.1); border: 1px solid rgba(255, 107, 107, 0.3); color: #ff6b6b; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s;">
+                            Tozalash
+                        </button>
+                        <button type="button" id="btn-undo-math" style="padding: 10px 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: #fff; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s;" title="Orqaga">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button type="button" id="btn-redo-math" style="padding: 10px 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: #fff; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s;" title="Oldinga">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="grid-3">
+                <div class="form-group">
+                    <label for="subject">Fan nomi</label>
+                    <select id="subject" name="subject" required class="form-control">
+                        {% for sub in subjects %}
+                            <option value="{{ sub }}" {% if question.subject == sub %}selected{% endif %}>{{ sub }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="difficulty">Qiyinlik darajasi</label>
+                    <select id="difficulty" name="difficulty" required class="form-control">
+                        <option value="3" {% if question.difficulty == 3 %}selected{% endif %}>Oson (3)</option>
+                        <option value="2" {% if question.difficulty == 2 %}selected{% endif %}>O'rtacha (2)</option>
+                        <option value="1" {% if question.difficulty == 1 %}selected{% endif %}>Qiyin (1)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="justify-content: center; align-items: flex-start; padding-top: 25px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #ffffff; text-transform: none; font-size: 13.5px; font-weight: 600;">
+                        <input type="checkbox" name="is_compulsory" {% if question.is_compulsory %}checked{% endif %} style="width: 20px; height: 20px; accent-color: #00f2fe;">
+                        Majburiy fan savoli
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label for="text" style="margin-bottom: 0;">Savol matni</label>
+                    <button type="button" id="btn-ai-format-text" class="btn-action" style="background: rgba(0, 242, 254, 0.08); border-color: rgba(0, 242, 254, 0.2); color: #00f2fe; margin: 0; font-size: 11.5px; padding: 4px 12px; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-magic"></i> AI Formulalarni Auto-Formatlash ($)
+                    </button>
+                </div>
+                <textarea id="text" name="text" rows="5" required class="form-control" placeholder="Savol matnini bu yerga yozing...">{{ question.text }}</textarea>
+                <div class="math-preview-title">Savol ko'rinishi:</div>
+                <div class="math-preview-box" id="text-preview"></div>
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="diagram_image">Rasm / Chizma biriktirish (ixtiyoriy)</label>
+                {% if current_image %}
+                    <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 12.5px; color: rgba(255,255,255,0.4);">Mavjud rasm:</span>
+                        <img src="/media/dtm_images/{{ current_image }}" style="max-height: 80px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);">
+                    </div>
+                {% endif %}
+                <input type="file" id="diagram_image" name="diagram_image" accept="image/*" class="form-control" style="padding: 8px 12px;">
+            </div>
+
+            <div style="border-top: 1px solid rgba(255,255,255,0.05); margin: 25px 0; padding-top: 15px; margin-bottom: 25px;">
+                <label style="display: block; font-size: 12.5px; font-weight: 700; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px;">Javob variantlari (To'g'ri javobni belgilang):</label>
+                
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <!-- Option A -->
+                    <div>
+                        <div class="option-row">
+                            <input type="radio" name="correct_option" value="1" {% if answers.0.is_correct %}checked{% endif %} required>
+                            <span style="font-weight: 700; color: rgba(255,255,255,0.4); font-size: 14px;">A)</span>
+                            <input type="text" id="option_1" name="option_1" value="{{ answers.0.text|default:'' }}" required class="form-control" placeholder="A variant matni">
+                            <input type="file" id="option_image_1" name="option_image_1" accept="image/*" class="form-control" style="width: 220px; padding: 8px; font-size: 11px; flex-shrink: 0;" title="Variant rasmi (Ixtiyoriy)">
+                        </div>
+                        <div class="math-preview-box" id="option_1-preview" style="margin-left: 37px; margin-top: 4px;"></div>
+                    </div>
+
+                    <!-- Option B -->
+                    <div>
+                        <div class="option-row">
+                            <input type="radio" name="correct_option" value="2" {% if answers.1.is_correct %}checked{% endif %} required>
+                            <span style="font-weight: 700; color: rgba(255,255,255,0.4); font-size: 14px;">B)</span>
+                            <input type="text" id="option_2" name="option_2" value="{{ answers.1.text|default:'' }}" required class="form-control" placeholder="B variant matni">
+                            <input type="file" id="option_image_2" name="option_image_2" accept="image/*" class="form-control" style="width: 220px; padding: 8px; font-size: 11px; flex-shrink: 0;" title="Variant rasmi (Ixtiyoriy)">
+                        </div>
+                        <div class="math-preview-box" id="option_2-preview" style="margin-left: 37px; margin-top: 4px;"></div>
+                    </div>
+
+                    <!-- Option C -->
+                    <div>
+                        <div class="option-row">
+                            <input type="radio" name="correct_option" value="3" {% if answers.2.is_correct %}checked{% endif %} required>
+                            <span style="font-weight: 700; color: rgba(255,255,255,0.4); font-size: 14px;">C)</span>
+                            <input type="text" id="option_3" name="option_3" value="{{ answers.2.text|default:'' }}" required class="form-control" placeholder="C variant matni">
+                            <input type="file" id="option_image_3" name="option_image_3" accept="image/*" class="form-control" style="width: 220px; padding: 8px; font-size: 11px; flex-shrink: 0;" title="Variant rasmi (Ixtiyoriy)">
+                        </div>
+                        <div class="math-preview-box" id="option_3-preview" style="margin-left: 37px; margin-top: 4px;"></div>
+                    </div>
+
+                    <!-- Option D -->
+                    <div>
+                        <div class="option-row">
+                            <input type="radio" name="correct_option" value="4" {% if answers.3.is_correct %}checked{% endif %} required>
+                            <span style="font-weight: 700; color: rgba(255,255,255,0.4); font-size: 14px;">D)</span>
+                            <input type="text" id="option_4" name="option_4" value="{{ answers.3.text|default:'' }}" required class="form-control" placeholder="D variant matni">
+                            <input type="file" id="option_image_4" name="option_image_4" accept="image/*" class="form-control" style="width: 220px; padding: 8px; font-size: 11px; flex-shrink: 0;" title="Variant rasmi (Ixtiyoriy)">
+                        </div>
+                        <div class="math-preview-box" id="option_4-preview" style="margin-left: 37px; margin-top: 4px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                <a href="{% url 'admin_dtm_questions_list' %}" class="btn-cancel">Bekor qilish</a>
+                <button type="submit" class="btn-submit"><i class="fas fa-save" style="margin-right: 6px;"></i> {% if question %}O'zgarishlarni saqlash{% else %}Saqlash{% endif %}</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let activeInput = null;
+
+    // Tab switching logic
+    document.querySelectorAll('.math-tab-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tabId = this.getAttribute('data-tab');
+            
+            // Toggle active class on tab buttons
+            document.querySelectorAll('.math-tab-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Toggle active class on tab contents
+            document.querySelectorAll('.math-tab-content').forEach(c => c.classList.remove('active-content'));
+            const activeContent = document.getElementById(tabId);
+            if (activeContent) activeContent.classList.add('active-content');
+        });
+    });
+
+    // Explicitly render KaTeX equations on all math buttons on load (robust against load delays)
+    function renderMathButtons() {
+        if (typeof katex === "undefined") {
+            setTimeout(renderMathButtons, 100);
+            return;
+        }
+        document.querySelectorAll('.math-btn').forEach(btn => {
+            const displayVal = btn.getAttribute('data-display') || btn.getAttribute('data-insert');
+            const hasText = btn.textContent.trim().length > 0;
+            if (displayVal && !hasText) {
+                try {
+                    // Try rendering with KaTeX
+                    katex.render(displayVal, btn, {
+                        displayMode: false,
+                        throwOnError: false
+                    });
+                } catch(e) {
+                    console.error("KaTeX button render failed:", e, displayVal);
+                    btn.textContent = btn.getAttribute('title') || displayVal;
+                }
+            }
+        });
+    }
+
+    renderMathButtons();
+
+    // Configure MathLive workspace after the custom element is registered by the browser
+    if (typeof customElements !== "undefined" && customElements.whenDefined) {
+        customElements.whenDefined('math-field').then(initMathLiveWorkspace);
+    } else {
+        // Fallback for older browsers
+        setTimeout(initMathLiveWorkspace, 500);
+    }
+
+    function initMathLiveWorkspace() {
+        const mathEditor = document.getElementById('visual-math-editor');
+        const latexDisplay = document.getElementById('latex-code-display');
+        
+        if (mathEditor && typeof mathEditor.setOptions === 'function') {
+            mathEditor.setOptions({
+                virtualKeyboardMode: 'manual', // standard toggle button
+                virtualKeyboardTheme: 'dark'
+            });
+            
+            mathEditor.addEventListener('input', () => {
+                if (latexDisplay) latexDisplay.textContent = mathEditor.value;
+            });
+        }
+
+        // Listen to math buttons click to insert in visual math editor
+        document.querySelectorAll('.math-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const insertVal = this.getAttribute('data-insert');
+                if (insertVal && mathEditor) {
+                    if (typeof mathEditor.insert === 'function') {
+                        mathEditor.insert(insertVal);
+                        mathEditor.focus();
+                        if (latexDisplay) latexDisplay.textContent = mathEditor.value;
+                    }
+                }
+            });
+        });
+
+        // Clear button
+        const clearBtn = document.getElementById('btn-clear-math');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (mathEditor) {
+                    mathEditor.value = '';
+                    mathEditor.focus();
+                    if (latexDisplay) latexDisplay.textContent = '';
+                }
+            });
+        }
+
+        // Undo / Redo
+        const undoBtn = document.getElementById('btn-undo-math');
+        if (undoBtn) {
+            undoBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (mathEditor && typeof mathEditor.executeCommand === 'function') {
+                    mathEditor.executeCommand('undo');
+                    mathEditor.focus();
+                }
+            });
+        }
+        const redoBtn = document.getElementById('btn-redo-math');
+        if (redoBtn) {
+            redoBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (mathEditor && typeof mathEditor.executeCommand === 'function') {
+                    mathEditor.executeCommand('redo');
+                    mathEditor.focus();
+                }
+            });
+        }
+
+        // Insert into active input field
+        const insertMathBtn = document.getElementById('btn-insert-math');
+        if (insertMathBtn) {
+            insertMathBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (!activeInput) {
+                    alert("Iltimos, avval formulani kiritmoqchi bo'lgan matn maydoniga bosing (kursorni qo'ying).");
+                    return;
+                }
+                if (!mathEditor || !mathEditor.value.trim()) {
+                    alert("Kiritish uchun avval formula yozing!");
+                    return;
+                }
+                
+                const blockMode = document.getElementById('math-block-mode').checked;
+                const delimiter = blockMode ? '$$' : '$';
+                const latexVal = mathEditor.value;
+                const insertion = `${delimiter}${latexVal}${delimiter}`;
+                
+                const start = activeInput.selectionStart;
+                const end = activeInput.selectionEnd;
+                const currentVal = activeInput.value;
+                
+                activeInput.value = currentVal.substring(0, start) + insertion + currentVal.substring(end);
+                activeInput.focus();
+                
+                const newPos = start + insertion.length;
+                activeInput.setSelectionRange(newPos, newPos);
+                
+                // Trigger input event to update preview
+                activeInput.dispatchEvent(new Event('input'));
+            });
+        }
+    }
+
+
+    // Track focused inputs
+    const textareas = document.querySelectorAll('textarea.form-control, input[type="text"].form-control');
+    const indicator = document.getElementById('active-field-indicator');
+
+    textareas.forEach(el => {
+        el.addEventListener('focus', function() {
+            activeInput = this;
+            
+            // Update active field indicator text
+            let fieldName = "Savol matni";
+            if (this.id === 'option_1') fieldName = "A variant";
+            else if (this.id === 'option_2') fieldName = "B variant";
+            else if (this.id === 'option_3') fieldName = "C variant";
+            else if (this.id === 'option_4') fieldName = "D variant";
+            
+            indicator.textContent = `(Hozirgi faol maydon: ${fieldName})`;
+            indicator.style.color = '#00ffaa';
+        });
+    });
+
+    // Live preview update function
+    function setupLivePreview(inputId, previewId) {
+        const inputEl = document.getElementById(inputId);
+        const previewEl = document.getElementById(previewId);
+        
+        if (!inputEl || !previewEl) return;
+        
+        function update() {
+            let val = inputEl.value;
+            if (val) {
+                // Strip MathLive internal \placeholder{} commands
+                val = val.replace(/\\placeholder(\{\})?/g, '');
+                if (!val.includes('$')) {
+                    if (val.includes('\\begin{')) {
+                        val = '$$ ' + val + ' $$';
+                    } else if (val.includes('\\') || val.includes('^') || val.includes('_')) {
+                        val = val.replace(/(\\([a-zA-Z]+)(\{[^{}]*\}|\[[^\[\]]*\])*|([a-zA-Z0-9_]+\^[a-zA-Z0-9_]+)|([a-zA-Z0-9_]+\_[a-zA-Z0-9_]+))/g, ' $$1$ ');
+                    }
+                }
+            }
+            // Escape simple HTML characters
+            val = val.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            
+            // Restore basic formatting tags so they render if present
+            val = val.replace(/&lt;sub&gt;/g, '<sub>').replace(/&lt;\/sub&gt;/g, '</sub>')
+                     .replace(/&lt;sup&gt;/g, '<sup>').replace(/&lt;\/sup&gt;/g, '</sup>')
+                     .replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>')
+                     .replace(/&lt;i&gt;/g, '<i>').replace(/&lt;\/i&gt;/g, '</i>');
+
+            // Render diagram image placeholder in preview
+            val = val.replace(/\[DIAGRAM_IMAGE:([^\]]+)\]/g, function(match, filename) {
+                return `<div style="margin-top: 8px; margin-bottom: 8px;"><img src="/media/dtm_images/${filename}" style="max-height: 100px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);"></div>`;
+            });
+
+            previewEl.innerHTML = val || '<span style="color: rgba(255,255,255,0.25);">Ko\'rinish (Preview)...</span>';
+            
+            // Trigger KaTeX rendering (using custom robust rendering + auto-render fallback)
+            if (typeof katex !== "undefined") {
+                let htmlText = previewEl.innerHTML;
+                htmlText = htmlText.replace(/\$\$(.*?)\$\$/gs, function(match, formula) {
+                    try {
+                        let cleanFormula = formula.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                        return katex.renderToString(cleanFormula, { displayMode: true, throwOnError: false });
+                    } catch (e) { return match; }
+                });
+                htmlText = htmlText.replace(/\$(.*?)\$/g, function(match, formula) {
+                    try {
+                        let cleanFormula = formula.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                        return katex.renderToString(cleanFormula, { displayMode: false, throwOnError: false });
+                    } catch (e) { return match; }
+                });
+                previewEl.innerHTML = htmlText;
+            } else if (typeof renderMathInElement === "function") {
+                renderMathInElement(previewEl, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        inputEl.addEventListener('input', update);
+        // Run once initially
+        update();
+    }
+
+    setupLivePreview('text', 'text-preview');
+    setupLivePreview('option_1', 'option_1-preview');
+    setupLivePreview('option_2', 'option_2-preview');
+    setupLivePreview('option_3', 'option_3-preview');
+    setupLivePreview('option_4', 'option_4-preview');
+
+    const btnAiFormat = document.getElementById('btn-ai-format-text');
+    if (btnAiFormat) {
+        btnAiFormat.addEventListener('click', async function() {
+            const textEl = document.getElementById('text');
+            if (!textEl || !textEl.value.trim()) return;
+            this.disabled = true;
+            const origHTML = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI Formatlamoqda...';
+            try {
+                const res = await fetch('/adminpanel/dtm/api/format-formula/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ text: textEl.value })
+                });
+                const data = await res.json();
+                if (data.status === 'success' && data.formatted_text) {
+                    textEl.value = data.formatted_text;
+                    textEl.dispatchEvent(new Event('input'));
+                }
+            } catch(err) {
+                console.error("AI Format error:", err);
+            } finally {
+                this.disabled = false;
+                this.innerHTML = origHTML;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

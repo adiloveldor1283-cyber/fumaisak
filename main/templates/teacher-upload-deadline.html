@@ -1,53 +1,10 @@
 {% extends 'baseteacher.html' %}
 {% load static %}
 
-{% block title %}Topshiriqlar paneli{% endblock %}
+{% block title %}Topshiriqlar{% endblock %}
 
 {% block extra_css %}
     <style>
-        /* --- 🔍 QIDIRUV PANELI - SPLIT DESIGN --- */
-        .search-form {
-            display: flex;
-            position: relative;
-        }
-        .search-input {
-            padding: 10px 16px;
-            font-size: 13px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px 0 0 12px;
-            outline: none;
-            width: 25vw;
-            background-color: rgba(255, 255, 255, 0.02);
-            color: #ffffff;
-            margin-left: 20px;
-            border-right: none;
-            transition: 0.3s;
-        }
-        .search-input:focus {
-            border-color: #00f2fe;
-            background: rgba(255, 255, 255, 0.06);
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
-        }
-        .search-btn {
-            background-color: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-left: none;
-            padding: 10px 18px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 13px;
-            border-radius: 0 12px 12px 0;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .search-btn:hover {
-            background-color: rgba(0, 242, 254, 0.1);
-            color: #00f2fe;
-            border-color: rgba(0, 242, 254, 0.2);
-        }
-
         .sarlavha {
             font-size: 20px;
             font-weight: 800;
@@ -92,37 +49,40 @@
             margin: 25px 0;
         }
 
-        /* --- 📊 CHEKSIZ SKROL BO'LUVCHI JADVAL KONTEYNERI --- */
         .jadval-container {
             flex-grow: 1;
-            overflow-y: auto; /* Faqat shu konteyner pastga skrol bo'ladi */
+            overflow-y: auto !important;
+            overflow-x: auto !important;
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 20px;
             background: rgba(255, 255, 255, 0.01);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            max-height: calc(100vh - 140px); /* Ekrandan chiqib ketmasligi uchun chegara */
+            max-height: calc(100vh - 200px);
+            min-height: 300px;
         }
 
         /* Skrolbar dizayni */
         .jadval-container::-webkit-scrollbar {
-            width: 1px;
-
+            width: 6px;
+            height: 6px;
         }
         .jadval-container::-webkit-scrollbar-track {
             background: transparent;
         }
         .jadval-container::-webkit-scrollbar-thumb {
-            background: rgba(0, 242, 254, 0.2);
-            border-radius: 4px;
+            background: rgba(0, 242, 254, 0.12);
+            border-radius: 10px;
         }
         .jadval-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 242, 254, 0.4);
+            background: rgba(0, 242, 254, 0.3);
         }
 
         table {
-            width: 100%;
+            width: max-content !important;
+            min-width: 100% !important;
+            white-space: nowrap;
             border-collapse: collapse;
             text-align: left;
         }
@@ -173,21 +133,7 @@
             box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
         }
 
-        /* --- 🖥️ MODERN TOP MESSAGE NOTIFICATION TOASTS --- */
-        .modal-backdropp { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1998; }
-        .top-modall {
-            position: fixed; top: -200px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 480px;
-            background: linear-gradient(135deg, #00b09b, #96c93d); color: white; padding: 16px 20px; z-index: 1999;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
-            transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .top-modall.show { top: 30px; }
-        .modal-contentt { display: flex; justify-content: space-between; align-items: center; }
-        .modall-message { font-size: 13.5px; font-weight: 600; line-height: 1.5; }
-        .close-modall-btn {
-            background: rgba(255, 255, 255, 0.2); border: none; font-size: 11px; color: white; cursor: pointer;
-            width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        }
+        
 
         /* --- 👾 MODAL OYNALAR (CYBER GLASS) --- */
         .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(7, 10, 18, 0.8); backdrop-filter: blur(10px); z-index: 1998; }
@@ -219,36 +165,32 @@
             .btn-otish, .edit-assignment-btn { width: 100%; padding: 10px; }
             .custom-modal { padding: 20px; }
         }
+
+        /* --- ☀️ LIGHT MODE OVERRIDES --- */
+        body.light-mode .guruh-btn,
+        body.light-mode .edit-assignment-btn {
+            background: #0284c7 !important;
+            border-color: #0284c7 !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15) !important;
+        }
+        body.light-mode .guruh-btn:hover,
+        body.light-mode .edit-assignment-btn:hover {
+            background: #0369a1 !important;
+            border-color: #0369a1 !important;
+            color: #ffffff !important;
+        }
     </style>
 {% endblock %}
 
-{% block header_search %}
-    <!-- QIDIRUV FORMASI -->
-    <form class="search-form" onsubmit="event.preventDefault()">
-        <input type="text" class="search-input" placeholder="Topshiriq nomi bo'yicha..." id="assignment-title-search">
-        <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
-    </form>
-{% endblock %}
+
 
 {% block content %}
-    <!-- TOAST BILDIRISHNOMALAR -->
-    {% if messages %}
-        {% for message in messages %}
-            {% if 'topshir_modal' in message.tags %}
-                <div id="modal-backdropp" class="modal-backdropp"></div>
-                <div id="top-modall" class="top-modall show">
-                    <div class="modal-contentt">
-                        <span class="modall-message"><i class="fas fa-check-circle" style="margin-right: 8px;"></i>{{ message }}</span>
-                        <button class="close-modall-btn" onclick="closeTopModall()">✖</button>
-                    </div>
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
+    
 
     <h2 class="sarlavha">Topshiriq yuklash uchun guruh tanlang:</h2>
     <div class="guruhlar-qatori">
-        <button onclick="openModall()" class="guruh-btn"><i class="fas fa-plus" style="margin-right: 8px;"></i>Topshiriq yuklash</button>
+        <a href="javascript:void(0);" onclick="openModall()" class="guruh-btn"><i class="fas fa-plus" style="margin-right: 8px;"></i>Topshiriq yuklash</a>
     </div>
 
     <!-- Modal orqa fon -->
@@ -323,7 +265,14 @@
 
     <hr class="hr-joy">
 
-    <h2 class="sarlavha">Yuklangan topshiriqlar to'plami</h2>
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0;">Yuklangan topshiriqlar to'plami</h2>
+        <!-- QIDIRUV FORMASI -->
+        <form class="search-form" onsubmit="event.preventDefault()">
+            <input type="text" class="search-input" placeholder="Topshiriq nomi bo'yicha..." id="assignment-title-search">
+            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
     <div class="jadval-container">
         <table>
             <thead>
@@ -345,14 +294,14 @@
                         <td data-label="No">{{ forloop.counter }}</td>
                         <td data-label="Nomi" style="font-weight: 700; color: #ffffff;">{{ assignment.title }}</td>
                         <td data-label="Guruh">{{ assignment.group.name }}</td>
-                        <td data-label="Yaratilgan sana" style="color: #4facfe; font-family: monospace;">{{ assignment.created_at|date:"H:i | d-m-y" }}</td>
-                        <td data-label="Muddati" style="color: #ff808b; font-family: monospace; font-weight: 600;">{{ assignment.deadline|date:"H:i | d-m-Y" }}</td>
+                        <td data-label="Yaratilgan sana" style="color: #4facfe; font-family: monospace;">{{ assignment.created_at|date:"d.m.Y H:i" }}</td>
+                        <td data-label="Muddati" style="color: #ff808b; font-family: monospace; font-weight: 600;">{{ assignment.deadline|date:"d.m.Y H:i" }}</td>
                         <td data-label="Maksimal ball" style="font-weight: 700; color: #00ffaa;">{{ assignment.max_score }}</td>
                         <td data-label="Fayl" style="text-align: center;">
                             {% if assignment.file %}
                                 <a href="{{ assignment.file.url }}" target="_blank" class="btn-otish"><i class="fas fa-file-download" style="margin-right: 6px;"></i>Ko'rish</a>
                             {% else %}
-                                <span style="color: rgba(255,255,255,0.3); font-style: italic;">Fayl yo‘q</span>
+                                <span style="color: rgba(255,255,255,0.3); font-style: italic;">Fayl yo'q</span>
                             {% endif %}
                         </td>
                         <td data-label="Tahrirlash" style="text-align: center;">
@@ -439,7 +388,7 @@
                 const deadline = button.getAttribute("data-deadline");
                 const score = button.getAttribute("data-max-score");
 
-                editFormEl.action = `/teacher/assignment/${id}/edit/`;
+                editFormEl.action = `/teacher/edit_deadline/${id}/`;
                 inputEditTitle.value = title;
                 inputEditGroup.value = group;
                 inputEditDeadline.value = deadline;
@@ -483,13 +432,6 @@
             updateRowNumbers();
         });
 
-        function closeTopModall() {
-            document.getElementById('modal-backdropp')?.remove();
-            document.getElementById('top-modall')?.remove();
-        }
-
-        window.addEventListener('load', function () {
-            setTimeout(closeTopModall, 5000);
-        });
+    
     </script>
 {% endblock %}

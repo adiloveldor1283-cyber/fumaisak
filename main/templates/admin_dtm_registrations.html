@@ -1,0 +1,226 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %}Ro'yxatdan o'tganlar | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .sarlavha {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #ffffff;
+            border-left: 4px solid #00f2fe;
+            padding-left: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .jadval-container {
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-height: calc(100vh - 240px);
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th {
+            padding: 16px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            position: sticky;
+            top: 0;
+            background: #080d1a;
+            z-index: 2;
+        }
+        td {
+            padding: 14px 18px;
+            font-size: 13.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.8);
+            vertical-align: middle;
+        }
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+            color: #ffffff;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .btn-generate {
+            background: rgba(0, 242, 254, 0.08);
+            border-color: rgba(0, 242, 254, 0.2);
+            color: #00f2fe;
+        }
+        .btn-generate:hover {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border-color: transparent;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+        }
+
+        .btn-download {
+            background: rgba(0, 255, 170, 0.08);
+            border-color: rgba(0, 255, 170, 0.2);
+            color: #00ffaa;
+        }
+        .btn-download:hover {
+            background: linear-gradient(135deg, #00ffaa, #00b3ff);
+            color: #070a12;
+            border-color: transparent;
+            box-shadow: 0 0 10px rgba(0, 255, 170, 0.3);
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr { display: block; }
+            thead { display: none; }
+            tr {
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 16px;
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            }
+            td:last-child { border-bottom: none; }
+            td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: rgba(255, 255, 255, 0.4);
+                font-size: 11px;
+                text-transform: uppercase;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+        <a href="{% url 'admin_dtm_list' %}" class="back-arrow-btn" title="Orqaga">
+            <i class="fas fa-chevron-left" style="font-size: 16px;"></i>
+        </a>
+        <h2 class="sarlavha" style="margin-bottom: 0;">Imtihonga ro'yxatdan o'tgan o'quvchilar: {{ exam.title }}</h2>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.2); color: #00ffaa; padding: 12px 20px; border-radius: 12px; margin-bottom: 20px; font-size: 13.5px;">
+                {{ message|safe }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="jadval-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>F.I.SH (GURUH)</th>
+                    <th>1-BLOK FANI</th>
+                    <th>2-BLOK FANI</th>
+                    <th>MAJBURIY FANLAR</th>
+                    <th>KITOBCHA RAQAMI</th>
+                    <th>SAVOLLAR KITOBCHASI (PDF)</th>
+                    <th>NATIJA HOLATI</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reg in registrations %}
+                    <tr>
+                        <td data-label="№" style="font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
+                        <td data-label="F.I.SH (GURUH)" style="font-weight: 700; color: #ffffff;">
+                            {{ reg.student.get_full_name }}
+                            <div style="font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 500; margin-top: 2px;">
+                                Guruh: {{ reg.student.student_groups.all|join:", " }}
+                            </div>
+                        </td>
+                        <td data-label="1-BLOK FANI" style="color: #00ffaa; font-weight: 700;">{{ reg.block1_subject }}</td>
+                        <td data-label="2-BLOK FANI" style="color: #00f2fe; font-weight: 700;">{{ reg.block2_subject }}</td>
+                        <td data-label="MAJBURIY FANLAR">
+                            {% if reg.take_compulsory %}
+                                <span style="color: #ffd700;"><i class="fas fa-check-circle"></i> Topshiradi</span>
+                            {% else %}
+                                <span style="color: rgba(255,255,255,0.3);"><i class="fas fa-times-circle"></i> Sertifikat bor</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="KITOBCHA RAQAMI" style="font-family: monospace; font-weight: 700; font-size: 14px; color: #ff9f43;">
+                            {{ reg.booklet_number|default:"-" }}
+                        </td>
+                        <td data-label="SAVOLLAR KITOBCHASI (PDF)">
+                            {% if reg.booklet_file %}
+                                <a href="{{ reg.booklet_file.url }}" target="_blank" class="btn-action btn-download"><i class="fas fa-file-pdf"></i> Yuklab olish</a>
+                            {% else %}
+                                <a href="{% url 'admin_dtm_generate_booklet' reg.id %}" class="btn-action btn-generate"><i class="fas fa-cog"></i> Shakllantirish</a>
+                            {% endif %}
+                        </td>
+                        <td data-label="NATIJA HOLATI">
+                            {% if reg.result %}
+                                <span style="color: #00ffaa; font-weight: 700; font-family: monospace; font-size: 14px;">{{ reg.result.total_score }} ball</span>
+                            {% else %}
+                                <span style="color: rgba(255,255,255,0.25); font-style: italic;">Tekshirilmagan</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: rgba(255,255,255,0.3); padding: 40px 20px;">
+                            <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 40px 20px; text-align: center;">
+                                <i class="fas fa-users" style="font-size: 36px; color: rgba(255,255,255,0.2); margin-bottom: 15px; display: inline-block;"></i>
+                                <h4 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Ro'yxatdan o'tganlar topilmadi</h4>
+                                <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin: 0;">Hozircha ushbu imtihonga hech kim ro'yxatdan o'tmagan.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -1,38 +1,181 @@
 {% extends 'baseadmin.html' %}
 {% load static %}
 
-{% block title %}Guruh O'quvchilari{% endblock %}
+{% block title %}Guruh o'quvchilari: {{ group.name }} | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    table.group-table th,
+    table.group-table td {
+        white-space: nowrap;
+    }
+    .btn-export-pdf:hover {
+        background: rgba(255, 79, 79, 0.18) !important;
+        border-color: rgba(255, 79, 79, 0.4) !important;
+    }
+    .btn-export-excel:hover {
+        background: rgba(0, 255, 170, 0.18) !important;
+        border-color: rgba(0, 255, 170, 0.4) !important;
+    }
+    html.light-theme .btn-export-pdf {
+        background: rgba(239, 68, 68, 0.08) !important;
+        border-color: rgba(239, 68, 68, 0.25) !important;
+        color: #ef4444 !important;
+    }
+    html.light-theme .btn-export-pdf:hover {
+        background: #ef4444 !important;
+        color: #ffffff !important;
+    }
+    html.light-theme .btn-export-excel {
+        background: rgba(16, 185, 129, 0.08) !important;
+        border-color: rgba(16, 185, 129, 0.25) !important;
+        color: #10b981 !important;
+    }
+    html.light-theme .btn-export-excel:hover {
+        background: #10b981 !important;
+        color: #ffffff !important;
+    }
+    /* Payment Modal & Light Theme */
+    .payment-modal-close:hover {
+        color: #ef4444 !important;
+    }
+    html.light-theme .payment-modal-card {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
+    }
+    html.light-theme .payment-modal-header {
+        border-bottom-color: #e2e8f0 !important;
+    }
+    html.light-theme .payment-modal-header div:first-child {
+        color: #0f172a !important;
+    }
+    html.light-theme #modalStudentName {
+        color: #0284c7 !important;
+    }
+    html.light-theme #modalStudentNameText {
+        color: #0f172a !important;
+    }
+    html.light-theme .payment-modal-card label {
+        color: #475569 !important;
+    }
+    html.light-theme .payment-modal-card #month {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+        color-scheme: light !important;
+    }
+    html.light-theme .payment-modal-card #month option {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+    }
+    html.light-theme .payment-modal-card #amount_paid {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    html.light-theme .payment-modal-card #discountContainer {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+    }
+    html.light-theme .payment-modal-card #discountReason {
+        color: #475569 !important;
+    }
+    html.light-theme .payment-modal-card #walletPayContainer {
+        background: #f0f9ff !important;
+        border-color: #bae6fd !important;
+    }
+    html.light-theme .payment-modal-card #walletPayContainer label {
+        color: #0f172a !important;
+    }
+    html.light-theme .payment-modal-card #studentBalanceInfo {
+        color: #64748b !important;
+    }
+    html.light-theme .payment-modal-card .btn-modal-cancel {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #334155 !important;
+    }
+    html.light-theme .payment-modal-card .btn-modal-cancel:hover {
+        background: #e2e8f0 !important;
+        color: #0f172a !important;
+    }
+    html.light-theme .payment-modal-close {
+        color: #64748b !important;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <!-- Cyber Payment Modal -->
 <div class="modal-overlay" id="paymentModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 10, 18, 0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2005;">
-    <div class="modal-content" style="background: #0c101d; border: 1px solid rgba(0, 242, 254, 0.2); box-shadow: 0 0 30px rgba(0, 242, 254, 0.15); border-radius: 20px; max-width: 440px; width: 90%; padding: 30px; position: relative; line-height: 1.6;">
-        <span class="close-btn" onclick="closeModal()" style="position: absolute; top: 15px; right: 20px; font-size: 20px; cursor: pointer; color: rgba(255, 255, 255, 0.4); transition: 0.2s;">✖</span>
-        <div class="modal-header" id="modalTitle" style="font-size: 18px; font-weight: 800; color: #ffffff; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 10px;">To‘lov qo‘shish</div>
+    <div class="payment-modal-card" style="background: #0c101d; border: 1px solid rgba(0, 242, 254, 0.25); box-shadow: 0 0 35px rgba(0, 242, 254, 0.15); border-radius: 20px; max-width: 580px; width: 92%; padding: 28px 32px; position: relative; line-height: 1.6; display: flex; flex-direction: column;">
+        <span class="payment-modal-close" onclick="closeModal()" style="position: absolute; top: 18px; right: 22px; font-size: 20px; cursor: pointer; color: rgba(255, 255, 255, 0.4); transition: 0.2s;">✖</span>
+        
+        <div class="payment-modal-header" style="margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 14px;">
+            <div style="font-size: 18px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                <i class="fas fa-wallet" style="color: #00f2fe;"></i> To'lov qabul qilish
+            </div>
+            <div id="modalStudentName" style="font-size: 14px; font-weight: 600; color: #4facfe;">
+                O'quvchi: <span id="modalStudentNameText" style="color: #ffffff; font-weight: 700;"></span>
+            </div>
+        </div>
 
-        <form method="POST" id="paymentForm">
+        <form method="POST" id="paymentForm" style="display: flex; flex-direction: column; width: 100%;">
             {% csrf_token %}
-            <label for="month" style="display: block; font-size: 12px; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px;">To'lov oyi</label>
-            <select name="month" id="month" required style="width: 100%; padding: 12px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; margin-bottom: 20px;">
-                {% for month in months %}
-                <option value="{{ month }}">{{ month }}</option>
-                {% endfor %}
-            </select>
+            <div style="margin-bottom: 18px;">
+                <label for="month" style="display: block; font-size: 12px; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px;">To'lov oyi *</label>
+                <select name="month" id="month" required onchange="fetchStudentDiscount()" style="width: 100%; padding: 12px 14px; font-size: 14px; background: #0c101d; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; color: white; outline: none; color-scheme: dark; cursor: pointer;">
+                    {% for month in months %}
+                    <option value="{{ month }}" style="background-color: #0c101d; color: #ffffff;">{{ month }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-            <label for="amount_paid" style="display: block; font-size: 12px; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px;">To‘lov summasi (so‘m)</label>
-            <input type="number" name="amount_paid" id="amount_paid" placeholder="so'mda kiriting (Masalan: 300000)" required style="width: 100%; padding: 12px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; margin-bottom: 20px;">
+            <!-- Discount Area -->
+            <div id="discountContainer" style="display: none; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px; margin-bottom: 18px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 700; text-transform: uppercase;">Imtiyoz:</span>
+                    <span id="discountBadge" style="padding: 4px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 800; text-transform: uppercase;"></span>
+                </div>
+                <div id="discountReason" style="font-size: 12.5px; color: rgba(255,255,255,0.7); line-height: 1.4;"></div>
+            </div>
+
+            <div style="margin-bottom: 18px;">
+                <label for="amount_paid" style="display: block; font-size: 12px; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px;">To'lov summasi (so'm) *</label>
+                <input type="number" name="amount_paid" id="amount_paid" placeholder="Masalan: 300000" required style="width: 100%; padding: 12px 14px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; color: white; outline: none;">
+            </div>
+
+            <!-- Wallet Pay Container -->
+            <div id="walletPayContainer" style="background: rgba(0, 242, 254, 0.04); border: 1px solid rgba(0, 242, 254, 0.15); border-radius: 12px; padding: 14px; margin-bottom: 22px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: white; font-weight: 700; font-size: 13.5px;">
+                    <input type="checkbox" name="pay_from_balance" value="1" id="pay_from_balance_checkbox" style="width: 16px; height: 16px; accent-color: #00f2fe; cursor: pointer;">
+                    Balansdan to'lash (Hamyon)
+                </label>
+                <div id="studentBalanceInfo" style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 6px; margin-left: 26px;">
+                    Joriy balans: <strong id="studentBalanceSpan" style="color: #00ffaa; font-size: 13px;">0.00</strong> UZS
+                </div>
+            </div>
 
             <div class="modal-buttons" style="display: flex; gap: 12px;">
-                <button type="button" class="btn-modal-cancel" onclick="closeModal()" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ffffff; border-radius: 12px; font-weight: 800; font-size: 13.5px; cursor: pointer; transition: 0.3s;">Bekor qilish</button>
-                <button type="submit" class="btn-modal-submit" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; border: none; border-radius: 12px; font-weight: 800; font-size: 13.5px; cursor: pointer; transition: 0.3s; text-transform: uppercase;">Saqlash</button>
+                <button type="button" class="btn-modal-cancel" onclick="closeModal()" style="flex: 1; padding: 13px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ffffff; border-radius: 12px; font-weight: 800; font-size: 13.5px; cursor: pointer; transition: 0.3s;">Bekor qilish</button>
+                <button type="submit" class="btn-modal-submit" style="flex: 1; padding: 13px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; border: none; border-radius: 12px; font-weight: 800; font-size: 13.5px; cursor: pointer; transition: 0.3s; text-transform: uppercase;">Saqlash</button>
             </div>
         </form>
     </div>
 </div>
 
-<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-    <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Guruh o'quvchilari va to'lovlari ({{ group.name }})</h2>
-    <a href="{% url 'group_payment_list' %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-arrow-left"></i> Orqaga</a>
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="{% url 'group_payment_list' %}" class="back-arrow-btn" title="Orqaga">
+            <i class="fas fa-chevron-left" style="font-size: 16px;"></i>
+        </a>
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Guruh o'quvchilari va to'lovlari ({{ group.name }})</h2>
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="{% url 'students_pdf' %}?group_id={{ group.id }}" target="_blank" class="btn-otish btn-export-pdf" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; background: rgba(255, 79, 79, 0.08); border: 1px solid rgba(255, 79, 79, 0.25); color: #ff6b6b; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 700; transition: 0.3s; text-align: center;"><i class="fas fa-file-pdf"></i> PDF yuklab olish</a>
+        <a href="{% url 'students_excel' %}?group_id={{ group.id }}" class="btn-otish btn-export-excel" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; background: rgba(0, 255, 170, 0.08); border: 1px solid rgba(0, 255, 170, 0.25); color: #00ffaa; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 700; transition: 0.3s; text-align: center;"><i class="fas fa-file-excel"></i> Excel (.xlsx) yuklab olish</a>
+    </div>
 </div>
 
 <div class="search-bar" style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); padding: 16px; border-radius: 16px;">
@@ -48,26 +191,26 @@
 </div>
 
 {% if students %}
-<div class="jadval-container" style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 12px; width: 100%; overflow-x: auto;">
+<div class="jadval-container" style="flex-grow: 1; overflow-y: auto; overflow-x: auto; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
     <table class="group-table" style="width: 100%; border-collapse: collapse; text-align: left;">
         <thead>
-            <tr>
-                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">NO</th>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); background: #080d1a; position: sticky; top: 0; z-index: 10;">
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">№</th>
                 <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FAMILIYASI</th>
                 <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">ISMI</th>
-                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">QO'SHILGAN VAQTI</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">QO'SHILGAN SANA</th>
                 <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">GURUHLARI</th>
-                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FAOLLIGI</th>
-                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">TO'LOVI</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">HOLATI</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">TO'LOV AMALI</th>
             </tr>
         </thead>
         <tbody id="group-body">
             {% for student in students %}
             <tr>
-                <td data-label="NO" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
+                <td data-label="№" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
                 <td data-label="FAMILIYASI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ student.last_name }}</td>
                 <td data-label="ISMI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ student.first_name }}</td>
-                <td data-label="QO'SHILGAN VAQTI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ student.joined_at|date:"d.m.Y H:i" }}</td>
+                <td data-label="QO'SHILGAN SANA" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ student.joined_at|date:"d.m.Y H:i" }}</td>
                 <td data-label="GURUHLARI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
                     {% if student.student_groups.all %}
                         {% for group in student.student_groups.all %}
@@ -77,16 +220,16 @@
                         <span style="color: rgba(255,255,255,0.3)">Yo'q</span>
                     {% endif %}
                 </td>
-                <td data-label="FAOLLIGI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                <td data-label="HOLATI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
                     {% if student.is_active %}
                         <span class="status-badge status-active" data-status="faol" style="padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(0, 255, 170, 0.1); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.2);">Faol</span>
                     {% else %}
                         <span class="status-badge status-blocked" data-status="bloklangan" style="padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(255, 0, 85, 0.1); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.2);">Bloklangan</span>
                     {% endif %}
                 </td>
-                <td data-label="TO'LOVI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
-                    <button class="btn-otish" onclick="openModal('{{ student.id }}', '{{ student.get_full_name }}')" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">
-                        To‘lov qo‘shish
+                <td data-label="TO'LOV AMALI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                    <button class="btn-otish" onclick="openModal('{{ student.id }}', '{{ student.get_full_name }}', '{{ student.balance }}')" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">
+                        To'lov qo'shish
                     </button>
                 </td>
             </tr>
@@ -95,7 +238,12 @@
     </table>
 </div>
 {% else %}
-    <p style="color: rgba(255,255,255,0.4); font-style: italic; padding: 10px;">Guruhda hech qanday o'quvchi mavjud emas.</p>
+<div style="text-align: center; padding: 50px 30px; background: rgba(255, 255, 255, 0.01); border: 1px dashed rgba(255, 255, 255, 0.08); border-radius: 20px; width: 100%; max-width: 500px; margin: 50px auto 0 auto;">
+    <i class="fas fa-user-graduate" style="font-size: 44px; color: rgba(0, 242, 254, 0.2); margin-bottom: 16px;"></i>
+    <h3 style="font-size: 17px; font-weight: 800; color: #ffffff; margin-bottom: 6px;">Ushbu guruhda o'quvchilar mavjud emas</h3>
+    <p style="color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 16px;">Guruhga o'quvchilarni biriktirish uchun guruhni tahrirlash sahifasiga o'ting.</p>
+    <a href="{% url 'edit_group_admin' group.id %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; font-weight: 800; border-radius: 8px; text-decoration: none; font-size: 13px;"><i class="fas fa-user-plus"></i> O'quvchi biriktirish</a>
+</div>
 {% endif %}
 {% endblock %}
 
@@ -126,10 +274,59 @@
     if (statusFilter) statusFilter.addEventListener('change', applyFilters);
 
     // Modal triggers
-    function openModal(studentId, studentName) {
-        document.getElementById("modalTitle").innerText = "O'quvchi: " + studentName;
+    let currentStudentIdForDiscount = null;
+
+    function openModal(studentId, studentName, studentBalance) {
+        currentStudentIdForDiscount = studentId;
+        const nameEl = document.getElementById("modalStudentNameText");
+        if (nameEl) nameEl.innerText = studentName;
+        document.getElementById("studentBalanceSpan").innerText = parseFloat(studentBalance).toLocaleString('uz-UZ') || '0';
         document.getElementById("paymentForm").action = "{% url 'student_payment' group.id 0 %}".replace("/0/", "/" + studentId + "/");
         document.getElementById("paymentModal").style.display = "flex";
+        document.getElementById("pay_from_balance_checkbox").checked = false;
+        fetchStudentDiscount();
+    }
+
+    function fetchStudentDiscount() {
+        const month = document.getElementById("month").value;
+        const discountContainer = document.getElementById("discountContainer");
+        const discountBadge = document.getElementById("discountBadge");
+        const discountReason = document.getElementById("discountReason");
+        const amountField = document.getElementById("amount_paid");
+
+        if (!currentStudentIdForDiscount) return;
+
+        discountContainer.style.display = "block";
+        discountBadge.innerText = "Yuklanmoqda...";
+        discountBadge.style.color = "#ffffff";
+        discountBadge.style.background = "rgba(255,255,255,0.05)";
+        discountBadge.style.border = "1px solid rgba(255,255,255,0.1)";
+
+        fetch(`/adminpanel/api/get-discount/{{ group.id }}/${currentStudentIdForDiscount}/${month}/`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.discount_percent > 0) {
+                    discountContainer.style.display = "block";
+                    discountBadge.innerText = `${data.badge_name} (${data.discount_percent}% chegirma)`;
+                    discountBadge.style.background = `${data.badge_color}1a`; // 10% opacity
+                    discountBadge.style.color = data.badge_color;
+                    discountBadge.style.border = `1px solid ${data.badge_color}`;
+                    discountReason.innerText = data.reason;
+                    amountField.value = data.final_amount;
+                } else {
+                    discountContainer.style.display = "block";
+                    discountBadge.innerText = "Imtiyoz yo'q";
+                    discountBadge.style.background = "rgba(255,255,255,0.05)";
+                    discountBadge.style.color = "rgba(255,255,255,0.4)";
+                    discountBadge.style.border = "1px solid rgba(255,255,255,0.1)";
+                    discountReason.innerText = data.reason;
+                    amountField.value = data.final_amount;
+                }
+            })
+            .catch(err => {
+                console.error("Discount loading error:", err);
+                discountContainer.style.display = "none";
+            });
     }
     function closeModal() {
         document.getElementById("paymentModal").style.display = "none";
@@ -140,5 +337,12 @@
             closeModal();
         }
     }
+
+    // Qarzdorlar sahifasidan kelganda to'lov modal oynasini avtomatik ochish
+    {% if student %}
+    window.addEventListener('load', function() {
+        openModal('{{ student.id }}', '{{ student.get_full_name|escapejs }}', '{{ student.balance }}');
+    });
+    {% endif %}
 </script>
 {% endblock %}

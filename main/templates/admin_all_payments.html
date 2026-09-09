@@ -1,0 +1,163 @@
+{% extends 'baseadmin.html' %}
+{% load static %}
+
+{% block title %}Barcha to'lovlar va cheklar | VLE Tizimi{% endblock %}
+
+
+
+{% block extra_css %}
+<style>
+    .konteyner {
+        overflow-y: auto !important;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sarlavha-qatori {
+        flex-shrink: 0;
+    }
+
+    .jadval-container {
+        width: 100%;
+        overflow-x: auto !important;
+        overflow-y: auto !important;
+        max-height: calc(100vh - 260px);
+        min-height: 300px;
+    }
+
+    table {
+        width: max-content !important;
+        min-width: 100% !important;
+        white-space: nowrap;
+    }
+
+    /* Paginator Styling */
+    .sahifalash {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+        padding-bottom: 20px;
+    }
+    .sahifalash a, .sahifalash span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 38px;
+        padding: 0 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        font-size: 13.5px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+    .sahifalash a:hover {
+        background: rgba(0, 242, 254, 0.08);
+        border-color: rgba(0, 242, 254, 0.3);
+        color: #00f2fe;
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+    }
+    .sahifalash .faol {
+        background: rgba(0, 242, 254, 0.12);
+        border-color: #00f2fe;
+        color: #00f2fe;
+        text-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
+    }
+    .sahifalash .disabled {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0;">Barcha to'lovlar va cheklar</h2>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <!-- JADVAL QIDIRUV FORMASI -->
+        <form class="search-form" method="GET" action="{% url 'student_list' %}" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px;">
+            <input type="text" name="query" value="{{ query|default:'' }}" class="search-input" placeholder="O'quvchi yoki guruhni qidirish..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        </form>
+        <a href="{% url 'export_payments_csv' %}{% if query %}?query={{ query }}{% endif %}" style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #00f2fe; padding: 10px 18px; border-radius: 12px; font-weight: 700; font-size: 13.5px; text-decoration: none; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.05); cursor: pointer;" onmouseover="this.style.background='rgba(0, 242, 254, 0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.03)';">
+            <i class="fas fa-file-excel"></i> Excel (.csv) yuklab olish
+        </a>
+    </div>
+</div>
+
+{% if payments %}
+<div class="jadval-container" style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 12px; width: 100%; overflow-x: auto;">
+    <table class="group-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">№</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">O'QUVCHI</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">GURUH</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">OY</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">TO'LANGAN SUMMA</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">TO'LANGAN VAQTI</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">KVITANSIYA / CHEK</th>
+            </tr>
+        </thead>
+        <tbody id="payment-body">
+            {% for payment in payments %}
+            <tr>
+                <td data-label="№" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #4facfe;">{{ forloop.counter0|add:payments.start_index }}</td>
+                <td data-label="O'quvchi" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ payment.student.first_name }} {{ payment.student.last_name }}</td>
+                <td data-label="Guruh" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: rgba(255,255,255,0.7);">{{ payment.group.name }}</td>
+                <td data-label="Oy" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #00f2fe; font-weight: 600;">{{ payment.month }}</td>
+                <td data-label="To'langan summa" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #00ffaa; font-weight: 700;">{{ payment.amount_paid }} so'm</td>
+                <td data-label="To'langan vaqti" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ payment.paid_at|date:"d.m.Y H:i" }}</td>
+                <td data-label="Kvitansiya" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><a href="{% url 'payment_receipt' payment.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-file-pdf"></i> Chek yuklab olish</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- PAGINATION CONTROLS -->
+{% if payments.has_other_pages %}
+<div class="sahifalash">
+    {% if payments.has_previous %}
+        <a href="?page=1{% if query %}&query={{ query }}{% endif %}"><i class="fas fa-angle-double-left"></i></a>
+        <a href="?page={{ payments.previous_page_number }}{% if query %}&query={{ query }}{% endif %}"><i class="fas fa-angle-left"></i></a>
+    {% else %}
+        <span class="disabled"><i class="fas fa-angle-double-left"></i></span>
+        <span class="disabled"><i class="fas fa-angle-left"></i></span>
+    {% endif %}
+
+    {% for num in payments.paginator.page_range %}
+        {% if payments.number == num %}
+            <span class="faol">{{ num }}</span>
+        {% elif num > payments.number|add:'-3' and num < payments.number|add:'3' %}
+            <a href="?page={{ num }}{% if query %}&query={{ query }}{% endif %}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if payments.has_next %}
+        <a href="?page={{ payments.next_page_number }}{% if query %}&query={{ query }}{% endif %}"><i class="fas fa-angle-right"></i></a>
+        <a href="?page={{ payments.paginator.num_pages }}{% if query %}&query={{ query }}{% endif %}"><i class="fas fa-angle-double-right"></i></a>
+    {% else %}
+        <span class="disabled"><i class="fas fa-angle-right"></i></span>
+        <span class="disabled"><i class="fas fa-angle-double-right"></i></span>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 40px 20px; text-align: center; margin-top: 20px;">
+    <i class="fas fa-receipt" style="font-size: 40px; color: rgba(255, 255, 255, 0.2); margin-bottom: 15px; display: block;"></i>
+    <h4 style="color: rgba(255, 255, 255, 0.8); font-size: 16px; margin-bottom: 8px;">To'lovlar tarixi mavjud emas</h4>
+    <p style="color: rgba(255, 255, 255, 0.4); font-size: 13.5px; margin: 0;">Tizimda hozircha hech qanday to'lov qayd etilmagan.</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

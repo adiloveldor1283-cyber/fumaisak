@@ -1,34 +1,212 @@
 {% extends 'baseadmin.html' %}
 {% load static %}
 
-{% block title %}O'qituvchilar ro'yhati{% endblock %}
+{% block title %}O'qituvchilar ro'yxati | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .konteyner {
+        overflow-y: auto !important;
+        display: flex;
+        flex-direction: column;
+    }
+
+    form[method="POST"] {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .sarlavha-qatori, .actions-card {
+        flex-shrink: 0;
+    }
+
+    .jadval-container {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: auto !important;
+        max-height: calc(100vh - 300px);
+        min-height: 300px;
+    }
+
+    table {
+        width: 100% !important;
+        min-width: 100% !important;
+        border-collapse: collapse;
+    }
+    .stats-grid {
+        flex-shrink: 0;
+        margin-top: auto !important;
+    }
+
+    /* Export buttons & format cards */
+    .btn-export-pdf:hover {
+        background: rgba(255, 79, 79, 0.18) !important;
+        border-color: rgba(255, 79, 79, 0.4) !important;
+    }
+    .btn-export-excel:hover {
+        background: rgba(0, 255, 170, 0.18) !important;
+        border-color: rgba(0, 255, 170, 0.4) !important;
+    }
+    .format-card.active-format {
+        border-color: #00f2fe !important;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.15) !important;
+    }
+
+    /* Export Modal & Select Dark/Light Themes */
+    #export_subject_id {
+        background: #0c101d !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        color-scheme: dark !important;
+    }
+    #export_subject_id option {
+        background-color: #0c101d !important;
+        color: #ffffff !important;
+    }
+
+    html.light-theme .pdf-modal {
+        background: rgba(15, 23, 42, 0.6) !important;
+    }
+    html.light-theme .pdf-modal-content {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
+    }
+    html.light-theme #exportModalTitle {
+        color: #0f172a !important;
+        border-bottom-color: #e2e8f0 !important;
+    }
+    html.light-theme .pdf-close-btn {
+        color: #64748b !important;
+    }
+    html.light-theme .pdf-close-btn:hover {
+        color: #ef4444 !important;
+    }
+    html.light-theme #exportModal label {
+        color: #475569 !important;
+    }
+    html.light-theme .format-card {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+    }
+    html.light-theme .format-card.active-format {
+        border-color: #0284c7 !important;
+        background: #f0f9ff !important;
+    }
+    html.light-theme .format-card div div:first-child {
+        color: #0f172a !important;
+    }
+    html.light-theme .format-card div div:last-child {
+        color: #64748b !important;
+    }
+    html.light-theme #export_subject_id {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+        color-scheme: light !important;
+    }
+    html.light-theme #export_subject_id option {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+    }
+    html.light-theme .btn-export-pdf {
+        background: rgba(239, 68, 68, 0.08) !important;
+        border-color: rgba(239, 68, 68, 0.25) !important;
+        color: #ef4444 !important;
+    }
+    html.light-theme .btn-export-pdf:hover {
+        background: #ef4444 !important;
+        color: #ffffff !important;
+    }
+    html.light-theme .btn-export-excel {
+        background: rgba(16, 185, 129, 0.08) !important;
+        border-color: rgba(16, 185, 129, 0.25) !important;
+        color: #10b981 !important;
+    }
+    html.light-theme .btn-export-excel:hover {
+        background: #10b981 !important;
+        color: #ffffff !important;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
+<!-- EKSPORT MODAL OYNASI (PDF / EXCEL) -->
+<div id="exportModal" class="pdf-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 10, 18, 0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2005;">
+    <div class="pdf-modal-content" style="background: #0c101d; border: 1px solid rgba(0, 242, 254, 0.2); box-shadow: 0 0 30px rgba(0, 242, 254, 0.15); border-radius: 20px; max-width: 480px; width: 92%; padding: 28px; position: relative; line-height: 1.6;">
+        <span class="pdf-close-btn" id="closeExportModal" style="position: absolute; top: 16px; right: 20px; font-size: 20px; cursor: pointer; color: rgba(255, 255, 255, 0.4); transition: 0.2s;">✖</span>
+        <h3 id="exportModalTitle" style="font-size: 18px; font-weight: 800; color: #ffffff; margin-bottom: 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-file-export" style="color: #00f2fe;"></i> O'qituvchilar ro'yxatini yuklab olish
+        </h3>
+        <form id="exportForm" method="GET" action="{% url 'teachers_pdf' %}">
+            <div style="margin-bottom: 18px;">
+                <label for="export_subject_id" style="display: block; font-size: 12px; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px;">Fan / Mutaxassislikni tanlang:</label>
+                <select name="subject_id" id="export_subject_id" required style="width: 100%; padding: 12px 14px; font-size: 14px; background: #0c101d; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; color: #ffffff; outline: none; color-scheme: dark; cursor: pointer;">
+                    <option value="all" style="background-color: #0c101d; color: #ffffff;">Barcha o'qituvchilar (Barcha fanlar)</option>
+                    {% for subject in subjects %}
+                        <option value="{{ subject.id }}" style="background-color: #0c101d; color: #ffffff;">{{ subject.name }} fani</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="margin-bottom: 22px;">
+                <label style="display: block; font-size: 12px; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px;">Fayl formatini tanlang:</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <label class="format-card" id="formatCardPdf" style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.06); border-radius: 12px; cursor: pointer; transition: 0.3s;">
+                        <input type="radio" name="export_format" value="pdf" id="formatRadioPdf" checked style="accent-color: #ef4444;" onchange="handleFormatChange('pdf')">
+                        <div>
+                            <div style="font-weight: 800; font-size: 13px; color: #ffffff;"><i class="fas fa-file-pdf" style="color: #ef4444; margin-right: 4px;"></i> PDF</div>
+                            <div style="font-size: 11px; color: rgba(255, 255, 255, 0.5);">Rasmiy qaydnoma</div>
+                        </div>
+                    </label>
+
+                    <label class="format-card" id="formatCardExcel" style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.06); border-radius: 12px; cursor: pointer; transition: 0.3s;">
+                        <input type="radio" name="export_format" value="excel" id="formatRadioExcel" style="accent-color: #10b981;" onchange="handleFormatChange('excel')">
+                        <div>
+                            <div style="font-weight: 800; font-size: 13px; color: #ffffff;"><i class="fas fa-file-excel" style="color: #10b981; margin-right: 4px;"></i> Excel</div>
+                            <div style="font-size: 11px; color: rgba(255, 255, 255, 0.5);">.xlsx elektron jadval</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" id="btnExportSubmit" class="btn-pdf-submit" style="width: 100%; padding: 13px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; border: none; border-radius: 12px; font-weight: 800; font-size: 13.5px; cursor: pointer; transition: 0.3s; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <i class="fas fa-download"></i> Yuklab olish
+            </button>
+        </form>
+    </div>
+</div>
+
 <form method="POST">
     {% csrf_token %}
     <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px;">O'qituvchilar ro'yhati</h2>
-        <a href="{% url 'add_teacher' %}" class="btn-otish" style="display: inline-block; padding: 10px 20px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; border: none; font-weight: 800; text-decoration: none; border-radius: 10px; font-size: 13px; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-plus" style="margin-right: 6px;"></i> O'qituvchi qo'shish</a>
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px;">O'qituvchilar ro'yxati</h2>
+        <div class="action-buttons-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button type="button" id="openPdfModal" class="btn-otish btn-export-pdf" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; background: rgba(255, 79, 79, 0.08); border: 1px solid rgba(255, 79, 79, 0.25); color: #ff6b6b; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 700; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-file-pdf"></i> PDF yuklab olish</button>
+            <button type="button" id="openExcelModal" class="btn-otish btn-export-excel" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; background: rgba(0, 255, 170, 0.08); border: 1px solid rgba(0, 255, 170, 0.25); color: #00ffaa; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 700; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-file-excel"></i> Excel (.xlsx) yuklab olish</button>
+            <a href="{% url 'add_teacher' %}" class="btn-otish" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; border: none; font-weight: 800; text-decoration: none; border-radius: 10px; font-size: 13px; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-user-plus"></i> Yangi o'qituvchi qo'shish</a>
+        </div>
     </div>
 
     <div class="actions-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
         <div class="search-bar" style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
-            <input type="text" class="search-input" id="search-lastname" placeholder="Familiya bo'yicha qidirish..." style="flex: 1; min-width: 200px; padding: 12px 18px; font-size: 14px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; background: rgba(255, 255, 255, 0.01); color: #ffffff; outline: none; transition: 0.3s;">
+            <input type="text" class="search-input" id="search-lastname" placeholder="Familiya, ism yoki fan bo'yicha qidirish..." style="flex: 1; min-width: 200px; padding: 12px 18px; font-size: 14px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; background: rgba(255, 255, 255, 0.01); color: #ffffff; outline: none; transition: 0.3s;">
         </div>
 
         <div class="actions" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; font-size: 13.5px;">
-            <label for="action" style="font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Tanlash:</label>
+            <label for="action" style="font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Amal:</label>
             <select id="action" name="action" style="padding: 10px 16px; font-size: 13.5px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; background: #0c101d; color: #ffffff; outline: none; cursor: pointer; transition: 0.3s;">
                 <option value="">---------</option>
-                <option value="delete">Tanlanganni o'chirish</option>
+                <option value="delete">Tanlanganlarni o'chirish</option>
             </select>
             <button type="submit" class="btn-action-submit" style="padding: 10px 20px; background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.3); color: #ff0055; font-weight: 800; border-radius: 10px; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;">Bajarish</button>
             <span id="selected-count" class="selected-badge" style="background: rgba(0, 242, 254, 0.1); color: #00f2fe; padding: 6px 12px; border-radius: 8px; font-weight: 700; border: 1px solid rgba(0, 242, 254, 0.2);">0 ta tanlandi</span>
 
             <div class="filter-bar" style="display: flex; align-items: center; gap: 10px; margin-left: auto;">
-                <label for="status-filter" style="font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Faollik:</label>
+                <label for="status-filter" style="font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Holati:</label>
                 <select id="status-filter" style="padding: 10px 16px; font-size: 13.5px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; background: #0c101d; color: #ffffff; outline: none; cursor: pointer; transition: 0.3s;">
-                    <option value="">Hammasi</option>
+                    <option value="">Barchasi</option>
                     <option value="faol">Faol</option>
                     <option value="bloklangan">Bloklangan</option>
                 </select>
@@ -37,47 +215,69 @@
     </div>
 
     {% if teachers %}
-    <div class="jadval-container" style="border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 12px; width: 100%; overflow-x: auto;">
+    <div class="jadval-container" style="flex-grow: 1; overflow-y: auto; overflow-x: auto; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
         <table class="group-table" style="width: 100%; border-collapse: collapse; text-align: left;">
             <thead>
-                <tr>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;"><input type="checkbox" id="check-all" style="accent-color: #00f2fe; width: 16px; height: 16px; cursor: pointer;"></th>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">USERNAME</th>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FAMILIYASI</th>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">ISMI</th>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">HOLATI</th>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">QO'SHILGAN VAQTI</th>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">GURUHLARI</th>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FAOLLIGI</th>
-                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">O'TISH</th>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); background: #080d1a; position: sticky; top: 0; z-index: 10;">
+                    <th style="padding: 14px 10px; width: 40px; text-align: center; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;"><input type="checkbox" id="check-all" style="accent-color: #00f2fe; width: 16px; height: 16px; cursor: pointer;"></th>
+                    <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a; white-space: nowrap;">LOGINI</th>
+                    <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FAMILIYASI</th>
+                    <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">ISMI</th>
+                    <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a; white-space: nowrap;">QO'SHILGAN VAQTI</th>
+                    <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FANLARI</th>
+                    <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">GURUHLARI</th>
+                    <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a; text-align: center; white-space: nowrap;">HOLATI</th>
+                    <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a; text-align: center; white-space: nowrap;">TELEGRAM</th>
+                    <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a; text-align: center; white-space: nowrap;">AMALLAR</th>
                 </tr>
             </thead>
             <tbody id="group-body">
                 {% for teacher in teachers %}
                 <tr>
-                    <td style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><input type="checkbox" class="row-check" name="selected_users" value="{{ teacher.id }}" style="accent-color: #00f2fe; width: 16px; height: 16px; cursor: pointer;"></td>
-                    <td data-label="USERNAME" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: #4facfe;">{{ teacher.username }}</td>
-                    <td data-label="FAMILIYASI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ teacher.last_name }}</td>
-                    <td data-label="ISMI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ teacher.first_name }}</td>
-                    <td data-label="HOLATI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 600;">{{ teacher.get_role_display }}</td>
-                    <td data-label="QO'SHILGAN VAQTI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ teacher.joined_at|date:"d.m.Y H:i" }}</td>
-                    <td data-label="GURUHLARI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
-                        {% if teacher.teachers_groups.all %}
-                            {% for group in teacher.teachers_groups.all %}
-                                <span style="background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; font-size: 12px; margin-right: 4px;">{{ group.name }}</span>
-                            {% endfor %}
-                        {% else %}
-                            <span style="color: rgba(255,255,255,0.3)">Yo‘q</span>
-                        {% endif %}
+                    <td style="padding: 12px 10px; width: 40px; text-align: center; font-size: 13px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><input type="checkbox" class="row-check" name="selected_users" value="{{ teacher.id }}" style="accent-color: #00f2fe; width: 16px; height: 16px; cursor: pointer;"></td>
+                    <td data-label="LOGINI" style="padding: 12px 10px; font-size: 13px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: #4facfe; white-space: nowrap;">{{ teacher.username }}</td>
+                    <td data-label="FAMILIYASI" style="padding: 12px 10px; font-size: 13.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ teacher.last_name }}</td>
+                    <td data-label="ISMI" style="padding: 12px 10px; font-size: 13.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ teacher.first_name }}</td>
+                    <td data-label="QO'SHILGAN VAQTI" style="padding: 12px 10px; font-size: 12.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6); white-space: nowrap;">{{ teacher.joined_at|date:"d.m.Y H:i" }}</td>
+                    <td data-label="FANLARI" style="padding: 12px 10px; font-size: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                            {% if teacher.subjects.all %}
+                                {% for subject in teacher.subjects.all %}
+                                    <span style="background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; padding: 3px 7px; border-radius: 6px; font-size: 11.5px; font-weight: 600;">{{ subject.name }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span style="color: rgba(255,255,255,0.3); font-size: 12px;">Yo'q</span>
+                            {% endif %}
+                        </div>
                     </td>
-                    <td data-label="FAOLLIGI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                    <td data-label="GURUHLARI" style="padding: 12px 10px; font-size: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                            {% if teacher.teachers_groups.all %}
+                                {% for group in teacher.teachers_groups.all %}
+                                    <span style="background: rgba(255,255,255,0.05); padding: 3px 7px; border-radius: 6px; font-size: 11.5px;">{{ group.name }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span style="color: rgba(255,255,255,0.3); font-size: 12px;">Yo'q</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td data-label="HOLATI" style="padding: 12px 10px; font-size: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); text-align: center; white-space: nowrap;">
                         {% if teacher.is_active %}
-                            <span class="status-badge status-active" data-status="faol" style="padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(0, 255, 170, 0.1); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.2);">Faol</span>
+                            <span class="status-badge status-active" data-status="faol" style="padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(0, 255, 170, 0.1); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.2);">Faol</span>
                         {% else %}
-                            <span class="status-badge status-blocked" data-status="bloklangan" style="padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(255, 0, 85, 0.1); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.2);">Bloklangan</span>
+                            <span class="status-badge status-blocked" data-status="bloklangan" style="padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(255, 0, 85, 0.1); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.2);">Bloklangan</span>
                         {% endif %}
                     </td>
-                    <td data-label="O'TISH" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><a href="{% url 'edit_teacher' teacher.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">Tahrirlash</a></td>
+                    <td data-label="TELEGRAM" style="padding: 12px 10px; font-size: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); text-align: center; white-space: nowrap;">
+                        {% if teacher.telegram_chat_id %}
+                            <span style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;">
+                                <i class="fab fa-telegram-plane"></i> Bog'langan
+                            </span>
+                        {% else %}
+                            <span style="color: rgba(255,255,255,0.25); font-size: 12px; font-weight: 500;">Bog'lanmagan</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="AMALLAR" style="padding: 12px 10px; font-size: 13px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); text-align: center; white-space: nowrap;"><a href="{% url 'edit_teacher' teacher.id %}" class="btn-otish" style="display: inline-block; padding: 6px 14px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 12px; font-weight: 700; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-edit" style="margin-right: 4px;"></i> Tahrirlash</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -85,32 +285,93 @@
     </div>
 
     <!-- Statistics Grid -->
-    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 25px;">
+    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; padding-top: 25px;">
         <div class="stats-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 16px; padding: 20px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: center;">
-            <i class="fas fa-users" style="font-size: 24px; margin-bottom: 10px; color: #4facfe;"></i>
-            <h4 style="font-size: 12px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 5px; letter-spacing: 0.5px;">Jami O'qituvchilar</h4>
+            <i class="fas fa-chalkboard-teacher" style="font-size: 24px; margin-bottom: 10px; color: #4facfe;"></i>
+            <h4 style="font-size: 12px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 5px; letter-spacing: 0.5px;">Jami o'qituvchilar</h4>
             <p style="font-size: 22px; font-weight: 800; color: #ffffff;">{{ total_teachers }} ta</p>
         </div>
         <div class="stats-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 16px; padding: 20px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: center;">
             <i class="fas fa-user-check" style="font-size: 24px; margin-bottom: 10px; color: #00ffaa;"></i>
-            <h4 style="font-size: 12px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 5px; letter-spacing: 0.5px;">Faol O'qituvchilar</h4>
+            <h4 style="font-size: 12px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 5px; letter-spacing: 0.5px;">Faol o'qituvchilar</h4>
             <p style="font-size: 22px; font-weight: 800; color: #00ffaa;">{{ active_teachers }} ta</p>
         </div>
         <div class="stats-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 16px; padding: 20px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: center;">
             <i class="fas fa-user-slash" style="font-size: 24px; margin-bottom: 10px; color: #ff0055;"></i>
-            <h4 style="font-size: 12px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 5px; letter-spacing: 0.5px;">Bloklanganlar</h4>
+            <h4 style="font-size: 12px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 5px; letter-spacing: 0.5px;">Bloklangan o'qituvchilar</h4>
             <p style="font-size: 22px; font-weight: 800; color: #ff0055;">{{ inactive_teachers }} ta</p>
         </div>
     </div>
 
     {% else %}
-        <p style="color: rgba(255,255,255,0.4); font-style: italic; padding: 10px;">Hech qanday o‘qituvchi topilmadi.</p>
+    <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 40px 20px; text-align: center; margin-top: 20px;">
+        <i class="fas fa-chalkboard-teacher" style="font-size: 36px; color: rgba(255, 255, 255, 0.2); margin-bottom: 15px; display: block;"></i>
+        <h4 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">O'qituvchilar topilmadi</h4>
+        <p style="color: rgba(255, 255, 255, 0.4); font-size: 13px; margin: 0;">Tizimda hozircha birorta ham o'qituvchi mavjud emas.</p>
+    </div>
     {% endif %}
 </form>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+    // Export Modal Logic (PDF / Excel)
+    const exportModal = document.getElementById("exportModal");
+    const openPdfBtn = document.getElementById("openPdfModal");
+    const openExcelBtn = document.getElementById("openExcelModal");
+    const closeExportBtn = document.getElementById("closeExportModal");
+    const exportForm = document.getElementById("exportForm");
+    const formatRadioPdf = document.getElementById("formatRadioPdf");
+    const formatRadioExcel = document.getElementById("formatRadioExcel");
+    const formatCardPdf = document.getElementById("formatCardPdf");
+    const formatCardExcel = document.getElementById("formatCardExcel");
+
+    function handleFormatChange(format) {
+        if (format === 'pdf') {
+            if (formatRadioPdf) formatRadioPdf.checked = true;
+            if (exportForm) {
+                exportForm.action = "{% url 'teachers_pdf' %}";
+                exportForm.target = "_blank";
+            }
+            if (formatCardPdf) formatCardPdf.classList.add('active-format');
+            if (formatCardExcel) formatCardExcel.classList.remove('active-format');
+        } else {
+            if (formatRadioExcel) formatRadioExcel.checked = true;
+            if (exportForm) {
+                exportForm.action = "{% url 'teachers_excel' %}";
+                exportForm.removeAttribute('target');
+            }
+            if (formatCardExcel) formatCardExcel.classList.add('active-format');
+            if (formatCardPdf) formatCardPdf.classList.remove('active-format');
+        }
+    }
+
+    if (openPdfBtn) {
+        openPdfBtn.addEventListener("click", () => {
+            handleFormatChange('pdf');
+            if (exportModal) exportModal.style.display = "flex";
+        });
+    }
+
+    if (openExcelBtn) {
+        openExcelBtn.addEventListener("click", () => {
+            handleFormatChange('excel');
+            if (exportModal) exportModal.style.display = "flex";
+        });
+    }
+
+    if (closeExportBtn) {
+        closeExportBtn.addEventListener("click", () => {
+            if (exportModal) exportModal.style.display = "none";
+        });
+    }
+
+    window.addEventListener("click", (e) => {
+        if (e.target === exportModal) {
+            exportModal.style.display = "none";
+        }
+    });
+
     // Bulk action selection logic
     const searchInput = document.querySelector('.search-input');
     const statusFilter = document.getElementById('status-filter');
@@ -144,11 +405,22 @@
         const selectedStatus = statusFilter.value;
 
         rows.forEach(row => {
-            const lastName = row.children[2].textContent.toLowerCase(); // Familiya column
+            const username = row.children[1] ? row.children[1].textContent.toLowerCase() : '';
+            const lastName = row.children[2] ? row.children[2].textContent.toLowerCase() : '';
+            const firstName = row.children[3] ? row.children[3].textContent.toLowerCase() : '';
+            const subjects = row.children[5] ? row.children[5].textContent.toLowerCase() : '';
+            const groups = row.children[6] ? row.children[6].textContent.toLowerCase() : '';
+
             const statusSpan = row.querySelector('.status-badge');
             const status = statusSpan ? statusSpan.getAttribute('data-status') : '';
 
-            const matchesQuery = lastName.includes(query);
+            const matchesQuery = !query || 
+                lastName.includes(query) || 
+                firstName.includes(query) || 
+                username.includes(query) || 
+                subjects.includes(query) || 
+                groups.includes(query);
+
             const matchesStatus = !selectedStatus || status === selectedStatus;
 
             row.style.display = (matchesQuery && matchesStatus) ? '' : 'none';
@@ -160,3 +432,4 @@
     if (statusFilter) statusFilter.addEventListener('change', applyFilters);
 </script>
 {% endblock %}
+

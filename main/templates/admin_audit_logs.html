@@ -1,0 +1,146 @@
+{% extends "baseadmin.html" %}
+
+{% block title %}Audit jurnali | VLE Tizimi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .konteyner {
+        overflow-y: auto !important;
+        display: flex;
+        flex-direction: column;
+    }
+    .jadval-container {
+        width: 100%;
+        overflow-x: auto !important;
+        overflow-y: auto !important;
+        max-height: calc(100vh - 280px);
+    }
+    table {
+        width: max-content !important;
+        min-width: 100% !important;
+        white-space: nowrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="padding: 10px; display: flex; flex-direction: column; width: 100%;">
+    
+    <!-- Header -->
+    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <div>
+            <h2 class="sarlavha" style="font-size: 24px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 4px; line-height: 1;">Tizim amallari jurnali</h2>
+            <p style="color: rgba(255,255,255,0.5); font-size: 13.5px; font-weight: 500; margin-bottom: 0; padding-left: 16px;">Adminlar va xodimlar tomonidan amalga oshirilgan tizim amallarining audit jurnali</p>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <!-- QIDIRUV FORMASI -->
+            <form class="search-form" method="GET" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
+                <input type="hidden" name="role" value="{{ selected_role }}">
+                <input type="text" class="search-input" name="query" value="{{ query }}" placeholder="Qidirish..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
+                <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+            </form>
+
+            {% if query or selected_role != 'all' %}
+                <a href="{% url 'admin_audit_logs' %}" style="display: inline-block; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #00f2fe; text-decoration: none; font-size: 13px; font-weight: 600; text-align: center; transition: 0.2s;" onmouseover="this.style.background='rgba(0, 242, 254, 0.1)'; this.style.borderColor='rgba(0, 242, 254, 0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.08)';">Filtrni tozalash</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Role Filter Tabs -->
+    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; flex-shrink: 0;">
+        <a href="?role=all{% if query %}&query={{ query }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-decoration: none; border: 1px solid {% if selected_role == 'all' or not selected_role %}#00f2fe; background: rgba(0, 242, 254, 0.1); color: #00f2fe;{% else %}rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.6);{% endif %} transition: 0.2s;">
+            Barchasi
+        </a>
+        <a href="?role=admin{% if query %}&query={{ query }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-decoration: none; border: 1px solid {% if selected_role == 'admin' %}#00f2fe; background: rgba(0, 242, 254, 0.1); color: #00f2fe;{% else %}rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.6);{% endif %} transition: 0.2s;">
+            Adminlar
+        </a>
+        <a href="?role=subadmin{% if query %}&query={{ query }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-decoration: none; border: 1px solid {% if selected_role == 'subadmin' %}#00f2fe; background: rgba(0, 242, 254, 0.1); color: #00f2fe;{% else %}rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.6);{% endif %} transition: 0.2s;">
+            Sub-adminlar (Reception)
+        </a>
+        <a href="?role=teacher{% if query %}&query={{ query }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-decoration: none; border: 1px solid {% if selected_role == 'teacher' %}#00f2fe; background: rgba(0, 242, 254, 0.1); color: #00f2fe;{% else %}rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.6);{% endif %} transition: 0.2s;">
+            O'qituvchilar
+        </a>
+        <a href="?role=student{% if query %}&query={{ query }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-decoration: none; border: 1px solid {% if selected_role == 'student' %}#00f2fe; background: rgba(0, 242, 254, 0.1); color: #00f2fe;{% else %}rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.6);{% endif %} transition: 0.2s;">
+            O'quvchilar
+        </a>
+        <a href="?role=system{% if query %}&query={{ query }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-decoration: none; border: 1px solid {% if selected_role == 'system' %}#00f2fe; background: rgba(0, 242, 254, 0.1); color: #00f2fe;{% else %}rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.6);{% endif %} transition: 0.2s;">
+            Tizim amallari (Anonim)
+        </a>
+    </div>
+
+    <!-- Table Container -->
+    <div class="jadval-container" style="flex-grow: 1; overflow-y: auto; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); background: #080d1a; position: sticky; top: 0; z-index: 10;">
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 20%;">FOYDALANUVCHI</th>
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 20%;">AMAL TURI</th>
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 35%;">TAFSILOT</th>
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 15%; text-align: center;">IP MANZIL</th>
+                    <th style="padding: 16px 20px; color: #00f2fe; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 10%; text-align: right;">SANA VA VAQT</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if logs %}
+                    {% for log in logs %}
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.01)';" onmouseout="this.style.background='none';">
+                            <td data-label="FOYDALANUVCHI" style="padding: 18px 20px; font-weight: 700; color: #ffffff; font-size: 14px;">
+                                {% if log.user %}
+                                    <span style="display: flex; align-items: center; gap: 8px;">
+                                        {% if log.user.profile_image %}
+                                            <img src="{{ log.user.profile_image.url }}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(0, 242, 254, 0.3);">
+                                        {% else %}
+                                            <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); display: flex; align-items: center; justify-content: center; font-size: 10px; color: #00f2fe; font-weight: 800;">
+                                                {{ log.user.first_name|slice:":1" }}{{ log.user.last_name|slice:":1" }}
+                                            </div>
+                                        {% endif %}
+                                        <span>{{ log.user.get_full_name }} <small style="display: block; color: rgba(255,255,255,0.4); font-weight: 500;">@{{ log.user.username }} ({{ log.user.get_role_display }})</small></span>
+                                    </span>
+                                {% else %}
+                                    <span style="color: rgba(255,255,255,0.3); font-style: italic;">Tizim (Tizimdan chiqilgan)</span>
+                                {% endif %}
+                            </td>
+                            <td data-label="AMAL TURI" style="padding: 18px 20px; font-size: 13.5px; font-weight: 700;">
+                                {% if "Qo'shildi" in log.action or "Yaratildi" in log.action %}
+                                    <span style="background: rgba(0, 255, 170, 0.05); border: 1px solid rgba(0, 255, 170, 0.2); color: #00ffaa; padding: 4px 10px; border-radius: 8px; font-size: 12px;">{{ log.action }}</span>
+                                {% elif "O'chirildi" in log.action %}
+                                    <span style="background: rgba(255, 0, 85, 0.05); border: 1px solid rgba(255, 0, 85, 0.2); color: #ff0055; padding: 4px 10px; border-radius: 8px; font-size: 12px;">{{ log.action }}</span>
+                                {% elif "Tahrirlandi" in log.action %}
+                                    <span style="background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; padding: 4px 10px; border-radius: 8px; font-size: 12px;">{{ log.action }}</span>
+                                {% else %}
+                                    <span style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); color: #ffffff; padding: 4px 10px; border-radius: 8px; font-size: 12px;">{{ log.action }}</span>
+                                {% endif %}
+                            </td>
+                            <td data-label="TAFSILOT" style="padding: 18px 20px; font-size: 13.5px; color: rgba(255,255,255,0.85); font-weight: 500; word-break: break-word;">
+                                {{ log.description }}
+                            </td>
+                            <td data-label="IP MANZIL" style="padding: 18px 20px; font-size: 13px; font-family: monospace; color: rgba(255,255,255,0.5); text-align: center; font-weight: 600;">
+                                {% if log.ip_address %}
+                                    <i class="fas fa-network-wired" style="color: #4facfe; margin-right: 4px;"></i> {{ log.ip_address }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td data-label="SANA VA VAQT" style="padding: 18px 20px; font-size: 13px; font-family: monospace; color: rgba(255,255,255,0.6); text-align: right; font-weight: 600;">
+                                {{ log.timestamp|date:"d.m.Y" }} <br>
+                                <small style="color: rgba(255,255,255,0.3);">{{ log.timestamp|date:"H:i:s" }}</small>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: rgba(255,255,255,0.3); padding: 40px 20px;">
+                            <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 40px 20px; text-align: center;">
+                                <i class="fas fa-history" style="font-size: 36px; color: rgba(255,255,255,0.2); margin-bottom: 15px; display: inline-block;"></i>
+                                <h4 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Audit yozuvlari topilmadi</h4>
+                                <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin: 0;">Tanlangan filtr bo'yicha hech qanday amal yozuvi mavjud emas.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

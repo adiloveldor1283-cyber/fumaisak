@@ -1,0 +1,46 @@
+{% extends 'baseadmin.html' %}
+{% load static %}
+
+{% block title %}Fan qo'shish | VLE Tizimi{% endblock %}
+
+{% block content %}
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="{% url 'subject_list_admin' %}" class="back-arrow-btn" title="Orqaga">
+            <i class="fas fa-chevron-left" style="font-size: 16px;"></i>
+        </a>
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Yangi fan qo'shish</h2>
+    </div>
+</div>
+
+<div class="form-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); width: 100%; max-width: 600px; margin: 0 auto;">
+    <form class="form-main" method="POST">
+        {% csrf_token %}
+
+        {% if messages %}
+            {% for message in messages %}
+                {% if 'error' in message.tags or 'warning' in message.tags %}
+                    <div style="background: rgba(255, 79, 79, 0.1); border: 1px solid rgba(255, 79, 79, 0.2); border-radius: 12px; padding: 12px 18px; color: #ff4f4f; font-size: 13.5px; margin-bottom: 20px; font-weight: 600;">
+                        <i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i> {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <div class="form-group" style="margin-bottom: 22px;">
+            <label for="name" style="display: block; font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Fan nomi *</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Masalan: Fizika" required style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; transition: 0.3s;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 22px;">
+            <label for="description" style="display: block; font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Fan haqida ma'lumot</label>
+            <textarea class="form-control" id="description" name="description" placeholder="Fan to'g'risida qisqacha ma'lumot yoki izoh..." style="width: 100%; height: 120px; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; transition: 0.3s; resize: none;"></textarea>
+        </div>
+
+        <div class="tugmalar" style="display: flex; gap: 12px; margin-top: 35px;">
+            <button type="submit" class="btn-submit" style="flex: 1; padding: 12px 24px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; transition: 0.3s; text-transform: uppercase;"><i class="fas fa-plus" style="margin-right: 6px;"></i> Fan qo'shish</button>
+            <a href="{% url 'subject_list_admin' %}" class="btn-cancel" style="flex: 1; padding: 12px 24px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); color: white; border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: 800; text-transform: uppercase; text-decoration: none; display: flex; align-items: center; justify-content: center;">Bekor qilish</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,6 +1,6 @@
 {% extends 'basestudent.html' %}
 
-{% block title %}Mustaqil AI Quiz Natijasi - {{ quiz.title }}{% endblock %}
+{% block title %}AI Test natijasi{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -46,14 +46,14 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 10px 18px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #ffffff;
+        padding: 8px 16px;
+        background: rgba(0, 242, 254, 0.07);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        color: #00f2fe;
         text-decoration: none;
-        border-radius: 10px;
+        border-radius: 8px;
         font-size: 13px;
-        font-weight: 700;
+        font-weight: 600;
         transition: all 0.2s;
     }
     .btn-back:hover {
@@ -321,7 +321,7 @@
             <span>Topshirilgan sana: {{ quiz.submitted_at|date:"d.m.Y H:i" }}</span>
         </div>
         <a href="{% url 'ai_quiz_dashboard' %}" class="btn-back">
-            <i class="fas fa-arrow-left"></i> Jurnalga qaytish
+            <i class="fas fa-arrow-left"></i> Oldingi sahifaga qaytish
         </a>
     </div>
 

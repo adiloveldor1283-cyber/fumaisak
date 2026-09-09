@@ -1,7 +1,7 @@
 {% extends "basestudent.html" %}
 {% load static %}
 
-{% block title %}Student profili{% endblock %}
+{% block title %}Bosh sahifa{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -214,6 +214,233 @@
             overflow-y: visible !important;
         }
     }
+
+    /* --- KUN REJIMI (LIGHT MODE) OVERRIDES --- */
+    body.light-mode {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+    }
+    body.light-mode .cyber-bg {
+        opacity: 0.01;
+    }
+    body.light-mode .main {
+        background: #f1f5f9 !important;
+    }
+    body.light-mode .sidebar {
+        background: #e2e8f0 !important;
+        border-right: 1px solid #cbd5e1 !important;
+        color: #1e293b !important;
+    }
+    body.light-mode .sidebar .toggle-container {
+        border-bottom: 1px solid #cbd5e1 !important;
+    }
+    body.light-mode .sidebar .brand {
+        background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+    }
+    body.light-mode .sidebar ul li a {
+        color: #475569 !important;
+    }
+    body.light-mode .sidebar ul li:hover {
+        background: #cbd5e1 !important;
+    }
+    body.light-mode .sidebar ul li:hover a i, 
+    body.light-mode .sidebar ul li:hover a span {
+        color: #0f172a !important;
+    }
+    body.light-mode .sidebar ul li.active {
+        background: #cbd5e1 !important;
+        border-left: 3px solid #0284c7 !important;
+    }
+    body.light-mode .sidebar ul li.active a i,
+    body.light-mode .sidebar ul li.active a span {
+        color: #0f172a !important;
+    }
+    body.light-mode .sidebar .user-info {
+        border-bottom: 1px solid #cbd5e1 !important;
+    }
+    body.light-mode .sidebar .user-info span {
+        color: #334155 !important;
+    }
+    body.light-mode .sidebar .span {
+        color: #0284c7 !important;
+    }
+    body.light-mode .header {
+        background: #e2e8f0 !important;
+        border-bottom: 1px solid #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    body.light-mode .header h1,
+    body.light-mode .username-display,
+    body.light-mode .bell-icon {
+        color: #0f172a !important;
+    }
+    body.light-mode .toggle-btn,
+    body.light-mode .toggle-main {
+        color: #0f172a !important;
+    }
+    body.light-mode .dropdown-panel {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+    }
+    body.light-mode .dropdown-item {
+        color: #334155 !important;
+    }
+    body.light-mode .dropdown-item:hover {
+        background: #f1f5f9 !important;
+    }
+    
+    body.light-mode .karta {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode .karta .pul {
+        color: #0f172a !important;
+    }
+    body.light-mode .karta .matn {
+        color: #64748b !important;
+    }
+    body.light-mode .karta .ikonka {
+        background: rgba(2, 132, 199, 0.06) !important;
+        border: 1px solid rgba(2, 132, 199, 0.15) !important;
+        color: #0284c7 !important;
+    }
+    body.light-mode .left-panel,
+    body.light-mode .right-panel {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04) !important;
+    }
+    body.light-mode .skill-title,
+    body.light-mode .filter-box h3 {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
+    }
+    body.light-mode .skill-name {
+        color: #64748b !important;
+    }
+    body.light-mode .progress-bar {
+        background: #f1f5f9 !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+    body.light-mode .progress {
+        background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.15) !important;
+    }
+    body.light-mode .progress span {
+        color: #ffffff !important;
+    }
+    body.light-mode th {
+        background: #f8fafc !important;
+        color: #64748b !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+    body.light-mode td {
+        color: #334155 !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+    }
+    body.light-mode tr:hover td {
+        background: #f8fafc !important;
+        color: #0284c7 !important;
+    }
+    body.light-mode tr[style*="background"] {
+        background: rgba(2, 132, 199, 0.05) !important;
+        border-left-color: #0284c7 !important;
+    }
+    
+    /* --- SCHEDULE CARD (KUN TARTIBI) LIGHT MODE OVERRIDES --- */
+    body.light-mode .schedule-card {
+        background: #f1f5f9 !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+    body.light-mode .schedule-group-name {
+        color: #0f172a !important;
+    }
+    body.light-mode .schedule-teachers {
+        color: #64748b !important;
+    }
+    body.light-mode .schedule-time {
+        color: #0284c7 !important;
+    }
+    body.light-mode .schedule-room {
+        color: #ea580c !important;
+    }
+    body.light-mode .schedule-empty-card {
+        background: #f8fafc !important;
+        border: 1px dashed #cbd5e1 !important;
+        color: #64748b !important;
+    }
+
+    /* --- DROPDOWN NOTIFICATION PANEL LIGHT MODE OVERRIDES --- */
+    body.light-mode .dropdown-panel strong {
+        color: #0284c7 !important;
+    }
+    body.light-mode .dropdown-panel span {
+        color: #334155 !important;
+    }
+    body.light-mode .dropdown-panel div {
+        color: #334155 !important;
+    }
+    body.light-mode .dropdown-item i {
+        color: #0284c7 !important;
+    }
+    body.light-mode .dropdown-panel hr {
+        border-top-color: #e2e8f0 !important;
+    }
+
+    /* --- NOTIFICATION BELL BUTTON LIGHT MODE --- */
+    body.light-mode #bell-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid #cbd5e1 !important;
+        background: #ffffff !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+        transition: all 0.3s ease;
+    }
+    body.light-mode #bell-btn i {
+        color: #0f172a !important;
+        font-size: 15px !important;
+        margin: 0 !important;
+    }
+    body.light-mode #bell-btn:hover {
+        border-color: #0284c7 !important;
+        background: #f1f5f9 !important;
+    }
+    body.light-mode #bell-btn:hover i {
+        color: #0284c7 !important;
+    }
+
+    /* --- 🏆 GAMIFIKATSIYA NISHONLARI LIGHT MODE OVERRIDES --- */
+    body.light-mode .badge-premium-card {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode .badge-premium-card.no-badge-card {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+    body.light-mode .badge-premium-card .badge-empty-icon {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #94a3b8 !important;
+    }
+    body.light-mode .badge-premium-card .badge-label-text {
+        color: #64748b !important;
+    }
+    body.light-mode .badge-premium-card .badge-title-text {
+        color: #0f172a !important;
+    }
+    body.light-mode .badge-premium-card .badge-desc-text {
+        color: #475569 !important;
+    }
 </style>
 {% endblock %}
 
@@ -228,14 +455,14 @@
         </div>
         <div class="karta">
             <div>
-                <div class="matn">Yaxshi o‘zlashtirganlar</div>
+                <div class="matn">Yaxshi o'zlashtirganlar</div>
                 <div class="pul" style="color: #00ffaa;">{{ level_good }}</div>
             </div>
             <div class="ikonka" style="color: #00ffaa; border-color: rgba(0,255,170,0.2); background: rgba(0,255,170,0.05);"><i class="fas fa-user-graduate"></i></div>
         </div>
         <div class="karta">
             <div>
-                <div class="matn">O‘rtacha o‘zlashtirganlar</div>
+                <div class="matn">O'rtacha o'zlashtirganlar</div>
                 <div class="pul" style="color: #ffc107;">{{ level_average }}</div>
             </div>
             <div class="ikonka" style="color: #ffc107; border-color: rgba(255,193,7,0.2); background: rgba(255,193,7,0.05);"><i class="fas fa-user-graduate"></i></div>
@@ -249,8 +476,42 @@
         </div>
     </div>
 
+    <!-- 🏆 GAMIFIKATSIYA NISHONI & IMTIYOZLAR -->
+    <div class="badge-premium-card {% if not badge %}no-badge-card{% endif %}" style="margin-top: 25px; background: {% if badge %}linear-gradient(135deg, rgba(0, 242, 254, 0.05), rgba(0, 242, 254, 0.01)){% else %}rgba(255, 255, 255, 0.01){% endif %}; border: 1px solid {% if badge %}{{ badge.color }}40{% else %}rgba(255,255,255,0.04){% endif %}; border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative; overflow: hidden; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        {% if badge %}
+        <div class="badge-icon-box" style="background: {{ badge.color }}15; border: 1px solid {{ badge.color }}30; border-radius: 14px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: {{ badge.color }}; font-size: 20px; box-shadow: 0 0 15px {{ badge.color }}20; flex-shrink: 0;">
+            <i class="{{ badge.icon }}"></i>
+        </div>
+        <div>
+            <div class="badge-label-text" style="font-size: 10.5px; text-transform: uppercase; font-weight: 700; color: {{ badge.color }}; letter-spacing: 0.5px; margin-bottom: 2px;">Sizning oylik yutug'ingiz:</div>
+            <h4 class="badge-title-text" style="margin: 0; font-size: 16px; font-weight: 800; color: #ffffff;">{{ badge.name }}</h4>
+            <p class="badge-desc-text" style="margin: 4px 0 0 0; font-size: 12.5px; color: rgba(255,255,255,0.7); line-height: 1.4;">{{ badge.desc }}</p>
+        </div>
+        {% else %}
+        <div class="badge-icon-box badge-empty-icon" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.3); font-size: 20px; flex-shrink: 0;">
+            <i class="fas fa-medal"></i>
+        </div>
+        <div>
+            <div class="badge-label-text" style="font-size: 10.5px; text-transform: uppercase; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 0.5px; margin-bottom: 2px;">Oylik imtiyozlar:</div>
+            <h4 class="badge-title-text" style="margin: 0; font-size: 15px; font-weight: 800; color: #ffffff;">Hozircha nishonlar mavjud emas</h4>
+            <p class="badge-desc-text" style="margin: 4px 0 0 0; font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.4;">Kursda Oltin, Kumush yoki Bronza nishon va oylik chegirmalarni qo'lga kiritish uchun o'tgan oylik davomatingizni 90%+ va o'rtacha ballingizni 75%+ qilib saqlang!</p>
+        </div>
+        {% endif %}
+    </div>
+
     <div class="left_right_panel">
         <div class="left-panel">
+            <!-- 📅 JORIY OY DAVOMATI -->
+            <div class="skill-title-panel">
+                <div class="skill-title">Joriy oydagi davomatingiz</div>
+                <div class="skill-name">Ushbu oy davomida darslarda ishtirok etish ko'rsatkichi</div>
+                <div class="progress-bar">
+                    <div class="progress" data-value="{{ current_attendance_percent }}" style="background: linear-gradient(135deg, #00ffaa, #00b377); box-shadow: 0 0 15px rgba(0, 255, 170, 0.2);">
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+
             {% if has_assignments %}
                 <div class="skill-title-panel">
                     <div class="skill-title">Bajarilgan topshiriqlar</div>
@@ -304,11 +565,53 @@
                     <div class="skill-name">Testlar hozircha tizimga kiritilmagan.</div>
                 </div>
             {% endif %}
+
+            <!-- Kun tartibi / Bugungi dars jadvali -->
+            <div style="margin-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 25px;">
+                <div class="skill-title" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-calendar-day" style="color: #00f2fe;"></i>
+                    <span>Bugungi dars jadvali (Kun tartibi: <span style="color: #00f2fe; font-weight: 800;">{% now "d.m.Y" %}</span>)</span>
+                </div>
+                <div class="skill-name" style="margin-bottom: 15px;">Bugun sizda belgilangan darslar ro'yxati</div>
+                
+                {% if today_schedules %}
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        {% for sch in today_schedules %}
+                            <div class="schedule-card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div class="schedule-group-name" style="font-weight: 700; color: #ffffff; font-size: 14px;">{{ sch.group.name }}</div>
+                                    <div class="schedule-teachers" style="font-size: 12px; color: rgba(255, 255, 255, 0.4); margin-top: 4px;">
+                                        <i class="fas fa-chalkboard-teacher" style="font-size: 10px; margin-right: 4px;"></i>
+                                        {% for t in sch.group.teachers.all %}
+                                            {{ t.first_name }} {{ t.last_name }}{% if not forloop.last %}, {% endif %}
+                                        {% empty %}
+                                            O'qituvchi biriktirilmagan
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="schedule-time" style="font-weight: 700; color: #00f2fe; font-size: 14px;">
+                                        <i class="far fa-clock" style="margin-right: 4px;"></i> {{ sch.start_time|time:"H:i" }} - {{ sch.end_time|time:"H:i" }}
+                                    </div>
+                                    <div class="schedule-room" style="font-size: 11px; color: #ff0055; font-weight: 600; margin-top: 4px; text-transform: uppercase;">
+                                        Xona: {{ sch.room|default:"Belgilanmagan" }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="schedule-empty-card" style="background: rgba(255, 255, 255, 0.01); border: 1px dashed rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 16px; text-align: center; color: rgba(255, 255, 255, 0.3); font-style: italic; font-size: 13px;">
+                        <i class="fas fa-mug-hot" style="font-size: 16px; margin-bottom: 8px; display: block; color: rgba(255, 255, 255, 0.2);"></i>
+                        Bugun siz uchun darslar belgilab qo'yilmagan. Dam olish kuni!
+                    </div>
+                {% endif %}
+            </div>
         </div>
 
         <div class="right-panel">
             <div class="filter-box">
-                <h3>Top 10 o‘quvchilar reytingi</h3>
+                <h3>Top 10 o'quvchilar reytingi</h3>
             </div>
 
             <div class="table-container">
