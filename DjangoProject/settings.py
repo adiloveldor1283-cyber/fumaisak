@@ -9,21 +9,23 @@ env = environ.Env()
 environ.Env.read_env()
 
 # Quick-start development settings - unsuitable for production
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = env('SECRET_KEY', default='django-insecure-fumaisak-production-key-change-later-1283')
 GEMINI_API_KEY = env('GEMINI_API_KEY', default=None)
 TELEGRAM_BOT_TOKEN = env('TELEGRAM_BOT_TOKEN', default=None)
 TELEGRAM_BOT_USERNAME = env('TELEGRAM_BOT_USERNAME', default=None)
 TELEGRAM_WEBHOOK_SECRET_TOKEN = env('TELEGRAM_WEBHOOK_SECRET_TOKEN', default=None)
 
-
-# DEBUG statusni .env fayldan o'qiymiz (lokal ishlash uchun default True qilinadi)
+# DEBUG statusni .env fayldan o'qiymiz (default True)
 DEBUG = env.bool('DEBUG', default=True)
 
 # Ruxsat etilgan xostlar
-if DEBUG:
-    ALLOWED_HOSTS = ['*']
-else:
-    ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[
+    'https://*.railway.app',
+    'https://*.up.railway.app',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000'
+])
 
 # Application definition
 INSTALLED_APPS = [
@@ -52,10 +54,11 @@ UNFOLD = {
     },
 }
 
+import dj_database_url
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # WhiteNoise faqat production uchun ishlatiladi
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -92,18 +95,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'DjangoProject.wsgi.application'
 
-# ✅ PostgreSQL 17 DATABASES sozlamalari
-DATABASES = {
-    'default': {
-        'ENGINE': env('DB_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': env('DB_NAME', default='fumaisak_db'),
-        'USER': env('DB_USER', default='postgres'),
-        'PASSWORD': env('DB_PASSWORD', default='123456'),
-        'HOST': env('DB_HOST', default='127.0.0.1'),
-        'PORT': env('DB_PORT', default='5432'),
-        'CONN_MAX_AGE': 600,
+# ✅ PostgreSQL DATABASES: Local yoki Railway (DATABASE_URL)
+DATABASE_URL = env('DATABASE_URL', default=None)
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': env('DB_ENGINE', default='django.db.backends.postgresql'),
+            'NAME': env('DB_NAME', default='fumaisak_db'),
+            'USER': env('DB_USER', default='postgres'),
+            'PASSWORD': env('DB_PASSWORD', default='123456'),
+            'HOST': env('DB_HOST', default='127.0.0.1'),
+            'PORT': env('DB_PORT', default='5432'),
+            'CONN_MAX_AGE': 600,
+        }
+    }
 
 # Parol validatsiya
 AUTH_PASSWORD_VALIDATORS = [
@@ -135,8 +144,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# ✅ WhiteNoise faqat production uchun kerak
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# ✅ WhiteNoise static storage
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
