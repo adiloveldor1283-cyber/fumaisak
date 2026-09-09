@@ -4,6 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "bash start.sh"
+    "startCommand": "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn DjangoProject.wsgi:application"
   }
 }
