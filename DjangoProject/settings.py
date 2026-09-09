@@ -19,12 +19,15 @@ TELEGRAM_WEBHOOK_SECRET_TOKEN = env('TELEGRAM_WEBHOOK_SECRET_TOKEN', default=Non
 DEBUG = env.bool('DEBUG', default=True)
 
 # Ruxsat etilgan xostlar
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['lms.upcode.uz', '*'])
 CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[
+    'https://api.upcode.uz',
+    'https://lms.upcode.uz',
+    'http://lms.upcode.uz',
     'https://*.railway.app',
     'https://*.up.railway.app',
     'http://127.0.0.1:8000',
-    'http://localhost:8000'
+    'http://localhost:8000',
 ])
 
 # Application definition
