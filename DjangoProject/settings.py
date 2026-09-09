@@ -139,10 +139,11 @@ FORMAT_MODULE_PATH = [
     'DjangoProject.formats',
 ]
 
-# Static fayllar (local uchun oddiy sozlama)
+# Static fayllar
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+_STATIC_DIR = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [_STATIC_DIR] if os.path.exists(_STATIC_DIR) else []
 
 # ✅ WhiteNoise static storage
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
