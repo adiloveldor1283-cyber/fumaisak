@@ -360,7 +360,15 @@ def teacher_profile_view(request):
             else:
                 messages.error(request, "Rasm tanlanmadi.", extra_tags='password')
 
-    return render(request, 'teacher-profile.html', {'teacher': teacher,})
+    telegram_link = None
+    if not teacher.telegram_chat_id:
+        from main.telegram_service import generate_telegram_link
+        telegram_link = generate_telegram_link(teacher)
+
+    return render(request, 'teacher-profile.html', {
+        'teacher': teacher,
+        'telegram_link': telegram_link,
+    })
 
 @teacher_required
 def my_student_view(request):
