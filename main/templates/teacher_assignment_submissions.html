@@ -1,64 +1,50 @@
 {% extends 'baseteacher.html' %}
 {% load static %}
 
-{% block title %}Topshiriqlarni baholash{% endblock %}
-
-
+{% block title %}Topshiriqlarni baholash: {{ assignment.title }} | VLE{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* --- 📊 GORIZONTAL INTERFEYS: INFO KARTALARI PANELI --- */
-    .assignment-meta-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-        margin-bottom: 25px;
-        width: 100%;
-    }
+    /* =========================================================
+       ✨ TOPSHIRIQLAR NATIJALARI VA BAHOLASH — 1-TO-1 PARITY
+       ========================================================= */
 
-    .kiber-karta {
-        background: rgba(255, 255, 255, 0.01);
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        border-radius: 20px;
-        padding: 20px;
+    /* --- 🔍 SARLAVHA VA TEPA PANELI --- */
+    .sarlavha-qatori {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+        width: 100%;
     }
-    .kiber-karta .matn-qismi { display: flex; flex-direction: column; gap: 4px; }
-    .kiber-karta .kichik-tizim { font-size: 11px; color: rgba(255, 255, 255, 0.4); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-    .kiber-karta .katta-qiymat { font-size: 16px; font-weight: 800; color: #ffffff; line-height: 1.3; }
-    .kiber-karta .ikonka-qutisi {
-        width: 44px; height: 44px; background: linear-gradient(135deg, rgba(0, 242, 254, 0.1), rgba(79, 172, 254, 0.1));
-        border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; border-radius: 12px;
-        display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+    .sarlavha-left-wrap {
+        display: flex;
+        align-items: center;
+        gap: 14px;
     }
-
-    /* --- 🔙 ORTGA QAYTISH STRELKASI (HEADER) --- */
     .btn-back-icon {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 38px;
-        height: 38px;
+        width: 42px;
+        height: 42px;
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px;
         color: #00f2fe;
         text-decoration: none;
-        font-size: 15px;
-        transition: 0.25s ease;
+        font-size: 16px;
+        transition: all 0.25s ease;
         flex-shrink: 0;
     }
     .btn-back-icon:hover {
         background: rgba(0, 242, 254, 0.12);
-        border-color: rgba(0, 242, 254, 0.3);
+        border-color: rgba(0, 242, 254, 0.35);
         color: #ffffff;
         transform: translateX(-3px);
-        box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
     }
     body.light-mode .btn-back-icon {
         background: #ffffff !important;
@@ -72,390 +58,1491 @@
         color: #0369a1 !important;
     }
 
+    .sarlavha-text-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
     .sarlavha {
-        font-size: 20px;
+        font-size: 22px;
         font-weight: 800;
-        margin: 0;
         color: #ffffff;
         border-left: 4px solid #00f2fe;
-        padding-left: 12px;
-        letter-spacing: -0.5px;
+        padding-left: 14px;
+        letter-spacing: -0.4px;
+        margin: 0;
+        line-height: 1.2;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
+    .sarlavha i.title-icon {
+        color: #00f2fe;
+        font-size: 20px;
+    }
+    .sarlavha-subtitle {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.5);
+        margin: 0;
+        padding-left: 18px;
+    }
+
     body.light-mode .sarlavha {
         color: #0f172a !important;
         border-left-color: #0284c7 !important;
     }
-
-    /* --- 📊 ICHKI MUSTAQIL SKROL BO'LUVCHI JADVAL KONTEYNERI (DESKTOP) --- */
-    .jadval-container {
-        flex-grow: 1;
-        overflow-y: auto !important;
-        overflow-x: auto !important;
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        border-radius: 20px;
-        background: #0c101d; /* Solid to'q fon glitchlarning oldini oladi */
-        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        max-height: calc(100vh - 200px);
-        min-height: 300px;
+    body.light-mode .sarlavha i.title-icon {
+        color: #0284c7 !important;
+    }
+    body.light-mode .sarlavha-subtitle {
+        color: #64748b !important;
     }
 
-    /* Skrolbar dizayni */
-    .jadval-container::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
+    /* --- 📊 4 TA STATISTIKA KARTALARI --- */
+    .stats-overview-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+        width: 100%;
     }
-    .jadval-container::-webkit-scrollbar-track {
-        background: transparent;
+    .stat-card {
+        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 16px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.25s ease;
     }
-    .jadval-container::-webkit-scrollbar-thumb {
-        background: rgba(0, 242, 254, 0.12);
-        border-radius: 10px;
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     }
-    .jadval-container::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 242, 254, 0.3);
+    body.light-mode .stat-card {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode .stat-card:hover {
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06) !important;
     }
 
-    table {
-        width: max-content !important;
-        min-width: 100% !important;
+    .stat-icon-wrap {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+        flex-shrink: 0;
+    }
+    .stat-card.blue .stat-icon-wrap {
+        background: rgba(0, 242, 254, 0.1);
+        color: #00f2fe;
+        border: 1px solid rgba(0, 242, 254, 0.25);
+    }
+    .stat-card.green .stat-icon-wrap {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .stat-card.amber .stat-icon-wrap {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+    .stat-card.purple .stat-icon-wrap {
+        background: rgba(168, 85, 247, 0.1);
+        color: #c084fc;
+        border: 1px solid rgba(168, 85, 247, 0.25);
+    }
+
+    body.light-mode .stat-card.blue .stat-icon-wrap {
+        background: #e0f2fe !important;
+        color: #0284c7 !important;
+        border-color: #bae6fd !important;
+    }
+    body.light-mode .stat-card.green .stat-icon-wrap {
+        background: #dcfce7 !important;
+        color: #16a34a !important;
+        border-color: #bbf7d0 !important;
+    }
+    body.light-mode .stat-card.amber .stat-icon-wrap {
+        background: #fef3c7 !important;
+        color: #d97706 !important;
+        border-color: #fde68a !important;
+    }
+    body.light-mode .stat-card.purple .stat-icon-wrap {
+        background: #f3e8ff !important;
+        color: #9333ea !important;
+        border-color: #e9d5ff !important;
+    }
+
+    .stat-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+    .stat-value {
+        font-size: 19px;
+        font-weight: 800;
+        color: #ffffff;
+        line-height: 1.2;
         white-space: nowrap;
-        border-collapse: separate;
-        border-spacing: 0;
-        text-align: left;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-    th {
-        padding: 16px 18px;
-        font-size: 12px;
-        font-weight: 700;
+    body.light-mode .stat-value {
+        color: #0f172a !important;
+    }
+    .stat-label {
+        font-size: 11.5px;
+        color: rgba(255, 255, 255, 0.5);
+        font-weight: 600;
         text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.4);
-        letter-spacing: 0.5px;
-        position: sticky;
-        top: 0;
-        background: #0c101d !important; /* Teshiksiz soya chizig'i */
-        z-index: 100;
-        border-bottom: none !important;
-        box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+        letter-spacing: 0.3px;
     }
-    td {
-        padding: 14px 18px;
-        font-size: 13.5px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-        color: rgba(255, 255, 255, 0.8);
-        vertical-align: middle;
+    body.light-mode .stat-label {
+        color: #64748b !important;
     }
-    tr:hover td {
-        background: rgba(255, 255, 255, 0.01);
+
+    /* --- 🔍 FILTER VA QIDIRUV QATORI --- */
+    .toolbar-panel {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+
+    .filter-pills-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .filter-pill {
+        padding: 7px 15px;
+        border-radius: 10px;
+        font-size: 12.5px;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.65);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        user-select: none;
+    }
+    .filter-pill:hover {
+        color: #ffffff;
+        border-color: rgba(0, 242, 254, 0.3);
+        background: rgba(0, 242, 254, 0.05);
+    }
+    .filter-pill.active {
+        background: rgba(0, 242, 254, 0.12);
+        border-color: #00f2fe;
+        color: #00f2fe;
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+    }
+    .filter-pill .pill-badge {
+        padding: 1px 6px;
+        border-radius: 6px;
+        font-size: 11px;
+        background: rgba(255, 255, 255, 0.08);
+    }
+    .filter-pill.active .pill-badge {
+        background: rgba(0, 242, 254, 0.25);
         color: #ffffff;
     }
 
-    .btn-otish {
-        display: inline-block;
-        padding: 8px 16px;
-        background: rgba(0, 242, 254, 0.07);
-        border: 1px solid rgba(0, 242, 254, 0.2);
+    body.light-mode .filter-pill {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #475569 !important;
+    }
+    body.light-mode .filter-pill:hover {
+        background: #f8fafc !important;
+        color: #0284c7 !important;
+        border-color: #0284c7 !important;
+    }
+    body.light-mode .filter-pill.active {
+        background: #e0f2fe !important;
+        border-color: #0284c7 !important;
+        color: #0284c7 !important;
+        box-shadow: 0 2px 6px rgba(2, 132, 199, 0.15) !important;
+    }
+    body.light-mode .filter-pill .pill-badge {
+        background: #e2e8f0 !important;
+        color: #334155 !important;
+    }
+    body.light-mode .filter-pill.active .pill-badge {
+        background: #0284c7 !important;
+        color: #ffffff !important;
+    }
+
+    /* Qidiruv formasi */
+    .search-form {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 4px 14px;
+        transition: all 0.25s ease;
+        width: 300px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    .search-form:focus-within {
+        border-color: #00f2fe !important;
+        box-shadow: 0 0 12px rgba(0, 242, 254, 0.2) !important;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    body input[type="text"].search-input,
+    body .search-form input,
+    .search-input {
+        background: transparent !important;
+        border: 0 !important;
+        border-style: none !important;
+        outline: none !important;
+        color: #ffffff !important;
+        font-size: 13px !important;
+        width: 100% !important;
+        padding: 6px 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+    }
+    body input[type="text"].search-input:focus,
+    body .search-form input:focus,
+    .search-input:focus {
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+    }
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+    .search-btn {
+        background: none !important;
+        border: none !important;
+        color: rgba(255, 255, 255, 0.6) !important;
+        cursor: pointer;
+        font-size: 13px;
+        transition: 0.3s;
+        padding: 0 0 0 8px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: none !important;
+    }
+    .search-btn:hover {
+        color: #00f2fe !important;
+    }
+
+    body.light-mode .search-form {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode .search-form:focus-within {
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+    }
+    body.light-mode input[type="text"].search-input,
+    body.light-mode .search-form input,
+    body.light-mode .search-input {
+        color: #0f172a !important;
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+    }
+    body.light-mode .search-input::placeholder {
+        color: #94a3b8 !important;
+    }
+    body.light-mode .search-btn {
+        color: #64748b !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    body.light-mode .search-btn:hover {
+        color: #0284c7 !important;
+    }
+
+    /* --- 📋 JADVAL KONTEYNERI (DESKTOP) --- */
+    .jadval-container {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: auto;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+        max-height: calc(100vh - 310px);
+        position: relative;
+        scroll-behavior: smooth;
+        margin-bottom: 25px;
+        box-sizing: border-box;
+    }
+
+    .jadval-container::-webkit-scrollbar {
+        height: 7px;
+        width: 6px;
+    }
+    .jadval-container::-webkit-scrollbar-track {
+        background: rgba(8, 13, 26, 0.8);
+        border-radius: 10px;
+    }
+    .jadval-container::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        border-radius: 10px;
+        box-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
+    }
+    .jadval-container::-webkit-scrollbar-thumb:hover {
+        background: #00f2fe;
+    }
+
+    body.light-mode .jadval-container {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode .jadval-container::-webkit-scrollbar-track {
+        background: #f8fafc !important;
+    }
+    body.light-mode .jadval-container::-webkit-scrollbar-thumb {
+        background: #cbd5e1 !important;
+        box-shadow: none !important;
+    }
+    body.light-mode .jadval-container::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8 !important;
+    }
+
+    table {
+        width: 100% !important;
+        border-collapse: collapse;
+        text-align: left;
+    }
+    th {
+        padding: 14px 18px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.5);
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        position: sticky;
+        top: 0;
+        background: #080d1a;
+        z-index: 2;
+        white-space: nowrap;
+    }
+    body.light-mode th {
+        background: #f8fafc !important;
+        color: #475569 !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+
+    td {
+        padding: 14px 18px;
+        font-size: 13.5px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        color: rgba(255, 255, 255, 0.85);
+        vertical-align: middle;
+        transition: background 0.2s ease;
+    }
+    tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+        color: #ffffff;
+    }
+    body.light-mode td {
+        color: #0f172a !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+    }
+    body.light-mode tr:hover td {
+        background: rgba(2, 132, 199, 0.02) !important;
+    }
+
+    /* --- 🏷️ NISHONLAR VA MA'LUMOT BLOKLARI --- */
+    
+    .row-index-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+        height: 28px;
+        padding: 0 6px;
+        border-radius: 8px;
+        background: rgba(0, 242, 254, 0.08);
+        border: 1px solid rgba(0, 242, 254, 0.22);
+        color: #00f2fe;
+        font-weight: 800;
+        font-size: 12.5px;
+        font-family: 'JetBrains Mono', monospace, sans-serif;
+        flex-shrink: 0;
+        box-sizing: border-box;
+    }
+    body.light-mode .row-index-pill {
+        background: #e0f2fe !important;
+        border-color: #bae6fd !important;
+        color: #0284c7 !important;
+    }
+
+    .student-cell-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .student-avatar-box {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(79, 172, 254, 0.15));
+        border: 1px solid rgba(0, 242, 254, 0.25);
+        color: #00f2fe;
+        font-weight: 800;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    body.light-mode .student-avatar-box {
+        background: #e0f2fe !important;
+        border-color: #bae6fd !important;
+        color: #0284c7 !important;
+    }
+
+    .student-names-col {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    .student-full-name {
+        font-weight: 700;
+        color: #ffffff;
+        font-size: 13.5px;
+    }
+    body.light-mode .student-full-name {
+        color: #0f172a !important;
+    }
+
+    .phone-chip {
+        font-family: 'JetBrains Mono', monospace, sans-serif;
+        color: #00ffaa;
+        font-weight: 600;
+        font-size: 12.5px;
+        white-space: nowrap;
+    }
+    body.light-mode .phone-chip {
+        color: #15803d !important;
+    }
+    .phone-chip.empty {
+        color: rgba(255, 255, 255, 0.35);
+        font-style: italic;
+        font-family: inherit;
+        font-weight: normal;
+    }
+    body.light-mode .phone-chip.empty {
+        color: #94a3b8 !important;
+    }
+
+    /* Holat status badge */
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .status-pill.submitted {
+        background: rgba(16, 185, 129, 0.12);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .status-pill.not-submitted {
+        background: rgba(239, 68, 68, 0.12);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    body.light-mode .status-pill.submitted {
+        background: #dcfce7 !important;
+        color: #15803d !important;
+        border-color: #bbf7d0 !important;
+    }
+    body.light-mode .status-pill.not-submitted {
+        background: #fee2e2 !important;
+        color: #b91c1c !important;
+        border-color: #fecaca !important;
+    }
+
+    /* Fayl chip */
+    .file-chip-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        background: rgba(0, 242, 254, 0.08);
+        border: 1px solid rgba(0, 242, 254, 0.25);
+        border-radius: 8px;
+        color: #00f2fe;
+        font-size: 12.5px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+    .file-chip-btn:hover {
+        background: rgba(0, 242, 254, 0.18);
+        border-color: #00f2fe;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+    body.light-mode .file-chip-btn {
+        background: #e0f2fe !important;
+        border-color: #bae6fd !important;
+        color: #0284c7 !important;
+    }
+    body.light-mode .file-chip-btn:hover {
+        background: #0284c7 !important;
+        color: #ffffff !important;
+        border-color: #0284c7 !important;
+    }
+
+    /* Ball badge */
+    .score-pill-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 11px;
+        border-radius: 8px;
+        font-weight: 800;
+        font-size: 13px;
+        background: rgba(0, 242, 254, 0.1);
+        color: #00f2fe;
+        border: 1px solid rgba(0, 242, 254, 0.25);
+        white-space: nowrap;
+    }
+    body.light-mode .score-pill-badge {
+        background: #e0f2fe !important;
+        color: #0284c7 !important;
+        border-color: #bae6fd !important;
+    }
+    .score-pill-badge.ungraded {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+        border-color: rgba(245, 158, 11, 0.25);
+        font-weight: 600;
+        font-size: 12px;
+    }
+    body.light-mode .score-pill-badge.ungraded {
+        background: #fef3c7 !important;
+        color: #b45309 !important;
+        border-color: #fde68a !important;
+    }
+
+    /* Amallar tugmasi */
+    .btn-action-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 7px 14px;
+        background: rgba(0, 242, 254, 0.08);
+        border: 1px solid rgba(0, 242, 254, 0.25);
         color: #00f2fe;
         text-decoration: none;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        transition: 0.3s;
+        border-radius: 10px;
+        font-size: 12.5px;
+        font-weight: 700;
+        transition: all 0.25s ease;
         text-align: center;
         cursor: pointer;
+        white-space: nowrap;
     }
-    .btn-otish:hover {
+    .btn-action-primary:hover {
         background: linear-gradient(135deg, #00f2fe, #4facfe);
         color: #070a12;
         border-color: transparent;
-        box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        box-shadow: 0 0 14px rgba(0, 242, 254, 0.4);
+        transform: translateY(-1px);
+    }
+    body.light-mode .btn-action-primary {
+        background: rgba(2, 132, 199, 0.08) !important;
+        border: 1px solid rgba(2, 132, 199, 0.3) !important;
+        color: #0284c7 !important;
+        box-shadow: 0 2px 6px rgba(2, 132, 199, 0.08) !important;
+    }
+    body.light-mode .btn-action-primary:hover {
+        background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+        border-color: transparent !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
     }
 
-    /* --- 👾 MODAL OYNA (CYBER GLASS) --- */
+    .date-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: 'JetBrains Mono', monospace, sans-serif;
+        font-size: 12.5px;
+        color: rgba(255, 255, 255, 0.65);
+        white-space: nowrap;
+    }
+    .date-chip i {
+        font-size: 11px;
+        opacity: 0.6;
+    }
+    body.light-mode .date-chip {
+        color: #475569 !important;
+    }
+
+    /* --- 🚫 BO'SH HOLAT --- */
+    .empty-state-box {
+        text-align: center;
+        padding: 45px 20px;
+        color: rgba(255, 255, 255, 0.4);
+        font-style: italic;
+        font-size: 14px;
+    }
+    .empty-state-box i {
+        font-size: 36px;
+        display: block;
+        margin-bottom: 12px;
+        opacity: 0.3;
+    }
+    body.light-mode .empty-state-box {
+        color: #64748b !important;
+    }
+
+    /* --- 👾 BAHOLASH MODAL OYNASI (CYBER GLASS / MODERN) --- */
     .grade-modal-overlay {
         display: none;
         position: fixed;
         top: 0; left: 0;
-        width: 100%; height: 100%;
+        width: 100vw; height: 100vh;
         background-color: rgba(7, 10, 18, 0.85);
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
         z-index: 9999;
         justify-content: center;
         align-items: center;
+        padding: 15px;
+        box-sizing: border-box;
     }
     .grade-modal {
-        background: #0c101d;
+        background: #0d1322;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 25px 30px;
+        padding: 26px 30px;
         border-radius: 20px;
-        width: 90%;
-        max-width: 460px;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-        animation: slideDown 0.3s ease;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+        animation: slideDownModal 0.25s ease-out;
+        box-sizing: border-box;
     }
-    @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-30px); }
-        to { opacity: 1; transform: translateY(0); }
+    @keyframes slideDownModal {
+        from { opacity: 0; transform: translateY(-20px) scale(0.97); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    body.light-mode .grade-modal {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .modal-header-row {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding-bottom: 14px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    body.light-mode .modal-header-row {
+        border-bottom-color: #e2e8f0 !important;
     }
     .grade-modal-title {
-        margin-top: 0; font-size: 20px; font-weight: 800; color: #ffffff;
-        border-left: 4px solid #00f2fe; padding-left: 12px; margin-bottom: 20px;
+        font-size: 19px;
+        font-weight: 800;
+        color: #ffffff;
+        border-left: 4px solid #00f2fe;
+        padding-left: 12px;
+        margin: 0;
+        letter-spacing: -0.3px;
     }
-    .close-modal { background: none; border: none; color: white; font-size: 18px; cursor: pointer; }
-    .close-modal:hover { color: #ff0055; }
-
-    .grade-modal p { margin: 12px 0; color: rgba(255,255,255,0.8); font-size: 14px; }
-    .grade-modal p strong {
-        color: rgba(255,255,255,0.4); font-size: 11px; text-transform: uppercase;
-        letter-spacing: 0.5px; display: block; margin-bottom: 2px;
+    body.light-mode .grade-modal-title {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
     }
-    .score-input {
-        width: 100%; padding: 12px 16px; margin-top: 6px; border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 12px; box-sizing: border-box; background-color: rgba(255, 255, 255, 0.01); color: white; outline: none; transition: 0.3s;
+    .close-modal-btn {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 18px;
+        cursor: pointer;
+        transition: 0.2s;
     }
-    .score-input:focus { border-color: #00f2fe; background: rgba(255,255,255,0.04); box-shadow: 0 0 12px rgba(0, 242, 254, 0.15); }
-
-    .file-link { color: #00f2fe; text-decoration: none; font-weight: 600; transition: 0.3s; }
-    .file-link:hover { text-shadow: 0 0 8px rgba(0, 242, 254, 0.4); }
-
-    .btn-save {
-        padding: 12px 24px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12;
-        border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 800;
-        text-transform: uppercase; letter-spacing: 0.5px; transition: 0.3s; box-shadow: 0 5px 15px rgba(0, 242, 254, 0.2); margin-top: 15px; margin-right: 10px;
+    .close-modal-btn:hover {
+        color: #ff4d6d;
     }
-    .btn-save:hover { box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); }
-
-    .btn-cancel {
-        padding: 12px 24px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08);
-        color: rgba(255, 255, 255, 0.7); border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 800;
-        text-transform: uppercase; letter-spacing: 0.5px; transition: 0.3s; margin-top: 15px;
+    body.light-mode .close-modal-btn {
+        color: #64748b !important;
     }
-    .btn-cancel:hover { background: rgba(255, 0, 85, 0.1); border-color: #ff0055; color: #ff0055; }
+    body.light-mode .close-modal-btn:hover {
+        color: #dc2626 !important;
+    }
 
-    .chiqish_sahifa { display: flex; align-items: center; margin-top: 25px; }
+    .modal-field-block {
+        margin-bottom: 16px;
+    }
+    .modal-field-label {
+        font-size: 11.5px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 6px;
+        display: block;
+    }
+    body.light-mode .modal-field-label {
+        color: #64748b !important;
+    }
+    .modal-field-val {
+        font-size: 14.5px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+    body.light-mode .modal-field-val {
+        color: #0f172a !important;
+    }
 
-    /* ==========================================
-       📱 TELEFON EKRANI UCHUN MUKAMMAL SKROL REJIMI
-       ========================================== */
+    /* Tezkor foiz tugmalari (Score Presets) */
+    .score-presets-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+    .preset-chip-btn {
+        padding: 5px 10px;
+        border-radius: 8px;
+        background: rgba(0, 242, 254, 0.08);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        color: #00f2fe;
+        font-size: 11.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .preset-chip-btn:hover {
+        background: #00f2fe;
+        color: #050b18;
+    }
+    body.light-mode .preset-chip-btn {
+        background: #e0f2fe !important;
+        border-color: #bae6fd !important;
+        color: #0284c7 !important;
+    }
+    body.light-mode .preset-chip-btn:hover {
+        background: #0284c7 !important;
+        color: #ffffff !important;
+    }
+
+    .modal-input-field {
+        width: 100%;
+        padding: 11px 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        box-sizing: border-box;
+        background-color: rgba(255, 255, 255, 0.02);
+        color: #ffffff;
+        outline: none;
+        font-family: inherit;
+        font-size: 14px;
+        transition: 0.25s ease;
+    }
+    .modal-input-field:focus {
+        border-color: #00f2fe !important;
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 0 12px rgba(0, 242, 254, 0.2) !important;
+    }
+    body.light-mode .modal-input-field {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    body.light-mode .modal-input-field:focus {
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
+    }
+
+    .modal-actions-row {
+        margin-top: 22px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+    .btn-modal-save {
+        padding: 11px 26px;
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        color: #070a12;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 13.5px;
+        font-weight: 800;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 15px rgba(0, 242, 254, 0.25);
+    }
+    .btn-modal-save:hover {
+        box-shadow: 0 0 20px rgba(0, 242, 254, 0.45);
+        transform: translateY(-1px);
+    }
+    body.light-mode .btn-modal-save {
+        background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25) !important;
+    }
+    body.light-mode .btn-modal-save:hover {
+        background: linear-gradient(135deg, #0369a1, #0284c7) !important;
+        box-shadow: 0 6px 18px rgba(2, 132, 199, 0.35) !important;
+    }
+
+    .btn-modal-cancel {
+        padding: 11px 22px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.7);
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 13.5px;
+        font-weight: 700;
+        transition: 0.25s ease;
+    }
+    .btn-modal-cancel:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+    }
+    body.light-mode .btn-modal-cancel {
+        background: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #475569 !important;
+    }
+    body.light-mode .btn-modal-cancel:hover {
+        background: #e2e8f0 !important;
+        color: #0f172a !important;
+    }
+
+    /* =========================================================
+       📱 RESPONSIVE MEDIA QUERIES (MOBIL KARTALAR)
+       ========================================================= */
+    @media (max-width: 992px) {
+        .stats-overview-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
     @media (max-width: 768px) {
-        /* 🛠️ ENG MUHIM TUZATISH: Ota shablon cheklovlarini buzib skrolni ochamiz */
         body .konteyner {
             height: auto !important;
             overflow: visible !important;
-            padding: 15px !important;
+            padding: 12px 14px 35px 14px !important;
+        }
+        .sarlavha-qatori {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            margin-bottom: 18px !important;
+        }
+        .sarlavha {
+            font-size: 18px !important;
+            border-left-width: 3.5px !important;
+            padding-left: 10px !important;
+        }
+        .sarlavha-subtitle {
+            font-size: 12px !important;
+            padding-left: 14px !important;
+        }
+        .toolbar-panel {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+        .search-form {
+            width: 100% !important;
         }
 
-        .assignment-meta-grid { grid-template-columns: 1fr; gap: 15px; }
-        .chiqish_sahifa { justify-content: center; width: 100%; }
-        .btn-otish { width: 100%; }
-        .search-input { width: 130px; margin-left: 10px; padding: 8px 12px; }
-        .search-btn { padding: 8px 14px; }
-
-        .jadval-container { max-height: none; overflow: visible; padding: 0; border: none; background: transparent; box-shadow: none; }
-        table, thead, tbody, th, td, tr { display: block; }
-        thead { display: none; }
-
-        tbody tr {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px; padding: 16px; margin-bottom: 16px; backdrop-filter: blur(10px);
+        .jadval-container {
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            overflow: visible !important;
+            max-height: none !important;
+            margin-bottom: 35px !important;
         }
-        tbody td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.03); text-align: right; font-size: 13px; }
-        tbody td:last-child { border-bottom: none; }
-        tbody td::before { content: attr(data-label); float: left; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+
+        table, thead, tbody, th, td, tr {
+            display: block !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        thead {
+            display: none !important;
+        }
+
+        /* Mobil karta */
+        tbody tr.submission-item-row {
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px solid rgba(255, 255, 255, 0.06) !important;
+            border-radius: 18px !important;
+            padding: 16px !important;
+            margin-bottom: 14px !important;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.18) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative !important;
+        }
+        tbody tr.submission-item-row.submitted {
+            border-left: 5px solid #10b981 !important;
+        }
+        tbody tr.submission-item-row.not-submitted {
+            border-left: 5px solid #ef4444 !important;
+        }
+
+        body.light-mode tbody tr.submission-item-row {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+        }
+        body.light-mode tbody tr.submission-item-row.submitted {
+            border-left: 5px solid #16a34a !important;
+        }
+        body.light-mode tbody tr.submission-item-row.not-submitted {
+            border-left: 5px solid #dc2626 !important;
+        }
+
+        tbody td {
+            padding: 0 !important;
+            border: none !important;
+            background: transparent !important;
+            width: 100% !important;
+        }
+
+        .mobile-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .mobile-metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .mobile-metric-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        body.light-mode .mobile-metric-box {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        .mobile-metric-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: rgba(255, 255, 255, 0.45);
+        }
+        body.light-mode .mobile-metric-label {
+            color: #64748b !important;
+        }
+        .mobile-metric-val {
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+        body.light-mode .mobile-metric-val {
+            color: #0f172a !important;
+        }
+
+        .mobile-actions-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .mobile-actions-row .btn-action-primary,
+        .mobile-actions-row .file-chip-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 9px 12px;
+        }
     }
+
+    @media (max-width: 576px) {
+        .stats-overview-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .d-row-hidden { display: none !important; }
 </style>
 {% endblock %}
 
 {% block content %}
-    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <a href="{% url 'teacher_deadline' %}" class="btn-back-icon" title="Topshiriqlar paneliga qaytish">
+    <!-- 🔝 SARLAVHA VA ORTGA QAYTISH -->
+    <div class="sarlavha-qatori">
+        <div class="sarlavha-left-wrap">
+            <a href="{% url 'teacher_deadline' %}" class="btn-back-icon" title="Topshiriqlar boshqaruviga qaytish">
                 <i class="fas fa-arrow-left"></i>
             </a>
-            <h2 class="sarlavha">Topshiriq: {{ assignment.title }} ({{ assignment.group.name }})</h2>
+            <div class="sarlavha-text-wrap">
+                <h2 class="sarlavha">
+                    <i class="fas fa-clipboard-check title-icon"></i> Topshiriq: {{ assignment.title }}
+                </h2>
+                <p class="sarlavha-subtitle">Guruh: <strong>{{ assignment.group.name }}</strong> &bull; Muddat: {{ assignment.deadline|date:"d.m.Y H:i" }} &bull; Max ball: {{ assignment.max_score }}</p>
+            </div>
         </div>
     </div>
 
-    <div class="assignment-meta-grid">
-        <div class="kiber-karta">
-            <div class="matn-qismi">
-                <span class="kichik-tizim">Topshiriq nomi</span>
-                <span class="katta-qiymat">{{ assignment.title }}</span>
+    <!-- 📊 4 TA STATISTIKA KARTASI -->
+    <div class="stats-overview-grid">
+        <!-- 1. Guruh & Max Ball -->
+        <div class="stat-card blue">
+            <div class="stat-icon-wrap"><i class="fas fa-users"></i></div>
+            <div class="stat-info">
+                <span class="stat-value">{{ assignment.group.name }}</span>
+                <span class="stat-label">Max ball: {{ assignment.max_score }} ball</span>
             </div>
-            <div class="ikonka-qutisi"><i class="fas fa-clipboard-list"></i></div>
         </div>
 
-        <div class="kiber-karta">
-            <div class="matn-qismi">
-                <span class="kichik-tizim">Guruh</span>
-                <span class="katta-qiymat" style="color: #4facfe;">{{ assignment.group.name }}</span>
+        <!-- 2. Topshirganlar -->
+        <div class="stat-card green">
+            <div class="stat-icon-wrap"><i class="fas fa-user-check"></i></div>
+            <div class="stat-info">
+                <span class="stat-value">{{ submitted_count }} / {{ total_students }}</span>
+                <span class="stat-label">Topshirganlar ({{ submission_percent }}%)</span>
             </div>
-            <div class="ikonka-qutisi"><i class="fas fa-users"></i></div>
         </div>
 
-        <div class="kiber-karta" style="border-color: rgba(0, 255, 170, 0.15);">
-            <div class="matn-qismi">
-                <span class="kichik-tizim">Maksimal Ball</span>
-                <span class="katta-qiymat" style="color: #00ffaa;">{{ assignment.max_score }} ball</span>
+        <!-- 3. Baholangan / Kutilmoqda -->
+        <div class="stat-card amber">
+            <div class="stat-icon-wrap"><i class="fas fa-hourglass-half"></i></div>
+            <div class="stat-info">
+                <span class="stat-value">{{ graded_count }} / {{ submitted_count }}</span>
+                <span class="stat-label">Baholandi ({{ ungraded_count }} kutilmoqda)</span>
             </div>
-            <div class="ikonka-qutisi" style="color: #00ffaa; border-color: rgba(0,255,170,0.2);"><i class="fas fa-star"></i></div>
+        </div>
+
+        <!-- 4. O'rtacha Natija -->
+        <div class="stat-card purple">
+            <div class="stat-icon-wrap"><i class="fas fa-star"></i></div>
+            <div class="stat-info">
+                <span class="stat-value">{% if avg_score %}{{ avg_score }} ball{% else %}—{% endif %}</span>
+                <span class="stat-label">O'rtacha natija ({% if avg_percent %}{{ avg_percent }}%{% else %}0%{% endif %})</span>
+            </div>
         </div>
     </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 0 20px 0; flex-wrap: wrap; gap: 15px;">
-        <h3 style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;"><i class="fas fa-list" style="color: #00f2fe;"></i> Topshirganlar ro'yxati</h3>
-        
-        <!-- SUBMISSIONS SEARCH FORM -->
-        <form class="search-form" onsubmit="event.preventDefault()">
-            <input type="text" class="search-input" placeholder="Familiya bo'yicha qidiruv..." id="qidiruv">
-            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+    <!-- 🔍 FILTER VA QIDIRUV QATORI -->
+    <div class="toolbar-panel">
+        <div class="filter-pills-group">
+            <div class="filter-pill active" data-filter="all">
+                <i class="fas fa-layer-group"></i> Barchasi <span class="pill-badge">{{ total_students }}</span>
+            </div>
+            <div class="filter-pill" data-filter="submitted">
+                <i class="fas fa-check-circle" style="color: #10b981;"></i> Topshirganlar <span class="pill-badge">{{ submitted_count }}</span>
+            </div>
+            <div class="filter-pill" data-filter="graded">
+                <i class="fas fa-marker" style="color: #00f2fe;"></i> Baholanganlar <span class="pill-badge">{{ graded_count }}</span>
+            </div>
+            <div class="filter-pill" data-filter="ungraded">
+                <i class="fas fa-clock" style="color: #f59e0b;"></i> Baholanmaganlar <span class="pill-badge">{{ ungraded_count }}</span>
+            </div>
+            <div class="filter-pill" data-filter="not-submitted">
+                <i class="fas fa-times-circle" style="color: #ef4444;"></i> Topshirmaganlar <span class="pill-badge">{{ not_submitted_count }}</span>
+            </div>
+        </div>
+
+        <form class="search-form" onsubmit="event.preventDefault();">
+            <input type="text" class="search-input" placeholder="Familiya, ism yoki telefon..." id="qidiruv" autocomplete="off">
+            <button type="submit" class="search-btn" aria-label="Qidirish"><i class="fas fa-search"></i></button>
         </form>
     </div>
 
-    <!-- JADVAL KONTENYNERI (TO'LIQ CHEKSIZ RO'YXAT) -->
-    <div class="jadval-container">
-        <table>
+    <!-- 📋 JADVAL KONTEYNERI -->
+    {% if student_data %}
+    <div class="jadval-container" id="jadvalContainer">
+        <table id="submissionsTable">
             <thead>
                 <tr>
-                    <th style="width: 60px; color: #4facfe;">№</th>
-                    <th>Familiya</th>
-                    <th>Ism</th>
+                    <th style="width: 45px; text-align: center;">№</th>
+                    <th>O'quvchi</th>
                     <th>Telefon raqam</th>
-                    <th>Topshirilganligi</th>
-                    <th style="width: 100px; text-align: center;">Fayl</th>
-                    <th style="width: 120px; text-align: center;">Ball</th>
-                    <th style="width: 120px; text-align: center;">Baholash</th>
+                    <th style="text-align: center;">Topshirish holati</th>
+                    <th style="text-align: center;">Biriktirilgan fayl</th>
+                    <th style="text-align: center;">To'plangan ball</th>
+                    <th style="text-align: center;">Amallar</th>
+                    <th style="text-align: right; padding-right: 25px;">Topshirilgan vaqt</th>
                 </tr>
             </thead>
             <tbody id="jadval-qatorlari">
                 {% for item in student_data %}
-                <tr>
-                    <td data-label="№" style="font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
-                    <td data-label="Familiya" style="font-weight: 700; color: #ffffff;">{{ item.student.last_name }}</td>
-                    <td data-label="Ism">{{ item.student.first_name }}</td>
-                    <td data-label="Telefon raqam" style="font-family: monospace; color: rgba(255,255,255,0.6);">{{ item.student.phone_number }}</td>
-                    <td data-label="Topshirilganligi">
-                        {% if item.submission %}
-                            <span style="color: #00ffaa; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 170, 0.2);"><i class="fas fa-check-circle" style="margin-right: 6px;"></i>Topshirgan</span>
-                        {% else %}
-                            <span style="color: #ff0055; font-weight: 600; text-shadow: 0 0 10px rgba(255, 0, 85, 0.2);"><i class="fas fa-times-circle" style="margin-right: 6px;"></i>Topshirmagan</span>
-                        {% endif %}
-                    </td>
-                    <td data-label="Fayl" style="text-align: center;">
-                        {% if item.submission and item.submission.file %}
-                            <a class="btn-otish" href="{{ item.submission.file.url }}" target="_blank"><i class="fas fa-eye"></i></a>
-                        {% else %}
-                            <span style="color: rgba(255,255,255,0.2);">—</span>
-                        {% endif %}
-                    </td>
-                    <td data-label="Ball" style="text-align: center; font-weight: 700; color: #4facfe;">
-                        {% if item.submission %}
-                            {% if item.submission.grade %}
-                                {{ item.submission.grade }}
-                            {% else %}
-                                <em style="color: rgba(255,255,255,0.4); font-size: 12px; font-weight: normal;">Baholanmagan</em>
+                    <tr class="submission-item-row {% if item.submission %}submitted{% else %}not-submitted{% endif %}"
+                        data-submitted="{% if item.submission %}submitted{% else %}not-submitted{% endif %}"
+                        data-graded="{% if item.submission and item.submission.grade is not None %}graded{% elif item.submission %}ungraded{% else %}not-submitted{% endif %}"
+                        data-name="{{ item.student.last_name|lower }} {{ item.student.first_name|lower }}"
+                        data-phone="{{ item.student.phone_number|default:'' }}">
+
+                        <!-- 📱 MOBIL REJIM KARTASI -->
+                        <td class="d-md-none" style="display: none;">
+                            <div class="mobile-card-header">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span class="row-index-pill mobile-row-index">{{ forloop.counter }}</span>
+                                    <div class="student-avatar-box">
+                                        {{ item.student.first_name|slice:":1"|upper }}{{ item.student.last_name|slice:":1"|upper }}
+                                    </div>
+                                    <div class="student-names-col">
+                                        <div class="student-full-name">{{ item.student.last_name }} {{ item.student.first_name }}</div>
+                                        <div class="phone-chip {% if not item.student.phone_number %}empty{% endif %}">
+                                            {{ item.student.phone_number|default:"Telefon ko'rsatilmagan" }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="status-pill {% if item.submission %}submitted{% else %}not-submitted{% endif %}">
+                                    {% if item.submission %}
+                                        <i class="fas fa-check-circle"></i> Topshirdi
+                                    {% else %}
+                                        <i class="fas fa-times-circle"></i> Topshirmadi
+                                    {% endif %}
+                                </span>
+                            </div>
+
+                            <div class="mobile-metrics-grid">
+                                <div class="mobile-metric-box">
+                                    <span class="mobile-metric-label">To'plangan Ball</span>
+                                    <span class="mobile-metric-val">
+                                        {% if item.submission %}
+                                            {% if item.submission.grade is not None %}
+                                                <span style="color: #00f2fe;">{{ item.submission.grade }} / {{ assignment.max_score }}</span>
+                                            {% else %}
+                                                <span style="color: #f59e0b;">Baholanmagan</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span style="color: rgba(255,255,255,0.35);">—</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="mobile-metric-box">
+                                    <span class="mobile-metric-label">Topshirgan vaqti</span>
+                                    <span class="mobile-metric-val" style="font-size: 12px; font-weight: 600;">
+                                        {% if item.submission %}
+                                            <i class="far fa-clock" style="margin-right: 4px; color: #4facfe;"></i>{{ item.submission.submitted_at|date:"d.m.Y H:i" }}
+                                        {% else %}
+                                            <span style="color: rgba(255,255,255,0.35);">Topshirmadi</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {% if item.submission %}
+                                <div class="mobile-actions-row">
+                                    {% if item.submission.file %}
+                                        <a href="{{ item.submission.file.url }}" target="_blank" class="file-chip-btn">
+                                            <i class="fas fa-file-download"></i> Faylni ko'rish
+                                        </a>
+                                    {% endif %}
+                                    <button type="button" class="btn-action-primary"
+                                            onclick="openModal('{{ item.student.id }}', '{{ item.student.get_full_name|escapejs }}', '{% if item.submission.file %}{{ item.submission.file.url }}{% endif %}', '{{ item.submission.grade|default:'' }}', '{{ item.submission.feedback|default:''|escapejs }}', '{{ assignment.max_score }}')">
+                                        <i class="fas fa-marker"></i> {% if item.submission.grade is not None %}Bahoni o'zgartirish{% else %}Baholash{% endif %}
+                                    </button>
+                                </div>
                             {% endif %}
-                        {% else %}
-                            <span style="color: rgba(255,255,255,0.2);">—</span>
-                        {% endif %}
-                    </td>
-                    <td data-label="Baholash" style="text-align: center;">
-                        {% if item.submission %}
-                            <button class="btn-otish" onclick="openModal('{{ item.student.id }}', '{{ item.student.get_full_name }}', '{% if item.submission.file %}{{ item.submission.file.url }}{% endif %}', '{{ item.submission.grade|default:'' }}', '{{ item.submission.feedback|default:''|escapejs }}')"><i class="fas fa-marker" style="margin-right: 6px;"></i>Baholash</button>
-                        {% else %}
-                            <span style="color: rgba(255,255,255,0.2);">—</span>
-                        {% endif %}
-                    </td>
-                </tr>
+                        </td>
+
+                        <!-- 💻 DESKTOP USTUNLAR -->
+                        <td class="d-none d-md-table-cell" style="text-align: center;">
+                            <span class="row-index-pill row-index-cell">{{ forloop.counter }}</span>
+                        </td>
+                        <td class="d-none d-md-table-cell">
+                            <div class="student-cell-wrap">
+                                <div class="student-avatar-box">
+                                    {{ item.student.first_name|slice:":1"|upper }}{{ item.student.last_name|slice:":1"|upper }}
+                                </div>
+                                <div class="student-names-col">
+                                    <span class="student-full-name">{{ item.student.last_name }} {{ item.student.first_name }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="d-none d-md-table-cell">
+                            <span class="phone-chip {% if not item.student.phone_number %}empty{% endif %}">
+                                {{ item.student.phone_number|default:"—" }}
+                            </span>
+                        </td>
+                        <td class="d-none d-md-table-cell" style="text-align: center;">
+                            {% if item.submission %}
+                                <span class="status-pill submitted">
+                                    <i class="fas fa-check-circle"></i> Topshirgan
+                                </span>
+                            {% else %}
+                                <span class="status-pill not-submitted">
+                                    <i class="fas fa-times-circle"></i> Topshirmagan
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="d-none d-md-table-cell" style="text-align: center;">
+                            {% if item.submission and item.submission.file %}
+                                <a href="{{ item.submission.file.url }}" target="_blank" class="file-chip-btn" title="Faylni yuklab olish yoki ko'rish">
+                                    <i class="fas fa-file-download"></i> Faylni ko'rish
+                                </a>
+                            {% elif item.submission and item.submission.text %}
+                                <span style="font-size: 12.5px; color: rgba(255,255,255,0.7); font-style: italic;">Matnli javob</span>
+                            {% else %}
+                                <span style="color: rgba(255,255,255,0.35);">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="d-none d-md-table-cell" style="text-align: center;">
+                            {% if item.submission %}
+                                {% if item.submission.grade is not None %}
+                                    <span class="score-pill-badge">
+                                        <i class="fas fa-star" style="font-size: 11px;"></i> {{ item.submission.grade }} / {{ assignment.max_score }}
+                                    </span>
+                                {% else %}
+                                    <span class="score-pill-badge ungraded">
+                                        <i class="fas fa-clock" style="font-size: 11px;"></i> Baholanmagan
+                                    </span>
+                                {% endif %}
+                            {% else %}
+                                <span style="color: rgba(255,255,255,0.35); font-weight: 600;">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="d-none d-md-table-cell" style="text-align: center;">
+                            {% if item.submission %}
+                                <button type="button" class="btn-action-primary"
+                                        onclick="openModal('{{ item.student.id }}', '{{ item.student.get_full_name|escapejs }}', '{% if item.submission.file %}{{ item.submission.file.url }}{% endif %}', '{{ item.submission.grade|default:'' }}', '{{ item.submission.feedback|default:''|escapejs }}', '{{ assignment.max_score }}')">
+                                    <i class="fas fa-marker"></i> {% if item.submission.grade is not None %}O'zgartirish{% else %}Baholash{% endif %}
+                                </button>
+                            {% else %}
+                                <span style="color: rgba(255,255,255,0.3); font-size: 12px; font-style: italic;">Topshirmadi</span>
+                            {% endif %}
+                        </td>
+                        <td class="d-none d-md-table-cell" style="text-align: right; padding-right: 25px;">
+                            {% if item.submission %}
+                                <span class="date-chip">
+                                    <i class="far fa-clock"></i> {{ item.submission.submitted_at|date:"d.m.Y H:i" }}
+                                </span>
+                            {% else %}
+                                <span style="color: rgba(255,255,255,0.4); font-style: italic; font-size: 12px;">Topshirmadi</span>
+                            {% endif %}
+                        </td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-
-    <!-- Baholash modal oynasi -->
-    <div class="grade-modal-overlay">
-      <div class="grade-modal">
-        <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <h3 class="grade-modal-title" style="margin-bottom: 0;">Baholash</h3>
-            <button class="close-modal" onclick="closeModal()">✖</button>
+    {% else %}
+        <div class="empty-state-box">
+            <i class="fas fa-users-slash"></i>
+            Ushbu topshiriq uchun hali o'quvchilar ro'yxati mavjud emas.
         </div>
-        <form method="post" action="{% url 'grade_assignment' %}" class="grade-form">
-          {% csrf_token %}
-          <p><strong>O'quvchi:</strong> <span class="student-name" style="font-weight: 700; color: #ffffff;"></span></p>
-          <input type="hidden" name="student_id" class="student-id">
-          <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
+    {% endif %}
 
-          <p><strong>Topshiriq fayli:</strong>
-            <a href="#" class="file-link" target="_blank"><i class="fas fa-download" style="margin-right: 6px;"></i>Faylni yuklab olish</a>
-          </p>
+    <!-- 👾 BAHOLASH MODAL OYNASI -->
+    <div class="grade-modal-overlay" id="gradeModalOverlay" onclick="handleOverlayClick(event)">
+        <div class="grade-modal">
+            <div class="modal-header-row">
+                <h3 class="grade-modal-title">
+                    <i class="fas fa-marker" style="color: #00f2fe; margin-right: 6px;"></i> Topshiriqni Baholash
+                </h3>
+                <button type="button" class="close-modal-btn" onclick="closeModal()" aria-label="Yopish">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
 
-          <p><strong>Ball (0 - {{ assignment.max_score }}):</strong></p>
-          <input type="number" name="score" class="score-input" min="0" max="{{ assignment.max_score }}" required>
+            <form method="post" action="{% url 'grade_assignment' %}" class="grade-form" id="gradeForm">
+                {% csrf_token %}
+                <input type="hidden" name="student_id" class="student-id" id="modalStudentId">
+                <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
 
-          <p style="margin-top: 15px;"><strong>Izoh (Feedback):</strong></p>
-          <textarea name="feedback" class="feedback-input score-input" style="height: 80px; resize: vertical;" placeholder="O'quvchiga izoh yozing..."></textarea>
+                <!-- O'quvchi ismi -->
+                <div class="modal-field-block">
+                    <span class="modal-field-label">O'quvchi:</span>
+                    <span class="modal-field-val" id="modalStudentName"></span>
+                </div>
 
-          <div style="margin-top: 25px; display: flex; gap: 12px;">
-              <button type="submit" class="btn-save">Saqlash</button>
-              <button type="button" class="btn-cancel" onclick="closeModal()">Bekor qilish</button>
-          </div>
-        </form>
-      </div>
+                <!-- Fayl havolasi -->
+                <div class="modal-field-block" id="modalFileBlock">
+                    <span class="modal-field-label">Topshirilgan fayl:</span>
+                    <a href="#" class="file-chip-btn" id="modalFileLink" target="_blank">
+                        <i class="fas fa-download"></i> Faylni yuklab olish / ko'rish
+                    </a>
+                </div>
+
+                <!-- Ball kiritish va tezkor foiz presetlari -->
+                <div class="modal-field-block">
+                    <span class="modal-field-label">Ball (0 - {{ assignment.max_score }}):</span>
+                    <div class="score-presets-row">
+                        <button type="button" class="preset-chip-btn" onclick="setPresetScore(1.0)">100% (max)</button>
+                        <button type="button" class="preset-chip-btn" onclick="setPresetScore(0.85)">85%</button>
+                        <button type="button" class="preset-chip-btn" onclick="setPresetScore(0.70)">70%</button>
+                        <button type="button" class="preset-chip-btn" onclick="setPresetScore(0.50)">50%</button>
+                    </div>
+                    <input type="number" name="score" id="modalScoreInput" class="modal-input-field" min="0" max="{{ assignment.max_score }}" required placeholder="To'plangan ballni kiriting...">
+                </div>
+
+                <!-- Feedback / Izoh -->
+                <div class="modal-field-block">
+                    <span class="modal-field-label">O'quvchiga izoh (Feedback):</span>
+                    <textarea name="feedback" id="modalFeedbackInput" class="modal-input-field" style="height: 80px; resize: vertical;" placeholder="O'quvchiga foydali tavsiya yoki fikringizni yozing..."></textarea>
+                </div>
+
+                <!-- Amallar tugmalari -->
+                <div class="modal-actions-row">
+                    <button type="button" class="btn-modal-cancel" onclick="closeModal()">Bekor qilish</button>
+                    <button type="submit" class="btn-modal-save">
+                        <i class="fas fa-check"></i> Saqlash
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    /* --- 🔍 JONLI QIDIRUV VA DINAMIK TARTIBRAQAMLASH MANTIQLARI --- */
-    document.addEventListener('DOMContentLoaded', () => {
-        const qidiruvMaydoni = document.getElementById("qidiruv");
-        const tableRows = document.querySelectorAll("#jadval-qatorlari tr");
+    let currentMaxScore = {{ assignment.max_score|default:100 }};
 
-        // Qidiruv vaqtida № tartib raqamlarini dinamik ravishda to'g'rilash
-        function updateRowNumbers() {
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById("qidiruv");
+        const filterPills = document.querySelectorAll(".filter-pill");
+        const tableRows = document.querySelectorAll("#jadval-qatorlari tr.submission-item-row");
+
+        let currentFilter = "all";
+        let currentSearch = "";
+
+        function applyFilters() {
             let visibleIndex = 1;
+
             tableRows.forEach(row => {
-                if (row.style.display !== "none" && row.cells.length > 1) {
-                    const firstCell = row.querySelector("td");
-                    if (firstCell) {
-                        firstCell.textContent = visibleIndex++;
+                const rowSubmitted = row.getAttribute("data-submitted") || "";
+                const rowGraded = row.getAttribute("data-graded") || "";
+                const rowName = row.getAttribute("data-name") || "";
+                const rowPhone = row.getAttribute("data-phone") || "";
+
+                let matchesFilter = false;
+                if (currentFilter === "all") {
+                    matchesFilter = true;
+                } else if (currentFilter === "submitted") {
+                    matchesFilter = (rowSubmitted === "submitted");
+                } else if (currentFilter === "graded") {
+                    matchesFilter = (rowGraded === "graded");
+                } else if (currentFilter === "ungraded") {
+                    matchesFilter = (rowGraded === "ungraded");
+                } else if (currentFilter === "not-submitted") {
+                    matchesFilter = (rowSubmitted === "not-submitted");
+                }
+
+                const matchesSearch = !currentSearch || rowName.includes(currentSearch) || rowPhone.includes(currentSearch);
+
+                if (matchesFilter && matchesSearch) {
+                    row.classList.remove("d-row-hidden");
+                    row.style.removeProperty("display");
+                    const indexCell = row.querySelector(".row-index-cell");
+                    const mobileIndex = row.querySelector(".mobile-row-index");
+                    if (indexCell) {
+                        indexCell.textContent = visibleIndex;
                     }
+                    if (mobileIndex) {
+                        mobileIndex.textContent = visibleIndex;
+                    }
+                    visibleIndex++;
+                } else {
+                    row.classList.add("d-row-hidden");
+                    row.style.setProperty("display", "none", "important");
                 }
             });
         }
 
-        if (qidiruvMaydoni) {
-            qidiruvMaydoni.addEventListener("input", function() {
-                const izlashSozi = this.value.toLowerCase().trim();
+        filterPills.forEach(pill => {
+            pill.addEventListener("click", function() {
+                filterPills.forEach(p => p.classList.remove("active"));
+                this.classList.add("active");
+                currentFilter = this.getAttribute("data-filter");
+                applyFilters();
+            });
+        });
 
-                tableRows.forEach(row => {
-                    const familiyaCell = row.cells[1];
-                    if (familiyaCell) {
-                        const familiya = familiyaCell.textContent.toLowerCase().trim();
-                        if (familiya.includes(izlashSozi)) {
-                            row.style.display = "";
-                        } else {
-                            row.style.display = "none";
-                        }
-                    }
-                });
-
-                updateRowNumbers();
+        if (searchInput) {
+            searchInput.addEventListener("input", function() {
+                currentSearch = this.value.toLowerCase().trim();
+                applyFilters();
             });
         }
     });
 
     /* --- 🎭 MODAL OYNA INTERFAOL ACTIONLARI --- */
-    function openModal(studentId, studentName, fileUrl, score, feedback) {
-        document.querySelector('.student-id').value = studentId;
-        document.querySelector('.student-name').innerText = studentName;
-        document.querySelector('.file-link').href = fileUrl;
-        document.querySelector('.score-input').value = score || '';
-        document.querySelector('.feedback-input').value = feedback || '';
-        document.querySelector('.grade-modal-overlay').style.display = 'flex';
+    function openModal(studentId, studentName, fileUrl, score, feedback, maxScore) {
+        currentMaxScore = parseInt(maxScore) || currentMaxScore;
+        document.getElementById('modalStudentId').value = studentId;
+        document.getElementById('modalStudentName').textContent = studentName;
+
+        const fileBlock = document.getElementById('modalFileBlock');
+        const fileLink = document.getElementById('modalFileLink');
+        if (fileUrl && fileUrl.trim() !== '') {
+            fileLink.href = fileUrl;
+            fileBlock.style.display = 'block';
+        } else {
+            fileBlock.style.display = 'none';
+        }
+
+        document.getElementById('modalScoreInput').value = score || '';
+        document.getElementById('modalFeedbackInput').value = feedback || '';
+
+        const overlay = document.getElementById('gradeModalOverlay');
+        overlay.style.display = 'flex';
     }
 
     function closeModal() {
-        document.querySelector('.grade-modal-overlay').style.display = 'none';
+        document.getElementById('gradeModalOverlay').style.display = 'none';
+    }
+
+    function handleOverlayClick(event) {
+        if (event.target === document.getElementById('gradeModalOverlay')) {
+            closeModal();
+        }
+    }
+
+    function setPresetScore(percentage) {
+        const calculated = Math.round(currentMaxScore * percentage);
+        document.getElementById('modalScoreInput').value = calculated;
     }
 </script>
 {% endblock %}

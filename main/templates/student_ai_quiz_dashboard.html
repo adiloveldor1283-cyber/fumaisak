@@ -18,6 +18,8 @@
         border-left: 4px solid #00f2fe;
         padding-left: 12px;
         letter-spacing: -0.5px;
+        margin: 0;
+        line-height: 1.2;
     }
     .content-title span {
         color: #00f2fe;
@@ -78,11 +80,12 @@
         grid-template-columns: 1.1fr 1.9fr;
         gap: 25px;
         align-items: start;
+        margin-bottom: 25px;
     }
 
     /* Glass Cards */
     .glass-card {
-        background: rgba(255, 255, 255, 0.01);
+        background: rgba(255, 255, 255, 0.015);
         border: 1px solid rgba(255, 255, 255, 0.04);
         border-radius: 24px;
         padding: 25px;
@@ -125,16 +128,28 @@
         color: white;
         outline: none;
         transition: all 0.3s;
+        -webkit-appearance: none;
+        appearance: none;
+        -webkit-tap-highlight-color: transparent;
     }
-    .form-control:focus {
-        border-color: #00f2fe;
-        box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+    .form-control:focus,
+    .form-control:focus-visible,
+    .form-control:active {
+        border-color: #00f2fe !important;
+        outline: none !important;
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.2) !important;
     }
 
     /* Difficulty Selection Styling */
     .level-grid {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+    .num-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
         gap: 10px;
         margin-bottom: 25px;
     }
@@ -153,12 +168,13 @@
         font-size: 12px;
         font-weight: 700;
         color: rgba(255, 255, 255, 0.6);
+        user-select: none;
     }
     .level-item input[type="radio"]:checked + .level-label {
-        background: rgba(0, 242, 254, 0.06);
+        background: rgba(0, 242, 254, 0.08);
         border-color: #00f2fe;
         color: #00f2fe;
-        box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
     }
 
     /* Buttons */
@@ -187,8 +203,8 @@
 
     /* History Table Card (Desktop) */
     .table-container {
-        overflow: auto;
-        max-height: 400px;
+        overflow-y: auto;
+        max-height: 440px;
     }
     .table-container::-webkit-scrollbar {
         width: 4px;
@@ -211,6 +227,10 @@
         color: rgba(255, 255, 255, 0.4);
         letter-spacing: 0.5px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        position: sticky;
+        top: 0;
+        background: #080d1a;
+        z-index: 2;
     }
     td {
         padding: 14px 10px;
@@ -335,6 +355,16 @@
         font-size: 12px;
     }
 
+    /* Today quiz alert */
+    .today-quiz-alert {
+        background: rgba(0, 242, 254, 0.05);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        border-radius: 14px;
+        padding: 16px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
     /* --- 📱 MOBIL REJIM VERTIKAL REJIM --- */
     @media (max-width: 1024px) {
         .workspace-grid {
@@ -342,61 +372,316 @@
         }
     }
     @media (max-width: 768px) {
-        .level-grid {
-            grid-template-columns: 1fr !important;
+        .content-header {
+            margin-bottom: 16px !important;
+            padding: 0 !important;
+        }
+        .content-title {
+            font-size: 18px !important;
+            border-left-width: 3px !important;
+            padding-left: 8px !important;
+            margin: 0 !important;
+        }
+
+        /* 2x2 statistika kartalari */
+        .kartalar {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
             gap: 10px !important;
+            margin-bottom: 16px !important;
+        }
+        .karta {
+            min-width: 0 !important;
+            padding: 12px 14px !important;
+            border-radius: 14px !important;
+        }
+        .karta .matn {
+            font-size: 10px !important;
+            margin-bottom: 3px !important;
+        }
+        .karta .pul {
+            font-size: 18px !important;
+        }
+        .karta .ikonka {
+            width: 36px !important;
+            height: 36px !important;
+            font-size: 14px !important;
+            border-radius: 10px !important;
+        }
+
+        .workspace-grid {
+            grid-template-columns: 1fr !important;
+            gap: 14px !important;
+            margin-bottom: 25px !important;
+        }
+        .glass-card {
+            padding: 16px 14px !important;
+            border-radius: 18px !important;
+            margin-bottom: 0 !important;
+        }
+        .glass-card h3 {
+            font-size: 15px !important;
+            margin-bottom: 14px !important;
+        }
+        .form-group {
+            margin-bottom: 14px !important;
+        }
+        .form-group label {
+            font-size: 10.5px !important;
+            margin-bottom: 6px !important;
+        }
+        .form-control {
+            padding: 10px 12px !important;
+            font-size: 13px !important;
+            border-radius: 10px !important;
+        }
+        .num-grid {
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 6px !important;
+            margin-bottom: 14px !important;
+        }
+        .level-grid {
+            grid-template-columns: 1fr 1fr 1fr !important;
+            gap: 6px !important;
+            margin-bottom: 14px !important;
+        }
+        .level-label {
+            padding: 8px 2px !important;
+            font-size: 11px !important;
+            border-radius: 8px !important;
+            white-space: nowrap !important;
+        }
+        .btn-generate {
+            padding: 12px 14px !important;
+            font-size: 13px !important;
+            border-radius: 10px !important;
         }
 
         /* JADVALNI KARTALARGA AYLANTIRISH */
         .table-container {
-            max-height: none;
-            overflow: visible;
-            width: 100%;
-        }
-        table, thead, tbody, th, td, tr {
-            display: block;
+            max-height: none !important;
+            overflow: visible !important;
             width: 100% !important;
         }
+        table, thead, tbody, th, td, tr {
+            display: block !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            white-space: normal !important;
+        }
         thead {
-            display: none;
+            display: none !important;
         }
         tr {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-radius: 16px !important;
+            padding: 14px 12px !important;
+            margin-bottom: 12px !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important;
+            box-sizing: border-box !important;
+        }
+        tr:last-child {
+            margin-bottom: 35px !important;
         }
         td {
             display: flex !important;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 8px 0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
             text-align: right !important;
-            padding: 12px 0 !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            font-size: 13px;
+            font-size: 13px !important;
+            gap: 10px !important;
+            box-sizing: border-box !important;
         }
         td:last-child {
-            border-bottom: none;
-            padding-top: 14px !important;
+            border-bottom: none !important;
+            padding-top: 12px !important;
             justify-content: center !important;
+            width: 100% !important;
         }
 
         td::before {
             content: attr(data-label);
-            float: left;
             font-weight: 700;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.45);
             text-transform: uppercase;
             font-size: 11px;
             letter-spacing: 0.5px;
+            text-align: left;
+            padding-right: 10px;
+            flex-shrink: 0;
+        }
+        td[data-label="Mavzu nomi"] {
+            padding-bottom: 10px !important;
+            margin-bottom: 4px !important;
+            border-bottom: 1px solid rgba(0, 242, 254, 0.2) !important;
+        }
+        td[data-label="Mavzu nomi"]::before {
+            color: #00f2fe !important;
+            font-size: 11px !important;
+        }
+        td[data-label="Mavzu nomi"] .td-val {
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            color: #ffffff !important;
+        }
+        .td-val {
+            display: block;
+            word-break: break-word;
+            text-align: right;
+            flex-grow: 1;
+            min-width: 0;
         }
         .btn-action {
-            width: 100%;
-            justify-content: center;
-            padding: 10px;
+            width: 100% !important;
+            padding: 10px 14px !important;
+            font-size: 13px !important;
+            border-radius: 10px !important;
+            justify-content: center !important;
+            margin-left: 0 !important;
         }
+    }
+
+    /* --- ☀️ LIGHT MODE SPECIFIC OVERRIDES --- */
+    body.light-mode .content-header {
+        background: rgba(241, 245, 249, 0.96) !important;
+        border-bottom-color: #cbd5e1 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    }
+    body.light-mode .content-title {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
+    }
+    body.light-mode .content-title span {
+        color: #0284c7 !important;
+    }
+    body.light-mode .karta {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important;
+    }
+    body.light-mode .karta .matn {
+        color: #64748b !important;
+    }
+    body.light-mode .karta .pul {
+        color: #0f172a !important;
+    }
+    body.light-mode .glass-card {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03) !important;
+    }
+    body.light-mode .glass-card h3 {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
+    }
+    body.light-mode .form-group label {
+        color: #475569 !important;
+    }
+    body.light-mode .form-control {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    body.light-mode .form-control:focus,
+    body.light-mode .form-control:focus-visible,
+    body.light-mode .form-control:active {
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.15) !important;
+    }
+    body.light-mode .form-control::placeholder {
+        color: #94a3b8 !important;
+    }
+    body.light-mode .level-label {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+        color: #475569 !important;
+    }
+    body.light-mode .level-item input[type="radio"]:checked + .level-label {
+        background: rgba(2, 132, 199, 0.08) !important;
+        border-color: #0284c7 !important;
+        color: #0284c7 !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.1) !important;
+    }
+    body.light-mode .btn-generate {
+        background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.2) !important;
+    }
+    body.light-mode .btn-generate:hover {
+        box-shadow: 0 0 20px rgba(2, 132, 199, 0.35) !important;
+    }
+    body.light-mode table th {
+        background: #f8fafc !important;
+        color: #475569 !important;
+        border-bottom-color: #e2e8f0 !important;
+    }
+    body.light-mode table td {
+        color: #334155 !important;
+        border-bottom-color: #f1f5f9 !important;
+    }
+    body.light-mode tr:hover td {
+        background: #f8fafc !important;
+    }
+    body.light-mode tr {
+        background: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important;
+    }
+    body.light-mode td::before {
+        color: #64748b !important;
+    }
+    body.light-mode td[data-label="Mavzu nomi"] {
+        border-bottom-color: #e2e8f0 !important;
+    }
+    body.light-mode td[data-label="Mavzu nomi"]::before {
+        color: #0284c7 !important;
+    }
+    body.light-mode td[data-label="Mavzu nomi"] .td-val {
+        color: #0f172a !important;
+    }
+    body.light-mode .badge-level {
+        background: #f1f5f9 !important;
+        color: #475569 !important;
+        border-color: #cbd5e1 !important;
+    }
+    body.light-mode .badge-completed {
+        background: rgba(22, 163, 74, 0.08) !important;
+        color: #15803d !important;
+        border-color: rgba(22, 163, 74, 0.25) !important;
+    }
+    body.light-mode .badge-pending {
+        background: rgba(217, 119, 6, 0.08) !important;
+        color: #b45309 !important;
+        border-color: rgba(217, 119, 6, 0.25) !important;
+    }
+    body.light-mode .score-good { color: #15803d !important; }
+    body.light-mode .score-average { color: #b45309 !important; }
+    body.light-mode .score-poor { color: #dc2626 !important; }
+    body.light-mode .btn-action {
+        background: rgba(2, 132, 199, 0.08) !important;
+        border-color: rgba(2, 132, 199, 0.25) !important;
+        color: #0284c7 !important;
+    }
+    body.light-mode .btn-action:hover {
+        background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+        color: #ffffff !important;
+    }
+    body.light-mode .today-quiz-alert {
+        background: rgba(2, 132, 199, 0.06) !important;
+        border-color: rgba(2, 132, 199, 0.25) !important;
+    }
+    body.light-mode .today-quiz-alert h4 {
+        color: #0f172a !important;
+    }
+    body.light-mode .today-quiz-alert p {
+        color: #475569 !important;
+    }
+    body.light-mode .today-quiz-alert i {
+        color: #0284c7 !important;
     }
 </style>
 {% endblock %}
@@ -452,8 +737,8 @@
             <h3><i class="fas fa-cog"></i> Yangi test sozlamalari</h3>
 
             {% if today_quiz_created %}
-                <div style="background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 14px; padding: 16px; margin-bottom: 20px; text-align: center;">
-                    <i class="fas fa-calendar-check" style="font-size: 24px; color: #00f2fe; margin-bottom: 8px;"></i>
+                <div class="today-quiz-alert">
+                    <i class="fas fa-calendar-check" style="font-size: 24px; color: #00f2fe; margin-bottom: 8px; display: inline-block;"></i>
                     <h4 style="font-size: 14px; font-weight: 800; color: #ffffff; margin-bottom: 4px;">Bugun AI testingizni yaratgansiz!</h4>
                     <p style="font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.4; margin-bottom: 12px;">Kunlik AI test bajarish limitingiz yetdi (1 kunda 1 marta). Yangi test yaratish uchun ertaga qayta kiring.</p>
                     {% if today_quiz %}
@@ -480,7 +765,7 @@
 
                 <div class="form-group">
                     <label>Testlar soni</label>
-                    <div class="level-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr !important;">
+                    <div class="num-grid">
                         <div class="level-item">
                             <input type="radio" name="num_questions" value="5" id="num5" checked {% if today_quiz_created %}disabled{% endif %}>
                             <label class="level-label" for="num5">5 ta</label>
@@ -543,7 +828,7 @@
                         <tbody>
                             {% for quiz in quizzes %}
                                 <tr>
-                                    <td data-label="Mavzu nomi" style="font-weight: bold; color: #ffffff;">{{ quiz.title }}</td>
+                                    <td data-label="Mavzu nomi" style="font-weight: bold; color: #ffffff;"><span class="td-val">{{ quiz.title }}</span></td>
                                     <td data-label="Daraja">
                                         <span class="badge badge-level">
                                             {% if quiz.level == 'beginner' %}A1-A2
@@ -560,15 +845,15 @@
                                             <span class="badge badge-pending">Topshirilmagan</span>
                                         {% endif %}
                                     </td>
-                                    <td data-label="Sana">{{ quiz.created_at|date:"d.m.Y H:i" }}</td>
+                                    <td data-label="Sana"><span class="td-val">{{ quiz.created_at|date:"d.m.Y H:i" }}</span></td>
                                     <td data-label="Harakat">
                                         {% if quiz.is_completed %}
                                             <a href="{% url 'ai_quiz_results' quiz.id %}" class="btn-action">
-                                                <i class="fas fa-eye"></i> Natija
+                                                <i class="fas fa-eye"></i> <span>Natija</span>
                                             </a>
                                         {% else %}
                                             <a href="{% url 'ai_quiz_take' quiz.id %}" class="btn-action" style="background: rgba(0, 242, 254, 0.08); border-color: rgba(0, 242, 254, 0.2); color: #00f2fe;">
-                                                <i class="fas fa-play"></i> Boshlash
+                                                <i class="fas fa-play"></i> <span>Boshlash</span>
                                             </a>
                                         {% endif %}
                                     </td>

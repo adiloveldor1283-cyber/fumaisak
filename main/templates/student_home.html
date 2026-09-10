@@ -153,6 +153,7 @@
     .table-container {
         flex-grow: 1;
         overflow-y: auto;
+        position: relative;
     }
     .table-container::-webkit-scrollbar {
         width: 4px;
@@ -184,7 +185,7 @@
         position: sticky;
         top: 0;
         background: #080d1a;
-        z-index: 2;
+        z-index: 5;
     }
     td {
         padding: 14px 10px;
@@ -197,21 +198,228 @@
         color: #ffffff;
     }
 
+    /* --- 🏆 GAMIFIKATSIYA NISHONI & IMTIYOZLAR ASOSIY STILLARI --- */
+    .badge-premium-card {
+        margin-top: 20px;
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 20px;
+        padding: 18px 22px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .badge-premium-card:not(.no-badge-card) {
+        background: linear-gradient(135deg, rgba(0, 242, 254, 0.05), rgba(0, 242, 254, 0.01));
+    }
+    .badge-icon-box {
+        width: 50px;
+        height: 50px;
+        min-width: 50px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .badge-empty-icon {
+        background: rgba(255, 255, 255, 0.02);
+        color: rgba(255, 255, 255, 0.35);
+        border-color: rgba(255, 255, 255, 0.06);
+    }
+    .badge-content-box {
+        flex: 1;
+        min-width: 0;
+    }
+    .badge-label-text {
+        font-size: 11px;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.45);
+        letter-spacing: 0.5px;
+        margin-bottom: 2px;
+    }
+    .badge-title-text {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 800;
+        color: #ffffff;
+        line-height: 1.3;
+    }
+    .badge-desc-text {
+        margin: 4px 0 0 0;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.45;
+    }
+
     /* Mobil moslashuvchanlik elementlari */
     @media (max-width: 768px) {
-        .left_right_panel {
-            flex-direction: column;
-            height: auto;
-            overflow: visible;
+        .kartalar {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px !important;
+            width: 100% !important;
         }
-        .right-panel {
-            width: 100%;
-            height: auto;
-            overflow: visible;
+        .karta {
+            min-width: 0 !important;
+            width: 100% !important;
+            padding: 14px 12px !important;
+            border-radius: 16px !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;
+        }
+        .karta .matn {
+            font-size: 10px !important;
+            margin-bottom: 3px !important;
+            line-height: 1.25 !important;
+        }
+        .karta .pul {
+            font-size: 19px !important;
+        }
+        .karta .ikonka {
+            width: 36px !important;
+            height: 36px !important;
+            font-size: 14px !important;
+            border-radius: 10px !important;
+            flex-shrink: 0 !important;
+        }
+        .badge-premium-card {
+            margin-top: 10px !important;
+            margin-bottom: 12px !important;
+            padding: 14px 12px !important;
+            gap: 12px !important;
+            align-items: flex-start !important;
+            border-radius: 16px !important;
+            width: 100% !important;
+        }
+        .badge-icon-box {
+            width: 42px !important;
+            height: 42px !important;
+            min-width: 42px !important;
+            font-size: 18px !important;
+            border-radius: 12px !important;
+            margin-top: 2px !important;
+            flex-shrink: 0 !important;
+        }
+        .badge-content-box {
+            flex: 1 !important;
+            min-width: 0 !important;
+        }
+        .badge-label-text {
+            font-size: 10px !important;
+            font-weight: 700 !important;
+            margin-bottom: 2px !important;
+        }
+        .badge-title-text {
+            font-size: 14px !important;
+            font-weight: 800 !important;
+            line-height: 1.3 !important;
+        }
+        .badge-desc-text {
+            font-size: 11.5px !important;
+            line-height: 1.4 !important;
+            margin-top: 3px !important;
+        }
+        .left_right_panel {
+            flex-direction: column !important;
+            height: auto !important;
+            overflow: visible !important;
+            gap: 14px !important;
+            margin-top: 10px !important;
+            margin-bottom: 0 !important;
+            width: 100% !important;
         }
         .left-panel {
-            width: 100%;
+            width: 100% !important;
+            padding: 16px 14px !important;
+            border-radius: 18px !important;
             overflow-y: visible !important;
+            height: auto !important;
+            margin-bottom: 0 !important;
+        }
+        .skill-title-panel {
+            margin-bottom: 16px !important;
+        }
+        .skill-title {
+            font-size: 14px !important;
+            font-weight: 700 !important;
+        }
+        .skill-name {
+            font-size: 11.5px !important;
+            margin-top: 2px !important;
+            line-height: 1.35 !important;
+        }
+        .progress-bar {
+            height: 14px !important;
+            border-radius: 10px !important;
+            margin-top: 6px !important;
+        }
+        .progress {
+            border-radius: 10px !important;
+        }
+        .progress span {
+            font-size: 9.5px !important;
+        }
+        .schedule-card {
+            padding: 12px 14px !important;
+            border-radius: 14px !important;
+        }
+        .schedule-group-name {
+            font-size: 13px !important;
+        }
+        .schedule-teachers {
+            font-size: 11px !important;
+        }
+        .schedule-time {
+            font-size: 12.5px !important;
+        }
+        .schedule-room {
+            font-size: 10px !important;
+        }
+        .right-panel {
+            width: 100% !important;
+            height: auto !important;
+            padding: 16px 14px !important;
+            border-radius: 18px !important;
+            overflow: visible !important;
+            margin-bottom: 20px !important;
+            flex: none !important;
+        }
+        .filter-box h3 {
+            font-size: 15px !important;
+            margin-bottom: 12px !important;
+        }
+        .table-container {
+            max-height: none !important;
+            overflow: visible !important;
+            position: relative !important;
+            border-radius: 12px !important;
+            width: 100% !important;
+        }
+        table {
+            width: 100% !important;
+            font-size: 12.5px !important;
+        }
+        th {
+            position: static !important;
+            padding: 10px 8px !important;
+            font-size: 11px !important;
+        }
+        td {
+            padding: 10px 8px !important;
+            font-size: 12px !important;
+        }
+        body.light-mode th {
+            background: #ffffff !important;
         }
     }
 
@@ -477,24 +685,24 @@
     </div>
 
     <!-- 🏆 GAMIFIKATSIYA NISHONI & IMTIYOZLAR -->
-    <div class="badge-premium-card {% if not badge %}no-badge-card{% endif %}" style="margin-top: 25px; background: {% if badge %}linear-gradient(135deg, rgba(0, 242, 254, 0.05), rgba(0, 242, 254, 0.01)){% else %}rgba(255, 255, 255, 0.01){% endif %}; border: 1px solid {% if badge %}{{ badge.color }}40{% else %}rgba(255,255,255,0.04){% endif %}; border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative; overflow: hidden; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+    <div class="badge-premium-card {% if not badge %}no-badge-card{% endif %}" {% if badge %}style="border-color: {{ badge.color }}40;"{% endif %}>
         {% if badge %}
-        <div class="badge-icon-box" style="background: {{ badge.color }}15; border: 1px solid {{ badge.color }}30; border-radius: 14px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: {{ badge.color }}; font-size: 20px; box-shadow: 0 0 15px {{ badge.color }}20; flex-shrink: 0;">
+        <div class="badge-icon-box" style="background: {{ badge.color }}15; border-color: {{ badge.color }}30; color: {{ badge.color }}; box-shadow: 0 0 15px {{ badge.color }}20;">
             <i class="{{ badge.icon }}"></i>
         </div>
-        <div>
-            <div class="badge-label-text" style="font-size: 10.5px; text-transform: uppercase; font-weight: 700; color: {{ badge.color }}; letter-spacing: 0.5px; margin-bottom: 2px;">Sizning oylik yutug'ingiz:</div>
-            <h4 class="badge-title-text" style="margin: 0; font-size: 16px; font-weight: 800; color: #ffffff;">{{ badge.name }}</h4>
-            <p class="badge-desc-text" style="margin: 4px 0 0 0; font-size: 12.5px; color: rgba(255,255,255,0.7); line-height: 1.4;">{{ badge.desc }}</p>
+        <div class="badge-content-box">
+            <div class="badge-label-text" style="color: {{ badge.color }};">Sizning oylik yutug'ingiz:</div>
+            <h4 class="badge-title-text">{{ badge.name }}</h4>
+            <p class="badge-desc-text">{{ badge.desc }}</p>
         </div>
         {% else %}
-        <div class="badge-icon-box badge-empty-icon" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.3); font-size: 20px; flex-shrink: 0;">
+        <div class="badge-icon-box badge-empty-icon">
             <i class="fas fa-medal"></i>
         </div>
-        <div>
-            <div class="badge-label-text" style="font-size: 10.5px; text-transform: uppercase; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 0.5px; margin-bottom: 2px;">Oylik imtiyozlar:</div>
-            <h4 class="badge-title-text" style="margin: 0; font-size: 15px; font-weight: 800; color: #ffffff;">Hozircha nishonlar mavjud emas</h4>
-            <p class="badge-desc-text" style="margin: 4px 0 0 0; font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.4;">Kursda Oltin, Kumush yoki Bronza nishon va oylik chegirmalarni qo'lga kiritish uchun o'tgan oylik davomatingizni 90%+ va o'rtacha ballingizni 75%+ qilib saqlang!</p>
+        <div class="badge-content-box">
+            <div class="badge-label-text">Oylik imtiyozlar:</div>
+            <h4 class="badge-title-text">Hozircha nishonlar mavjud emas</h4>
+            <p class="badge-desc-text">Kursda Oltin, Kumush yoki Bronza nishon va oylik chegirmalarni qo'lga kiritish uchun o'tgan oylik davomatingizni 90%+ va o'rtacha ballingizni 75%+ qilib saqlang!</p>
         </div>
         {% endif %}
     </div>

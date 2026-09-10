@@ -4,111 +4,261 @@
 
 {% block extra_css %}
     <style>
+    .header-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+    .back-arrow-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 50%;
+        background: rgba(0, 242, 254, 0.08);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        color: #00f2fe;
+        transition: 0.3s;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .back-arrow-btn:hover {
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        color: #070a12;
+        border-color: transparent;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+    }
+    .back-arrow-btn i {
+        font-size: 15px;
+    }
+
+    .sarlavha {
+        font-size: 22px;
+        font-weight: 800;
+        color: #ffffff;
+        border-left: 4px solid #00f2fe;
+        padding-left: 12px;
+        letter-spacing: -0.5px;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .form-card {
+        background: rgba(11, 15, 25, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 40px 80px rgba(0,0,0,0.25);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 30px;
+        max-width: 600px;
+        margin: 30px auto;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group label {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.6);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+        font-size: 14px;
+        outline: none;
+        transition: 0.3s;
+        box-sizing: border-box;
+    }
+    .form-control:focus {
+        border-color: #00f2fe;
+        background: rgba(255, 255, 255, 0.04);
+        box-shadow: 0 0 12px rgba(0, 242, 254, 0.15);
+    }
+    .form-control option {
+        background-color: #0c101d;
+        color: #ffffff;
+    }
+
+    .btn-submit {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        color: #070a12;
+        border: none;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0 5px 15px rgba(0, 242, 254, 0.2);
+        text-align: center;
+        display: inline-block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .btn-submit:hover {
+        box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        transform: translateY(-1px);
+    }
+
+    .btn-cancel {
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.7);
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        text-align: center;
+        transition: 0.3s;
+        display: block;
+        margin-top: 12px;
+        box-sizing: border-box;
+    }
+    .btn-cancel:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: #ffffff;
+    }
+
+    /* --- 📱 MOBIL QURILMALAR UCHUN --- */
+    @media (max-width: 768px) {
+        .header-row {
+            gap: 10px !important;
+            margin-bottom: 16px !important;
+        }
+        .back-arrow-btn {
+            width: 34px !important;
+            height: 34px !important;
+            min-width: 34px !important;
+        }
+        .back-arrow-btn i {
+            font-size: 13px !important;
+        }
         .sarlavha {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            color: #ffffff;
-            border-left: 4px solid #00f2fe;
-            padding-left: 12px;
-            letter-spacing: -0.5px;
+            font-size: 16px !important;
+            border-left-width: 3px !important;
+            padding-left: 8px !important;
         }
-
         .form-card {
-            background: rgba(11, 15, 25, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 40px 80px rgba(0,0,0,0.25);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 30px;
-            max-width: 600px;
-            margin: 40px auto;
+            margin: 0 0 45px 0 !important;
+            padding: 18px 14px !important;
+            border-radius: 18px !important;
+            max-width: 100% !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
         }
-
+        .form-card h3 {
+            font-size: 14.5px !important;
+            margin-bottom: 16px !important;
+        }
         .form-group {
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            margin-bottom: 16px !important;
         }
-
         .form-group label {
-            font-size: 12.5px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.5);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 11.5px !important;
         }
-
         .form-control {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #ffffff;
-            font-size: 14px;
-            outline: none;
-            transition: 0.3s;
+            font-size: 13px !important;
+            padding: 10px 12px !important;
         }
-        .form-control:focus {
-            border-color: #00f2fe;
-            background: rgba(255, 255, 255, 0.04);
-            box-shadow: 0 0 12px rgba(0, 242, 254, 0.15);
-        }
-        .form-control option {
-            background-color: #0c101d;
-            color: #ffffff;
-        }
-        body.light-mode .form-control option {
-            background-color: #ffffff;
-            color: #0f172a;
-        }
-
         .btn-submit {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #00f2fe, #4facfe);
-            color: #070a12;
-            border: none;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.2);
-            text-align: center;
-            display: inline-block;
-            width: 100%;
+            padding: 12px 16px !important;
+            font-size: 13px !important;
+            border-radius: 10px !important;
         }
-        .btn-submit:hover {
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
-            transform: translateY(-1px);
-        }
-
         .btn-cancel {
-            padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: rgba(255, 255, 255, 0.7);
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            text-decoration: none;
-            text-align: center;
-            transition: 0.3s;
-            display: block;
-            margin-top: 12px;
+            padding: 10px 16px !important;
+            font-size: 13px !important;
+            border-radius: 10px !important;
         }
-        .btn-cancel:hover {
-            background: rgba(255, 255, 255, 0.06);
-            color: #ffffff;
-        }
-    </style>
+    }
+
+    /* --- KUN REJIMI (LIGHT MODE) OVERRIDES --- */
+    body.light-mode .sarlavha {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
+    }
+    body.light-mode .back-arrow-btn {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #475569 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    }
+    body.light-mode .back-arrow-btn:hover {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+        border-color: #94a3b8 !important;
+    }
+    body.light-mode .form-card {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode .form-card h3 {
+        color: #0f172a !important;
+        border-bottom-color: #e2e8f0 !important;
+    }
+    body.light-mode .form-group label {
+        color: #475569 !important;
+    }
+    body.light-mode .form-control {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    body.light-mode .form-control:focus {
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.15) !important;
+    }
+    body.light-mode .form-control option {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+    }
+    body.light-mode .checkbox-label {
+        color: #0f172a !important;
+    }
+    body.light-mode .checkbox-subtext {
+        color: #64748b !important;
+    }
+    body.light-mode .btn-submit {
+        background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.25) !important;
+    }
+    body.light-mode .btn-cancel {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #475569 !important;
+    }
+    body.light-mode .btn-cancel:hover {
+        background: #e2e8f0 !important;
+        color: #0f172a !important;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-    <h2 class="sarlavha">Imtihonga Ro'yxatdan O'tish</h2>
+    <div class="header-row">
+        <a href="{% url 'student_dtm_list' %}" class="back-arrow-btn" title="Orqaga">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 class="sarlavha">Imtihonga Ro'yxatdan O'tish</h2>
+    </div>
 
     <div class="form-card">
         <h3 style="color: #ffffff; font-size: 16px; font-weight: 800; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">{{ exam.title }}</h3>
@@ -137,11 +287,11 @@
             </div>
 
             <div class="form-group" style="margin-top: 25px; margin-bottom: 30px;">
-                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; color: #ffffff; text-transform: none; font-size: 13.5px; font-weight: 600; line-height: 1.5;">
+                <label class="checkbox-label" style="display: flex; align-items: center; gap: 12px; cursor: pointer; color: #ffffff; text-transform: none; font-size: 13.5px; font-weight: 600; line-height: 1.5;">
                     <input type="checkbox" name="take_compulsory" checked style="width: 22px; height: 22px; accent-color: #00f2fe; flex-shrink: 0;">
                     <div>
                         Majburiy fanlarni topshiraman
-                        <div style="font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 500; margin-top: 2px;">
+                        <div class="checkbox-subtext" style="font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 500; margin-top: 2px;">
                             Agarda sertifikatingiz bo'lsa, belgini olib tashlang (majburiy fanlardan ozod bo'lasiz).
                         </div>
                     </div>

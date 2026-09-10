@@ -5,6 +5,21 @@
 
 {% block extra_css %}
 <style>
+    /* --- 🔍 SARLAVHA VA QIDIRUV PANELI --- */
+    .sarlavha-qatori {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-shrink: 0;
+    }
+    .sarlavha-title-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
     .sarlavha {
         font-size: 22px;
         font-weight: 800;
@@ -12,6 +27,19 @@
         border-left: 4px solid #00f2fe;
         padding-left: 12px;
         letter-spacing: -0.5px;
+        margin: 0;
+        line-height: 1.2;
+    }
+    .sarlavha i.title-icon {
+        color: #00f2fe;
+        margin-right: 6px;
+    }
+    body.light-mode .sarlavha {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
+    }
+    body.light-mode .sarlavha i.title-icon {
+        color: #0284c7 !important;
     }
 
     /* --- 🔙 ORTGA QAYTISH STRELKASI (HEADER) --- */
@@ -49,7 +77,7 @@
         color: #0369a1 !important;
     }
 
-    /* --- 🔍 QIDIRUV PANELI (UNIFIED PILL DESIGN) --- */
+    /* --- 🔍 QIDIRUV PANELI --- */
     .search-form {
         display: flex;
         align-items: center;
@@ -60,6 +88,7 @@
         transition: 0.3s;
         width: 270px;
         margin: 0;
+        box-sizing: border-box;
     }
     .search-form:focus-within {
         border-color: #00f2fe !important;
@@ -76,6 +105,9 @@
         padding: 6px 0 !important;
         margin: 0 !important;
         box-shadow: none !important;
+    }
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.35);
     }
     .search-btn {
         background: none !important;
@@ -105,27 +137,374 @@
     }
     body.light-mode .search-input {
         color: #0f172a !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        outline: none !important;
     }
-    body.light-mode .search-input:focus {
-        border: none !important;
-        box-shadow: none !important;
-        outline: none !important;
-        background: transparent !important;
+    body.light-mode .search-input::placeholder {
+        color: rgba(15, 23, 42, 0.35);
     }
     body.light-mode .search-btn {
         color: #64748b !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
     }
     body.light-mode .search-btn:hover {
         color: #0284c7 !important;
-        background: transparent !important;
+    }
+
+    /* --- 🎛️ CONTROL BAR --- */
+    .control-header-bar {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 12px 18px;
+        margin-bottom: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .filter-pills-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .control-actions-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn-scroll {
+        padding: 7px 14px;
+        background: rgba(0, 242, 254, 0.1);
+        border: 1px solid rgba(0, 242, 254, 0.3);
+        color: #00f2fe;
+        border-radius: 8px;
+        font-size: 12.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-scroll:hover {
+        background: rgba(0, 242, 254, 0.25);
+        transform: translateY(-1px);
+    }
+
+    .filter-pill {
+        padding: 6px 14px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.7);
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+    }
+    .filter-pill.active, .filter-pill:hover {
+        background: rgba(0, 242, 254, 0.15);
+        color: #00f2fe;
+        border-color: rgba(0, 242, 254, 0.4);
+    }
+
+    body.light-mode .control-header-bar {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode .control-label {
+        color: #64748b !important;
+        opacity: 1 !important;
+    }
+    body.light-mode .filter-pill {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #475569 !important;
+    }
+    body.light-mode .filter-pill:hover {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    body.light-mode .filter-pill.active {
+        background: #e0f2fe !important;
+        border-color: #bae6fd !important;
+        color: #0284c7 !important;
+        font-weight: 700 !important;
+    }
+    body.light-mode .btn-scroll {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #334155 !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode .btn-scroll:hover {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        color: #0284c7 !important;
+    }
+    body.light-mode #btnToggleViewMode {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #0f172a !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode #btnToggleViewMode:hover {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #0284c7 !important;
+    }
+    body.light-mode #btnToggleViewMode.active {
+        background: #e0f2fe !important;
+        border-color: #bae6fd !important;
+        color: #0284c7 !important;
+    }
+
+    /* --- 🟩 GITHUB HEATMAP KO'RINISHI --- */
+    .mobile-heatmap-container {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 35px;
+    }
+
+    .heatmap-legend-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 8px 14px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+        flex-wrap: wrap;
+    }
+    body.light-mode .heatmap-legend-bar {
+        background: #ffffff !important;
+        border: 1px solid #f1f5f9 !important;
+        color: #64748b !important;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+    }
+    .legend-sq {
+        width: 14px;
+        height: 14px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+    .legend-sq.present { background: #10b981; }
+    .legend-sq.absent { background: #ef4444; }
+    .legend-sq.none { background: rgba(255, 255, 255, 0.08); }
+    body.light-mode .legend-sq.none { background: #e2e8f0; }
+
+    .heatmap-students-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .student-heatmap-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 18px;
+        padding: 14px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    body.light-mode .student-heatmap-card {
+        background: #ffffff !important;
+        border: 1px solid #f1f5f9 !important;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.03) !important;
+    }
+
+    .student-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    body.light-mode .student-card-header {
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .student-avatar-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .student-avatar {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        border-radius: 10px;
+        background: rgba(0, 242, 254, 0.1);
+        border: 1px solid rgba(0, 242, 254, 0.25);
+        color: #00f2fe;
+        font-weight: 800;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    body.light-mode .student-avatar {
+        background: rgba(2, 132, 199, 0.08) !important;
+        border-color: rgba(2, 132, 199, 0.2) !important;
+        color: #0284c7 !important;
+    }
+
+    .student-name-box {
+        display: flex;
+        flex-direction: column;
+    }
+    .student-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+    body.light-mode .student-name {
+        color: #0f172a !important;
+    }
+    .student-stat-summary {
+        font-size: 11.5px;
+        color: rgba(255, 255, 255, 0.45);
+        margin-top: 2px;
+    }
+    body.light-mode .student-stat-summary {
+        color: #64748b !important;
+    }
+
+    .student-rate-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 800;
+        font-family: monospace;
+    }
+    .rate-high {
+        background: rgba(16, 185, 129, 0.12);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .rate-medium {
+        background: rgba(245, 158, 11, 0.12);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .rate-low {
+        background: rgba(239, 68, 68, 0.12);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    body.light-mode .rate-high {
+        background: #dcfce7 !important;
+        color: #15803d !important;
+        border: 1px solid #bbf7d0 !important;
+    }
+    body.light-mode .rate-medium {
+        background: #fef3c7 !important;
+        color: #b45309 !important;
+        border: 1px solid #fde68a !important;
+    }
+    body.light-mode .rate-low {
+        background: #fee2e2 !important;
+        color: #b91c1c !important;
+        border: 1px solid #fecaca !important;
+    }
+
+    .heatmap-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .heatmap-sq {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        user-select: none;
+        position: relative;
+    }
+    .heatmap-sq:active {
+        transform: scale(0.9);
+    }
+    .heatmap-sq.present {
+        background: #10b981;
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+    }
+    .heatmap-sq.absent {
+        background: #ef4444;
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25);
+    }
+    .heatmap-sq.none {
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(255, 255, 255, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    body.light-mode .heatmap-sq.none {
+        background: #f1f5f9 !important;
+        color: #94a3b8 !important;
         border: none !important;
+    }
+
+    /* Floating Toast / Info Pill on tile tap */
+    .tile-toast-pill {
+        position: fixed;
+        bottom: 25px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: #0f172a;
+        color: #ffffff;
+        padding: 10px 18px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        border: 1px solid rgba(0, 242, 254, 0.3);
+        z-index: 2000;
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+        opacity: 0;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+    .tile-toast-pill.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+    body.light-mode .tile-toast-pill {
+        background: #ffffff;
+        color: #0f172a;
+        border: 1px solid #cbd5e1;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
 
     /* --- 📊 CHEKSIZ & QULAY SKROL BO'LUVCHI JADVAL KONTEYNERI --- */
@@ -141,10 +520,12 @@
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        max-height: calc(100vh - 200px);
+        max-height: calc(100vh - 240px);
         position: relative;
         scroll-behavior: smooth;
         display: block;
+        margin-bottom: 35px;
+        box-sizing: border-box;
     }
 
     .jadval-container table {
@@ -167,6 +548,9 @@
         padding: 14px 10px !important;
         background-color: #080d1a;
         border-bottom: 2px solid rgba(255, 255, 255, 0.06);
+        position: sticky;
+        top: 0;
+        z-index: 5;
     }
 
     /* Custom Always-Visible Glowing Scrollbar */
@@ -191,13 +575,14 @@
     .sticky-col-name {
         position: sticky !important;
         left: 0 !important;
-        z-index: 4 !important;
+        z-index: 6 !important;
         min-width: 180px !important;
         max-width: 220px !important;
         box-shadow: 5px 0 15px rgba(0,0,0,0.4) !important;
     }
 
     th.sticky-col-name {
+        z-index: 10 !important;
         background-color: #080d1a !important;
         border-bottom: 2px solid rgba(0, 242, 254, 0.3) !important;
         padding: 14px 18px !important;
@@ -225,6 +610,7 @@
         text-align: center;
         padding: 8px 10px !important;
         min-width: 75px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
     }
     .attendance-badge {
         display: inline-flex;
@@ -233,7 +619,7 @@
         gap: 4px;
         padding: 6px 12px;
         border-radius: 8px;
-        font-size: 12.5px;
+        font-size: 12px;
         font-weight: 700;
         cursor: default;
         transition: 0.2s;
@@ -266,108 +652,70 @@
         font-size: 11px;
         border-radius: 6px;
     }
-    .compact-mode .badge-text {
-        display: none;
-    }
-    .compact-mode td.sticky-col-name {
-        padding: 8px 12px !important;
-        font-size: 13px;
-    }
-    .compact-mode th.sticky-col-name {
-        padding: 10px 12px !important;
-        font-size: 12px;
-    }
 
-    /* Control Bar Header */
-    .control-header-bar {
-        background: rgba(15, 23, 42, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 16px;
-        padding: 12px 18px;
-        margin-bottom: 16px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 14px;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    }
-
-    .btn-scroll {
-        padding: 7px 14px;
-        background: rgba(0, 242, 254, 0.1);
-        border: 1px solid rgba(0, 242, 254, 0.3);
-        color: #00f2fe;
-        border-radius: 8px;
-        font-size: 12.5px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .btn-scroll:hover {
-        background: rgba(0, 242, 254, 0.25);
-        transform: translateY(-1px);
-    }
-
-    .filter-pill {
-        padding: 6px 14px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.08);
-        color: rgba(255,255,255,0.7);
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-    .filter-pill.active, .filter-pill:hover {
-        background: rgba(0, 242, 254, 0.15);
-        color: #00f2fe;
-        border-color: rgba(0, 242, 254, 0.4);
-    }
-
-    /* Light Mode Overrides */
-    body.light-mode h2.sarlavha {
-        color: #0f172a !important;
-    }
-    body.light-mode .control-header-bar {
-        background: #ffffff !important;
-        border: 1px solid #cbd5e1 !important;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important;
-    }
-    body.light-mode .control-label {
-        color: #475569 !important;
-    }
-    body.light-mode .filter-pill {
-        background: #f1f5f9 !important;
-        border: 1px solid #cbd5e1 !important;
-        color: #475569 !important;
-    }
-    body.light-mode .filter-pill.active,
-    body.light-mode .filter-pill:hover {
-        background: rgba(2, 132, 199, 0.08) !important;
-        color: #0284c7 !important;
-        border-color: rgba(2, 132, 199, 0.3) !important;
-    }
-    body.light-mode .btn-scroll {
-        background: rgba(2, 132, 199, 0.08) !important;
-        border: 1px solid rgba(2, 132, 199, 0.3) !important;
-        color: #0284c7 !important;
-    }
-    body.light-mode .btn-scroll:hover {
-        background: rgba(2, 132, 199, 0.15) !important;
-    }
-
+    /* --- ☀️ LIGHT MODE JADVAL VA ELEMENTLAR USLUBI --- */
     body.light-mode .jadval-container {
         background: #ffffff !important;
-        border: 1px solid #cbd5e1 !important;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.04) !important;
+        border: 1px solid #f1f5f9 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
+    }
+    body.light-mode .jadval-container th {
+        background-color: #f8fafc !important;
+        color: #475569 !important;
+        border: none !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+    }
+    body.light-mode th.sticky-col-name {
+        background-color: #f8fafc !important;
+        color: #0f172a !important;
+        border: none !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode td.sticky-col-name {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border: none !important;
+        border-bottom: 1px solid #f8fafc !important;
+        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode tr:hover td.sticky-col-name {
+        background-color: #f8fafc !important;
+    }
+    body.light-mode .jadval-container tr {
+        border: none !important;
+        border-bottom: 1px solid #f8fafc !important;
+    }
+    body.light-mode .jadval-container tr:hover {
+        background-color: #f8fafc !important;
+    }
+    body.light-mode .attendance-cell {
+        border: none !important;
+        border-bottom: 1px solid #f8fafc !important;
+    }
+    body.light-mode .attendance-badge.present {
+        background: #dcfce7 !important;
+        color: #15803d !important;
+        border: 1px solid #bbf7d0 !important;
+    }
+    body.light-mode .attendance-badge.absent {
+        background: #fee2e2 !important;
+        color: #b91c1c !important;
+        border: 1px solid #fecaca !important;
+    }
+    body.light-mode .attendance-badge.none {
+        background: #f8fafc !important;
+        color: #94a3b8 !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+    body.light-mode .empty-text {
+        color: #94a3b8 !important;
+    }
+    body.light-mode #no-attendance-search-results {
+        color: #64748b !important;
     }
     body.light-mode .jadval-container::-webkit-scrollbar-track {
-        background: #f1f5f9 !important;
+        background: #f8fafc !important;
     }
     body.light-mode .jadval-container::-webkit-scrollbar-thumb {
         background: #cbd5e1 !important;
@@ -376,92 +724,107 @@
     body.light-mode .jadval-container::-webkit-scrollbar-thumb:hover {
         background: #94a3b8 !important;
     }
-
-    body.light-mode .jadval-container th {
-        background-color: #f8fafc !important;
-        border-bottom: 2px solid #e2e8f0 !important;
-        color: #475569 !important;
-    }
-    body.light-mode th.date-col {
-        color: #0284c7 !important;
-    }
-    body.light-mode th.sticky-col-name {
-        background-color: #f8fafc !important;
-        border-bottom: 2px solid #cbd5e1 !important;
-        color: #475569 !important;
-    }
-    body.light-mode td.sticky-col-name {
-        background-color: #ffffff !important;
-        border-bottom: 1px solid #e2e8f0 !important;
-        color: #0f172a !important;
-    }
-    body.light-mode tr:hover td.sticky-col-name {
-        background-color: #f1f5f9 !important;
-    }
-    body.light-mode .jadval-container tr {
-        border-bottom: 1px solid #e2e8f0 !important;
-    }
-    body.light-mode .jadval-container tr:hover {
-        background-color: #f8fafc !important;
-    }
-
-    body.light-mode .attendance-badge.none {
-        background: #f1f5f9 !important;
-        color: #94a3b8 !important;
-        border: 1px solid #e2e8f0 !important;
-    }
-
-    body.light-mode .empty-text {
-        color: #94a3b8 !important;
-    }
 </style>
 {% endblock %}
 
 {% block content %}
     {% load custom_tags %}
-    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
+    <div class="sarlavha-qatori">
+        <div class="sarlavha-title-box">
             <a href="{% url 'teacher_attendance_groups' %}" class="btn-back-icon" title="Davomat guruhlariga qaytish">
                 <i class="fas fa-arrow-left"></i>
             </a>
-            <h2 class="sarlavha" style="margin: 0; line-height: 1;"><i class="fas fa-clipboard-user" style="color: #00f2fe; margin-right: 8px;"></i> {{ group.name }} Davomat Jurnali</h2>
+            <h2 class="sarlavha"><i class="fas fa-clipboard-user title-icon"></i> {{ group.name }} Davomat Jurnali</h2>
         </div>
         <!-- QIDIRUV FORMASI -->
-        <form class="search-form" onsubmit="event.preventDefault()">
-            <input type="text" class="search-input" placeholder="Ism-familiya bo'yicha..." id="qidiruv">
-            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+        <form class="search-form" onsubmit="event.preventDefault();" id="attendance-table-search-form">
+            <input type="text" class="search-input" placeholder="Ism-familiya bo'yicha..." id="qidiruv" autocomplete="off">
+            <button type="submit" class="search-btn" aria-label="Qidirish"><i class="fas fa-search"></i></button>
         </form>
     </div>
 
     <!-- 🎛️ CONTROL & FILTER BAR -->
     <div class="control-header-bar">
         <!-- Date Filters -->
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <span class="control-label" style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-right: 4px;"><i class="fas fa-calendar-alt"></i> Ko'rinish:</span>
-            <a href="?range=7" class="filter-pill {% if range_val == '7' %}active{% endif %}" id="btnFilterRecent7" style="text-decoration: none;">Oxirgi 1 hafta</a>
-            <a href="?range=30" class="filter-pill {% if range_val == '30' %}active{% endif %}" id="btnFilterRecent30" style="text-decoration: none;">Oxirgi 30 kun</a>
-            <a href="?range=all" class="filter-pill {% if range_val == 'all' %}active{% endif %}" id="btnFilterAll" style="text-decoration: none;">Barcha darslar ({{ total_dates_count }})</a>
+        <div class="filter-pills-wrap">
+            <span class="control-label" style="font-size: 12px; font-weight: 700; opacity: 0.6; text-transform: uppercase; margin-right: 4px;"><i class="fas fa-calendar-alt"></i> Ko'rinish:</span>
+            <a href="?range=7" class="filter-pill {% if range_val == '7' %}active{% endif %}" id="btnFilterRecent7">Oxirgi 1 hafta</a>
+            <a href="?range=30" class="filter-pill {% if range_val == '30' %}active{% endif %}" id="btnFilterRecent30">Oxirgi 30 kun</a>
+            <a href="?range=all" class="filter-pill {% if range_val == 'all' %}active{% endif %}" id="btnFilterAll">Barcha darslar ({{ total_dates_count }})</a>
         </div>
 
-        <!-- Scroll Controls & View Toggle -->
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <button class="filter-pill" id="btnToggleCompact" onclick="toggleCompactMode()" title="Ixcham ko'rinishni yoqish/o'chirish">
-                <i class="fas fa-compress-alt"></i> <span id="compactText">Ixcham</span>
+        <!-- View Switcher & Table Controls -->
+        <div class="control-actions-wrap">
+            <!-- Rejimni almashtirish (Heatmap / Jadval) -->
+            <button class="filter-pill active" id="btnToggleViewMode" onclick="toggleViewMode()" title="Ko'rinish rejimini almashtirish">
+                <i class="fas fa-th-large" id="viewModeIcon"></i> <span id="viewModeText">Jadval</span>
             </button>
-            <div style="display: flex; gap: 6px;">
-                <button class="btn-scroll" onclick="scrollSchedule(-400)" title="Chapga skrol"><i class="fas fa-chevron-left"></i> Chapga</button>
-                <button class="btn-scroll" onclick="scrollSchedule(400)" title="O'ngga skrol">O'ngga <i class="fas fa-chevron-right"></i></button>
+            <div id="table-scroll-controls" style="display: flex; gap: 6px;">
+                <button class="btn-scroll" onclick="scrollSchedule(-400)" title="Chapga skrol"><i class="fas fa-chevron-left"></i></button>
+                <button class="btn-scroll" onclick="scrollSchedule(400)" title="O'ngga skrol"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
     </div>
 
+    <!-- 🟩 GITHUB USLUBIDAGI DAVOMAT HEATMAP KARTALARI -->
+    <div class="mobile-heatmap-container" id="mobileHeatmapContainer">
+        <!-- Heatmap Legend -->
+        <div class="heatmap-legend-bar">
+            <div class="legend-item"><span class="legend-sq present"></span> Kelgan</div>
+            <div class="legend-item"><span class="legend-sq absent"></span> Kelmadi</div>
+            <div class="legend-item"><span class="legend-sq none"></span> Dars yo'q / Olinmagan</div>
+        </div>
+
+        <!-- Student Heatmap Cards List -->
+        <div class="heatmap-students-list" id="heatmap-students-list">
+            {% for row in attendance_list %}
+                <div class="student-heatmap-card" data-student-name="{{ row.student.get_full_name|lower }}">
+                    <div class="student-card-header">
+                        <div class="student-avatar-info">
+                            <div class="student-avatar">
+                                {{ row.student.first_name|first|upper }}{{ row.student.last_name|first|upper }}
+                            </div>
+                            <div class="student-name-box">
+                                <span class="student-name">{{ row.student.get_full_name }}</span>
+                                <span class="student-stat-summary" id="heatmap-summary-{{ forloop.counter }}">
+                                    Yuklanmoqda...
+                                </span>
+                            </div>
+                        </div>
+                        <div class="student-rate-badge rate-high" id="heatmap-rate-{{ forloop.counter }}">
+                            --%
+                        </div>
+                    </div>
+
+                    <!-- Mini Squares Contribution Matrix -->
+                    <div class="heatmap-grid" id="heatmap-grid-{{ forloop.counter }}">
+                        {% for cell in row.dates %}
+                            <div class="heatmap-sq {{ cell.status }}" 
+                                 data-student="{{ row.student.get_full_name|escapejs }}"
+                                 data-date="{{ cell.date|date:'d.m.Y' }}"
+                                 data-status="{{ cell.status }}"
+                                 onclick="showTileToast(this)">
+                                {{ cell.date|date:"d" }}
+                            </div>
+                        {% empty %}
+                            <div class="empty-text" style="padding: 10px; font-size: 12px; color: rgba(255,255,255,0.4);">Davomat yozuvlari mavjud emas.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-text" style="text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.4); font-style: italic;">Guruhda o'quvchilar mavjud emas.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 📊 AN'ANAVIY MATRITSA JADVALI -->
     <div class="jadval-container" id="jadvalContainer">
         <table>
             <thead>
                 <tr>
                     <th class="sticky-col-name">O'quvchi</th>
                     {% for date in dates %}
-                        <th class="date-col" data-date="{{ date|date:'Y-m-d' }}" style="text-align: center; min-width: 75px; font-family: monospace; font-size: 12.5px; color: #00f2fe;" title="{{ date|date:'d.m.Y' }}">
+                        <th class="date-col" data-date="{{ date|date:'Y-m-d' }}" style="text-align: center; min-width: 75px; font-family: monospace; font-size: 12.5px;" title="{{ date|date:'d.m.Y' }}">
                             {{ date|date:"d.m" }}
                         </th>
                     {% empty %}
@@ -471,7 +834,7 @@
             </thead>
             <tbody id="jadval-qatorlari">
                 {% for row in attendance_list %}
-                    <tr>
+                    <tr class="attendance-row">
                         <td class="sticky-col-name">{{ row.student.get_full_name }}</td>
                         {% for cell in row.dates %}
                             <td class="attendance-cell date-col" data-date="{{ cell.date|date:'Y-m-d' }}">
@@ -497,11 +860,94 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Qidiruv natijasi yo'q bo'lganda chiqadigan blok -->
+    <div id="no-attendance-search-results" style="display: none; text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.4); font-style: italic;">
+        <i class="fas fa-search-minus" style="font-size: 28px; display: block; margin-bottom: 10px; color: rgba(255,255,255,0.2);"></i>
+        Qidiruv bo'yicha o'quvchi topilmadi.
+    </div>
+
+    <!-- 🔔 KATAKCHA BOSILGANDA CHIQUVCHI SUZUVCHI TOAST PILL -->
+    <div id="tile-toast-pill" class="tile-toast-pill">
+        <span id="tile-toast-content"></span>
+    </div>
 {% endblock %}
 
 {% block extra_js %}
     <script>
         const jadvalContainer = document.getElementById("jadvalContainer");
+        const heatmapContainer = document.getElementById("mobileHeatmapContainer");
+        const tileToast = document.getElementById("tile-toast-pill");
+        const toastContent = document.getElementById("tile-toast-content");
+        let toastTimeout = null;
+
+        // --- 🟩 KATAKCHAGA BOSILGANDA SANA VA HOLATNI KO'RSATISH ---
+        function showTileToast(el) {
+            const student = el.getAttribute("data-student") || "";
+            const date = el.getAttribute("data-date") || "";
+            const status = el.getAttribute("data-status") || "";
+
+            let statusHtml = "";
+            if (status === "present") {
+                statusHtml = `<span style="color: #10b981; font-weight: 700;">Kelgan ✅</span>`;
+            } else if (status === "absent") {
+                statusHtml = `<span style="color: #ef4444; font-weight: 700;">Kelmadi ❌</span>`;
+            } else {
+                statusHtml = `<span style="opacity: 0.6;">Dars yo'q / Olinmagan ⚪</span>`;
+            }
+
+            if (tileToast && toastContent) {
+                toastContent.innerHTML = `<i class="far fa-calendar-check" style="color: #00f2fe;"></i> <strong>${date}</strong>: ${student} — ${statusHtml}`;
+                tileToast.classList.add("show");
+
+                if (toastTimeout) clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    tileToast.classList.remove("show");
+                }, 3000);
+            }
+        }
+
+        // --- 🔀 KO'RINISH REJIMINI O'ZGARTIRISH (HEATMAP <-> JADVAL) ---
+        let currentMode = window.innerWidth <= 768 ? 'heatmap' : 'table';
+
+        function updateViewModeUI() {
+            const btn = document.getElementById("btnToggleViewMode");
+            const modeText = document.getElementById("viewModeText");
+            const modeIcon = document.getElementById("viewModeIcon");
+            const scrollControls = document.getElementById("table-scroll-controls");
+            const body = document.body;
+
+            if (window.innerWidth <= 768) {
+                if (currentMode === 'table') {
+                    body.classList.add('show-table-mode');
+                    if (modeText) modeText.innerText = "Heatmap";
+                    if (modeIcon) modeIcon.className = "fas fa-th-large";
+                    if (scrollControls) scrollControls.style.display = "flex";
+                } else {
+                    body.classList.remove('show-table-mode');
+                    if (modeText) modeText.innerText = "Jadval";
+                    if (modeIcon) modeIcon.className = "fas fa-table";
+                    if (scrollControls) scrollControls.style.display = "none";
+                }
+            } else {
+                if (currentMode === 'heatmap') {
+                    body.classList.add('show-heatmap-desktop');
+                    if (modeText) modeText.innerText = "Jadval";
+                    if (modeIcon) modeIcon.className = "fas fa-table";
+                    if (scrollControls) scrollControls.style.display = "none";
+                } else {
+                    body.classList.remove('show-heatmap-desktop');
+                    if (modeText) modeText.innerText = "Heatmap";
+                    if (modeIcon) modeIcon.className = "fas fa-th-large";
+                    if (scrollControls) scrollControls.style.display = "flex";
+                }
+            }
+        }
+
+        function toggleViewMode() {
+            currentMode = currentMode === 'heatmap' ? 'table' : 'heatmap';
+            updateViewModeUI();
+        }
 
         function scrollSchedule(amount) {
             if (jadvalContainer) {
@@ -518,46 +964,89 @@
             }, { passive: false });
         }
 
-        let isCompact = false;
-        function toggleCompactMode() {
-            isCompact = !isCompact;
-            const container = document.getElementById("jadvalContainer");
-            const compactText = document.getElementById("compactText");
-            const btn = document.getElementById("btnToggleCompact");
+        // --- 📊 O'QUVCHILAR DAVOMAT FOIZI VA STATISTIKASINI HISOBLASH ---
+        function calculateStudentStats() {
+            const cards = document.querySelectorAll(".student-heatmap-card");
+            cards.forEach((card, idx) => {
+                const counter = idx + 1;
+                const squares = card.querySelectorAll(".heatmap-sq");
+                let present = 0;
+                let absent = 0;
+                let totalRecorded = 0;
 
-            if (isCompact) {
-                container.classList.add("compact-mode");
-                compactText.innerText = "Kengaytirilgan";
-                btn.classList.add("active");
-            } else {
-                container.classList.remove("compact-mode");
-                compactText.innerText = "Ixcham";
-                btn.classList.remove("active");
-            }
+                squares.forEach(sq => {
+                    if (sq.classList.contains("present")) {
+                        present++;
+                        totalRecorded++;
+                    } else if (sq.classList.contains("absent")) {
+                        absent++;
+                        totalRecorded++;
+                    }
+                });
+
+                const rate = totalRecorded > 0 ? Math.round((present / totalRecorded) * 100) : 100;
+                
+                const rateBadge = document.getElementById(`heatmap-rate-${counter}`);
+                const summarySpan = document.getElementById(`heatmap-summary-${counter}`);
+
+                if (rateBadge) {
+                    rateBadge.innerText = `${rate}%`;
+                    rateBadge.className = "student-rate-badge " + (rate >= 80 ? "rate-high" : (rate >= 60 ? "rate-medium" : "rate-low"));
+                }
+
+                if (summarySpan) {
+                    summarySpan.innerText = `${present} ta kelgan, ${absent} ta qoldirgan (${totalRecorded} dars)`;
+                }
+            });
         }
 
         document.addEventListener("DOMContentLoaded", () => {
+            calculateStudentStats();
+            updateViewModeUI();
+
             if (jadvalContainer) {
                 jadvalContainer.scrollLeft = jadvalContainer.scrollWidth;
             }
 
+            // --- 🔍 REAL-TIME QIDIRUV ---
             const qidiruvMaydoni = document.getElementById("qidiruv");
-            const jadvalTana = document.getElementById("jadval-qatorlari");
-            const barchaQatorlar = jadvalTana ? Array.from(jadvalTana.querySelectorAll("tr")) : [];
+            const tableRows = document.querySelectorAll("#jadval-qatorlari tr.attendance-row");
+            const heatmapCards = document.querySelectorAll(".student-heatmap-card");
+            const noResults = document.getElementById("no-attendance-search-results");
 
             if (qidiruvMaydoni) {
                 qidiruvMaydoni.addEventListener("input", () => {
                     const izlashSozi = qidiruvMaydoni.value.toLowerCase().trim();
-                    barchaQatorlar.forEach(qator => {
+                    let visibleCount = 0;
+
+                    tableRows.forEach(qator => {
                         const ismFamiliya = qator.querySelector(".sticky-col-name")?.textContent.toLowerCase().trim() || '';
-                        if (ismFamiliya.includes(izlashSozi)) {
+                        if (!izlashSozi || ismFamiliya.includes(izlashSozi)) {
                             qator.style.display = "";
+                            visibleCount++;
                         } else {
                             qator.style.display = "none";
                         }
                     });
+
+                    heatmapCards.forEach(card => {
+                        const ismFamiliya = card.getAttribute("data-student-name") || card.querySelector(".student-name")?.textContent.toLowerCase().trim() || '';
+                        if (!izlashSozi || ismFamiliya.includes(izlashSozi)) {
+                            card.style.display = "";
+                        } else {
+                            card.style.display = "none";
+                        }
+                    });
+
+                    if (noResults) {
+                        noResults.style.display = (visibleCount === 0 && (tableRows.length > 0 || heatmapCards.length > 0)) ? "block" : "none";
+                    }
                 });
             }
+        });
+
+        window.addEventListener("resize", () => {
+            updateViewModeUI();
         });
     </script>
 {% endblock %}

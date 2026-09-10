@@ -4,249 +4,548 @@
 
 {% block extra_css %}
 <style>
-    /* --- 🔒 ASOSIY CONTENT SKROLINI QOTIRISH --- */
-    body .content {
-        overflow: hidden !important;
+    /* --- 📝 ONLAYN TESTLAR STILLARI --- */
+    .quiz-sticky-header {
+        margin-bottom: 25px;
     }
-
-    /* --- 📝 SAHIFANING O'ZIGA XOS SERLAVHA VA JADVAL STILLARI --- */
+    .sarlavha-qatori {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
     .sarlavha {
         font-size: 22px;
         font-weight: 800;
-        margin-bottom: 20px;
         color: #ffffff;
         border-left: 4px solid #00f2fe;
         padding-left: 12px;
         letter-spacing: -0.5px;
+        margin: 0;
+        line-height: 1.2;
     }
 
-
+    /* Qidiruv formasi */
+    .quiz-search-box {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 4px 14px;
+        transition: 0.3s;
+        width: 300px;
+        max-width: 100%;
+    }
+    .quiz-search-box:focus-within {
+        border-color: rgba(0, 242, 254, 0.5) !important;
+        box-shadow: 0 0 12px rgba(0, 242, 254, 0.2) !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+    }
+    .quiz-search-box input,
+    .quiz-search-box input:focus,
+    .quiz-search-box input:focus-visible,
+    .quiz-search-box input:active {
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        -webkit-box-shadow: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        -webkit-tap-highlight-color: transparent !important;
+        color: #ffffff;
+        font-size: 13px;
+        width: 100%;
+        padding: 6px 0;
+    }
+    .quiz-search-box input::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+    .quiz-search-box i {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 13px;
+        padding-left: 8px;
+    }
 
     /* 📊 JADVALNING O'ZI MUSTAQIL SKROL BO'LISHI UCHUN */
     .jadval-container {
-            flex-grow: 1;
-            overflow-y: auto; /* Faqat shu konteyner pastga skrol bo'ladi */
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            max-height: calc(100vh - 140px); /* Ekrandan chiqib ketmasligi uchun chegara */
-        }
+        flex-grow: 1;
+        overflow-y: auto;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.015);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        max-height: calc(100vh - 180px);
+        margin-bottom: 25px;
+    }
+    .jadval-container::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+    .jadval-container::-webkit-scrollbar-thumb {
+        background: rgba(0, 242, 254, 0.2);
+        border-radius: 4px;
+    }
+    .jadval-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 242, 254, 0.4);
+    }
 
-        /* Skrolbar dizayni */
-        .jadval-container::-webkit-scrollbar {
-            width: 1px;
-
-        }
-        .jadval-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .jadval-container::-webkit-scrollbar-thumb {
-            background: rgba(0, 242, 254, 0.2);
-            border-radius: 4px;
-        }
-        .jadval-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 242, 254, 0.4);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-        th {
-            padding: 16px 18px;
-            font-size: 13.5px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            position: sticky; /* Tepa qismi qotib turadi */
-            top: 0;
-            background: #080d1a;
-            z-index: 2;
-        }
-        td {
-            padding: 14px 18px;
-            font-size: 13.5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-            color: rgba(255, 255, 255, 0.8);
-            vertical-align: middle;
-        }
-        tr:hover td {
-            background: rgba(255, 255, 255, 0.01);
-            color: #ffffff;
-        }
-
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+    th {
+        padding: 14px 16px;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.4);
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        position: sticky;
+        top: 0;
+        background: #080d1a;
+        z-index: 2;
+    }
+    td {
+        padding: 12px 16px;
+        font-size: 13px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        color: rgba(255, 255, 255, 0.85);
+        vertical-align: middle;
+    }
+    tr:hover td {
+        background: rgba(255, 255, 255, 0.01);
+        color: #ffffff;
+    }
 
     /* Action button style */
     .btn-otish {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
         padding: 8px 16px;
         background: linear-gradient(135deg, #00f2fe, #4facfe);
-        color: #070a12;
+        color: #070a12 !important;
         text-decoration: none;
         border-radius: 8px;
-        font-size: 13px;
+        font-size: 12.5px;
         font-weight: 700;
         transition: 0.3s ease;
         box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
+        white-space: nowrap;
     }
     .btn-otish:hover {
         box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
         transform: translateY(-1px);
-        color: #070a12;
+        color: #070a12 !important;
     }
 
-        
+    /* Score badges */
+    .score-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(0, 255, 170, 0.1);
+        border: 1px solid rgba(0, 255, 170, 0.25);
+        color: #00ffaa;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 12px;
+    }
 
-    /* --- 📱 MOBIL REJIMDA RESET --- */
+    /* Empty state */
+    .empty-state-card {
+        text-align: center;
+        padding: 50px 30px;
+        background: rgba(255, 255, 255, 0.015);
+        border: 1px dashed rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        width: 100%;
+        max-width: 550px;
+        margin: 40px auto;
+    }
+    .empty-state-card i {
+        font-size: 44px;
+        color: rgba(0, 242, 254, 0.2);
+        margin-bottom: 16px;
+    }
+    .empty-state-card h3 {
+        font-size: 18px;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 8px;
+    }
+    .empty-state-card p {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 13.5px;
+    }
+
+    /* --- 📱 MOBIL REJIMDA GLASS CARD LAYOUT --- */
     @media (max-width: 768px) {
-        body .content {
-            overflow: auto !important;
+        .quiz-sticky-header {
+            position: sticky !important;
+            top: 58px !important;
+            z-index: 40 !important;
+            background: rgba(7, 10, 18, 0.96) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            margin: -12px -10px 14px -10px !important;
+            padding: 10px 10px 10px 10px !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
         }
-        .jadval-container {
-            max-height: none;
-            overflow: visible;
-            padding: 10px;
-            background: transparent;
-            border: none;
-            box-shadow: none;
+        .sarlavha-qatori {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 8px !important;
+        }
+        .sarlavha {
+            font-size: 17px !important;
+            border-left-width: 3px !important;
+            padding-left: 8px !important;
+        }
+        .quiz-search-box {
+            width: 100% !important;
+            height: 36px !important;
+            padding: 0 12px !important;
+            border-radius: 10px !important;
+        }
+        .quiz-search-box input {
+            font-size: 12px !important;
         }
 
-        table, thead, tbody, th, td, tr { display: block; }
-        thead { display: none; }
+        .jadval-container {
+            max-height: none !important;
+            overflow: visible !important;
+            padding: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            margin-bottom: 45px !important;
+        }
+
+        .hidden-row {
+            display: none !important;
+        }
+
+        table, thead, tbody, th, td, tr {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            white-space: normal;
+        }
+        thead {
+            display: none !important;
+        }
 
         tr {
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            padding: 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 18px;
+            padding: 14px 12px;
+            margin-bottom: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-sizing: border-box;
         }
-        tr:hover td { background: transparent; }
+        tr:last-child {
+            margin-bottom: 45px !important;
+        }
+        tr:hover td {
+            background: transparent;
+        }
+
         td {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            text-align: right; font-weight: 600;
-            gap: 12px;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 8px 0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+            text-align: right !important;
+            font-size: 13px !important;
+            gap: 10px !important;
+            box-sizing: border-box !important;
         }
-        td:last-child { border-bottom: none; padding-top: 14px; justify-content: center; }
+        td:last-child {
+            border-bottom: none !important;
+            padding-top: 12px !important;
+            justify-content: center !important;
+            width: 100% !important;
+        }
         td::before {
-            content: attr(data-label); font-weight: 700; color: #00f2fe;
-            text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;
-            text-align: left; padding-right: 15px;
+            content: attr(data-label);
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.45);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            text-align: left;
+            padding-right: 10px;
             flex-shrink: 0;
         }
-        td[data-label="No"]::before, td:last-child::before { display: none; }
         td[data-label="No"] {
-            font-size: 14px; color: #4facfe; border-bottom: 1px solid rgba(0, 242, 254, 0.15);
-            padding-bottom: 6px; justify-content: center;
+            display: none !important;
         }
+        td[data-label="Test nomi"] {
+            padding-bottom: 10px !important;
+            margin-bottom: 4px !important;
+            border-bottom: 1px solid rgba(0, 242, 254, 0.2) !important;
+        }
+        td[data-label="Test nomi"]::before {
+            color: #00f2fe !important;
+            font-size: 11px !important;
+        }
+        td[data-label="Test nomi"] .td-val {
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            color: #ffffff !important;
+        }
+
         .td-val {
             display: block;
-            max-width: 70%;
             word-break: break-word;
             text-align: right;
             flex-grow: 1;
             min-width: 0;
         }
+        .btn-otish {
+            width: 100% !important;
+            padding: 10px 14px !important;
+            font-size: 13px !important;
+            border-radius: 10px !important;
+        }
+    }
+
+    /* --- ☀️ LIGHT MODE SPECIFIC OVERRIDES --- */
+    body.light-mode .quiz-sticky-header {
+        background: rgba(241, 245, 249, 0.96) !important;
+        border-bottom-color: #cbd5e1 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    }
+    body.light-mode .sarlavha {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
+    }
+    body.light-mode .quiz-search-box {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03) !important;
+    }
+    body.light-mode .quiz-search-box:focus-within {
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.15) !important;
+        background: #ffffff !important;
+    }
+    body.light-mode .quiz-search-box input,
+    body.light-mode .quiz-search-box input:focus,
+    body.light-mode .quiz-search-box input:focus-visible,
+    body.light-mode .quiz-search-box input:active {
+        color: #0f172a !important;
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        -webkit-box-shadow: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+    }
+    body.light-mode .quiz-search-box input::placeholder {
+        color: #94a3b8 !important;
+    }
+    body.light-mode .quiz-search-box i {
+        color: #64748b !important;
+    }
+
+    body.light-mode .jadval-container {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03) !important;
+    }
+    body.light-mode table th {
+        background: #f8fafc !important;
+        color: #475569 !important;
+        border-bottom-color: #e2e8f0 !important;
+    }
+    body.light-mode table td {
+        color: #334155 !important;
+        border-bottom-color: #f1f5f9 !important;
+    }
+    body.light-mode tr:hover td {
+        background: #f8fafc !important;
+    }
+    body.light-mode tr {
+        background: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important;
+    }
+    body.light-mode td::before {
+        color: #64748b !important;
+    }
+    body.light-mode td[data-label="Test nomi"] {
+        border-bottom-color: #e2e8f0 !important;
+    }
+    body.light-mode td[data-label="Test nomi"]::before {
+        color: #0284c7 !important;
+    }
+    body.light-mode td[data-label="Test nomi"] .td-val {
+        color: #0f172a !important;
+    }
+    body.light-mode .btn-otish {
+        background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.2) !important;
+    }
+    body.light-mode .btn-otish:hover {
+        box-shadow: 0 0 20px rgba(2, 132, 199, 0.35) !important;
+        color: #ffffff !important;
+    }
+    body.light-mode .score-badge {
+        background: rgba(22, 163, 74, 0.08) !important;
+        border-color: rgba(22, 163, 74, 0.25) !important;
+        color: #15803d !important;
+    }
+    body.light-mode td[data-label="Maksimal ball"] .td-val {
+        color: #b45309 !important;
+    }
+    body.light-mode td[data-label="Taymer"] .td-val {
+        color: #dc2626 !important;
+    }
+    body.light-mode td[data-label="Guruh"] .td-val {
+        color: #0284c7 !important;
+    }
+    body.light-mode .empty-state-card {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+    }
+    body.light-mode .empty-state-card h3 {
+        color: #0f172a !important;
+    }
+    body.light-mode .empty-state-card p {
+        color: #64748b !important;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-    <!-- Test qidiruv formasi -->
-    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
-        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">Onlayn testlar</h2>
-        <!-- QIDIRUV FORMASI -->
-        <form class="search-form" id="quizSearchForm" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
-            <input type="text" class="search-input" id="quiz-search" placeholder="Test nomini yozing..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
-            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
-        </form>
+    <!-- 📌 STICKY HEADER & QUIZ SEARCH -->
+    <div class="quiz-sticky-header">
+        <div class="sarlavha-qatori">
+            <h2 class="sarlavha">Onlayn testlar</h2>
+            <div class="quiz-search-box">
+                <input type="text" id="quiz-search" placeholder="Test nomini yozing...">
+                <i class="fas fa-search"></i>
+            </div>
+        </div>
     </div>
 
+    {% if quiz_data %}
     <div class="jadval-container">
         <table id="quiz-table">
             <thead>
                 <tr>
-                    <th>No</th>
+                    <th style="width: 50px;">No</th>
                     <th>Nomi</th>
                     <th>Guruh</th>
                     <th>Yaratilgan sana</th>
-                    <th>Savollar soni</th>
-                    <th>Maksimal ball</th>
-                    <th>Taymer</th>
-                    <th>To'g'ri savollar</th>
-                    <th>To'plangan ball</th>
-                    <th style="text-align: center;">Boshlash</th>
+                    <th style="text-align: center;">Savollar soni</th>
+                    <th style="text-align: center;">Maksimal ball</th>
+                    <th style="text-align: center;">Taymer</th>
+                    <th style="text-align: center;">To'g'ri javoblar</th>
+                    <th style="text-align: center;">To'plangan ball</th>
+                    <th style="text-align: center; width: 140px;">Harakat</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in quiz_data %}
-                    <tr>
+                    <tr class="quiz-row">
                         <td data-label="No"><span>{{ forloop.counter }}</span></td>
-                        <td data-label="Test nomi" style="font-weight: 700; color: #ffffff; text-align: left;"><span class="td-val">{{ item.quiz.title }}</span></td>
+                        <td data-label="Test nomi" style="font-weight: 700; color: #ffffff;"><span class="td-val">{{ item.quiz.title }}</span></td>
                         <td data-label="Guruh"><span class="td-val" style="color: #4facfe; font-weight: 600;">{{ item.quiz.group.name }}</span></td>
                         <td data-label="Yaratilgan sana"><span class="td-val">{{ item.quiz.created_at|date:"d.m.Y" }}</span></td>
-                        <td data-label="Savollar soni"><span class="td-val">{{ item.total_questions }}</span></td>
-                        <td data-label="Maksimal ball" style="color: #ffc107;"><span class="td-val">{{ item.quiz.max_score }}</span></td>
-                        <td data-label="Taymer" style="color: #ff808b;"><span class="td-val"><i class="far fa-clock" style="font-size: 12px; margin-right: 2px;"></i> {{ item.quiz.time_limit }} daqiqa</span></td>
-                        <td data-label="To'g'ri javoblar">
+                        <td data-label="Savollar soni" style="text-align: center;"><span class="td-val">{{ item.total_questions }} ta</span></td>
+                        <td data-label="Maksimal ball" style="text-align: center; color: #ffd700;"><span class="td-val">{{ item.quiz.max_score }} ball</span></td>
+                        <td data-label="Taymer" style="text-align: center; color: #ff808b;"><span class="td-val"><i class="far fa-clock" style="font-size: 11px; margin-right: 2px;"></i> {{ item.quiz.time_limit }} daqiqa</span></td>
+                        <td data-label="To'g'ri javoblar" style="text-align: center;">
                             {% if item.correct_count is not None %}
-                                <span class="td-val" style="color: #00ffaa; font-weight: 700;">{{ item.correct_count }}</span>
+                                <span class="score-badge"><i class="fas fa-check-circle"></i> {{ item.correct_count }} ta</span>
                             {% else %}
-                                <span class="td-val" style="color: rgba(255,255,255,0.35);">–</span>
+                                <span class="td-val" style="color: rgba(255,255,255,0.35); font-style: italic;">–</span>
                             {% endif %}
                         </td>
-                        <td data-label="To'plangan ball">
+                        <td data-label="To'plangan ball" style="text-align: center;">
                             {% if item.score is not None %}
-                                <span class="td-val" style="color: #00ffaa; font-weight: 700;">{{ item.score }}</span>
+                                <span class="score-badge">{{ item.score }} ball</span>
                             {% else %}
-                                <span class="td-val" style="color: rgba(255,255,255,0.35);">–</span>
+                                <span class="td-val" style="color: rgba(255,255,255,0.35); font-style: italic;">Topshirilmagan</span>
                             {% endif %}
                         </td>
-                        <td>
-                            <a class="btn-otish td-val" href="{% url 'start_quiz' item.quiz.id %}"><i class="fas fa-play" style="font-size: 11px; margin-right: 4px;"></i> Boshlash</a>
+                        <td style="text-align: center;">
+                            <a class="btn-otish" href="{% url 'start_quiz' item.quiz.id %}"><i class="fas fa-play" style="font-size: 11px;"></i> <span>Boshlash</span></a>
                         </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="10" style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; padding: 40px 0;">Siz uchun testlar mavjud emas.</td>
                     </tr>
                 {% endfor %}
+                <tr id="noSearchResultRow" style="display: none;"><td colspan="10" style="text-align: center; color: rgba(255,255,255,0.4); font-style: italic; padding: 35px 0;"><i class="fas fa-search" style="margin-right: 6px;"></i> Qidiruv bo'yicha mos keladigan testlar topilmadi.</td></tr>
             </tbody>
         </table>
     </div>
+    {% else %}
+        <div class="empty-state-card">
+            <i class="fas fa-clipboard-list"></i>
+            <h3>Siz uchun testlar mavjud emas</h3>
+            <p>Guruhlaringiz bo'yicha hali yangi onlayn testlar e'lon qilinmagan.</p>
+        </div>
+        {% endif %}
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    /* --- 🔍 QIDIRUV PANELINI HEADERGA KO'CHIRISH VA JONLI QIDIRUV --- */
+    /* --- 🔍 JONLI QIDIRUV --- */
     document.addEventListener("DOMContentLoaded", function () {
-
-
         const searchInput = document.getElementById("quiz-search");
         const table = document.getElementById("quiz-table");
         if (table && searchInput) {
-            const rows = table.querySelectorAll("tbody tr");
+            const rows = table.querySelectorAll("tbody tr.quiz-row");
+            const noSearchResultRow = document.getElementById("noSearchResultRow");
+
             searchInput.addEventListener("input", function () {
-                const searchTerm = this.value.toLowerCase();
+                const searchTerm = this.value.toLowerCase().trim();
+                let visibleCount = 0;
+
                 rows.forEach(row => {
-                    const secondColumn = row.querySelectorAll("td")[1];
-                    const text = secondColumn ? secondColumn.textContent.toLowerCase() : "";
-                    row.style.display = text.includes(searchTerm) ? "" : "none";
+                    const text = row.textContent.toLowerCase();
+                    if (searchTerm === "" || text.includes(searchTerm)) {
+                        row.style.removeProperty('display');
+                        row.classList.remove('hidden-row');
+                        visibleCount++;
+                    } else {
+                        row.style.setProperty('display', 'none', 'important');
+                        row.classList.add('hidden-row');
+                    }
                 });
+
+                if (noSearchResultRow) {
+                    if (rows.length > 0 && visibleCount === 0 && searchTerm !== "") {
+                        noSearchResultRow.style.setProperty('display', 'table-row', 'important');
+                        noSearchResultRow.classList.remove('hidden-row');
+                    } else {
+                        noSearchResultRow.style.setProperty('display', 'none', 'important');
+                        noSearchResultRow.classList.add('hidden-row');
+                    }
+                }
             });
         }
     });
-
-    
 </script>
 {% endblock %}

@@ -727,7 +727,7 @@
         body.light-mode .dars-yoq {
             color: #94a3b8 !important;
         }
-        body.light-mode td div {
+        body.light-mode #jadval td div {
             background: rgba(2, 132, 199, 0.05) !important;
             border: 1px solid rgba(2, 132, 199, 0.15) !important;
             border-radius: 8px !important;
@@ -787,12 +787,11 @@
             color: #475569 !important;
             font-weight: 600;
         }
-        body.light-mode input[type="text"],
+        body.light-mode input[type="text"]:not(.search-input):not(.search-pill-input),
         body.light-mode input[type="password"],
         body.light-mode input[type="email"],
         body.light-mode select,
         body.light-mode textarea,
-        body.light-mode .search-input,
         body.light-mode .form-control {
             background: #ffffff !important;
             border: 1px solid #cbd5e1 !important;
@@ -804,10 +803,9 @@
             color: #334155 !important;
             box-shadow: none !important;
         }
-        body.light-mode input:focus,
+        body.light-mode input:not(.search-input):not(.search-pill-input):focus,
         body.light-mode select:focus,
         body.light-mode textarea:focus,
-        body.light-mode .search-input:focus,
         body.light-mode .form-control:focus {
             border-color: #0284c7 !important;
             box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15) !important;
@@ -1008,6 +1006,12 @@
             box-shadow: none !important;
             outline: none !important;
             border-radius: 0 !important;
+        }
+        body.light-mode .search-form .search-input::placeholder,
+        body.light-mode .search-input::placeholder,
+        body.light-mode input::placeholder,
+        body.light-mode textarea::placeholder {
+            color: rgba(15, 23, 42, 0.4) !important;
         }
         body.light-mode .search-form .search-input:focus,
         body.light-mode .search-input:focus {
@@ -1356,7 +1360,7 @@
         body.light-mode .dars-yoq {
             color: #94a3b8 !important;
         }
-        body.light-mode td div {
+        body.light-mode #jadval td div {
             background: rgba(2, 132, 199, 0.05) !important;
             border: 1px solid rgba(2, 132, 199, 0.15) !important;
             border-radius: 8px !important;
@@ -1366,14 +1370,14 @@
             font-weight: 700 !important;
             text-align: center !important;
         }
-        body.light-mode td div[style*="color: #ffffff"],
-        body.light-mode td div[style*="color:#ffffff"] {
+        body.light-mode #jadval td div[style*="color: #ffffff"],
+        body.light-mode #jadval td div[style*="color:#ffffff"] {
             color: #0284c7 !important;
         }
-        body.light-mode td hr[style*="border-top"] {
+        body.light-mode #jadval td hr[style*="border-top"] {
             border-top-color: #cbd5e1 !important;
         }
-        body.light-mode th small[style*="color: rgba(255,255,255,0.3)"] {
+        body.light-mode #jadval th small[style*="color: rgba(255,255,255,0.3)"] {
             color: #64748b !important;
         }
 

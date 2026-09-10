@@ -5,7 +5,26 @@
 
 {% block extra_css %}
     <style>
-        /* --- 🔍 QIDIRUV PANELI (UNIFIED PILL DESIGN) --- */
+        /* --- 🔍 SARLAVHA VA QIDIRUV PANELI --- */
+        .sarlavha-qatori {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .sarlavha {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            border-left: 4px solid #00f2fe;
+            padding-left: 12px;
+            letter-spacing: -0.5px;
+            margin: 0;
+            line-height: 1;
+        }
+
         .search-form {
             display: flex;
             align-items: center;
@@ -14,8 +33,9 @@
             border-radius: 12px;
             padding: 4px 14px;
             transition: 0.3s;
-            width: 280px;
+            width: 300px;
             margin: 0;
+            box-sizing: border-box;
         }
         .search-form:focus-within {
             border-color: #00f2fe !important;
@@ -32,6 +52,9 @@
             padding: 6px 0 !important;
             margin: 0 !important;
             box-shadow: none !important;
+        }
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
         }
         .search-btn {
             background: none !important;
@@ -50,6 +73,7 @@
             color: #00f2fe !important;
         }
 
+        /* Light Mode Search */
         body.light-mode .search-form {
             background: #ffffff !important;
             border: 1px solid #cbd5e1 !important;
@@ -66,11 +90,8 @@
             box-shadow: none !important;
             outline: none !important;
         }
-        body.light-mode .search-input:focus {
-            border: none !important;
-            box-shadow: none !important;
-            outline: none !important;
-            background: transparent !important;
+        body.light-mode .search-input::placeholder {
+            color: rgba(15, 23, 42, 0.35) !important;
         }
         body.light-mode .search-btn {
             color: #64748b !important;
@@ -80,10 +101,9 @@
         }
         body.light-mode .search-btn:hover {
             color: #0284c7 !important;
-            background: transparent !important;
-            border: none !important;
         }
 
+        /* --- 📋 JADVAL KONTENYNERI --- */
         .jadval-container {
             flex-grow: 1;
             overflow-y: auto !important;
@@ -96,6 +116,8 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             max-height: calc(100vh - 165px);
             min-height: 400px;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
         }
 
         /* Skrolbar dizayni */
@@ -115,125 +137,412 @@
         }
 
         table {
-            width: max-content !important;
-            min-width: 100% !important;
-            white-space: nowrap;
+            width: 100% !important;
             border-collapse: collapse;
             text-align: left;
         }
         th {
-            padding: 16px 18px;
-            font-size: 13.5px;
+            padding: 14px 18px;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
             color: rgba(255, 255, 255, 0.4);
             letter-spacing: 0.5px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            position: sticky; /* Tepa qismi qotib turadi */
+            position: sticky;
             top: 0;
             background: #080d1a;
             z-index: 2;
+        }
+        .th-num {
+            width: 70px;
+            color: #00f2fe;
         }
         td {
             padding: 14px 18px;
             font-size: 13.5px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.85);
             vertical-align: middle;
         }
         tr:hover td {
-            background: rgba(255, 255, 255, 0.01);
+            background: rgba(255, 255, 255, 0.02);
             color: #ffffff;
         }
+        #jadval-qatorlari tr:last-child td {
+            border-bottom: none !important;
+        }
 
+        /* Profil Rasmi */
         .profil-rasm-rasm {
-            width: 38px;
-            height: 38px;
+            width: 42px;
+            height: 42px;
             object-fit: cover;
             object-position: center;
             border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: inline-block;
         }
 
-        /* --- ☀️ LIGHT MODE MOSLASHUVI --- */
+        /* Telefon Raqam */
+        .phone-link {
+            color: #00ffaa;
+            text-decoration: none;
+            font-family: monospace;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+        .phone-link:hover {
+            color: #4facfe;
+            text-decoration: underline;
+        }
+        .phone-empty {
+            color: rgba(255, 255, 255, 0.3);
+            font-style: italic;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Tartib raqam (Oddiy raqam) */
+        .row-num-badge,
+        .row-num {
+            font-weight: 700;
+            color: #4facfe;
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        .mobile-phone-wrap {
+            display: none;
+        }
+
+        /* F.I.SH Matni */
+        .student-name-wrap {
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 13.5px;
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            text-align: left !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+
+        .hidden-row {
+            display: none !important;
+        }
+
+        .empty-state-cell {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.35);
+            font-style: italic;
+            padding: 50px 20px !important;
+        }
+        .empty-state-cell i {
+            display: block;
+            font-size: 26px;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* --- ☀️ LIGHT MODE MOSLASHUVI (1-TO-1 AYNAN BIR XIL DIZAYN) --- */
         body.light-mode .jadval-container {
             background: #ffffff !important;
             border: 1px solid #e2e8f0 !important;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .jadval-container::-webkit-scrollbar-thumb {
+            background: rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode .jadval-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(2, 132, 199, 0.4) !important;
         }
         body.light-mode th {
             background: #f8fafc !important;
             color: #475569 !important;
             border-bottom: 1px solid #e2e8f0 !important;
         }
+        body.light-mode .th-num {
+            color: #0284c7 !important;
+        }
         body.light-mode td {
             color: #1e293b !important;
             border-bottom: 1px solid #f1f5f9 !important;
         }
-        body.light-mode td[data-label="Familiya"] {
+        body.light-mode tr:hover td {
+            background: #f8fafc !important;
             color: #0f172a !important;
         }
-        body.light-mode td[data-label="Telefon raqam"] {
-            color: #059669 !important;
+        body.light-mode .student-name-wrap {
+            color: #0f172a !important;
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            text-align: left !important;
+            box-shadow: none !important;
         }
-        body.light-mode tr:hover td {
+        body.light-mode .phone-link {
+            color: #059669 !important;
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+        body.light-mode .phone-link:hover {
+            color: #0284c7 !important;
+            text-decoration: underline;
+        }
+        body.light-mode .phone-empty {
+            color: #94a3b8 !important;
+        }
+        body.light-mode .profil-rasm-rasm {
+            border: 1px solid #cbd5e1 !important;
             background: #f8fafc !important;
         }
         body.light-mode .sarlavha {
             color: #0f172a !important;
+            border-left-color: #0284c7 !important;
+        }
+        body.light-mode .empty-state-cell {
+            color: #64748b !important;
+        }
+        body.light-mode .empty-state-cell i {
+            color: #94a3b8 !important;
+        }
+        body.light-mode .row-num-badge,
+        body.light-mode .row-num {
+            color: #0284c7 !important;
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
         }
 
-        /* TELEFON EKRANI UCHUN REJIM (Table-to-Cards) */
+        /* --- 📱 TELEFON EKRANI UCHUN REJIM (MODERN COMPACT CARDS) --- */
         @media (max-width: 768px) {
             .konteyner {
                 height: auto !important;
                 overflow: visible !important;
-                padding: 15px !important;
+                padding: 14px 14px 35px 14px !important;
             }
-            .search-input { width: 130px; margin-left: 10px; padding: 8px 12px; }
-            .search-btn { padding: 8px 14px; }
-            .jadval-container { border: none; background: transparent; box-shadow: none; overflow: visible; max-height: none; }
-            table, thead, tbody, th, td, tr { display: block; }
-            thead { display: none; }
+            .sarlavha-qatori {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 12px !important;
+                margin-bottom: 16px !important;
+            }
+            .sarlavha {
+                font-size: 18.5px !important;
+                border-left-width: 3.5px !important;
+                padding-left: 10px !important;
+            }
+            .search-form {
+                width: 100% !important;
+                padding: 6px 14px !important;
+            }
+            .search-input {
+                font-size: 13.5px !important;
+                width: 100% !important;
+            }
 
-            #jadval-qatorlari tr {
-                background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
-                border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-                backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            .jadval-container {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                overflow: visible !important;
+                max-height: none !important;
+                padding: 0 !important;
+                margin-bottom: 20px !important;
             }
-            body.light-mode #jadval-qatorlari tr {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead {
+                display: none !important;
+            }
+
+            /* Har bir o'quvchi uchun ixcham zamonaviy karta */
+            #jadval-qatorlari tr:not(#noResultsRow):not(#emptyInitialRow) {
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(255, 255, 255, 0.06);
+                border-radius: 16px;
+                padding: 12px 14px;
+                margin-bottom: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                gap: 12px;
+                transition: 0.2s;
+            }
+            body.light-mode #jadval-qatorlari tr:not(#noResultsRow):not(#emptyInitialRow) {
                 background: #ffffff !important;
                 border: 1px solid #e2e8f0 !important;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.04) !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
             }
-            #jadval-qatorlari td {
-                display: flex; justify-content: space-between; align-items: center;
-                padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.03); text-align: right; font-size: 13px;
+
+            /* Mobil kartalarning ichki td elementlarini tozalash */
+            #jadval-qatorlari tr:not(#noResultsRow):not(#emptyInitialRow) td,
+            body.light-mode #jadval-qatorlari tr:not(#noResultsRow):not(#emptyInitialRow) td {
+                padding: 0 !important;
+                border: none !important;
+                border-bottom: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
             }
-            body.light-mode #jadval-qatorlari td {
-                border-bottom: 1px solid #f1f5f9 !important;
+
+            /* Chap tomonda: Avatar */
+            .td-avatar {
+                order: 1 !important;
+                flex-shrink: 0 !important;
+                text-align: left !important;
             }
-            #jadval-qatorlari td:last-child { border-bottom: none; }
-            #jadval-qatorlari td::before {
-                content: attr(data-label); float: left; font-weight: 700; color: rgba(255, 255, 255, 0.4);
-                text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;
+            .profil-rasm-rasm {
+                width: 44px !important;
+                height: 44px !important;
+                border-radius: 12px !important;
+                border: 1.5px solid rgba(0, 242, 254, 0.25) !important;
+                background: rgba(0, 242, 254, 0.05);
             }
-            body.light-mode #jadval-qatorlari td::before {
+            body.light-mode .profil-rasm-rasm {
+                border-color: rgba(2, 132, 199, 0.25) !important;
+                background: #f8fafc !important;
+            }
+
+            /* Markazda: Ism va Telefon */
+            .td-name {
+                order: 2 !important;
+                flex: 1 !important;
+                min-width: 0 !important;
+            }
+            .student-name-wrap {
+                font-size: 14px !important;
+                font-weight: 700 !important;
+                color: #ffffff !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                display: block !important;
+            }
+            body.light-mode .student-name-wrap {
+                color: #0f172a !important;
+            }
+            .mobile-phone-wrap {
+                display: block !important;
+                margin-top: 3px !important;
+                font-size: 12px !important;
+            }
+            .mobile-phone-wrap .phone-link {
+                font-size: 12px !important;
+                color: #00ffaa !important;
+                font-family: monospace !important;
+                font-weight: 600 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 5px !important;
+                text-decoration: none !important;
+            }
+            .mobile-phone-wrap .phone-link:hover {
+                color: #4facfe !important;
+                text-decoration: underline !important;
+            }
+            body.light-mode .mobile-phone-wrap .phone-link {
+                color: #059669 !important;
+            }
+            body.light-mode .mobile-phone-wrap .phone-link:hover {
+                color: #0284c7 !important;
+                text-decoration: underline !important;
+            }
+            .mobile-phone-wrap .phone-empty {
+                font-size: 11.5px !important;
+                color: rgba(255, 255, 255, 0.35) !important;
+                font-style: italic !important;
+            }
+            body.light-mode .mobile-phone-wrap .phone-empty {
+                color: #94a3b8 !important;
+            }
+
+            /* Desktop Telefon Ustunini telefonda yashirish */
+            .td-phone-desktop {
+                display: none !important;
+            }
+
+            /* O'ng tomonda: Oddiy tartib raqam (1, 2, 3...) */
+            .td-num {
+                order: 3 !important;
+                flex-shrink: 0 !important;
+            }
+            .row-num-badge,
+            .row-num {
+                font-weight: 800 !important;
+                font-size: 13.5px !important;
+                color: #00f2fe !important;
+                background: none !important;
+                border: none !important;
+                padding: 0 !important;
+                display: inline-block !important;
+            }
+            body.light-mode .row-num-badge,
+            body.light-mode .row-num {
+                color: #0284c7 !important;
+                background: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+
+            #noResultsRow td,
+            #emptyInitialRow td {
+                display: block !important;
+                background: rgba(255, 255, 255, 0.01) !important;
+                border: 1px dashed rgba(255, 255, 255, 0.08) !important;
+                color: rgba(255, 255, 255, 0.4) !important;
+                border-radius: 16px !important;
+                padding: 35px 15px !important;
+                text-align: center !important;
+            }
+            #noResultsRow td i,
+            #emptyInitialRow td i {
+                color: rgba(0, 242, 254, 0.3) !important;
+            }
+            body.light-mode #noResultsRow td,
+            body.light-mode #emptyInitialRow td {
+                background: #ffffff !important;
+                border: 1px dashed #cbd5e1 !important;
                 color: #64748b !important;
             }
-            #jadval-qatorlari td[data-label="№"] { border-bottom: 1px solid rgba(0, 242, 254, 0.1); padding-bottom: 12px; margin-bottom: 6px; }
-            body.light-mode #jadval-qatorlari td[data-label="№"] { border-bottom: 1px solid #e2e8f0 !important; }
+            body.light-mode #noResultsRow td i,
+            body.light-mode #emptyInitialRow td i {
+                color: #0284c7 !important;
+            }
+
+            .bottom-page-spacer {
+                height: 35px !important;
+                min-height: 35px !important;
+            }
         }
     </style>
 {% endblock %}
 
 {% block content %}
-    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
-        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">O'quvchilar ro'yxati</h2>
+    <div class="sarlavha-qatori">
+        <h2 class="sarlavha">O'quvchilar ro'yxati</h2>
+        
         <!-- QIDIRUV PANELI -->
-        <form class="search-form" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
-            <input type="text" class="search-input" placeholder="Familiya bo'yicha qidiruv..." id="qidiruv" style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
-            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        <form class="search-form" onsubmit="event.preventDefault();">
+            <input type="text" class="search-input" placeholder="Familiya, ism yoki telefon..." id="qidiruv" autocomplete="off">
+            <button type="submit" class="search-btn" aria-label="Qidirish"><i class="fas fa-search"></i></button>
         </form>
     </div>
 
@@ -242,21 +551,37 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 60px; color: #4facfe;">№</th>
-                    <th>Familiya</th>
-                    <th>Ism</th>
+                    <th class="th-num">№</th>
+                    <th>F.I.SH</th>
                     <th>Telefon raqam</th>
                     <th style="width: 80px; text-align: center;">Rasm</th>
                 </tr>
             </thead>
             <tbody id="jadval-qatorlari">
                 {% for student in students %}
-                    <tr>
-                        <td data-label="№" style="font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
-                        <td data-label="Familiya" style="font-weight: 600; color: #ffffff;">{{ student.last_name }}</td>
-                        <td data-label="Ism">{{ student.first_name }}</td>
-                        <td data-label="Telefon raqam" style="color: #00ffaa; font-family: monospace;">{{ student.phone_number }}</td>
-                        <td data-label="Rasm" style="text-align: center;">
+                    <tr data-student-row>
+                        <td class="td-num"><span class="row-num-badge"><span class="row-num">{{ forloop.counter }}</span></span></td>
+                        <td class="td-name">
+                            <div class="student-name-wrap">
+                                <span class="student-lastname">{{ student.last_name }}</span>
+                                <span class="student-firstname">{{ student.first_name }}</span>
+                            </div>
+                            <div class="mobile-phone-wrap">
+                                {% if student.phone_number %}
+                                    <a href="tel:{{ student.phone_number }}" class="phone-link"><i class="fas fa-phone-alt"></i> {{ student.phone_number }}</a>
+                                {% else %}
+                                    <span class="phone-empty">Telefon kiritilmagan</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="td-phone-desktop">
+                            {% if student.phone_number %}
+                                <a href="tel:{{ student.phone_number }}" class="phone-link"><i class="fas fa-phone-alt"></i> {{ student.phone_number }}</a>
+                            {% else %}
+                                <span class="phone-empty">Mavjud emas</span>
+                            {% endif %}
+                        </td>
+                        <td class="td-avatar" style="text-align: center;">
                           {% if student.profile_image %}
                             <img src="{{ student.profile_image.url }}" alt="Rasm" class="profil-rasm-rasm">
                           {% else %}
@@ -265,53 +590,92 @@
                         </td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="5" style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; padding: 40px 0;">O'quvchilar topilmadi.</td></tr>
+                    <tr id="emptyInitialRow">
+                        <td colspan="4" class="empty-state-cell">
+                            <i class="fas fa-user-slash"></i>
+                            <span>O'quvchilar topilmadi.</span>
+                        </td>
+                    </tr>
                 {% endfor %}
+                <tr id="noResultsRow" class="hidden-row" style="display: none;">
+                    <td colspan="4" class="empty-state-cell">
+                        <i class="fas fa-search-minus"></i>
+                        <span>Qidiruv bo'yicha o'quvchilar topilmadi.</span>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
+
+    <!-- Pastki qismda 35px sof bo'sh joy qoldiruvchi spacer -->
+    <div style="height: 35px; min-height: 35px; width: 100%; flex-shrink: 0; pointer-events: none;" class="bottom-page-spacer"></div>
 {% endblock %}
 
 {% block extra_js %}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const qidiruvMaydoni = document.getElementById("qidiruv");
-            const tableRows = document.querySelectorAll("#jadval-qatorlari tr");
+            const studentRows = document.querySelectorAll("#jadval-qatorlari tr[data-student-row]");
+            const noResultsRow = document.getElementById("noResultsRow");
 
-            // Qidiruv natijasiga qarab tartib raqamlarni (№) qayta avtomatik 1, 2, 3 qilib hisoblash funksiyasi
             function updateRowNumbers() {
                 let visibleIndex = 1;
-                tableRows.forEach(row => {
-                    if (row.style.display !== "none" && row.cells.length > 1) {
-                        const firstCell = row.querySelector("td");
-                        if (firstCell) {
-                            firstCell.textContent = visibleIndex++;
+                studentRows.forEach(row => {
+                    if (!row.classList.contains("hidden-row") && row.style.display !== "none") {
+                        const numCell = row.querySelector(".row-num");
+                        if (numCell) {
+                            numCell.textContent = visibleIndex++;
                         }
                     }
                 });
             }
 
-            if (qidiruvMaydoni) {
-                qidiruvMaydoni.addEventListener("input", function () {
-                    const izlashSozi = this.value.toLowerCase().trim();
+            function filterStudents() {
+                const query = qidiruvMaydoni ? qidiruvMaydoni.value.toLowerCase().trim() : "";
+                let visibleCount = 0;
 
-                    tableRows.forEach(row => {
-                        // Familiya 2-ustunda joylashgan (index: 1)
-                        const familiyaCell = row.cells[1];
-                        if (familiyaCell) {
-                            const familiya = familiyaCell.textContent.toLowerCase().trim();
+                studentRows.forEach(row => {
+                    const lastNameEl = row.querySelector(".student-lastname");
+                    const firstNameEl = row.querySelector(".student-firstname");
+                    const phoneEl = row.querySelector(".phone-link");
 
-                            if (familiya.startsWith(izlashSozi)) {
-                                row.style.display = "";
-                            } else {
-                                row.style.display = "none";
-                            }
-                        }
-                    });
+                    const lastName = lastNameEl ? lastNameEl.textContent.toLowerCase().trim() : "";
+                    const firstName = firstNameEl ? firstNameEl.textContent.toLowerCase().trim() : "";
+                    const phone = phoneEl ? phoneEl.textContent.toLowerCase().replace(/[\s\-\(\)]/g, "") : "";
+                    const queryClean = query.replace(/[\s\-\(\)]/g, "");
+                    const fullName = (lastName + " " + firstName);
 
-                    // Tartib raqamlarini yangilash
-                    updateRowNumbers();
+                    const matches = !query || 
+                        lastName.includes(query) || 
+                        firstName.includes(query) || 
+                        fullName.includes(query) ||
+                        (queryClean && phone.includes(queryClean));
+
+                    if (matches) {
+                        row.classList.remove("hidden-row");
+                        row.style.display = "";
+                        visibleCount++;
+                    } else {
+                        row.classList.add("hidden-row");
+                        row.style.display = "none";
+                    }
                 });
+
+                if (noResultsRow) {
+                    if (visibleCount === 0 && studentRows.length > 0) {
+                        noResultsRow.style.display = "";
+                        noResultsRow.classList.remove("hidden-row");
+                    } else {
+                        noResultsRow.style.display = "none";
+                        noResultsRow.classList.add("hidden-row");
+                    }
+                }
+
+                updateRowNumbers();
+            }
+
+            if (qidiruvMaydoni) {
+                qidiruvMaydoni.addEventListener("input", filterStudents);
             }
         });
     </script>

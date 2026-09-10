@@ -5,22 +5,66 @@
 
 {% block extra_css %}
 <style>
-    /* --- 🔒 ASOSIY CONTENT SKROLINI QOTIRISH --- */
-    body .content {
-        overflow: hidden !important;
+    .sarlavha-qatori {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
     }
-
     .sarlavha {
         font-size: 22px;
         font-weight: 800;
-        margin-bottom: 20px;
         color: #ffffff;
         border-left: 4px solid #00f2fe;
         padding-left: 12px;
         letter-spacing: -0.5px;
+        margin: 0;
+        line-height: 1.2;
     }
-
-
+    .search-form {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 4px 14px;
+        transition: 0.3s;
+        width: 280px;
+        margin: 0;
+    }
+    .search-form:focus-within {
+        border-color: rgba(0, 242, 254, 0.4);
+        box-shadow: 0 0 12px rgba(0, 242, 254, 0.15);
+        background: rgba(255, 255, 255, 0.04);
+    }
+    .search-input,
+    .search-input:focus,
+    .search-input:focus-visible,
+    .search-input:active {
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        -webkit-box-shadow: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        color: #ffffff !important;
+        font-size: 13px;
+        width: 100%;
+        padding: 6px 0;
+    }
+    .search-btn {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.4);
+        cursor: pointer;
+        font-size: 13px;
+        transition: 0.3s;
+        padding-left: 8px;
+    }
 
     /* 📊 JADVALNING O'ZI MUSTAQIL SKROL BO'LISHI UCHUN */
     .jadval-container {
@@ -31,13 +75,11 @@
         -webkit-backdrop-filter: blur(20px);
         border-radius: 24px;
         padding: 0 24px 24px 24px;
-        max-height: calc(100vh - 300px);
-        min-height: 300px;
-        overflow-y: auto !important;
-        overflow-x: auto !important;
+        overflow-y: auto;
+        overflow-x: auto;
     }
 
-    /* Skrolbarga chiroyli kiber dizayn */
+    /* Skrolbar dizayni */
     .jadval-container::-webkit-scrollbar {
         width: 6px;
         height: 6px;
@@ -51,15 +93,13 @@
     }
 
     table {
-        width: max-content !important;
-        min-width: 100% !important;
-        white-space: nowrap;
+        width: 100%;
         border-collapse: collapse;
         text-align: left;
     }
 
     th {
-        padding: 24px 16px 14px 16px;
+        padding: 20px 16px 14px 16px;
         font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
@@ -68,13 +108,12 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         position: sticky;
         top: 0;
-        background: #0b0f19 !important;
-        background-clip: padding-box;
-        z-index: 100;
+        background: #0b0f19;
+        z-index: 10;
     }
     td {
         padding: 16px 16px;
-        font-size: 14px;
+        font-size: 13.5px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.02);
         color: rgba(255, 255, 255, 0.85);
     }
@@ -85,7 +124,9 @@
 
     /* Buttons & Links styling */
     .open-modal {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         padding: 8px 16px;
         background: linear-gradient(135deg, #00f2fe, #4facfe);
         color: #070a12;
@@ -96,6 +137,7 @@
         border: none;
         cursor: pointer;
         box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
+        white-space: nowrap;
     }
     .open-modal:hover {
         box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
@@ -103,12 +145,15 @@
     }
     a.download-link {
         text-decoration: none;
-        color: #4facfe;
+        color: #00f2fe;
         font-weight: 600;
         transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
     a.download-link:hover {
-        color: #00f2fe;
+        color: #4facfe;
         text-decoration: underline;
     }
 
@@ -162,6 +207,7 @@
         border-radius: 10px;
         outline: none;
         font-size: 13px;
+        box-sizing: border-box;
     }
     .modal-content button[type="submit"] {
         margin-top: 20px;
@@ -195,7 +241,7 @@
         color: #ff0055;
     }
 
-    /* --- ⏳ 🚀 YANGI QO'SHILGAN YUKLASH OVERLAY VA SPINNER STILLARI --- */
+    /* --- ⏳ YUKLASH OVERLAY VA SPINNER STILLARI --- */
     .loading-overlay {
         position: fixed;
         top: 0; left: 0;
@@ -203,7 +249,7 @@
         background: rgba(7, 10, 18, 0.9);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        z-index: 3000; /* Modal oynadan ham yuqorida turishi kerak */
+        z-index: 3000;
         display: none;
         align-items: center;
         justify-content: center;
@@ -216,7 +262,7 @@
         border: 3px solid rgba(0, 242, 254, 0.1);
         border-radius: 50%;
         border-top-color: #00f2fe;
-        animation: spin 1s linear infinite; /* Aylanish animatsiyasi */
+        animation: spin 1s linear infinite;
         box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
     }
     .loading-text {
@@ -235,60 +281,249 @@
         to { transform: rotate(360deg); }
     }
 
-    /* --- 📱 MOBIL REJIMDA RESET --- */
+    /* --- 📱 MOBIL REJIMDA KARTALARGA AYLANTIRISH --- */
     @media (max-width: 768px) {
-        body .content {
-            overflow: auto !important;
+        .sarlavha-qatori {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            margin-bottom: 16px !important;
         }
-
+        .sarlavha {
+            font-size: 17px !important;
+            border-left-width: 3px !important;
+            padding-left: 8px !important;
+        }
+        .search-form {
+            width: 100% !important;
+            padding: 4px 12px !important;
+            box-sizing: border-box !important;
+        }
         .jadval-container {
-            max-height: none;
-            overflow: visible;
-            padding: 10px;
-            background: transparent;
-            border: none;
-            box-shadow: none;
+            max-height: none !important;
+            overflow: visible !important;
+            padding: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
         }
 
-        table, thead, tbody, th, td, tr { display: block; }
-        thead { display: none; }
+        table, thead, tbody, th, td, tr {
+            display: block !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        thead {
+            display: none !important;
+        }
 
         tr {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            padding: 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-radius: 18px !important;
+            padding: 14px 12px !important;
+            margin-bottom: 14px !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
         }
-        tr:hover td { background: transparent; }
+        tr:last-child {
+            margin-bottom: 45px !important;
+        }
+        tr:hover td {
+            background: transparent !important;
+        }
         td {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            text-align: right; font-weight: 600;
-            gap: 12px;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 8px 0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+            text-align: right !important;
+            font-size: 13px !important;
+            gap: 10px !important;
         }
-        td:last-child { border-bottom: none; padding-top: 14px; justify-content: center; }
+        td:last-child {
+            border-bottom: none !important;
+            padding-top: 12px !important;
+            justify-content: center !important;
+            width: 100% !important;
+        }
         td::before {
-            content: attr(data-label); font-weight: 700; color: #00f2fe;
-            text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;
-            text-align: left; padding-right: 15px;
+            content: attr(data-label);
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.45);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            text-align: left;
+            padding-right: 10px;
             flex-shrink: 0;
         }
-        td[data-label="No"]::before, td:last-child::before { display: none; }
         td[data-label="No"] {
-            font-size: 14px; color: #4facfe; border-bottom: 1px solid rgba(0, 242, 254, 0.15);
-            padding-bottom: 6px; justify-content: center;
+            display: none !important;
+        }
+        td[data-label="Topshiriq nomi"] {
+            padding-bottom: 10px !important;
+            margin-bottom: 4px !important;
+            border-bottom: 1px solid rgba(0, 242, 254, 0.2) !important;
+        }
+        td[data-label="Topshiriq nomi"]::before {
+            color: #00f2fe !important;
+            font-size: 11px !important;
+        }
+        td[data-label="Topshiriq nomi"] .td-val {
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            color: #ffffff !important;
         }
         .td-val {
             display: block;
-            max-width: 70%;
             word-break: break-word;
             text-align: right;
             flex-grow: 1;
             min-width: 0;
+        }
+        .open-modal {
+            width: 100% !important;
+            padding: 10px 14px !important;
+            font-size: 13px !important;
+            border-radius: 10px !important;
+            justify-content: center !important;
+        }
+        .modal-content {
+            width: 92% !important;
+            padding: 20px 16px !important;
+            border-radius: 16px !important;
+        }
+    }
+
+    /* --- ☀️ KUN REJIMI (LIGHT MODE) OVERRIDES --- */
+    body.light-mode .sarlavha {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
+    }
+    body.light-mode .search-form {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode .search-form:focus-within {
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.15) !important;
+    }
+    body.light-mode .search-input {
+        color: #0f172a !important;
+    }
+    body.light-mode .search-input::placeholder {
+        color: #94a3b8 !important;
+    }
+    body.light-mode .search-btn {
+        color: #64748b !important;
+    }
+    body.light-mode .jadval-container {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04) !important;
+    }
+    body.light-mode th {
+        background: #f8fafc !important;
+        color: #475569 !important;
+        border-bottom-color: #e2e8f0 !important;
+    }
+    body.light-mode th:first-child {
+        color: #0284c7 !important;
+    }
+    body.light-mode td {
+        color: #334155 !important;
+        border-bottom-color: #f1f5f9 !important;
+    }
+    body.light-mode td[data-label="Topshiriq nomi"] {
+        color: #0f172a !important;
+    }
+    body.light-mode tr:hover td {
+        background: #f8fafc !important;
+    }
+    body.light-mode .open-modal {
+        background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.25) !important;
+    }
+    body.light-mode .open-modal:hover {
+        box-shadow: 0 0 20px rgba(2, 132, 199, 0.4) !important;
+    }
+    body.light-mode a.download-link {
+        color: #0284c7 !important;
+    }
+    body.light-mode a.download-link:hover {
+        color: #0369a1 !important;
+    }
+    body.light-mode .modal-content {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15) !important;
+    }
+    body.light-mode #modalTitle {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
+    }
+    body.light-mode .modal-content input[type="file"] {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        color: #334155 !important;
+    }
+    body.light-mode .modal-content button[type="submit"] {
+        background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.25) !important;
+    }
+    body.light-mode .close {
+        color: #64748b !important;
+    }
+    body.light-mode .close:hover {
+        color: #dc2626 !important;
+    }
+    body.light-mode #uploadedFileSection {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+        color: #334155 !important;
+    }
+    body.light-mode #uploadedFileSection a {
+        color: #0284c7 !important;
+    }
+    body.light-mode .loading-overlay {
+        background: rgba(241, 245, 249, 0.95) !important;
+    }
+    body.light-mode .loading-text {
+        color: #0f172a !important;
+    }
+    body.light-mode .loading-subtext {
+        color: #64748b !important;
+    }
+    body.light-mode .spinner {
+        border-color: rgba(2, 132, 199, 0.15) !important;
+        border-top-color: #0284c7 !important;
+        box-shadow: 0 0 20px rgba(2, 132, 199, 0.2) !important;
+    }
+
+    @media (max-width: 768px) {
+        body.light-mode tr {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02) !important;
+        }
+        body.light-mode td {
+            border-bottom-color: #f1f5f9 !important;
+        }
+        body.light-mode td::before {
+            color: #0284c7 !important;
+        }
+        body.light-mode td[data-label="Topshiriq nomi"] {
+            border-bottom-color: rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode td[data-label="Topshiriq nomi"] .td-val {
+            color: #0f172a !important;
         }
     }
 </style>
@@ -301,12 +536,12 @@
         <div class="loading-subtext">Fayl tizimga yuklanmoqda, iltimos sahifani yopmang yoki qayta yuklamang.</div>
     </div>
 
-    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
-        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">Topshiriqlarim</h2>
+    <div class="sarlavha-qatori">
+        <h2 class="sarlavha">Topshiriqlarim</h2>
         <!-- QIDIRUV FORMASI -->
-        <form class="search-form" id="dynamic-search-form" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
-            <input type="text" class="search-input" id="top-search" placeholder="Topshiriq nomi bo'yicha..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
-            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        <form class="search-form" id="dynamic-search-form" onsubmit="event.preventDefault();">
+            <input type="text" class="search-input" id="top-search" placeholder="Topshiriq nomi bo'yicha...">
+            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
         </form>
     </div>
 
@@ -338,7 +573,7 @@
                                 <span class="td-val" style="color: rgba(255,255,255,0.3)">Fayl yo'q</span>
                             {% endif %}
                         </td>
-                        <td>
+                        <td data-label="Holati">
                           {% with submission=submissions|get_item:assignment.id %}
                             {% if assignment.id in expired_ids %}
                               <span style="color: #ff0055; font-weight: 800;"><i class="fas fa-exclamation-circle"></i> Muddati o'tgan</span>

@@ -5,50 +5,15 @@
 
 {% block extra_css %}
     <style>
-        /* --- 🔍 QIDIRUV PANELI - SPLIT DESIGN (STUDENT SHABLONI USLUBIDA) --- */
-        .search-form {
+        /* --- 🔍 SARLAVHA VA QIDIRUV PANELI --- */
+        .sarlavha-qatori {
             display: flex;
-            position: relative;
-        }
-        .search-input {
-            padding: 10px 16px;
-            font-size: 13px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px 0 0 12px;
-            outline: none;
-            width: 25vw;
-            background-color: rgba(255, 255, 255, 0.02);
-            color: #ffffff;
-            margin-left: 20px;
-            border-right: none;
-            transition: 0.3s;
-        }
-        .search-input:focus {
-            border-color: #00f2fe;
-            background: rgba(255, 255, 255, 0.06);
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
-        }
-        .search-btn {
-            background-color: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-left: none;
-            padding: 10px 18px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 13px;
-            border-radius: 0 12px 12px 0;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        .search-btn:hover {
-            background-color: rgba(0, 242, 254, 0.1);
-            color: #00f2fe;
-            border-color: rgba(0, 242, 254, 0.2);
-        }
-
-        /* --- 📅 JADVALNING O'ZIGA XOS STILLARI --- */
         .sarlavha {
             font-size: 22px;
             font-weight: 800;
@@ -56,27 +21,80 @@
             border-left: 4px solid #00f2fe;
             padding-left: 12px;
             letter-spacing: -0.5px;
+            margin: 0;
+            line-height: 1.2;
         }
 
+        .search-form {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 4px 14px;
+            transition: 0.3s;
+            width: 280px;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        .search-form:focus-within {
+            border-color: #00f2fe !important;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.2) !important;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .search-input {
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            color: #ffffff !important;
+            font-size: 13px;
+            width: 100% !important;
+            padding: 6px 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+        }
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .search-btn {
+            background: none !important;
+            border: none !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+            padding: 0 0 0 8px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .search-btn:hover {
+            color: #00f2fe !important;
+        }
+
+        /* --- 📅 HAFTA SURISH TUGMALARI --- */
         .hafta-sur {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            align-items: center;
             margin-bottom: 20px;
-            gap: 15px;
+            gap: 12px;
             width: 100%;
         }
         .hafta-sur_bir, .hafta-sur_ikki {
-            padding: 10px 20px;
+            padding: 9px 18px;
             background: rgba(255, 255, 255, 0.02);
             color: #00f2fe;
             border: 1px solid rgba(0, 242, 254, 0.2);
             border-radius: 10px;
             cursor: pointer;
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 700;
             transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
         .hafta-sur_bir:hover, .hafta-sur_ikki:hover {
             background: linear-gradient(135deg, #00f2fe, #4facfe);
@@ -86,20 +104,30 @@
             transform: translateY(-1px);
         }
 
+        .current-week-display {
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: monospace;
+            text-align: center;
+        }
+
         /* Glassmorphic Table Container Card (Desktop) */
         .jadval-container {
             background: rgba(255, 255, 255, 0.01);
             border: 1px solid rgba(255, 255, 255, 0.04);
-            box-shadow: 0 40px 80px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border-radius: 24px;
-            padding: 24px;
+            border-radius: 20px;
+            padding: 20px;
             flex-grow: 1;
             overflow-y: auto !important;
             overflow-x: auto !important;
-            max-height: calc(100vh - 300px);
+            max-height: calc(100vh - 270px);
             min-height: 300px;
+            box-sizing: border-box;
+            margin-bottom: 35px;
         }
         .jadval-container::-webkit-scrollbar {
             width: 6px;
@@ -114,17 +142,15 @@
         }
 
         table {
-            width: max-content !important;
-            min-width: 100% !important;
-            white-space: nowrap;
+            width: 100% !important;
             border-collapse: collapse;
             text-align: center;
         }
 
         th, td {
             border: 1px solid rgba(255, 255, 255, 0.04);
-            padding: 14px;
-            font-size: 13.5px;
+            padding: 12px 14px;
+            font-size: 13px;
             vertical-align: middle;
             color: rgba(255, 255, 255, 0.85);
             transition: background-color 0.3s ease;
@@ -132,12 +158,15 @@
 
         th {
             background-color: #080d1a;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.45);
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-size: 11px;
             padding: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
         }
 
         th.today {
@@ -167,160 +196,271 @@
             background-color: rgba(255, 255, 255, 0.005);
         }
 
+        .time-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 6px;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 12px;
+            font-family: monospace;
+        }
+
         .dars-yoq {
             color: rgba(255, 255, 255, 0.25);
             font-style: italic;
-            font-size: 12.5px;
+            font-size: 12px;
+        }
+
+        /* --- ☀️ LIGHT MODE SPECIFIC OVERRIDES --- */
+        body.light-mode .sarlavha {
+            color: #0f172a !important;
+            border-left-color: #0284c7 !important;
+        }
+        body.light-mode .search-form {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .search-form:focus-within {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode .search-input {
+            color: #0f172a !important;
+        }
+        body.light-mode .search-input::placeholder {
+            color: rgba(15, 23, 42, 0.4) !important;
+        }
+        body.light-mode .search-btn {
+            color: #64748b !important;
+        }
+        body.light-mode .hafta-sur_bir, 
+        body.light-mode .hafta-sur_ikki {
+            background: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #0284c7 !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03) !important;
+        }
+        body.light-mode .hafta-sur_bir:hover, 
+        body.light-mode .hafta-sur_ikki:hover {
+            background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+            color: #ffffff !important;
+            border-color: transparent !important;
+        }
+        body.light-mode .current-week-display {
+            color: #475569 !important;
+        }
+        body.light-mode .jadval-container {
+            background: #ffffff !important;
+            border: 1px solid #f1f5f9 !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02) !important;
+        }
+        body.light-mode #jadval th {
+            background: #f8fafc !important;
+            color: #475569 !important;
+            border: none !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+        }
+        body.light-mode #jadval td {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border: none !important;
+            border-bottom: 1px solid #f8fafc !important;
+        }
+        body.light-mode #jadval tr:last-child td {
+            border-bottom: none !important;
+        }
+        body.light-mode #jadval th.today {
+            background: #f0f9ff !important;
+            color: #0284c7 !important;
+            border: none !important;
+            border-bottom: 2px solid #0284c7 !important;
+            text-shadow: none !important;
+        }
+        body.light-mode #jadval th.today small {
+            color: #0284c7 !important;
+        }
+        body.light-mode #jadval .guruh-ustuni {
+            background: #f8fafc !important;
+            color: #0284c7 !important;
+            border: none !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+        }
+        body.light-mode #jadval td.today-td {
+            background: #f0f9ff !important;
+            border: none !important;
+            border-bottom: 1px solid #f0f9ff !important;
+        }
+        body.light-mode #jadval .dars-yoq {
+            color: #cbd5e1 !important;
+        }
+        body.light-mode #jadval td:not(.guruh-ustuni):hover {
+            background-color: #f8fafc !important;
+        }
+        body.light-mode .time-badge {
+            background: #e0f2fe !important;
+            border: 1px solid rgba(2, 132, 199, 0.15) !important;
+            color: #0369a1 !important;
         }
 
         /* ==========================================
-           📱 TELEFON EKRANI UCHUN MUKAMMAL RESPONSIVE & SKROL
+           📱 TELEFON EKRANI UCHUN MUKAMMAL RESPONSIVE
            ========================================== */
         @media (max-width: 768px) {
-            /* Ota shablondagi balandlik va skrol qulfini ochamiz */
             .konteyner {
                 height: auto !important;
                 overflow: visible !important;
-                padding: 12px !important;
+                padding: 12px 14px 35px 14px !important;
             }
 
-            .search-input { width: 130px; margin-left: 10px; padding: 8px 12px; }
-            .search-btn { padding: 8px 14px; }
+            .sarlavha-qatori {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 10px !important;
+                margin-bottom: 15px !important;
+            }
+            .sarlavha {
+                font-size: 18px !important;
+                border-left-width: 3.5px !important;
+                padding-left: 10px !important;
+            }
+            .search-form {
+                width: 100% !important;
+                padding: 4px 12px !important;
+            }
+            .search-input {
+                font-size: 12.5px !important;
+                padding: 4px 0 !important;
+            }
 
             .hafta-sur {
-                gap: 10px;
-                margin-top: 15px;
-                margin-bottom: 15px;
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 8px !important;
+                margin-bottom: 15px !important;
             }
             .hafta-sur_bir, .hafta-sur_ikki {
-                flex: 1;
-                padding: 10px 5px !important;
-                font-size: 12px !important;
+                padding: 8px 10px !important;
+                font-size: 11.5px !important;
                 white-space: nowrap;
-                display: flex;
-                align-items: center;
                 justify-content: center;
-                gap: 4px;
             }
 
             .jadval-container {
-                padding: 0;
-                background: transparent;
-                border: none;
-                box-shadow: none;
-                overflow: visible;
-                max-height: none;
+                padding: 0 !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                overflow: visible !important;
+                max-height: none !important;
+                margin-bottom: 35px !important;
             }
 
             table, thead, tbody, th, td, tr {
                 display: block;
                 width: 100% !important;
+                box-sizing: border-box !important;
             }
             thead { display: none; }
 
             tr.jadval-qatori {
-                background: rgba(255, 255, 255, 0.02);
-                border: 1px solid rgba(255, 255, 255, 0.04);
-                border-radius: 20px;
-                padding: 16px;
-                margin-bottom: 20px;
-                box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-                backdrop-filter: blur(15px);
-                -webkit-backdrop-filter: blur(15px);
+                background: rgba(255, 255, 255, 0.02) !important;
+                border: 1px solid rgba(255, 255, 255, 0.05) !important;
+                border-radius: 18px !important;
+                padding: 14px !important;
+                margin-bottom: 14px !important;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+                backdrop-filter: blur(10px) !important;
+                -webkit-backdrop-filter: blur(10px) !important;
+            }
+            body.light-mode tr.jadval-qatori {
+                background: #ffffff !important;
+                border: 1px solid #f1f5f9 !important;
+                box-shadow: 0 4px 14px rgba(0,0,0,0.03) !important;
             }
 
             .guruh-ustuni {
-                text-align: center !important;
-                font-size: 16px !important;
+                text-align: left !important;
+                font-size: 15px !important;
+                font-weight: 800 !important;
                 color: #00f2fe !important;
                 border: none !important;
-                border-bottom: 1px solid rgba(0, 242, 254, 0.2) !important;
-                padding-bottom: 10px !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+                padding: 0 0 10px 0 !important;
                 margin-bottom: 10px !important;
+                background: transparent !important;
+                width: 100% !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+            }
+            body.light-mode .guruh-ustuni {
+                color: #0284c7 !important;
+                border-bottom: 1px solid #f1f5f9 !important;
                 background: transparent !important;
             }
 
             td:not(.guruh-ustuni) {
                 text-align: left !important;
-                padding: 12px 10px !important;
-                border: none !important;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+                padding: 8px 10px !important;
+                border: 1px solid rgba(255, 255, 255, 0.03) !important;
+                border-radius: 10px !important;
+                margin-bottom: 6px !important;
                 display: flex !important;
-                flex-direction: column;
-                align-items: flex-start;
+                align-items: center !important;
+                justify-content: space-between !important;
+                background: rgba(255, 255, 255, 0.01) !important;
             }
-            td:not(.guruh-ustuni):last-child { border-bottom: none !important; }
+            body.light-mode td:not(.guruh-ustuni) {
+                background: #f8fafc !important;
+                border: none !important;
+            }
 
             /* Dinamik kiber data-label orqali sarlavhalar */
             td:not(.guruh-ustuni)::before {
                 content: attr(data-label);
-                display: block;
+                display: inline-block;
                 font-weight: 700;
-                color: #4facfe;
-                font-size: 11px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                margin-bottom: 6px;
+                color: rgba(255, 255, 255, 0.6);
+                font-size: 11.5px;
+                letter-spacing: 0.2px;
+            }
+            body.light-mode td:not(.guruh-ustuni)::before {
+                color: #64748b !important;
             }
 
             /* Bugungi kun neonli ajratilishi */
             td.today-td {
-                background: rgba(0, 242, 254, 0.04) !important;
-                border-left: 3px solid #00f2fe !important;
-                border-radius: 0 10px 10px 0;
-                padding-left: 14px !important;
+                background: rgba(0, 242, 254, 0.06) !important;
+                border: 1px solid rgba(0, 242, 254, 0.3) !important;
             }
-        }
-
-        /* --- ☀️ LIGHT MODE SPECIFIC OVERRIDES --- */
-        body.light-mode #jadval th {
-            background: #f8fafc !important;
-            color: #475569 !important;
-            border: 1px solid #e2e8f0 !important;
-        }
-        body.light-mode #jadval td {
-            background: #ffffff !important;
-            color: #0f172a !important;
-            border: 1px solid #e2e8f0 !important;
-        }
-        body.light-mode #jadval th.today {
-            background: #0284c7 !important;
-            color: #ffffff !important;
-            border: 1.5px solid #0284c7 !important;
-        }
-        body.light-mode #jadval th.today small {
-            color: #e0f2fe !important;
-        }
-        body.light-mode #jadval td.today-td {
-            background: #e0f2fe !important; /* Standout light blue background */
-            border: 1.5px solid #0284c7 !important;
-        }
-        body.light-mode #jadval td.today-td div {
-            background: #ffffff !important;
-            color: #0284c7 !important;
-            border: 1px solid #cbd5e1 !important;
-        }
-        body.light-mode #jadval .guruh-ustuni {
-            background: #f1f5f9 !important;
-            color: #0f172a !important;
-            border-right: 1.5px solid #cbd5e1 !important;
-        }
-        body.light-mode #jadval .dars-yoq {
-            color: #94a3b8 !important;
-        }
-        body.light-mode #jadval td:not(.guruh-ustuni):hover {
-            background-color: #f1f5f9 !important;
+            td.today-td::before {
+                color: #00f2fe !important;
+                font-weight: 800 !important;
+            }
+            body.light-mode td.today-td {
+                background: #e0f2fe !important;
+                border: none !important;
+            }
+            body.light-mode td.today-td::before {
+                color: #0369a1 !important;
+            }
         }
     </style>
 {% endblock %}
 
 {% block content %}
-    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
-        <h3 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">Dars reja</h3>
+    <div class="sarlavha-qatori">
+        <h3 class="sarlavha">Dars jadvalim</h3>
         <!-- GURUH QIDIRUV FORMASI -->
-        <form class="search-form" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
-            <input type="text" class="search-input" placeholder="Guruh bo'yicha qidiruv..." id="qidiruv" style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
-            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        <form class="search-form" onsubmit="event.preventDefault();" id="schedule-search-form">
+            <input type="text" class="search-input" placeholder="Guruh bo'yicha qidiruv..." id="qidiruv" autocomplete="off">
+            <button type="submit" class="search-btn" aria-label="Qidirish"><i class="fas fa-search"></i></button>
         </form>
     </div>
 
@@ -342,14 +482,14 @@
             </thead>
             <tbody>
               {% for group in jadval_data %}
-                <tr class="jadval-qatori">
-                  <td class="guruh-ustuni">{{ group.name }}</td>
+                <tr class="jadval-qatori" data-group-schedule-row>
+                  <td class="guruh-ustuni"><i class="fas fa-users" style="font-size: 13px;"></i> {{ group.name }}</td>
                   {% for kun in group.schedule_list %}
                     <td>
                       {% for vaqt in kun.vaqtlar %}
-                        <div style="padding: 4px 0; font-weight: 600; color: #ffffff;">{{ vaqt }}</div>
+                        <div class="time-badge"><i class="fas fa-clock" style="font-size: 10px;"></i> {{ vaqt }}</div>
                         {% if not forloop.last %}
-                          <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 4px 0;">
+                          <div style="height: 4px;"></div>
                         {% endif %}
                       {% empty %}
                         <span class="dars-yoq">Dars yo'q</span>
@@ -357,9 +497,20 @@
                     </td>
                   {% endfor %}
                 </tr>
+              {% empty %}
+                <tr id="emptyScheduleRow">
+                    <td colspan="7" style="text-align: center; padding: 40px; color: rgba(255,255,255,0.35); font-style: italic;">
+                        <i class="fas fa-calendar-times" style="font-size: 32px; display: block; margin-bottom: 10px; color: rgba(255,255,255,0.2);"></i>
+                        Dars jadvallari mavjud emas.
+                    </td>
+                </tr>
               {% endfor %}
             </tbody>
         </table>
+        <div id="no-schedule-search-results" style="display: none; text-align: center; padding: 35px 20px; color: rgba(255,255,255,0.4); font-style: italic;">
+            <i class="fas fa-search-minus" style="font-size: 26px; display: block; margin-bottom: 8px; color: rgba(255,255,255,0.2);"></i>
+            Qidiruv bo'yicha guruh jadvali topilmadi.
+        </div>
     </div>
 {% endblock %}
 
@@ -400,11 +551,13 @@
             const year = sana.getFullYear();
 
             const sanaStr = `${day}.${month}.${year}`;
-            mobilSarlavhalar.push(`${kunlar[i]} (${sanaStr})`);
+            const isBugun = sana.toDateString() === bugunStr;
+            
+            mobilSarlavhalar.push(isBugun ? `${kunlar[i]} (${sanaStr}) • BUGUN` : `${kunlar[i]} (${sanaStr})`);
 
             const th = document.createElement('th');
-            th.innerHTML = `${kunlar[i]}<br><small style="color: rgba(255,255,255,0.3); font-weight: 500; margin-top: 2px; display:block;">${sanaStr}</small>`;
-            if (sana.toDateString() === bugunStr) {
+            th.innerHTML = `${kunlar[i]}<br><small style="opacity: 0.6; font-weight: 500; margin-top: 2px; display:block;">${sanaStr}</small>`;
+            if (isBugun) {
               th.classList.add("today");
             }
             headerRow.appendChild(th);
@@ -444,19 +597,30 @@
             jadvalSanasiniYangila();
 
             // Guruhlar ro'yxatini filtrlash qidiruvi
-            document.getElementById('qidiruv')?.addEventListener('input', function() {
-                let input = this.value.toLowerCase().trim();
-                let rows = document.querySelectorAll('#jadval tbody tr.jadval-qatori');
+            const searchInput = document.getElementById('qidiruv');
+            const noResults = document.getElementById('no-schedule-search-results');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    let input = this.value.toLowerCase().trim();
+                    let rows = document.querySelectorAll('#jadval tbody tr.jadval-qatori');
+                    let visibleCount = 0;
 
-                rows.forEach(row => {
-                    let groupName = row.cells[0]?.textContent.toLowerCase();
-                    if (groupName && groupName.includes(input)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
+                    rows.forEach(row => {
+                        let groupName = row.cells[0]?.textContent.toLowerCase();
+                        if (!input || (groupName && groupName.includes(input))) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+
+                    if (noResults) {
+                        noResults.style.display = (visibleCount === 0 && rows.length > 0) ? 'block' : 'none';
                     }
                 });
-            });
+            }
         });
     </script>
 {% endblock %}

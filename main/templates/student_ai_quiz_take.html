@@ -4,41 +4,26 @@
 
 {% block extra_css %}
 <style>
-    /* --- 🔄 ANDOZADAN KELAYOTGAN SKROL CHEKLOVINI OLIB TASHLASH (FIX) --- */
-    body .content {
-        overflow-y: auto !important;
-    }
-    body .content::-webkit-scrollbar {
-        width: 5px;
-    }
-    body .content::-webkit-scrollbar-thumb {
-        background: rgba(0, 242, 254, 0.2);
-        border-radius: 4px;
-    }
-
     /* --- ⏱️ TEST TOPSHIRISH, TAYMER VA PROGRESS BAR STILLARI --- */
     .quiz-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: #070a13;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 20px 30px !important;
-        border-radius: 0 0 20px 20px !important;
+        background: rgba(255, 255, 255, 0.015);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        padding: 18px 25px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         margin-bottom: 25px;
-        position: sticky;
-        top: -30px;
-        z-index: 999;
-        margin-left: -30px;
-        margin-right: -30px;
-        margin-top: -30px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
     .quiz-title-box h2 {
         font-size: 18px;
         font-weight: 800;
         color: #ffffff;
         margin-bottom: 4px;
+        line-height: 1.3;
     }
     .quiz-title-box span {
         font-size: 11.5px;
@@ -47,25 +32,51 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    .btn-quit {
-        display: inline-flex;
+    .quiz-header-left {
+        display: flex;
         align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        background: rgba(0, 242, 254, 0.07);
+        gap: 16px;
+        min-width: 0;
+    }
+    .back-arrow-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 50%;
+        background: rgba(0, 242, 254, 0.08);
         border: 1px solid rgba(0, 242, 254, 0.2);
         color: #00f2fe;
+        transition: 0.3s;
         text-decoration: none;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        transition: all 0.2s;
+        cursor: pointer;
     }
-    .btn-quit:hover {
+    .back-arrow-btn:hover {
         background: linear-gradient(135deg, #00f2fe, #4facfe);
         color: #070a12;
         border-color: transparent;
         box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+    }
+    .back-arrow-btn i {
+        font-size: 15px;
+    }
+    .quiz-header-top {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .cyber-timer-card {
+        padding: 8px 16px;
+        min-width: 125px;
+        background: rgba(255, 0, 85, 0.04);
+        border: 1px solid rgba(255, 0, 85, 0.2);
+        box-shadow: 0 0 10px rgba(255, 0, 85, 0.1);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
     /* Progress Bar */
@@ -102,7 +113,7 @@
         margin: 0 auto;
     }
     .question-card {
-        background: rgba(255, 255, 255, 0.01);
+        background: rgba(255, 255, 255, 0.015);
         border: 1px solid rgba(255, 255, 255, 0.04);
         border-radius: 24px;
         padding: 30px;
@@ -147,8 +158,11 @@
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         font-size: 14px;
         font-weight: 600;
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(255, 255, 255, 0.85);
         position: relative;
+        gap: 14px;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
     }
     .option-label:hover {
         background: rgba(255, 255, 255, 0.04);
@@ -160,7 +174,6 @@
         height: 20px;
         border: 2px solid rgba(255, 255, 255, 0.25);
         border-radius: 50%;
-        margin-right: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -180,10 +193,10 @@
 
     /* Option Checked State */
     .option-item input[type="radio"]:checked + .option-label {
-        background: rgba(0, 242, 254, 0.04);
+        background: rgba(0, 242, 254, 0.06);
         border-color: #00f2fe;
         color: #00f2fe;
-        box-shadow: 0 0 15px rgba(0, 242, 254, 0.1);
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.15);
     }
     .option-item input[type="radio"]:checked + .option-label .option-circle {
         border-color: #00f2fe;
@@ -267,38 +280,200 @@
     /* Mobile adaptation */
     @media (max-width: 768px) {
         .quiz-header {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 15px;
-            padding: 15px !important;
-            top: -15px !important;
-            margin-left: -15px !important;
-            margin-right: -15px !important;
-            margin-top: -15px !important;
-            border-radius: 0 !important;
+            position: relative !important;
+            top: auto !important;
+            z-index: 10 !important;
+            background: rgba(255, 255, 255, 0.02) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            margin: 0 0 16px 0 !important;
+            padding: 12px 14px !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+            border-radius: 18px !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            gap: 10px !important;
+        }
+        .quiz-header-left {
+            gap: 10px !important;
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+        }
+        .back-arrow-btn {
+            width: 34px !important;
+            height: 34px !important;
+            min-width: 34px !important;
+        }
+        .back-arrow-btn i {
+            font-size: 13px !important;
+        }
+        .quiz-title-box h2 {
+            font-size: 14px !important;
+            line-height: 1.25 !important;
+            margin-bottom: 2px !important;
+        }
+        .quiz-title-box span {
+            font-size: 10px !important;
+        }
+        .quiz-header-top {
+            flex: 0 0 auto !important;
+            gap: 8px !important;
         }
         .cyber-timer-card {
             margin-left: 0 !important;
             margin-right: 0 !important;
-            justify-content: center;
-            width: 100%;
+            justify-content: center !important;
+            padding: 5px 10px !important;
+            min-width: auto !important;
+            gap: 6px !important;
         }
-        .question-card { padding: 20px; }
-        .option-label { padding: 14px 16px; font-size: 13px; }
+        .cyber-timer-card #time {
+            font-size: 14px !important;
+        }
+        .progress-container {
+            margin-bottom: 16px !important;
+        }
+        .question-card {
+            padding: 16px 14px !important;
+            border-radius: 18px !important;
+            margin-bottom: 14px !important;
+        }
+        .question-number {
+            font-size: 11px !important;
+            margin-bottom: 8px !important;
+        }
+        .question-text {
+            font-size: 14px !important;
+            line-height: 1.5 !important;
+            margin-bottom: 16px !important;
+        }
+        .option-label {
+            padding: 12px 14px !important;
+            font-size: 13px !important;
+            border-radius: 12px !important;
+            gap: 10px !important;
+        }
+        .option-circle {
+            width: 18px !important;
+            height: 18px !important;
+        }
+        .quiz-form {
+            padding-bottom: 25px !important;
+        }
+        .submit-container {
+            margin-top: 10px !important;
+            margin-bottom: 50px !important;
+            padding-bottom: 15px !important;
+        }
+        .btn-submit-quiz {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 14px !important;
+            font-size: 13px !important;
+            border-radius: 12px !important;
+        }
     }
+
+    /* Light Mode */
+    body.light-mode .quiz-header {
+        background: rgba(241, 245, 249, 0.96) !important;
+        border-bottom-color: #cbd5e1 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    }
+    body.light-mode .quiz-title-box h2 {
+        color: #0f172a !important;
+    }
+    body.light-mode .quiz-title-box span {
+        color: #64748b !important;
+    }
+    body.light-mode .back-arrow-btn {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #475569 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    }
+    body.light-mode .back-arrow-btn:hover {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+        border-color: #94a3b8 !important;
+    }
+    body.light-mode .progress-text {
+        color: #64748b !important;
+    }
+    body.light-mode .progress-bar-bg {
+        background: #e2e8f0 !important;
+    }
+    body.light-mode .progress-bar-fill {
+        background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.3) !important;
+    }
+    body.light-mode .question-card {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode .question-number {
+        color: #0284c7 !important;
+    }
+    body.light-mode .question-text {
+        color: #0f172a !important;
+    }
+    body.light-mode .option-label {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+        color: #334155 !important;
+    }
+    body.light-mode .option-label:hover {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    body.light-mode .option-circle {
+        border-color: #94a3b8 !important;
+    }
+    body.light-mode .option-circle::after {
+        background: #ffffff !important;
+    }
+    body.light-mode .option-item input[type="radio"]:checked + .option-label {
+        background: rgba(2, 132, 199, 0.08) !important;
+        border-color: #0284c7 !important;
+        color: #0284c7 !important;
+    }
+    body.light-mode .option-item input[type="radio"]:checked + .option-label .option-circle {
+        border-color: #0284c7 !important;
+        background: #0284c7 !important;
+    }
+    body.light-mode .btn-submit-quiz {
+        background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 20px rgba(2, 132, 199, 0.3) !important;
+    }
+    body.light-mode .btn-submit-quiz:hover {
+        box-shadow: 0 0 30px rgba(2, 132, 199, 0.45) !important;
+    }
+    body.light-mode .cyber-timer-card {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode .cyber-timer-card #time {
+        color: #0f172a !important;
+    }
+    body.light-mode .cyber-timer-card div div:first-child {
+        color: #64748b !important;
+    }
+
     @keyframes pulse {
         0% { opacity: 0.6; }
         50% { opacity: 1; }
         100% { opacity: 0.6; }
     }
     @keyframes spin {
-    from {
-        transform: rotate(0deg);
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
     }
-    to {
-        transform: rotate(360deg);
-    }
-}
 </style>
 {% endblock %}
 
@@ -310,20 +485,24 @@
     </div>
 
     <div class="quiz-header">
-        <div class="quiz-title-box">
-            <h2>{{ quiz.title }}</h2>
-            <span>Daraja: {% if quiz.level == 'beginner' %}A1-A2 (Boshlang'ich){% elif quiz.level == 'intermediate' %}B1-B2 (O'rta){% else %}C1-C2 (Yuqori){% endif %}</span>
-        </div>
-        <div class="cyber-timer-card" style="padding: 8px 16px; min-width: 140px; margin-left: auto; margin-right: 20px; background: rgba(255, 0, 85, 0.04); border: 1px solid rgba(255, 0, 85, 0.2); box-shadow: 0 0 10px rgba(255, 0, 85, 0.1); border-radius: 12px; display: flex; align-items: center; gap: 10px;">
-            <i class="fas fa-stopwatch" style="color: #ff0055; animation: pulse 2s infinite; font-size: 18px;"></i>
-            <div>
-                <div style="font-size: 9px; text-transform: uppercase; color: rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 0.5px; line-height: 1;">Vaqt</div>
-                <div id="time" style="font-size: 18px; font-weight: 800; color: #ffffff; font-variant-numeric: tabular-nums; letter-spacing: -0.5px; line-height: 1.2;">00:00</div>
+        <div class="quiz-header-left">
+            <a href="{% url 'ai_quiz_dashboard' %}" class="back-arrow-btn" onclick="return confirm('Haqiqatan ham testdan chiqmoqchisiz? Barcha saqlanmagan javoblar yo\'qoladi.');" title="Chiqish">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="quiz-title-box">
+                <h2>{{ quiz.title }}</h2>
+                <span>Daraja: {% if quiz.level == 'beginner' %}A1-A2 (Boshlang'ich){% elif quiz.level == 'intermediate' %}B1-B2 (O'rta){% else %}C1-C2 (Yuqori){% endif %}</span>
             </div>
         </div>
-        <a href="{% url 'ai_quiz_dashboard' %}" class="btn-quit" onclick="return confirm('Haqiqatan ham testdan chiqmoqchisiz? Barcha saqlanmagan javoblar yo\'qoladi.');">
-            <i class="fas fa-times-circle"></i> Oldingi sahifaga qaytish
-        </a>
+        <div class="quiz-header-top">
+            <div class="cyber-timer-card">
+                <i class="fas fa-stopwatch" style="color: #ff0055; animation: pulse 2s infinite; font-size: 18px;"></i>
+                <div>
+                    <div style="font-size: 9px; text-transform: uppercase; color: rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 0.5px; line-height: 1;">Vaqt</div>
+                    <div id="time" style="font-size: 18px; font-weight: 800; color: #ffffff; font-variant-numeric: tabular-nums; letter-spacing: -0.5px; line-height: 1.2;">00:00</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="progress-container">

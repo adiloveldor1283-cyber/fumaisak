@@ -5,122 +5,462 @@
 
 {% block extra_css %}
 <style>
+    /* --- 🔍 SARLAVHA VA QIDIRUV --- */
+    .sarlavha-qatori {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    .sarlavha {
+        font-size: 22px;
+        font-weight: 800;
+        color: #ffffff;
+        border-left: 4px solid #00f2fe;
+        padding-left: 12px;
+        letter-spacing: -0.5px;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .search-form {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 4px 14px;
+        transition: 0.3s;
+        width: 280px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    .search-form:focus-within {
+        border-color: #00f2fe !important;
+        box-shadow: 0 0 12px rgba(0, 242, 254, 0.2) !important;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    .search-input {
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        color: #ffffff !important;
+        font-size: 13px;
+        width: 100% !important;
+        padding: 6px 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+    }
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.35);
+    }
+    .search-btn {
+        background: none !important;
+        border: none !important;
+        color: rgba(255, 255, 255, 0.6) !important;
+        cursor: pointer;
+        font-size: 13px;
+        transition: 0.3s;
+        padding: 0 0 0 8px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .search-btn:hover {
+        color: #00f2fe !important;
+    }
+
+    /* --- 📚 FANLAR RO'YXATI VA KARTALAR --- */
     .subjects-list {
         display: flex;
         flex-direction: column;
-        gap: 25px;
+        gap: 22px;
         width: 100%;
+        margin-bottom: 35px;
     }
     
     .subject-card {
         background: rgba(255, 255, 255, 0.01);
         border: 1px solid rgba(255, 255, 255, 0.04);
         border-radius: 20px;
-        padding: 24px;
+        padding: 22px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 18px;
+        box-sizing: border-box;
+        transition: 0.3s;
     }
 
     .subject-header-section {
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        padding-bottom: 18px;
+        padding-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
     }
 
+    .subject-title-box {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .subject-icon-box {
+        background: rgba(0, 242, 254, 0.1);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        border-radius: 12px;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #00f2fe;
+        font-size: 19px;
+        flex-shrink: 0;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.15);
+    }
+
+    .subject-name-text {
+        font-size: 18px;
+        font-weight: 800;
+        color: #ffffff;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .subject-badge-pill {
+        color: rgba(255, 255, 255, 0.45);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .subject-stats-pills {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .stat-pill {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.7);
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* --- 📂 SPLIT BODY SECTION (FORM + LIST) --- */
     .subject-body-section {
         display: flex;
-        flex-direction: row; /* Left side: upload form, Right side: materials list */
-        gap: 25px;
+        flex-direction: row;
+        gap: 20px;
         align-items: stretch;
     }
 
     .upload-pane {
         flex: 1;
-        padding: 18px;
+        padding: 16px;
         background: rgba(255,255,255,0.02);
         border: 1px solid rgba(255,255,255,0.05);
         border-radius: 14px;
+        box-sizing: border-box;
     }
 
     .materials-pane {
-        flex: 1;
-        padding: 18px;
+        flex: 1.2;
+        padding: 16px;
         background: rgba(255,255,255,0.02);
         border: 1px solid rgba(255,255,255,0.05);
         border-radius: 14px;
         display: flex;
         flex-direction: column;
+        box-sizing: border-box;
     }
 
+    .pane-heading {
+        font-size: 11.5px;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .pane-heading-material {
+        color: #00f2fe;
+    }
+    .pane-heading-book {
+        color: #00ffaa;
+    }
+    .pane-heading-list {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .subject-form-input {
+        width: 100%;
+        padding: 9px 12px;
+        font-size: 13px;
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 8px;
+        color: white;
+        outline: none;
+        transition: 0.2s;
+        box-sizing: border-box;
+    }
+    .subject-form-input:focus {
+        border-color: #00f2fe;
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+    }
+    .subject-form-input-book:focus {
+        border-color: #00ffaa;
+        box-shadow: 0 0 10px rgba(0, 255, 170, 0.2);
+    }
+
+    .file-input-wrapper {
+        font-size: 12px;
+        color: rgba(255,255,255,0.6);
+        outline: none;
+        width: 100%;
+    }
+
+    .btn-upload-submit {
+        width: 100%;
+        padding: 9px 14px;
+        font-weight: 800;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .btn-upload-material {
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        color: #070a12;
+    }
+    .btn-upload-material:hover {
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        transform: translateY(-1px);
+    }
+    .btn-upload-book {
+        background: linear-gradient(135deg, #00ffaa, #00b4d8);
+        color: #070a12;
+    }
+    .btn-upload-book:hover {
+        box-shadow: 0 0 15px rgba(0, 255, 170, 0.4);
+        transform: translateY(-1px);
+    }
+
+    /* --- 📜 MATERIAL VA KITOB ELEMENTLARI --- */
     .materials-scroll-list {
         display: flex;
         flex-direction: column;
         gap: 8px;
-        max-height: 220px;
+        max-height: 240px;
         overflow-y: auto;
-        padding-right: 6px;
+        padding-right: 4px;
         flex-grow: 1;
     }
-
     .materials-scroll-list::-webkit-scrollbar {
         width: 4px;
-    }
-    .materials-scroll-list::-webkit-scrollbar-track {
-        background: transparent;
     }
     .materials-scroll-list::-webkit-scrollbar-thumb {
         background: rgba(0, 242, 254, 0.2);
         border-radius: 4px;
     }
-    .materials-scroll-list::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 242, 254, 0.4);
+
+    .material-item {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.04);
+        border-radius: 10px;
+        padding: 9px 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: 0.2s;
+        box-sizing: border-box;
     }
-    body.light-mode .materials-scroll-list::-webkit-scrollbar-thumb {
-        background: rgba(2, 132, 199, 0.2) !important;
+    .material-item:hover {
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255,255,255,0.08);
     }
 
-    /* Light Mode Overrides */
-    body.light-mode .subject-card {
+    .material-info-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        flex: 1;
+        margin-right: 8px;
+    }
+    .material-title {
+        color: #ffffff;
+        font-size: 12.5px;
+        font-weight: 700;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+    }
+    .material-description {
+        color: rgba(255,255,255,0.4);
+        font-size: 10.5px;
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .material-actions-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .btn-action-icon {
+        color: #00f2fe;
+        font-size: 13.5px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px;
+        transition: 0.2s;
+    }
+    .btn-action-icon:hover {
+        color: #ffffff;
+        transform: scale(1.15);
+    }
+    .btn-action-delete {
+        color: rgba(255, 79, 79, 0.6);
+    }
+    .btn-action-delete:hover {
+        color: #ff4f4f;
+        transform: scale(1.15);
+    }
+
+    .no-materials-placeholder {
+        background: rgba(255,255,255,0.01);
+        border: 1px dashed rgba(255,255,255,0.08);
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        color: rgba(255,255,255,0.3);
+        font-size: 12px;
+        font-style: italic;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-grow: 1;
+    }
+
+    .hidden-card {
+        display: none !important;
+    }
+
+    /* --- ☀️ LIGHT MODE MOSLASHUVI --- */
+    body.light-mode .sarlavha {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
+    }
+    body.light-mode .search-form {
         background: #ffffff !important;
         border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode .search-form:focus-within {
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+    }
+    body.light-mode .search-input {
+        color: #0f172a !important;
+    }
+    body.light-mode .search-input::placeholder {
+        color: rgba(15, 23, 42, 0.4) !important;
+    }
+    body.light-mode .search-btn {
+        color: #64748b !important;
+    }
+    body.light-mode .subject-card {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
     }
     body.light-mode .subject-header-section {
-        border-bottom: 1px solid #cbd5e1 !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+    body.light-mode .subject-icon-box {
+        background: rgba(2, 132, 199, 0.08) !important;
+        border-color: rgba(2, 132, 199, 0.2) !important;
+        color: #0284c7 !important;
+    }
+    body.light-mode .subject-name-text {
+        color: #0f172a !important;
+    }
+    body.light-mode .subject-badge-pill {
+        color: #64748b !important;
+    }
+    body.light-mode .stat-pill {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #475569 !important;
     }
     body.light-mode .upload-pane,
     body.light-mode .materials-pane {
         background: #f8fafc !important;
-        border: 1px solid #cbd5e1 !important;
+        border: 1px solid #e2e8f0 !important;
     }
-    body.light-mode .subject-card h3 {
-        color: #0f172a !important;
-    }
-    body.light-mode .subject-card p {
-        color: #475569 !important;
-    }
-    body.light-mode .upload-pane h4 {
+    body.light-mode .pane-heading-material {
         color: #0284c7 !important;
     }
-    body.light-mode .upload-pane input[type="text"] {
+    body.light-mode .pane-heading-book {
+        color: #059669 !important;
+    }
+    body.light-mode .pane-heading-list {
+        color: #64748b !important;
+    }
+    body.light-mode .subject-form-input {
         background: #ffffff !important;
         border: 1px solid #cbd5e1 !important;
         color: #0f172a !important;
     }
-    body.light-mode .upload-pane input[type="text"]::placeholder {
-        color: #64748b !important;
+    body.light-mode .subject-form-input::placeholder {
+        color: #94a3b8 !important;
     }
-    body.light-mode .upload-pane input[type="file"] {
-        color: #0f172a !important;
+    body.light-mode .subject-form-input:focus {
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15) !important;
     }
-    body.light-mode .materials-pane h4 {
+    body.light-mode .file-input-wrapper {
         color: #475569 !important;
     }
     body.light-mode .material-item {
         background: #ffffff !important;
-        border: 1px solid #cbd5e1 !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+    body.light-mode .material-item:hover {
+        background: #f1f5f9 !important;
     }
     body.light-mode .material-title {
         color: #0f172a !important;
@@ -128,90 +468,189 @@
     body.light-mode .material-description {
         color: #64748b !important;
     }
+    body.light-mode .btn-action-icon {
+        color: #0284c7 !important;
+    }
+    body.light-mode .btn-action-icon:hover {
+        color: #0369a1 !important;
+    }
+    body.light-mode .btn-action-delete {
+        color: #ef4444 !important;
+    }
     body.light-mode .no-materials-placeholder {
         background: #ffffff !important;
         border-color: #cbd5e1 !important;
         color: #64748b !important;
     }
 
-    /* Responsive design for tablets and mobile */
+    /* --- 📱 TELEFON EKRANI UCHUN REJIM --- */
     @media (max-width: 768px) {
+        .konteyner {
+            height: auto !important;
+            overflow: visible !important;
+            padding: 12px 14px 35px 14px !important;
+        }
+        .sarlavha-qatori {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 10px !important;
+            margin-bottom: 16px !important;
+        }
+        .sarlavha {
+            font-size: 18px !important;
+            border-left-width: 3.5px !important;
+            padding-left: 10px !important;
+        }
+        .search-form {
+            width: 100% !important;
+            padding: 4px 12px !important;
+        }
+        .search-input {
+            font-size: 12.5px !important;
+            padding: 4px 0 !important;
+        }
+
+        .subjects-list {
+            gap: 16px !important;
+            margin-bottom: 35px !important;
+        }
+        .subject-card {
+            padding: 15px !important;
+            border-radius: 16px !important;
+            gap: 14px !important;
+        }
+        .subject-header-section {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            padding-bottom: 12px !important;
+            gap: 10px !important;
+        }
+        .subject-icon-box {
+            width: 38px !important;
+            height: 38px !important;
+            font-size: 17px !important;
+            border-radius: 10px !important;
+        }
+        .subject-name-text {
+            font-size: 16px !important;
+        }
+        .subject-stats-pills {
+            width: 100% !important;
+        }
+        .stat-pill {
+            font-size: 10.5px !important;
+            padding: 3px 8px !important;
+        }
+
         .subject-body-section {
-            flex-direction: column;
-            gap: 20px;
+            flex-direction: column !important;
+            gap: 12px !important;
+        }
+        .upload-pane,
+        .materials-pane {
+            padding: 12px !important;
+            border-radius: 12px !important;
+            width: 100% !important;
+        }
+        .materials-scroll-list {
+            max-height: 200px !important;
+        }
+        .material-item {
+            padding: 8px 10px !important;
+        }
+        .material-title {
+            font-size: 12px !important;
+        }
+        .material-description {
+            font-size: 10px !important;
+        }
+        .btn-action-icon {
+            font-size: 14px !important;
+            padding: 6px !important;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-    <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px;">Mening fanlarim va materiallar</h2>
+<div class="sarlavha-qatori">
+    <h2 class="sarlavha">Mening fanlarim va materiallar</h2>
+    <form class="search-form" onsubmit="event.preventDefault();" id="subject-search-form">
+        <input type="text" class="search-input" placeholder="Fan yoki material bo'yicha qidiruv..." id="subject-search" autocomplete="off">
+        <button type="submit" class="search-btn" aria-label="Qidirish">
+            <i class="fas fa-search"></i>
+        </button>
+    </form>
 </div>
 
 {% if subjects_data %}
-<div class="subjects-list">
+<div class="subjects-list" id="subjects-container">
     {% for item in subjects_data %}
-        <div class="subject-card">
+        <div class="subject-card" data-subject-card>
             <!-- Top Section: Subject Info -->
             <div class="subject-header-section">
-                <!-- Subject Header -->
-                <div style="display: flex; align-items: center; gap: 14px; margin: 0;">
-                    <div style="background: rgba(0, 242, 254, 0.1); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #00f2fe; font-size: 20px; flex-shrink: 0; box-shadow: 0 0 15px rgba(0, 242, 254, 0.15);">
+                <div class="subject-title-box">
+                    <div class="subject-icon-box">
                         <i class="fas fa-book"></i>
                     </div>
                     <div>
-                        <h3 style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0;">{{ item.subject.name }}</h3>
-                        <span style="color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 700; text-transform: uppercase;">MUTAXASSISLIK FAN</span>
+                        <h3 class="subject-name-text" data-subject-name>{{ item.subject.name }}</h3>
+                        <span class="subject-badge-pill">MUTAXASSISLIK FAN</span>
                     </div>
+                </div>
+                <div class="subject-stats-pills">
+                    <span class="stat-pill"><i class="fas fa-file-alt" style="color: #00f2fe;"></i> {{ item.materials|length }} ta material</span>
+                    <span class="stat-pill"><i class="fas fa-book-open" style="color: #00ffaa;"></i> {{ item.books|length }} ta kitob</span>
                 </div>
             </div>
 
-            <!-- Bottom Section: Split Body -->
+            <!-- Section 1: Dars Materiallari -->
             <div class="subject-body-section">
-                <!-- Left Column: Upload Form -->
+                <!-- Left Column: Upload Material Form -->
                 <div class="upload-pane">
-                    <h4 style="font-size: 11.5px; font-weight: 800; color: #00f2fe; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;"><i class="fas fa-plus" style="margin-right: 4px;"></i> Yangi material yuklash</h4>
-                    <form method="POST" enctype="multipart/form-data">
+                    <h4 class="pane-heading pane-heading-material"><i class="fas fa-plus-circle"></i> Yangi material yuklash</h4>
+                    <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 10px;">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="upload_material">
                         <input type="hidden" name="subject" value="{{ item.subject.id }}">
 
-                        <div style="margin-bottom: 10px;">
-                            <input type="text" name="material_title" required placeholder="Material nomi (masalan: 1-ma'ruza)" style="width: 100%; padding: 10px 14px; font-size: 13px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#00f2fe'" onblur="this.style.borderColor='rgba(255,255,255,0.06)'">
+                        <div>
+                            <input type="text" name="material_title" required placeholder="Material nomi (masalan: 1-ma'ruza)" class="subject-form-input">
                         </div>
 
-                        <div style="margin-bottom: 12px;">
-                            <input type="text" name="material_description" placeholder="Qisqacha tavsif..." style="width: 100%; padding: 10px 14px; font-size: 13px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#00f2fe'" onblur="this.style.borderColor='rgba(255,255,255,0.06)'">
+                        <div>
+                            <input type="text" name="material_description" placeholder="Qisqacha tavsif..." class="subject-form-input">
                         </div>
 
-                        <div style="margin-bottom: 15px; display: flex; flex-direction: column; gap: 4px;">
-                            <input type="file" name="material_file" required style="font-size: 12.5px; color: rgba(255,255,255,0.6); outline: none;">
+                        <div>
+                            <input type="file" name="material_file" required class="file-input-wrapper">
                         </div>
 
-                        <button type="submit" style="width: 100%; padding: 10px 16px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 6px;" onmouseover="this.style.boxShadow='0 0 15px rgba(0, 242, 254, 0.4)';" onmouseout="this.style.boxShadow='none'"><i class="fas fa-upload"></i> Yuklash</button>
+                        <div>
+                            <button type="submit" class="btn-upload-submit btn-upload-material"><i class="fas fa-upload"></i> Yuklash</button>
+                        </div>
                     </form>
                 </div>
 
                 <!-- Right Column: Materials List -->
                 <div class="materials-pane">
-                    <h4 style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">Yuklangan dars materiallari</h4>
+                    <h4 class="pane-heading pane-heading-list"><i class="fas fa-layer-group"></i> Yuklangan dars materiallari</h4>
                     {% if item.materials %}
                         <div class="materials-scroll-list">
                             {% for material in item.materials %}
-                                <div class="material-item" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; margin-right: 10px;">
+                                <div class="material-item" data-material-item>
+                                    <div class="material-info-box">
                                         <i class="fas fa-file-alt" style="color: #4facfe; font-size: 13px; flex-shrink: 0;"></i>
                                         <div style="min-width: 0;">
-                                            <span class="material-title" style="color: #ffffff; font-size: 12.5px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;">{{ material.title }}</span>
-                                            <span class="material-description" style="color: rgba(255,255,255,0.4); font-size: 10px; display: block;">{{ material.description|default:"Tavsif yo'q" }}</span>
+                                            <span class="material-title" data-item-title>{{ material.title }}</span>
+                                            <span class="material-description">{{ material.description|default:"Tavsif yo'q" }}</span>
                                         </div>
                                     </div>
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <a href="{{ material.file.url }}" target="_blank" download style="color: #00f2fe; font-size: 13px; text-decoration: none; font-weight: 800; display: flex; align-items: center; gap: 4px;" onmouseover="this.style.textShadow='0 0 8px rgba(0, 242, 254, 0.4)'" onmouseout="this.style.textShadow='none'">
+                                    <div class="material-actions-box">
+                                        <a href="{{ material.file.url }}" target="_blank" download class="btn-action-icon" title="Yuklab olish">
                                             <i class="fas fa-download"></i>
                                         </a>
-                                        <a href="{% url 'delete_subject_material_teacher' material.id %}" onclick="return confirm('Ushbu materialni o\'chirmoqchimisiz?');" style="color: rgba(255,79,79,0.6); font-size: 13px; text-decoration: none; transition: color 0.2s; cursor: pointer;" onmouseover="this.style.color='#ff4f4f'" onmouseout="this.style.color='rgba(255,79,79,0.6)'">
+                                        <a href="{% url 'delete_subject_material_teacher' material.id %}" onclick="return confirm('Ushbu materialni o\'chirmoqchimisiz?');" class="btn-action-icon btn-action-delete" title="O'chirish">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
                                     </div>
@@ -219,61 +658,63 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <div class="no-materials-placeholder" style="background: rgba(255,255,255,0.01); border: 1px dashed rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; text-align: center; color: rgba(255,255,255,0.3); font-size: 12px; font-style: italic; display: flex; align-items: center; justify-content: center; flex-grow: 1;">
+                        <div class="no-materials-placeholder">
                             Ushbu fanga hali materiallar yuklanmagan.
                         </div>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- New Section: Split Body (E-Books) -->
-            <div class="subject-body-section" style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 20px;">
+            <!-- Section 2: E-Books (PDF) -->
+            <div class="subject-body-section" style="border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 16px;">
                 <!-- Left Column: Upload Book Form -->
                 <div class="upload-pane">
-                    <h4 style="font-size: 11.5px; font-weight: 800; color: #00ffaa; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;"><i class="fas fa-plus" style="margin-right: 4px;"></i> Yangi kitob yuklash (PDF)</h4>
-                    <form method="POST" enctype="multipart/form-data">
+                    <h4 class="pane-heading pane-heading-book"><i class="fas fa-plus-circle"></i> Yangi kitob yuklash (PDF)</h4>
+                    <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 10px;">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="upload_book">
                         <input type="hidden" name="subject" value="{{ item.subject.id }}">
 
-                        <div style="margin-bottom: 10px;">
-                            <input type="text" name="book_title" required placeholder="Kitob nomi (masalan: Matematika darslik)" style="width: 100%; padding: 10px 14px; font-size: 13px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#00ffaa'" onblur="this.style.borderColor='rgba(255,255,255,0.06)'">
+                        <div>
+                            <input type="text" name="book_title" required placeholder="Kitob nomi (masalan: Matematika darslik)" class="subject-form-input subject-form-input-book">
                         </div>
 
-                        <div style="margin-bottom: 12px;">
-                            <input type="text" name="book_description" placeholder="Qisqacha tavsif..." style="width: 100%; padding: 10px 14px; font-size: 13px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#00ffaa'" onblur="this.style.borderColor='rgba(255,255,255,0.06)'">
+                        <div>
+                            <input type="text" name="book_description" placeholder="Qisqacha tavsif..." class="subject-form-input subject-form-input-book">
                         </div>
 
-                        <div style="margin-bottom: 15px; display: flex; flex-direction: column; gap: 4px;">
-                            <input type="file" name="book_file" required accept=".pdf" style="font-size: 12.5px; color: rgba(255,255,255,0.6); outline: none;">
+                        <div>
+                            <input type="file" name="book_file" required accept=".pdf" class="file-input-wrapper">
                         </div>
 
-                        <button type="submit" style="width: 100%; padding: 10px 16px; background: linear-gradient(135deg, #00ffaa, #00b4d8); color: #070a12; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 6px;" onmouseover="this.style.boxShadow='0 0 15px rgba(0, 255, 170, 0.4)';" onmouseout="this.style.boxShadow='none'"><i class="fas fa-upload"></i> Kitobni yuklash</button>
+                        <div>
+                            <button type="submit" class="btn-upload-submit btn-upload-book"><i class="fas fa-upload"></i> Kitobni yuklash</button>
+                        </div>
                     </form>
                 </div>
 
                 <!-- Right Column: Books List -->
                 <div class="materials-pane">
-                    <h4 style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">Yuklangan elektron kitoblar</h4>
+                    <h4 class="pane-heading pane-heading-list"><i class="fas fa-book-reader"></i> Yuklangan elektron kitoblar</h4>
                     {% if item.books %}
                         <div class="materials-scroll-list">
                             {% for book in item.books %}
-                                <div class="material-item" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; margin-right: 10px;">
+                                <div class="material-item" data-book-item>
+                                    <div class="material-info-box">
                                         <i class="fas fa-book" style="color: #00ffaa; font-size: 13px; flex-shrink: 0;"></i>
                                         <div style="min-width: 0;">
-                                            <span class="material-title" style="color: #ffffff; font-size: 12.5px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;">{{ book.title }}</span>
-                                            <span class="material-description" style="color: rgba(255,255,255,0.4); font-size: 10px; display: block;">{{ book.description|default:"Tavsif yo'q" }}</span>
+                                            <span class="material-title" data-item-title>{{ book.title }}</span>
+                                            <span class="material-description">{{ book.description|default:"Tavsif yo'q" }}</span>
                                         </div>
                                     </div>
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <a href="{% url 'student_book_flipbook' book.id %}" target="_blank" style="color: #00f2fe; font-size: 13px; text-decoration: none; font-weight: 800; display: flex; align-items: center; gap: 4px;" title="Varaqalab ko'rish">
+                                    <div class="material-actions-box">
+                                        <a href="{% url 'student_book_flipbook' book.id %}" target="_blank" class="btn-action-icon" title="Varaqalab ko'rish">
                                             <i class="fas fa-book-open"></i>
                                         </a>
-                                        <a href="{{ book.file.url }}" target="_blank" download style="color: #00f2fe; font-size: 13px; text-decoration: none; font-weight: 800; display: flex; align-items: center; gap: 4px;" onmouseover="this.style.textShadow='0 0 8px rgba(0, 242, 254, 0.4)'" onmouseout="this.style.textShadow='none'" title="Yuklab olish">
+                                        <a href="{{ book.file.url }}" target="_blank" download class="btn-action-icon" title="Yuklab olish">
                                             <i class="fas fa-download"></i>
                                         </a>
-                                        <a href="{% url 'delete_book_teacher' book.id %}" onclick="return confirm('Ushbu kitobni o\'chirmoqchimisiz?');" style="color: rgba(255,79,79,0.6); font-size: 13px; text-decoration: none; transition: color 0.2s; cursor: pointer;" onmouseover="this.style.color='#ff4f4f'" onmouseout="this.style.color='rgba(255,79,79,0.6)'" title="O'chirish">
+                                        <a href="{% url 'delete_book_teacher' book.id %}" onclick="return confirm('Ushbu kitobni o\'chirmoqchimisiz?');" class="btn-action-icon btn-action-delete" title="O'chirish">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
                                     </div>
@@ -281,7 +722,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <div class="no-materials-placeholder" style="background: rgba(255,255,255,0.01); border: 1px dashed rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; text-align: center; color: rgba(255,255,255,0.3); font-size: 12px; font-style: italic; display: flex; align-items: center; justify-content: center; flex-grow: 1;">
+                        <div class="no-materials-placeholder">
                             Ushbu fanga hali kitoblar yuklanmagan.
                         </div>
                     {% endif %}
@@ -289,6 +730,10 @@
             </div>
         </div>
     {% endfor %}
+    <div id="no-search-results" style="display: none; text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.4); font-style: italic;">
+        <i class="fas fa-search-minus" style="font-size: 28px; display: block; margin-bottom: 10px; color: rgba(255,255,255,0.2);"></i>
+        Qidiruv bo'yicha fan yoki material topilmadi.
+    </div>
 </div>
 {% else %}
 <div class="empty-state-card" style="text-align: center; padding: 50px 30px; background: rgba(255, 255, 255, 0.01); border: 1px dashed rgba(255, 255, 255, 0.08); border-radius: 20px; width: 100%; max-width: 600px; margin: 50px auto 0 auto;">
@@ -298,3 +743,46 @@
 </div>
 {% endif %}
 {% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('subject-search');
+        const subjectCards = document.querySelectorAll('[data-subject-card]');
+        const noResults = document.getElementById('no-search-results');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const query = this.value.toLowerCase().trim();
+                let visibleCount = 0;
+
+                subjectCards.forEach(card => {
+                    const subjectName = card.querySelector('[data-subject-name]')?.textContent.toLowerCase() || '';
+                    const items = card.querySelectorAll('[data-item-title]');
+                    let itemMatch = false;
+
+                    items.forEach(item => {
+                        if (item.textContent.toLowerCase().includes(query)) {
+                            itemMatch = true;
+                        }
+                    });
+
+                    if (!query || subjectName.includes(query) || itemMatch) {
+                        card.classList.remove('hidden-card');
+                        card.style.display = '';
+                        visibleCount++;
+                    } else {
+                        card.classList.add('hidden-card');
+                        card.style.display = 'none';
+                    }
+                });
+
+                if (noResults) {
+                    noResults.style.display = (visibleCount === 0 && subjectCards.length > 0) ? 'block' : 'none';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+

@@ -5,35 +5,121 @@
 
 {% block extra_css %}
 <style>
-    /* --- 🔒 ASOSIY CONTENT SKROLINI QOTIRISH --- */
-    body .content {
-        overflow: hidden !important;
+    .sarlavha-qatori {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
     }
-
-    /* --- 💵 FAQAT TO'LOVLAR JADVALLARI VA GURUH STILLARI --- */
+    .header-left-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
     .sarlavha {
         font-size: 22px;
         font-weight: 800;
-        margin-bottom: 20px;
         color: #ffffff;
         border-left: 4px solid #00f2fe;
         padding-left: 12px;
         letter-spacing: -0.5px;
+        margin: 0;
+        line-height: 1.2;
+    }
+    .wallet-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(0, 242, 254, 0.08);
+        border: 1px solid rgba(0, 242, 254, 0.25);
+        border-radius: 12px;
+        padding: 6px 14px;
+    }
+    .wallet-badge span:first-child {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 13px;
+    }
+    .wallet-badge span:last-child {
+        color: #00ffaa;
+        font-weight: 800;
+        font-size: 14px;
+    }
+    .btn-topup {
+        background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+        color: #070a12;
+        border: none;
+        border-radius: 10px;
+        padding: 7px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        transition: 0.2s;
+        white-space: nowrap;
+    }
+    .btn-topup:hover {
+        box-shadow: 0 0 20px rgba(0, 242, 254, 0.5);
+        transform: translateY(-1px);
+    }
+    .search-form {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 4px 14px;
+        transition: 0.3s;
+        width: 280px;
+        margin: 0;
+    }
+    .search-form:focus-within {
+        border-color: rgba(0, 242, 254, 0.4);
+        box-shadow: 0 0 12px rgba(0, 242, 254, 0.15);
+        background: rgba(255, 255, 255, 0.04);
+    }
+    .search-input,
+    .search-input:focus,
+    .search-input:focus-visible,
+    .search-input:active {
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        -webkit-box-shadow: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        color: #ffffff !important;
+        font-size: 13px;
+        width: 100%;
+        padding: 6px 0;
+    }
+    .search-btn {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.4);
+        cursor: pointer;
+        font-size: 13px;
+        transition: 0.3s;
+        padding-left: 8px;
     }
 
     .group_name {
         font-size: 15px;
         font-weight: 700;
         color: #4facfe;
-        margin-top: 25px;
-        margin-bottom: 12px;
         border-left: 3px solid #4facfe;
         padding-left: 8px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        margin: 0;
     }
-
-
 
     /* 📊 TO'LOVLAR BLOKI MUSTAQIL SKROL BO'LISHI UCHUN */
     .jadval-container {
@@ -43,15 +129,9 @@
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-radius: 24px;
-
-        /* 🛠️ FIX: Tepadagi padding 0 qilindi, matn sizib chiqmasligi uchun */
         padding: 0 24px 24px 24px;
-
-        /* Ekran balandligiga moslab ichki mustaqil skrol ochish */
-        max-height: calc(100vh - 210px);
         overflow-y: auto;
     }
-
     .jadval-container::-webkit-scrollbar {
         width: 4px;
     }
@@ -61,143 +141,9 @@
     }
 
     .group-payment-block {
-        margin-bottom: 15px;
+        margin-bottom: 25px;
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
-    }
-
-    /* 🛠️ FIX: Sarlavha mutloq to'siq (Shield) vazifasini bajaradi */
-    th {
-        padding: 24px 16px 14px 16px;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.4);
-        letter-spacing: 0.5px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-
-        position: sticky;
-        top: 0;
-        background: #0b0f19 !important; /* To'liq to'q va shaffof bo'lmagan fon rang */
-        background-clip: padding-box;
-        z-index: 100;
-    }
-    td {
-        padding: 16px 16px;
-        font-size: 14px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-        color: rgba(255, 255, 255, 0.85);
-    }
-    tr:hover td {
-        background: rgba(255, 255, 255, 0.01);
-        color: #ffffff;
-    }
-
-    /* --- 📱 MOBIL REJIMDA RESET --- */
-    @media (max-width: 768px) {
-        body .content {
-            overflow: auto !important;
-        }
-        .jadval-container {
-            max-height: none;
-            overflow: visible;
-            padding: 10px;
-            background: transparent;
-            border: none;
-            box-shadow: none;
-        }
-
-        .group_name {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-
-        table, thead, tbody, th, td, tr {
-            display: block;
-        }
-
-        thead {
-            display: none;
-        }
-
-        tr {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        tr:hover td {
-            background: transparent;
-        }
-
-        td {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            text-align: right;
-            font-weight: 600;
-            gap: 12px;
-        }
-
-        td:last-child {
-            border-bottom: none;
-        }
-
-        td::before {
-            content: attr(data-label);
-            font-weight: 700;
-            color: #00f2fe;
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.5px;
-            text-align: left;
-            padding-right: 15px;
-            flex-shrink: 0;
-        }
-        .td-val {
-            display: block;
-            max-width: 70%;
-            word-break: break-word;
-            text-align: right;
-            flex-grow: 1;
-            min-width: 0;
-        }
-    }
-
-    .btn-otish {
-        display: inline-block;
-        padding: 6px 12px;
-        background: rgba(0, 242, 254, 0.07);
-        border: 1px solid rgba(0, 242, 254, 0.2);
-        color: #00f2fe;
-        text-decoration: none;
-        border-radius: 8px;
-        font-size: 12.5px;
-        font-weight: 600;
-        transition: 0.3s;
-        text-align: center;
-        cursor: pointer;
-    }
-    .btn-otish:hover {
-        background: linear-gradient(135deg, #00f2fe, #4facfe);
-        color: #070a12;
-        border-color: transparent;
-        box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
-    }
-
-    /* 📊 JADVALNING O'ZI MUSTAQIL SKROL BO'LISHI UCHUN */
     .table-scroll-wrapper {
         width: 100%;
         overflow-x: auto;
@@ -216,23 +162,66 @@
         background: rgba(0, 242, 254, 0.25);
         border-radius: 4px;
     }
-    .table-scroll-wrapper::-webkit-scrollbar-track {
-        background: transparent;
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
     }
-    .table-scroll-wrapper th {
+    th {
+        padding: 20px 16px 14px 16px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.4);
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         position: sticky;
         top: 0;
-        z-index: 10;
         background: #0b0f19 !important;
+        z-index: 10;
+    }
+    td {
+        padding: 16px 16px;
+        font-size: 13.5px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        color: rgba(255, 255, 255, 0.85);
+    }
+    tr:hover td {
+        background: rgba(255, 255, 255, 0.01);
+        color: #ffffff;
     }
 
-    /* 💸 QARZDORLIKLAR BILAN ISHLASH STILLARI (GORIZONTAL) */
+    .btn-otish {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        background: rgba(0, 242, 254, 0.07);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        color: #00f2fe;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 12.5px;
+        font-weight: 600;
+        transition: 0.3s;
+        text-align: center;
+        cursor: pointer;
+    }
+    .btn-otish:hover {
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        color: #070a12;
+        border-color: transparent;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+    }
+
+    /* 💸 QARZDORLIKLAR BILAN ISHLASH STILLARI */
     .debt-box {
         background: rgba(255, 0, 85, 0.04) !important;
         border: 1px solid rgba(255, 0, 85, 0.2) !important;
         border-radius: 16px;
         padding: 16px;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
     }
     .debt-card {
         background: rgba(255, 255, 255, 0.02) !important;
@@ -288,22 +277,318 @@
         border: 1px solid rgba(0, 255, 170, 0.2) !important;
         border-radius: 16px;
         padding: 12px 16px;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
         display: flex;
         align-items: center;
         gap: 8px;
     }
+    .payment-notice-banner {
+        background: rgba(255, 193, 7, 0.08);
+        border: 1px solid rgba(255, 193, 7, 0.25);
+        border-radius: 14px;
+        padding: 14px 18px;
+        margin-bottom: 22px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        color: #ffc107;
+    }
+    .debt-offline-badge {
+        background: rgba(255, 193, 7, 0.08);
+        border: 1px solid rgba(255, 193, 7, 0.25);
+        color: #ffc107;
+        border-radius: 8px;
+        padding: 5px 12px;
+        font-size: 11.5px;
+        font-weight: 600;
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
 
-    /* Light mode overrides */
+    /* --- 📱 MOBIL REJIMDA KARTALARGA AYLANTIRISH --- */
+    @media (max-width: 768px) {
+        .sarlavha-qatori {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            margin-bottom: 16px !important;
+        }
+        .header-left-actions {
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            gap: 10px !important;
+            width: 100% !important;
+        }
+        .sarlavha {
+            font-size: 17px !important;
+            border-left-width: 3px !important;
+            padding-left: 8px !important;
+        }
+        .wallet-badge {
+            padding: 4px 10px !important;
+            border-radius: 10px !important;
+            gap: 6px !important;
+        }
+        .wallet-badge span:first-child {
+            font-size: 11.5px !important;
+        }
+        .wallet-badge span:last-child {
+            font-size: 12.5px !important;
+        }
+        .btn-topup {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 10px 14px !important;
+            font-size: 13px !important;
+            border-radius: 10px !important;
+        }
+        .search-form {
+            width: 100% !important;
+            padding: 4px 12px !important;
+            box-sizing: border-box !important;
+        }
+        .payment-notice-banner {
+            padding: 12px 14px !important;
+            font-size: 12.5px !important;
+            gap: 10px !important;
+            margin-bottom: 16px !important;
+            border-radius: 12px !important;
+        }
+
+        .jadval-container {
+            max-height: none !important;
+            overflow: visible !important;
+            padding: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+        .group-payment-block {
+            margin-bottom: 20px !important;
+        }
+        .group-payment-block:last-child {
+            margin-bottom: 45px !important;
+        }
+        .group_name {
+            font-size: 14px !important;
+        }
+
+        .debt-box {
+            padding: 12px 10px !important;
+            border-radius: 14px !important;
+        }
+        .debt-card {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 8px !important;
+            padding: 12px 12px !important;
+            border-radius: 12px !important;
+        }
+        .debt-card > div {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            width: 100% !important;
+        }
+        .debt-card button,
+        .debt-offline-badge {
+            width: 100% !important;
+            justify-content: center !important;
+            margin-left: 0 !important;
+            margin-top: 4px !important;
+            padding: 8px 12px !important;
+            font-size: 12px !important;
+            box-sizing: border-box !important;
+        }
+
+        .table-scroll-wrapper {
+            max-height: none !important;
+            overflow: visible !important;
+            border: none !important;
+            background: transparent !important;
+            margin-top: 10px !important;
+            border-radius: 0 !important;
+        }
+        table, thead, tbody, th, td, tr {
+            display: block !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        thead {
+            display: none !important;
+        }
+        tr {
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-radius: 16px !important;
+            padding: 12px 14px !important;
+            margin-bottom: 12px !important;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+        }
+        tr:hover td {
+            background: transparent !important;
+        }
+        td {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 7px 0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+            text-align: right !important;
+            font-size: 13px !important;
+            gap: 10px !important;
+        }
+        td:last-child {
+            border-bottom: none !important;
+            padding-top: 10px !important;
+            justify-content: center !important;
+            width: 100% !important;
+        }
+        td::before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.45);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            text-align: left;
+            padding-right: 10px;
+            flex-shrink: 0;
+        }
+        td[data-label="Oy"] {
+            padding-bottom: 8px !important;
+            margin-bottom: 3px !important;
+            border-bottom: 1px solid rgba(0, 242, 254, 0.2) !important;
+        }
+        td[data-label="Oy"]::before {
+            color: #00f2fe !important;
+            font-size: 11px !important;
+        }
+        td[data-label="Oy"] .td-val {
+            font-size: 14px !important;
+            font-weight: 800 !important;
+            color: #ffffff !important;
+        }
+        .td-val {
+            display: block;
+            word-break: break-word;
+            text-align: right;
+            flex-grow: 1;
+            min-width: 0;
+        }
+        .btn-otish {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 9px 14px !important;
+            font-size: 13px !important;
+            border-radius: 10px !important;
+        }
+        .no-debt-box {
+            padding: 10px 12px !important;
+            font-size: 12px !important;
+            border-radius: 12px !important;
+        }
+    }
+
+    /* --- ☀️ KUN REJIMI (LIGHT MODE) OVERRIDES --- */
+    body.light-mode .sarlavha {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
+    }
+    body.light-mode .wallet-badge {
+        background: #f0fdf4 !important;
+        border-color: #bbf7d0 !important;
+    }
+    body.light-mode .wallet-badge span:first-child {
+        color: #64748b !important;
+    }
+    body.light-mode .wallet-badge span:last-child {
+        color: #15803d !important;
+    }
+    body.light-mode .btn-topup {
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.25) !important;
+    }
+    body.light-mode .search-form {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    }
+    body.light-mode .search-form:focus-within {
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.15) !important;
+    }
+    body.light-mode .search-input {
+        color: #0f172a !important;
+    }
+    body.light-mode .search-input::placeholder {
+        color: #94a3b8 !important;
+    }
+    body.light-mode .search-btn {
+        color: #64748b !important;
+    }
+    body.light-mode .group_name {
+        color: #0284c7 !important;
+        border-left-color: #0284c7 !important;
+    }
+    body.light-mode .jadval-container {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04) !important;
+    }
     body.light-mode .table-scroll-wrapper {
         background: #ffffff !important;
         border: 1px solid #e2e8f0 !important;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
     }
-    body.light-mode .table-scroll-wrapper th {
+    body.light-mode th {
         background: #f8fafc !important;
         color: #475569 !important;
         border-bottom: 1px solid #e2e8f0 !important;
+    }
+    body.light-mode th:first-child {
+        color: #0284c7 !important;
+    }
+    body.light-mode td {
+        color: #334155 !important;
+        border-bottom-color: #f1f5f9 !important;
+    }
+    body.light-mode td[data-label="Oy"] span.td-val {
+        color: #0f172a !important;
+    }
+    body.light-mode td[data-label="Kurs davomiyligi"] span.td-val {
+        color: #475569 !important;
+    }
+    body.light-mode td[data-label="To'lash kerak"] span.td-val {
+        color: #b45309 !important;
+        font-weight: 700;
+    }
+    body.light-mode td[data-label="To'langan summa"] span.td-val {
+        color: #15803d !important;
+        font-weight: 700;
+    }
+    body.light-mode td[data-label="To'langan vaqti"] span.td-val {
+        color: #64748b !important;
+    }
+    body.light-mode tr:hover td {
+        background: #f8fafc !important;
+    }
+    body.light-mode .btn-otish {
+        background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+        color: #ffffff !important;
+        border: none !important;
+        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.2) !important;
+    }
+    body.light-mode .btn-otish:hover {
+        background: #0369a1 !important;
+        color: #ffffff !important;
     }
     body.light-mode .debt-box {
         background: rgba(239, 68, 68, 0.03) !important;
@@ -331,39 +616,18 @@
         color: #dc2626 !important;
     }
     body.light-mode .no-debt-box {
-        background: rgba(16, 185, 129, 0.03) !important;
-        border: 1px solid rgba(16, 185, 129, 0.15) !important;
+        background: rgba(16, 185, 129, 0.04) !important;
+        border: 1px solid rgba(16, 185, 129, 0.2) !important;
     }
-    body.light-mode td {
-        color: #334155 !important;
-        border-bottom-color: #f1f5f9 !important;
+    body.light-mode .payment-notice-banner {
+        background: #fffbeb !important;
+        border-color: #fde68a !important;
+        color: #b45309 !important;
     }
-    body.light-mode td[data-label="Oy"] span.td-val {
-        color: #0f172a !important;
-    }
-    body.light-mode td[data-label="Kurs davomiyligi"] span.td-val {
-        color: #475569 !important;
-    }
-    body.light-mode td[data-label="To'lash kerak"] span.td-val {
-        color: #0f172a !important;
-        font-weight: 700;
-    }
-    body.light-mode td[data-label="To'langan summa"] span.td-val {
-        color: #0f172a !important;
-        font-weight: 700;
-    }
-    body.light-mode td[data-label="To'langan vaqti"] span.td-val {
-        color: #475569 !important;
-    }
-    body.light-mode .btn-otish {
-        background: #0284c7 !important;
-        color: #ffffff !important;
-        border: none !important;
-        box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25) !important;
-    }
-    body.light-mode .btn-otish:hover {
-        background: #0369a1 !important;
-        color: #ffffff !important;
+    body.light-mode .debt-offline-badge {
+        background: #fffbeb !important;
+        border-color: #fde68a !important;
+        color: #b45309 !important;
     }
 
     /* Modal Light Mode */
@@ -393,61 +657,47 @@
     body.light-mode .provider-choice small {
         color: #64748b !important;
     }
-    .payment-notice-banner {
-        background: rgba(255, 193, 7, 0.08);
-        border: 1px solid rgba(255, 193, 7, 0.25);
-        border-radius: 14px;
-        padding: 14px 18px;
-        margin-bottom: 22px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        color: #ffc107;
-    }
-    .debt-offline-badge {
-        background: rgba(255, 193, 7, 0.08);
-        border: 1px solid rgba(255, 193, 7, 0.25);
-        color: #ffc107;
-        border-radius: 8px;
-        padding: 5px 12px;
-        font-size: 11.5px;
-        font-weight: 600;
-        margin-left: auto;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-    body.light-mode .payment-notice-banner {
-        background: #fffbeb !important;
-        border-color: #fde68a !important;
-        color: #b45309 !important;
-    }
-    body.light-mode .debt-offline-badge {
-        background: #fffbeb !important;
-        border-color: #fde68a !important;
-        color: #b45309 !important;
+
+    @media (max-width: 768px) {
+        body.light-mode tr {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02) !important;
+        }
+        body.light-mode td {
+            border-bottom-color: #f1f5f9 !important;
+        }
+        body.light-mode td::before {
+            color: #0284c7 !important;
+        }
+        body.light-mode td[data-label="Oy"] {
+            border-bottom-color: rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode td[data-label="Oy"] .td-val {
+            color: #0f172a !important;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
-        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-            <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">To'lovlarim</h2>
-            <div style="display: flex; align-items: center; gap: 8px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 12px; padding: 6px 14px;">
-                <span style="color: rgba(255,255,255,0.6); font-size: 13px;">Hamyon:</span>
-                <span style="color: #00ffaa; font-weight: 800; font-size: 14px;">{{ request.user.balance|floatformat:0 }} so'm</span>
+    <div class="sarlavha-qatori">
+        <div class="header-left-actions">
+            <h2 class="sarlavha">To'lovlarim</h2>
+            <div class="wallet-badge">
+                <span>Hamyon:</span>
+                <span>{{ request.user.balance|floatformat:0 }} so'm</span>
             </div>
             {% if online_payments_enabled %}
-            <button type="button" onclick="openTopUpModal()" style="background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #000; border: none; border-radius: 10px; padding: 7px 16px; font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3); transition: 0.2s;">
+            <button type="button" class="btn-topup" onclick="openTopUpModal()">
                 <i class="fas fa-plus-circle"></i> Balansni to'ldirish
             </button>
             {% endif %}
         </div>
         <!-- QIDIRUV FORMASI -->
-        <form class="search-form" id="paymentSearchForm" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
-            <input type="text" class="search-input" id="group-search" placeholder="Guruh nomi bo'yicha..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
-            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        <form class="search-form" id="paymentSearchForm" onsubmit="event.preventDefault();">
+            <input type="text" class="search-input" id="group-search" placeholder="Guruh nomi bo'yicha...">
+            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
         </form>
     </div>
 

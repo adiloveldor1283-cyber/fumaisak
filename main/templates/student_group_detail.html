@@ -6,6 +6,24 @@
 {% block extra_css %}
     <style>
         /* --- 📊 TAB CONTROLS & SEARCH --- */
+        .group-sticky-header {
+            margin-bottom: 25px;
+        }
+        .group-title-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .group-heading {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            border-left: 4px solid #00f2fe;
+            padding-left: 12px;
+            letter-spacing: -0.5px;
+            margin-bottom: 0;
+        }
         .tabs-header-wrap {
             display: flex;
             justify-content: space-between;
@@ -60,20 +78,23 @@
             box-shadow: 0 0 12px rgba(0, 242, 254, 0.15);
             background: rgba(255, 255, 255, 0.04);
         }
-        .lesson-search-box input {
+        .lesson-search-box input,
+        .lesson-search-box input:focus,
+        .lesson-search-box input:focus-visible,
+        .lesson-search-box input:active {
             background: transparent !important;
             border: none !important;
             outline: none !important;
             box-shadow: none !important;
+            -webkit-box-shadow: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            -webkit-tap-highlight-color: transparent !important;
             color: #ffffff;
             font-size: 13px;
             width: 100%;
             padding: 6px 0;
-        }
-        .lesson-search-box input:focus {
-            border: none !important;
-            outline: none !important;
-            box-shadow: none !important;
         }
         .lesson-search-box i {
             color: rgba(255, 255, 255, 0.4);
@@ -147,7 +168,6 @@
             color: #ffffff;
         }
 
-
         /* Rank badges */
         .rank-badge {
             display: inline-flex;
@@ -212,44 +232,195 @@
             border-left: 3px solid #00f2fe;
         }
 
+        /* Attendance Stats Grid */
+        .attendance-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .attendance-stat-card {
+            background: rgba(11, 15, 25, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        .attendance-stat-card .stat-title {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .attendance-stat-card .stat-val {
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 6px;
+        }
+
         /* --- 📱 MOBIL QURILMALAR MEDIA REJIMI --- */
         @media (max-width: 768px) {
-            .konteyner {
-                height: auto !important;
-                overflow: visible !important;
-                padding: 15px !important;
+            .group-sticky-header {
+                position: sticky !important;
+                top: 58px !important;
+                z-index: 40 !important;
+                background: rgba(7, 10, 18, 0.96) !important;
+                backdrop-filter: blur(20px) !important;
+                -webkit-backdrop-filter: blur(20px) !important;
+                margin: -12px -10px 10px -10px !important;
+                padding: 10px 10px 8px 10px !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
             }
-            .tabs-nav { flex-wrap: wrap; }
-            .tab-btn { flex: 1; text-align: center; font-size: 12px; padding: 8px 12px; }
+            .group-title-row {
+                gap: 10px !important;
+                margin-bottom: 8px !important;
+            }
+            .group-title-row .back-arrow-btn {
+                width: 32px !important;
+                height: 32px !important;
+                min-width: 32px !important;
+            }
+            .group-title-row .back-arrow-btn i {
+                font-size: 13px !important;
+            }
+            .group-heading {
+                font-size: 16px !important;
+                border-left-width: 3px !important;
+                padding-left: 8px !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+            .tabs-header-wrap {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 8px !important;
+                margin-bottom: 0 !important;
+                padding-bottom: 0 !important;
+                border-bottom: none !important;
+            }
+            .tabs-nav {
+                width: 100% !important;
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                gap: 6px !important;
+                padding-bottom: 2px !important;
+                scrollbar-width: none !important;
+            }
+            .tabs-nav::-webkit-scrollbar {
+                display: none !important;
+            }
+            .tab-btn {
+                flex: 1 0 auto !important;
+                text-align: center !important;
+                font-size: 11.5px !important;
+                padding: 7px 10px !important;
+                border-radius: 8px !important;
+                white-space: nowrap !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 4px !important;
+            }
+            .tab-btn i {
+                font-size: 12px !important;
+                margin-right: 0 !important;
+            }
+            .lesson-search-box {
+                width: 100% !important;
+                height: 36px !important;
+                padding: 0 10px !important;
+                border-radius: 10px !important;
+            }
+            .lesson-search-box input {
+                font-size: 12px !important;
+                padding: 4px 0 !important;
+            }
+
+            .attendance-stats-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 8px !important;
+                margin-bottom: 10px !important;
+            }
+            .attendance-stat-card {
+                padding: 10px 8px !important;
+                border-radius: 12px !important;
+            }
+            .attendance-stat-card .stat-title {
+                font-size: 10.5px !important;
+            }
+            .attendance-stat-card .stat-val {
+                font-size: 18px !important;
+                margin-top: 3px !important;
+            }
 
             .jadval-container {
-                border: none;
-                background: transparent;
-                box-shadow: none;
-                overflow: visible;
-                max-height: none;
-                padding: 0;
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                max-height: calc(100vh - 215px) !important;
+                max-height: calc(100dvh - 215px) !important;
+                padding: 2px 2px 25px 2px !important;
+            }
+            #tab-attendance .jadval-container {
+                max-height: calc(100vh - 325px) !important;
+                max-height: calc(100dvh - 325px) !important;
             }
 
-            table, thead, tbody, th, td, tr { display: block; }
-            thead { display: none; }
+            .hidden-row {
+                display: none !important;
+            }
+
+            table, thead, tbody, th, td, tr {
+                display: block;
+                width: 100%;
+                min-width: 0;
+                max-width: 100%;
+                white-space: normal;
+            }
+            thead { display: none !important; }
 
             tr {
-                background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
-                border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 16px;
+                padding: 14px;
+                margin-bottom: 12px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+                box-sizing: border-box;
+            }
+            tr:last-child {
+                margin-bottom: 45px !important;
             }
             td {
-                display: flex; justify-content: space-between; align-items: center;
-                padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.03); text-align: right; font-size: 13px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+                text-align: right;
+                font-size: 13px;
+                word-break: break-word;
             }
             td:last-child { border-bottom: none; }
             td::before {
-                content: attr(data-label); float: left; font-weight: 700; color: rgba(255, 255, 255, 0.4);
-                text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;
+                content: attr(data-label);
+                font-weight: 700;
+                color: rgba(255, 255, 255, 0.4);
+                text-transform: uppercase;
+                font-size: 11px;
+                letter-spacing: 0.5px;
+                flex-shrink: 0;
+                padding-right: 12px;
             }
             .chiqish_sahifa {
-                margin-top: 30px !important;
-                padding-bottom: 40px !important;
+                margin-top: 20px;
+                margin-bottom: 20px;
             }
         }
 
@@ -484,25 +655,35 @@
         }
         
         /* Attendance Stats cards light mode */
-        body.light-mode div[style*="grid-template-columns"] > div {
+        body.light-mode .attendance-stat-card {
             background: #ffffff !important;
             border: 1px solid #cbd5e1 !important;
             box-shadow: 0 4px 15px rgba(0,0,0,0.02) !important;
         }
-        body.light-mode div[style*="grid-template-columns"] > div > div[style*="color: rgba(255,255,255,0.4)"] {
+        body.light-mode .attendance-stat-card .stat-title {
             color: #64748b !important;
         }
-        body.light-mode div[style*="grid-template-columns"] > div > div[style*="color: #ffffff"] {
+        body.light-mode .attendance-stat-card .stat-val[style*="color: #ffffff"] {
             color: #0f172a !important;
         }
-        body.light-mode div[style*="grid-template-columns"] > div > div[style*="color: #00ffaa"] {
+        body.light-mode .attendance-stat-card .stat-val[style*="color: #00ffaa"] {
             color: #15803d !important;
         }
-        body.light-mode div[style*="grid-template-columns"] > div > div[style*="color: #ff808b"] {
+        body.light-mode .attendance-stat-card .stat-val[style*="color: #ff808b"] {
             color: #dc2626 !important;
         }
-        body.light-mode div[style*="grid-template-columns"] > div > div[style*="color: #00f2fe"] {
+        body.light-mode .attendance-stat-card .stat-val[style*="color: #00f2fe"] {
             color: #0284c7 !important;
+        }
+
+        body.light-mode .group-sticky-header {
+            background: rgba(241, 245, 249, 0.96) !important;
+            border-bottom-color: #cbd5e1 !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+        }
+        body.light-mode .group-heading {
+            color: #0f172a !important;
+            border-left-color: #0284c7 !important;
         }
 
         @media (max-width: 768px) {
@@ -533,11 +714,17 @@
             box-shadow: 0 0 10px rgba(2, 132, 199, 0.15) !important;
         }
         body.light-mode .lesson-search-box input,
-        body.light-mode .lesson-search-box input:focus {
+        body.light-mode .lesson-search-box input:focus,
+        body.light-mode .lesson-search-box input:focus-visible,
+        body.light-mode .lesson-search-box input:active {
             color: #0f172a !important;
             border: none !important;
             outline: none !important;
             box-shadow: none !important;
+            -webkit-box-shadow: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
             background: transparent !important;
         }
         body.light-mode .lesson-search-box input::placeholder {
@@ -565,23 +752,26 @@
 {% endblock %}
 
 {% block content %}
-    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
-        <a href="{% url 'student_groups_view' %}" class="back-arrow-btn" title="Orqaga">
-            <i class="fas fa-chevron-left"></i>
-        </a>
-        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Guruh: {{ group.name }}</h2>
-    </div>
-
-    <!-- TABS NAVIGATION & SEARCH -->
-    <div class="tabs-header-wrap">
-        <div class="tabs-nav">
-            <button class="tab-btn active" onclick="switchTab('tab-lessons', this)"><i class="fas fa-book-open" style="margin-right: 6px;"></i> Dars kundaligi</button>
-            <button class="tab-btn" onclick="switchTab('tab-leaderboard', this)"><i class="fas fa-trophy" style="margin-right: 6px;"></i> Guruh reytingi</button>
-            <button class="tab-btn" onclick="switchTab('tab-attendance', this)"><i class="fas fa-calendar-check" style="margin-right: 6px;"></i> Davomatlarim</button>
+    <!-- STICKY TOP HEADER ON MOBILE -->
+    <div class="group-sticky-header">
+        <div class="group-title-row">
+            <a href="{% url 'student_groups_view' %}" class="back-arrow-btn" title="Orqaga">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h2 class="sarlavha group-heading">Guruh: {{ group.name }}</h2>
         </div>
-        <div class="lesson-search-box" id="lessonSearchBox">
-            <input type="text" id="lessonSearchInput" placeholder="Mavzu, sana yoki reja bo'yicha qidiruv...">
-            <i class="fas fa-search"></i>
+
+        <!-- TABS NAVIGATION & SEARCH -->
+        <div class="tabs-header-wrap">
+            <div class="tabs-nav">
+                <button class="tab-btn active" onclick="switchTab('tab-lessons', this)"><i class="fas fa-book-open"></i> <span>Dars kundaligi</span></button>
+                <button class="tab-btn" onclick="switchTab('tab-leaderboard', this)"><i class="fas fa-trophy"></i> <span>Guruh reytingi</span></button>
+                <button class="tab-btn" onclick="switchTab('tab-attendance', this)"><i class="fas fa-calendar-check"></i> <span>Davomatlarim</span></button>
+            </div>
+            <div class="lesson-search-box" id="lessonSearchBox">
+                <input type="text" id="lessonSearchInput" placeholder="Mavzu, sana yoki reja bo'yicha qidiruv...">
+                <i class="fas fa-search"></i>
+            </div>
         </div>
     </div>
 
@@ -686,22 +876,22 @@
     <!-- TAB 3: ATTENDANCE HISTORY -->
     <div id="tab-attendance" class="tab-content">
         <!-- Attendance Stats Cards -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px;">
-            <div style="background: rgba(11, 15, 25, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 16px; text-align: center;">
-                <div style="font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 700; text-transform: uppercase;">Jami darslar</div>
-                <div style="font-size: 24px; font-weight: 800; color: #ffffff; margin-top: 6px;">{{ my_total_att }} ta</div>
+        <div class="attendance-stats-grid">
+            <div class="attendance-stat-card">
+                <div class="stat-title">Jami darslar</div>
+                <div class="stat-val" style="color: #ffffff;">{{ my_total_att }} ta</div>
             </div>
-            <div style="background: rgba(11, 15, 25, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 16px; text-align: center;">
-                <div style="font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 700; text-transform: uppercase;">Kelgan darslar</div>
-                <div style="font-size: 24px; font-weight: 800; color: #00ffaa; margin-top: 6px;">{{ my_present_att }} ta</div>
+            <div class="attendance-stat-card">
+                <div class="stat-title">Kelgan darslar</div>
+                <div class="stat-val" style="color: #00ffaa;">{{ my_present_att }} ta</div>
             </div>
-            <div style="background: rgba(11, 15, 25, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 16px; text-align: center;">
-                <div style="font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 700; text-transform: uppercase;">Qoldirilgan darslar</div>
-                <div style="font-size: 24px; font-weight: 800; color: #ff808b; margin-top: 6px;">{{ my_absent_att }} ta</div>
+            <div class="attendance-stat-card">
+                <div class="stat-title">Qoldirilgan darslar</div>
+                <div class="stat-val" style="color: #ff808b;">{{ my_absent_att }} ta</div>
             </div>
-            <div style="background: rgba(11, 15, 25, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 16px; text-align: center;">
-                <div style="font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 700; text-transform: uppercase;">Davomat foizi</div>
-                <div style="font-size: 24px; font-weight: 800; color: #00f2fe; margin-top: 6px;">{{ my_att_rate }}%</div>
+            <div class="attendance-stat-card">
+                <div class="stat-title">Davomat foizi</div>
+                <div class="stat-val" style="color: #00f2fe;">{{ my_att_rate }}%</div>
             </div>
         </div>
 
@@ -746,14 +936,19 @@
                 content.classList.remove('active');
             });
             // Show selected content
-            document.getElementById(tabId).classList.add('active');
+            const activeContent = document.getElementById(tabId);
+            if (activeContent) {
+                activeContent.classList.add('active');
+            }
 
             // Deactivate all buttons
             document.querySelectorAll('.tab-btn').forEach(button => {
                 button.classList.remove('active');
             });
             // Activate selected button
-            btn.classList.add('active');
+            if (btn) {
+                btn.classList.add('active');
+            }
 
             // Show/Hide search box according to active tab
             const searchBox = document.getElementById('lessonSearchBox');
@@ -766,24 +961,41 @@
             const searchInput = document.getElementById("lessonSearchInput");
             const lessonRows = document.querySelectorAll(".lesson-row");
             const noSearchResultRow = document.getElementById("noSearchResultRow");
+            const emptyLessonsRow = document.getElementById("emptyLessonsRow");
 
-            if (searchInput && lessonRows.length > 0) {
+            if (searchInput) {
                 searchInput.addEventListener("input", function () {
                     const query = this.value.toLowerCase().trim();
                     let visibleCount = 0;
 
                     lessonRows.forEach(row => {
                         const text = row.textContent.toLowerCase();
-                        if (text.includes(query)) {
-                            row.style.display = "";
+                        if (query === "" || text.includes(query)) {
+                            row.style.removeProperty('display');
+                            row.classList.remove('hidden-row');
                             visibleCount++;
                         } else {
-                            row.style.display = "none";
+                            row.style.setProperty('display', 'none', 'important');
+                            row.classList.add('hidden-row');
                         }
                     });
 
                     if (noSearchResultRow) {
-                        noSearchResultRow.style.display = (visibleCount === 0 && query !== "") ? "" : "none";
+                        if (lessonRows.length > 0 && visibleCount === 0 && query !== "") {
+                            noSearchResultRow.style.setProperty('display', 'table-row', 'important');
+                            noSearchResultRow.classList.remove('hidden-row');
+                        } else {
+                            noSearchResultRow.style.setProperty('display', 'none', 'important');
+                            noSearchResultRow.classList.add('hidden-row');
+                        }
+                    }
+
+                    if (emptyLessonsRow) {
+                        if (query !== "") {
+                            emptyLessonsRow.classList.add('hidden-row');
+                        } else {
+                            emptyLessonsRow.classList.remove('hidden-row');
+                        }
                     }
                 });
             }

@@ -5,7 +5,60 @@
 
 {% block extra_css %}
     <style>
-        /* --- 🔍 QIDIRUV PANELI (UNIFIED PILL DESIGN) --- */
+        /* =========================================================
+           ✨ TEST YARATISH — 1-TO-1 PARITY LIGHT & DARK MODE DESIGN
+           ========================================================= */
+
+        /* --- 🔍 SARLAVHA VA QIDIRUV PANELI --- */
+        .sarlavha-qatori {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+        .sarlavha-text-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .sarlavha {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            border-left: 4px solid #00f2fe;
+            padding-left: 12px;
+            letter-spacing: -0.4px;
+            margin: 0;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sarlavha i.title-icon {
+            color: #00f2fe;
+        }
+        .sarlavha-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin: 0;
+            padding-left: 16px;
+        }
+
+        body.light-mode .sarlavha {
+            color: #0f172a !important;
+            border-left-color: #0284c7 !important;
+        }
+        body.light-mode .sarlavha i.title-icon {
+            color: #0284c7 !important;
+        }
+        body.light-mode .sarlavha-subtitle {
+            color: #64748b !important;
+        }
+
+        /* --- 🔍 QIDIRUV PANELI --- */
         .search-form {
             display: flex;
             align-items: center;
@@ -13,25 +66,43 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
             padding: 4px 14px;
-            transition: 0.3s;
+            transition: all 0.25s ease;
             width: 280px;
             margin: 0;
+            box-sizing: border-box;
         }
         .search-form:focus-within {
             border-color: #00f2fe !important;
             box-shadow: 0 0 12px rgba(0, 242, 254, 0.2) !important;
             background: rgba(255, 255, 255, 0.05);
         }
+        
+        body input[type="text"].search-input,
+        body .search-form input,
         .search-input {
             background: transparent !important;
-            border: none !important;
+            border: 0 !important;
+            border-style: none !important;
             outline: none !important;
             color: #ffffff !important;
-            font-size: 13px;
+            font-size: 13px !important;
             width: 100% !important;
             padding: 6px 0 !important;
             margin: 0 !important;
             box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+        body input[type="text"].search-input:focus,
+        body .search-form input:focus,
+        .search-input:focus {
+            background: transparent !important;
+            border: 0 !important;
+            border-style: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
         }
         .search-btn {
             background: none !important;
@@ -59,18 +130,26 @@
             border-color: #0284c7 !important;
             box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
         }
+        body.light-mode input[type="text"].search-input,
+        body.light-mode .search-form input,
         body.light-mode .search-input {
             color: #0f172a !important;
             background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
+            border: 0 !important;
+            border-style: none !important;
             outline: none !important;
+            box-shadow: none !important;
         }
+        body.light-mode input[type="text"].search-input:focus,
+        body.light-mode .search-form input:focus,
         body.light-mode .search-input:focus {
-            border: none !important;
+            border: 0 !important;
             box-shadow: none !important;
             outline: none !important;
             background: transparent !important;
+        }
+        body.light-mode .search-input::placeholder {
+            color: #94a3b8 !important;
         }
         body.light-mode .search-btn {
             color: #64748b !important;
@@ -80,251 +159,1073 @@
         }
         body.light-mode .search-btn:hover {
             color: #0284c7 !important;
-            background: transparent !important;
-            border: none !important;
         }
 
-        /* --- 📊 JADVAL VA STRUKTURA STILLARI --- */
-        .sarlavha {
-            font-size: 18px;
-            font-weight: 700;
-            color: #ffffff;
-            border-left: 4px solid #00f2fe;
-            padding-left: 12px;
-            letter-spacing: -0.3px;
-            margin-bottom: 20px;
-            margin-top: 5px;
+        /* --- 📁 GURUHLARNI TANLASH PANELI --- */
+        .guruhlar-section {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 18px;
+            padding: 16px 20px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        body.light-mode .guruhlar-section {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        .guruhlar-section-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        body.light-mode .guruhlar-section-title {
+            color: #475569 !important;
         }
 
         .guruhlar-qatori {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
-            margin-bottom: 5px;
         }
         .guruh-btn {
-            display: inline-block;
-            padding: 10px 22px;
-            background: rgba(0, 242, 254, 0.05);
-            border: 1px solid rgba(0, 242, 254, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(0, 242, 254, 0.06);
+            border: 1px solid rgba(0, 242, 254, 0.22);
             color: #00f2fe;
             text-decoration: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 700;
+            transition: all 0.25s ease;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         .guruh-btn:hover {
             background: linear-gradient(135deg, #00f2fe, #4facfe);
             color: #070a12;
             border-color: transparent;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.35);
+            transform: translateY(-2px);
+        }
+        body.light-mode .guruh-btn {
+            background: rgba(2, 132, 199, 0.06) !important;
+            border: 1px solid rgba(2, 132, 199, 0.25) !important;
+            color: #0284c7 !important;
+            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.06) !important;
+        }
+        body.light-mode .guruh-btn:hover {
+            background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+            border-color: transparent !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
             transform: translateY(-2px);
         }
 
-        .hr-joy {
-            border: none;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            margin: 25px 0;
-        }
-
-        /* Mustaqil Skrol bo'luvchi konteyner (Desktop) */
         /* --- 📊 CHEKSIZ SKROL BO'LUVCHI JADVAL KONTEYNERI --- */
         .jadval-container {
-            flex-grow: 1;
-            overflow-y: auto; /* Faqat shu konteyner pastga skrol bo'ladi */
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            max-height: calc(100vh - 140px); /* Ekrandan chiqib ketmasligi uchun chegara */
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            overflow-x: auto;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            max-height: calc(100vh - 280px);
+            position: relative;
+            scroll-behavior: smooth;
+            margin-bottom: 35px;
+            box-sizing: border-box;
         }
 
-        /* Skrolbar dizayni */
+        /* Skrolbar */
         .jadval-container::-webkit-scrollbar {
-            width: 1px;
+            height: 7px;
+            width: 6px;
         }
         .jadval-container::-webkit-scrollbar-track {
-            background: transparent;
+            background: rgba(8, 13, 26, 0.8);
+            border-radius: 10px;
         }
         .jadval-container::-webkit-scrollbar-thumb {
-            background: rgba(0, 242, 254, 0.2);
-            border-radius: 4px;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
         }
         .jadval-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 242, 254, 0.4);
+            background: #00f2fe;
+        }
+
+        body.light-mode .jadval-container {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .jadval-container::-webkit-scrollbar-track {
+            background: #f8fafc !important;
+        }
+        body.light-mode .jadval-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1 !important;
+            box-shadow: none !important;
+        }
+        body.light-mode .jadval-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8 !important;
         }
 
         table {
-            width: 100%;
+            width: 100% !important;
             border-collapse: collapse;
             text-align: left;
         }
         th {
-            padding: 16px 18px;
+            padding: 14px 18px;
             font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.5);
             letter-spacing: 0.5px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            position: sticky; /* Tepa qismi qotib turadi */
+            position: sticky;
             top: 0;
             background: #080d1a;
             z-index: 2;
+            white-space: nowrap;
         }
+        body.light-mode th {
+            background: #f8fafc !important;
+            color: #475569 !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
         td {
             padding: 14px 18px;
             font-size: 13.5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-            color: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.85);
             vertical-align: middle;
+            transition: background 0.2s ease;
         }
         tr:hover td {
-            background: rgba(255, 255, 255, 0.01);
+            background: rgba(255, 255, 255, 0.02);
             color: #ffffff;
         }
-
-        .btn-otish {
-            display: inline-block; padding: 6px 14px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); margin-left: 10px;
-            color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 12.5px; font-weight: 600; transition: 0.3s; text-align: center;
+        body.light-mode td {
+            color: #0f172a !important;
+            border-bottom: 1px solid #f1f5f9 !important;
         }
-        .btn-otish:hover { background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; border-color: transparent; box-shadow: 0 0 12px rgba(0, 242, 254, 0.3); }
+        body.light-mode tr:hover td {
+            background: rgba(2, 132, 199, 0.02) !important;
+        }
+
+        /* --- 🏷️ NISHONLAR VA MA'LUMOT BLOKLARI --- */
+        .quiz-title-text {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 14px;
+        }
+        body.light-mode .quiz-title-text {
+            color: #0f172a !important;
+        }
 
         
+        .row-index-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 6px;
+            border-radius: 8px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.22);
+            color: #00f2fe;
+            font-weight: 800;
+            font-size: 12.5px;
+            font-family: 'JetBrains Mono', monospace, sans-serif;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+        body.light-mode .row-index-pill {
+            background: #e0f2fe !important;
+            border-color: #bae6fd !important;
+            color: #0284c7 !important;
+        }
+
+        .group-pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            color: #00f2fe;
+            font-weight: 600;
+            font-size: 12.5px;
+            white-space: nowrap;
+        }
+        body.light-mode 
+        .row-index-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 6px;
+            border-radius: 8px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.22);
+            color: #00f2fe;
+            font-weight: 800;
+            font-size: 12.5px;
+            font-family: 'JetBrains Mono', monospace, sans-serif;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+        body.light-mode .row-index-pill {
+            background: #e0f2fe !important;
+            border-color: #bae6fd !important;
+            color: #0284c7 !important;
+        }
+
+        .group-pill-badge {
+            background: #e0f2fe !important;
+            border-color: #bae6fd !important;
+            color: #0284c7 !important;
+        }
+
+        .date-badge-cell {
+            font-family: monospace;
+            font-size: 12.5px;
+            color: rgba(255, 255, 255, 0.6);
+            white-space: nowrap;
+        }
+        body.light-mode .date-badge-cell {
+            color: #64748b !important;
+        }
+
+        .score-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: rgba(0, 255, 170, 0.1);
+            border: 1px solid rgba(0, 255, 170, 0.25);
+            color: #00ffaa;
+            font-weight: 700;
+            font-size: 12.5px;
+        }
+        body.light-mode .score-badge {
+            background: #dcfce7 !important;
+            border-color: #bbf7d0 !important;
+            color: #15803d !important;
+        }
+
+        .count-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            font-size: 12.5px;
+        }
+        body.light-mode .count-badge {
+            background: #f1f5f9 !important;
+            border-color: #e2e8f0 !important;
+            color: #334155 !important;
+        }
+
+        /* --- 📈 PROGRESS BAR & TOPSHIRGANLIK KO'RSATKICHI --- */
+        .submission-progress-box {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 140px;
+        }
+        .progress-header-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11.5px;
+        }
+        .progress-count-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+        }
+        body.light-mode .progress-count-text {
+            color: #475569 !important;
+        }
+        .progress-percent-badge {
+            font-weight: 800;
+            font-size: 11.5px;
+            font-family: monospace;
+        }
+        .percent-completed { color: #10b981; }
+        .percent-active { color: #00f2fe; }
+        .percent-pending { color: rgba(255, 255, 255, 0.4); }
+        body.light-mode .percent-active { color: #0284c7; }
+        body.light-mode .percent-pending { color: #94a3b8; }
+
+        .mini-progress-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        body.light-mode .mini-progress-track {
+            background: #e2e8f0 !important;
+        }
+        .mini-progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+        .fill-completed {
+            background: linear-gradient(90deg, #10b981, #34d399);
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+        }
+        .fill-active {
+            background: linear-gradient(90deg, #00f2fe, #4facfe);
+            box-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
+        }
+        .fill-pending {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        body.light-mode .fill-pending {
+            background: #cbd5e1 !important;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .status-pill.completed {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .status-pill.active {
+            background: rgba(0, 242, 254, 0.1);
+            color: #00f2fe;
+            border: 1px solid rgba(0, 242, 254, 0.25);
+        }
+        .status-pill.pending {
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        body.light-mode .status-pill.completed {
+            background: #dcfce7 !important;
+            color: #15803d !important;
+            border-color: #bbf7d0 !important;
+        }
+        body.light-mode .status-pill.active {
+            background: #e0f2fe !important;
+            color: #0284c7 !important;
+            border-color: #bae6fd !important;
+        }
+        body.light-mode .status-pill.pending {
+            background: #f1f5f9 !important;
+            color: #64748b !important;
+            border-color: #e2e8f0 !important;
+        }
+
+        /* --- 🔘 DESKTOP TUGMALAR (SAME GLASSMORPHIC/PILL STYLE IN LIGHT MODE) --- */
+        .btn-action-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            color: #00f2fe;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            transition: all 0.25s ease;
+            text-align: center;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-action-primary:hover {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border-color: transparent;
+            box-shadow: 0 0 14px rgba(0, 242, 254, 0.4);
+            transform: translateY(-1px);
+        }
+        body.light-mode .btn-action-primary {
+            background: rgba(2, 132, 199, 0.08) !important;
+            border: 1px solid rgba(2, 132, 199, 0.3) !important;
+            color: #0284c7 !important;
+            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.08) !important;
+        }
+        body.light-mode .btn-action-primary:hover {
+            background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+            border-color: transparent !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
+        }
+
+        .btn-action-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            text-align: center;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-action-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+        body.light-mode .btn-action-secondary {
+            background: #f8fafc !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #334155 !important;
+        }
+        body.light-mode .btn-action-secondary:hover {
+            background: #e2e8f0 !important;
+            color: #0f172a !important;
+            border-color: #94a3b8 !important;
+        }
+
+        .actions-cell-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- 🚫 NATIJA TOPILMADI VA BO'SH HOLAT --- */
+        .empty-state-box {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-style: italic;
+            font-size: 14px;
+        }
+        .empty-state-box i {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+        body.light-mode .empty-state-box {
+            color: #64748b !important;
+        }
 
         /* ========================================================
-           📱 RESPONSIVE SYSTEM (TELEFON REJIMIDAGI VERTIKAL FORMA)
+           📱 1-VARIANT: "EDTECH DASHBOARD CARDS" (MOBIL REJIM)
            ======================================================== */
         @media (max-width: 768px) {
             .konteyner {
-                height: auto !important; overflow: visible !important; padding: 16px 12px !important;
+                height: auto !important;
+                overflow: visible !important;
+                padding: 12px 14px 35px 14px !important;
             }
-            .search-input { width: 130px; margin-left: 10px; padding: 8px 12px; }
-            .search-btn { padding: 8px 14px; }
-            .guruh-btn { width: 100%; text-align: center; padding: 12px; }
+            .sarlavha-qatori {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 12px !important;
+                margin-bottom: 16px !important;
+            }
+            .sarlavha {
+                font-size: 18px !important;
+                border-left-width: 3.5px !important;
+                padding-left: 10px !important;
+            }
+            .sarlavha-subtitle {
+                font-size: 12px !important;
+                padding-left: 14px !important;
+            }
+            .search-form {
+                width: 100% !important;
+            }
 
-            .jadval-container { border: none; background: transparent; box-shadow: none; padding: 0; max-height: none; overflow: visible; }
-            table, thead, tbody, th, td, tr { display: block; width: 100% !important; }
-            thead { display: none; }
+            .guruhlar-section {
+                padding: 14px !important;
+                margin-bottom: 18px !important;
+                border-radius: 16px !important;
+            }
+            .guruhlar-qatori {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 8px !important;
+            }
+            .guruh-btn {
+                padding: 10px 8px !important;
+                font-size: 12.5px !important;
+                justify-content: center !important;
+                border-radius: 10px !important;
+            }
 
-            tr { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-            td { display: flex !important; justify-content: space-between; align-items: center; text-align: right !important; padding: 10px 0 !important; border-bottom: 1px solid rgba(255, 255, 255, 0.03); font-size: 13px; }
-            td:last-child { border-bottom: none; padding-top: 14px !important; justify-content: center; gap: 10px; }
-            td::before { content: attr(data-label); float: left; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
-            .btn-otish { flex: 1; padding: 10px; }
-            .top-modal { width: 95%; }
+            .jadval-container {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                overflow: visible !important;
+                max-height: none !important;
+                margin-bottom: 35px !important;
+            }
+
+            table, thead, tbody, th, td, tr {
+                display: block !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            thead {
+                display: none !important;
+            }
+
+            /* 🌟 EDTECH DASHBOARD CARD */
+            #group-table tbody tr.quiz-item-row {
+                background: rgba(255, 255, 255, 0.02) !important;
+                border: 1px solid rgba(255, 255, 255, 0.06) !important;
+                border-radius: 18px !important;
+                padding: 16px !important;
+                margin-bottom: 16px !important;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.18) !important;
+                backdrop-filter: blur(10px) !important;
+                -webkit-backdrop-filter: blur(10px) !important;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                position: relative !important;
+                overflow: hidden !important;
+            }
+
+            /* 🎨 Chap tomondagi rangli Accent Chizig'i */
+            #group-table tbody tr.quiz-item-row.status-border-completed {
+                border-left: 5px solid #10b981 !important;
+            }
+            #group-table tbody tr.quiz-item-row.status-border-active {
+                border-left: 5px solid #00f2fe !important;
+            }
+            #group-table tbody tr.quiz-item-row.status-border-pending {
+                border-left: 5px solid #f59e0b !important;
+            }
+
+            body.light-mode #group-table tbody tr.quiz-item-row {
+                background: #ffffff !important;
+                border: 1px solid #e2e8f0 !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+            }
+            body.light-mode #group-table tbody tr.quiz-item-row.status-border-completed {
+                border-left: 5px solid #16a34a !important;
+            }
+            body.light-mode #group-table tbody tr.quiz-item-row.status-border-active {
+                border-left: 5px solid #0284c7 !important;
+            }
+            body.light-mode #group-table tbody tr.quiz-item-row.status-border-pending {
+                border-left: 5px solid #d97706 !important;
+            }
+
+            #group-table tbody td {
+                padding: 0 !important;
+                border: none !important;
+                background: transparent !important;
+                width: 100% !important;
+            }
+
+            /* 1. Header: Guruh & Holat */
+            .edtech-card-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+            }
+
+            /* 2. Main Title & Date */
+            .edtech-title-wrap {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+            .edtech-quiz-title {
+                font-size: 16px;
+                font-weight: 800;
+                color: #ffffff;
+                line-height: 1.3;
+            }
+            body.light-mode .edtech-quiz-title {
+                color: #0f172a !important;
+            }
+            .edtech-quiz-date {
+                font-size: 11.5px;
+                color: rgba(255, 255, 255, 0.5);
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+            body.light-mode .edtech-quiz-date {
+                color: #64748b !important;
+            }
+
+            /* 3. Progress Section */
+            .edtech-progress-card {
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                padding: 10px 12px;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+            body.light-mode .edtech-progress-card {
+                background: #f8fafc !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+
+            .edtech-progress-info {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-size: 12px;
+            }
+            .edtech-progress-label {
+                color: rgba(255, 255, 255, 0.7);
+                font-weight: 600;
+            }
+            body.light-mode .edtech-progress-label {
+                color: #475569 !important;
+            }
+            .edtech-percent-pill {
+                font-weight: 800;
+                font-size: 12px;
+                font-family: monospace;
+                padding: 2px 7px;
+                border-radius: 6px;
+            }
+            .edtech-percent-pill.completed {
+                background: rgba(16, 185, 129, 0.15);
+                color: #10b981;
+            }
+            .edtech-percent-pill.active {
+                background: rgba(0, 242, 254, 0.15);
+                color: #00f2fe;
+            }
+            .edtech-percent-pill.pending {
+                background: rgba(245, 158, 11, 0.15);
+                color: #f59e0b;
+            }
+            body.light-mode .edtech-percent-pill.completed {
+                background: #dcfce7;
+                color: #15803d;
+            }
+            body.light-mode .edtech-percent-pill.active {
+                background: #e0f2fe;
+                color: #0284c7;
+            }
+            body.light-mode .edtech-percent-pill.pending {
+                background: #fef3c7;
+                color: #b45309;
+            }
+
+            /* 4. Metrics Row (3 ta mini katak) */
+            .edtech-metrics-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 8px;
+            }
+            .edtech-metric-box {
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(255, 255, 255, 0.04);
+                border-radius: 10px;
+                padding: 8px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                gap: 2px;
+            }
+            body.light-mode .edtech-metric-box {
+                background: #f8fafc !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+            .edtech-metric-label {
+                font-size: 10px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                color: rgba(255, 255, 255, 0.45);
+            }
+            body.light-mode .edtech-metric-label {
+                color: #64748b !important;
+            }
+            .edtech-metric-val {
+                font-size: 13px;
+                font-weight: 800;
+                color: #ffffff;
+            }
+            body.light-mode .edtech-metric-val {
+                color: #0f172a !important;
+            }
+
+            /* 5. Action Buttons (Outline & Glassmorphic pill style) */
+            .edtech-actions-grid {
+                display: grid;
+                grid-template-columns: 1.4fr 1fr;
+                gap: 8px;
+                margin-top: 4px;
+            }
+            .edtech-btn-results {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                padding: 10px 12px;
+                background: linear-gradient(135deg, rgba(0, 242, 254, 0.12), rgba(79, 172, 254, 0.12));
+                border: 1px solid rgba(0, 242, 254, 0.3);
+                color: #00f2fe;
+                font-weight: 700;
+                font-size: 13px;
+                border-radius: 10px;
+                text-decoration: none;
+                transition: all 0.2s ease;
+            }
+            body.light-mode .edtech-btn-results {
+                background: rgba(2, 132, 199, 0.08) !important;
+                color: #0284c7 !important;
+                border: 1px solid rgba(2, 132, 199, 0.3) !important;
+                box-shadow: 0 2px 6px rgba(2, 132, 199, 0.08) !important;
+            }
+            body.light-mode .edtech-btn-results:hover {
+                background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+                color: #ffffff !important;
+                border-color: transparent !important;
+            }
+
+            .edtech-btn-questions {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                padding: 10px 12px;
+                background: rgba(255, 255, 255, 0.04);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                color: rgba(255, 255, 255, 0.85);
+                font-weight: 600;
+                font-size: 13px;
+                border-radius: 10px;
+                text-decoration: none;
+                transition: all 0.2s ease;
+            }
+            body.light-mode .edtech-btn-questions {
+                background: #f8fafc !important;
+                border: 1px solid #cbd5e1 !important;
+                color: #334155 !important;
+            }
+            body.light-mode .edtech-btn-questions:hover {
+                background: #e2e8f0 !important;
+                color: #0f172a !important;
+            }
         }
+            .d-row-hidden { display: none !important; }
     </style>
 {% endblock %}
 
-
-
 {% block content %}
-    
-
-    <h2 class="sarlavha">Test tuzish uchun guruh tanlang:</h2>
-    <div class="guruhlar-qatori">
-        {% for group in groups %}
-            <a href="{% url 'add_questions' group.id %}" class="guruh-btn">
-                 <i class="fas fa-folder-plus" style="margin-right: 6px; font-size: 13px;"></i> {{ group.name }}
-            </a>
-        {% endfor %}
+    <!-- 📁 YUQORI GURUHLAR BO'LIMI -->
+    <div class="guruhlar-section">
+        <div class="guruhlar-section-title">
+            <i class="fas fa-plus-circle" style="color: #00f2fe;"></i> Yangi test tuzish uchun guruhni tanlang:
+        </div>
+        <div class="guruhlar-qatori">
+            {% for group in groups %}
+                <a href="{% url 'add_questions' group.id %}" class="guruh-btn">
+                    <i class="fas fa-folder-plus"></i> {{ group.name }}
+                </a>
+            {% empty %}
+                <div style="color: rgba(255,255,255,0.4); font-size: 13px; font-style: italic;">
+                    Biriktirilgan guruhlar mavjud emas.
+                </div>
+            {% endfor %}
+        </div>
     </div>
 
-    <hr class="hr-joy">
-
-    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
-        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0;">Tuzilgan testlar to'plami</h2>
-        <!-- QIDIRUV PANELI -->
-        <form class="search-form" onsubmit="handleSearch(event)" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px;">
-            <input type="text" class="search-input" placeholder="Quiz nomi bo'yicha qidiruv..." id="qidiruv" style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
-            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+    <!-- 🔍 SARLAVHA VA QIDIRUV -->
+    <div class="sarlavha-qatori">
+        <div class="sarlavha-text-wrap">
+            <h2 class="sarlavha">
+                <i class="fas fa-vial title-icon"></i> Tuzilgan testlar to'plami
+            </h2>
+            <p class="sarlavha-subtitle">Guruhlar uchun yaratilgan testlar va o'quvchilarning topshirish holati</p>
+        </div>
+        <!-- QIDIRUV FORMASI -->
+        <form class="search-form" onsubmit="event.preventDefault();" id="quiz-search-form">
+            <input type="text" class="search-input" placeholder="Quiz nomi yoki guruh bo'yicha..." id="qidiruv" autocomplete="off">
+            <button type="submit" class="search-btn" aria-label="Qidirish"><i class="fas fa-search"></i></button>
         </form>
     </div>
+
     {% if quizzes %}
-    <div class="jadval-container">
+    <div class="jadval-container" id="jadvalContainer">
         <table id="group-table">
             <thead>
                 <tr>
-                    <th>No</th>
+                    <th style="width: 45px; text-align: center;">№</th>
                     <th>Quiz nomi</th>
                     <th>Guruh</th>
                     <th>Yaratilgan vaqt</th>
-                    <th>Savollar soni</th>
-                    <th>Max ball</th>
-                    <th>Natija</th>
-                    <th>Amallar</th>
+                    <th style="text-align: center;">Savollar</th>
+                    <th style="text-align: center;">Max ball</th>
+                    <th style="min-width: 170px;">Topshirish holati</th>
+                    <th style="text-align: right; padding-right: 25px;">Amallar</th>
                 </tr>
             </thead>
             <tbody id="jadval-qatorlari">
                 {% for quiz in quizzes %}
-                    <tr>
-                        <td data-label="No" style="font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
-                        <td data-label="Quiz nomi" style="font-weight: 600; color: #ffffff;">{{ quiz.title }}</td>
-                        <td data-label="Guruh"><span style="color: #00f2fe; font-weight: 600;">{{ quiz.group.name }}</span></td>
-                        <td data-label="Yaratilgan vaqt" style="font-family: monospace; color: rgba(255,255,255,0.6);">{{ quiz.created_at|date:"d.m.Y  H:i" }}</td>
-                        <td data-label="Savollar soni">{{ quiz.question_count }}</td>
-                        <td data-label="Max ball" style="color: #00ffaa; font-weight: 700;">{{ quiz.max_score }}</td>
-                        <td data-label="Natija"><a class="btn-otish" href="{% url 'quiz_results' quiz.id %}">Natija</a></td>
-                        <td data-label="Amallar"><a class="btn-otish" style="background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.15); color: #fff;" href="{% url 'quiz_detail' quiz.id %}">Ko'rish</a></td>
+                    <tr class="quiz-item-row status-border-{{ quiz.status_type }}" data-quiz-title="{{ quiz.title|lower }}" data-group-name="{{ quiz.group.name|lower }}">
+                        
+                        <!-- 📱 TELEFON UCHUN 1-VARIANT: "EDTECH DASHBOARD CARD" -->
+                        <td class="d-md-none" style="display: none;">
+                            <!-- 1. Header: Guruh & Holat -->
+                            <div class="edtech-card-header">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="row-index-pill mobile-row-index">{{ forloop.counter }}</span>
+                                    <span class="group-pill-badge">
+                                        <i class="fas fa-users" style="font-size: 11px;"></i> {{ quiz.group.name }}
+                                    </span>
+                                </div>
+                                <span class="status-pill {{ quiz.status_type }}">
+                                    {% if quiz.status_type == 'completed' %}
+                                        <i class="fas fa-check-circle"></i>
+                                    {% elif quiz.status_type == 'active' %}
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    {% else %}
+                                        <i class="fas fa-clock"></i>
+                                    {% endif %}
+                                    {{ quiz.status_label }}
+                                </span>
+                            </div>
+
+                            <!-- 2. Asosiy blok: Test nomi & sana -->
+                            <div class="edtech-title-wrap">
+                                <div class="edtech-quiz-title">{{ quiz.title }}</div>
+                                <div class="edtech-quiz-date">
+                                    <i class="far fa-calendar-alt"></i> {{ quiz.created_at|date:"d.m.Y H:i" }}
+                                </div>
+                            </div>
+
+                            <!-- 3. Progress Paneli -->
+                            <div class="edtech-progress-card">
+                                <div class="edtech-progress-info">
+                                    <span class="edtech-progress-label">
+                                        Topshirganlar: <strong>{{ quiz.submitted_count }}</strong> / {{ quiz.total_students }} o'quvchi
+                                    </span>
+                                    <span class="edtech-percent-pill {{ quiz.status_type }}">
+                                        {{ quiz.completion_percent }}%
+                                    </span>
+                                </div>
+                                <div class="mini-progress-track">
+                                    <div class="mini-progress-fill fill-{{ quiz.status_type }}" style="width: {{ quiz.completion_percent }}%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- 4. Ko'rsatkichlar Paneli (3 ta katak) -->
+                            <div class="edtech-metrics-grid">
+                                <div class="edtech-metric-box">
+                                    <span class="edtech-metric-label">Savollar</span>
+                                    <span class="edtech-metric-val">
+                                        <i class="fas fa-question-circle" style="color: #00f2fe; font-size: 11px;"></i> {{ quiz.question_count }} ta
+                                    </span>
+                                </div>
+                                <div class="edtech-metric-box">
+                                    <span class="edtech-metric-label">Max Ball</span>
+                                    <span class="edtech-metric-val" style="color: #00ffaa;">
+                                        <i class="fas fa-trophy" style="color: #00ffaa; font-size: 11px;"></i> {{ quiz.max_score }}
+                                    </span>
+                                </div>
+                                <div class="edtech-metric-box">
+                                    <span class="edtech-metric-label">O'rtacha</span>
+                                    <span class="edtech-metric-val" style="color: #f59e0b;">
+                                        <i class="fas fa-chart-line" style="color: #f59e0b; font-size: 11px;"></i> {{ quiz.avg_score }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- 5. Amallar Tugmalari -->
+                            <div class="edtech-actions-grid">
+                                <a class="edtech-btn-results" href="{% url 'quiz_results' quiz.id %}">
+                                    <i class="fas fa-poll"></i> Natijalar ({% if quiz.submitted_count %}{{ quiz.submitted_count }}{% else %}0{% endif %})
+                                </a>
+                                <a class="edtech-btn-questions" href="{% url 'quiz_detail' quiz.id %}">
+                                    <i class="fas fa-eye"></i> Savollar
+                                </a>
+                            </div>
+                        </td>
+
+                        <!-- 💻 DESKTOP UCHUN AN'ANAVIY USTUNLAR -->
+                        <td class="d-none d-md-table-cell" style="text-align: center;">
+                            <span class="row-index-pill row-index-cell">{{ forloop.counter }}</span>
+                        </td>
+                        <td class="d-none d-md-table-cell">
+                            <span class="quiz-title-text">{{ quiz.title }}</span>
+                        </td>
+                        <td class="d-none d-md-table-cell">
+                            <span class="group-pill-badge">
+                                <i class="fas fa-users" style="font-size: 11px;"></i> {{ quiz.group.name }}
+                            </span>
+                        </td>
+                        <td class="d-none d-md-table-cell">
+                            <span class="date-badge-cell">
+                                <i class="far fa-calendar-alt" style="margin-right: 4px; opacity: 0.6;"></i>
+                                {{ quiz.created_at|date:"d.m.Y  H:i" }}
+                            </span>
+                        </td>
+                        <td class="d-none d-md-table-cell" style="text-align: center;">
+                            <span class="count-badge">
+                                {{ quiz.question_count }} ta
+                            </span>
+                        </td>
+                        <td class="d-none d-md-table-cell" style="text-align: center;">
+                            <span class="score-badge">
+                                <i class="fas fa-star" style="font-size: 10px;"></i> {{ quiz.max_score }}
+                            </span>
+                        </td>
+                        <!-- 📈 Topshirish Holati va Progress Bar -->
+                        <td class="d-none d-md-table-cell">
+                            <div class="submission-progress-box">
+                                <div class="progress-header-info">
+                                    <span class="status-pill {{ quiz.status_type }}">
+                                        {% if quiz.status_type == 'completed' %}
+                                            <i class="fas fa-check-circle"></i>
+                                        {% elif quiz.status_type == 'active' %}
+                                            <i class="fas fa-spinner fa-spin"></i>
+                                        {% else %}
+                                            <i class="fas fa-clock"></i>
+                                        {% endif %}
+                                        {{ quiz.status_label }}
+                                    </span>
+                                    <span class="progress-percent-badge percent-{{ quiz.status_type }}">
+                                        {{ quiz.completion_percent }}%
+                                    </span>
+                                </div>
+                                <div class="mini-progress-track">
+                                    <div class="mini-progress-fill fill-{{ quiz.status_type }}" style="width: {{ quiz.completion_percent }}%;"></div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span class="progress-count-text">
+                                        <strong>{{ quiz.submitted_count }}</strong> / {{ quiz.total_students }} o'quvchi
+                                    </span>
+                                    {% if quiz.avg_score %}
+                                        <span style="font-size: 11px; color: rgba(255,255,255,0.5);" class="desktop-avg-score">
+                                            O'rtacha: <strong style="color: #00f2fe;">{{ quiz.avg_score }}</strong>
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="d-none d-md-table-cell" style="text-align: right; padding-right: 20px;">
+                            <div class="actions-cell-wrap" style="justify-content: flex-end;">
+                                <a class="btn-action-primary" href="{% url 'quiz_results' quiz.id %}" title="O'quvchilar natijalari">
+                                    <i class="fas fa-poll"></i> Natijalar
+                                </a>
+                                <a class="btn-action-secondary" href="{% url 'quiz_detail' quiz.id %}" title="Savollar va tahrirlash">
+                                    <i class="fas fa-eye"></i> Savollar
+                                </a>
+                            </div>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-        <p style="color: rgba(255,255,255,0.4); font-style: italic; padding: 10px;">Hech qanday test yaratilmagan.</p>
+        <div class="empty-state-box">
+            <i class="fas fa-folder-open"></i>
+            Hozircha hech qanday test yaratilmagan. Yuqoridagi guruhlardan birini tanlab yangi test yarating.
+        </div>
     {% endif %}
 {% endblock %}
 
 {% block extra_js %}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const qidiruvMaydoni = document.getElementById("qidiruv");
-            const tableRows = document.querySelectorAll('#jadval-qatorlari tr');
+            const searchInput = document.getElementById("qidiruv");
+            const tableRows = document.querySelectorAll("#jadval-qatorlari tr.quiz-item-row");
 
-            // Filtrdan so'ng No (№) ustunini dinamik tartiblash funksiyasi
             function updateRowNumbers() {
                 let visibleIndex = 1;
                 tableRows.forEach(row => {
-                    if (row.style.display !== "none" && row.cells.length > 1) {
-                        const firstCell = row.querySelector("td");
-                        if (firstCell) {
-                            firstCell.textContent = visibleIndex++;
+                    if (!row.classList.contains("d-row-hidden") && row.style.display !== "none") {
+                        const indexCell = row.querySelector(".row-index-cell");
+                        const mobileIndex = row.querySelector(".mobile-row-index");
+                        if (indexCell) {
+                            indexCell.textContent = visibleIndex;
                         }
+                        if (mobileIndex) {
+                            mobileIndex.textContent = visibleIndex;
+                        }
+                        visibleIndex++;
                     }
                 });
             }
 
-            if (qidiruvMaydoni) {
-                qidiruvMaydoni.addEventListener('input', function() {
-                    let input = this.value.toLowerCase().trim();
+            if (searchInput) {
+                searchInput.addEventListener("input", function () {
+                    const query = this.value.toLowerCase().trim();
 
                     tableRows.forEach(row => {
-                        let quizName = row.cells[1]?.textContent.toLowerCase();
-                        if (quizName) {
-                            if (quizName.includes(input)) {
-                                row.style.display = '';
-                            } else {
-                                row.style.display = 'none';
-                            }
+                        const title = row.getAttribute("data-quiz-title") || "";
+                        const group = row.getAttribute("data-group-name") || "";
+
+                        if (title.includes(query) || group.includes(query)) {
+                            row.classList.remove("d-row-hidden");
+                            row.style.removeProperty("display");
+                        } else {
+                            row.classList.add("d-row-hidden");
+                            row.style.setProperty("display", "none", "important");
                         }
                     });
 
-                    // Tartib raqamlarni qayta hisoblash
                     updateRowNumbers();
                 });
             }
         });
-
-    
-
-        function handleSearch(event) {
-            event.preventDefault();
-        }
     </script>
 {% endblock %}

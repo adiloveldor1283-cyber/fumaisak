@@ -4,7 +4,16 @@
 
 {% block extra_css %}
 <style>
-    /* --- 📅 FAQAT JADVAL VA HAFTA NAVIGATSIYASI STILLARI --- */
+    /* --- 📅 DARS JADVALI ASOSIY STILLARI --- */
+    .schedule-sticky-header {
+        margin-bottom: 20px;
+    }
+    .sarlavha-qatori {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
     .sarlavha {
         font-size: 22px;
         font-weight: 800;
@@ -12,28 +21,33 @@
         border-left: 4px solid #00f2fe;
         padding-left: 12px;
         letter-spacing: -0.5px;
+        margin: 0;
     }
 
     /* Hafta navigatsiyasi */
-    .hafta-sur {
+    .hafta-nav-wrap {
         display: flex;
         justify-content: space-between;
-        margin-top: 20px;
-        margin-bottom: 20px;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
     }
-    .hafta-sur_bir, .hafta-sur_ikki {
-        padding: 10px 20px;
+    .hafta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 18px;
         background: rgba(255, 255, 255, 0.02);
         color: #00f2fe;
         border: 1px solid rgba(0, 242, 254, 0.2);
-        border-radius: 10px;
+        border-radius: 12px;
         cursor: pointer;
-        font-size: 13.5px;
+        font-size: 13px;
         font-weight: 700;
-        transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: 0.25s ease;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    .hafta-sur_bir:hover, .hafta-sur_ikki:hover {
+    .hafta-btn:hover {
         background: linear-gradient(135deg, #00f2fe, #4facfe);
         color: #070a12;
         border-color: transparent;
@@ -42,29 +56,30 @@
     }
 
     .jadval-container {
-        background: rgba(255, 255, 255, 0.01);
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        box-shadow: 0 40px 80px rgba(0,0,0,0.2);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.015);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border-radius: 24px;
-        padding: 24px;
+        padding: 22px;
         flex-grow: 1;
         overflow-y: auto !important;
         overflow-x: auto !important;
-        max-height: calc(100vh - 300px);
+        max-height: calc(100vh - 270px);
         min-height: 300px;
+        margin-bottom: 25px;
     }
     .jadval-container::-webkit-scrollbar {
         width: 6px;
         height: 6px;
     }
     .jadval-container::-webkit-scrollbar-thumb {
-        background: rgba(0, 242, 254, 0.12);
+        background: rgba(0, 242, 254, 0.15);
         border-radius: 10px;
     }
     .jadval-container::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 242, 254, 0.3);
+        background: rgba(0, 242, 254, 0.35);
     }
 
     table {
@@ -77,11 +92,11 @@
 
     th, td {
         border: 1px solid rgba(255, 255, 255, 0.04);
-        padding: 14px;
+        padding: 14px 16px;
         font-size: 13.5px;
         vertical-align: middle;
         color: rgba(255, 255, 255, 0.85);
-        transition: background-color 0.3s ease;
+        transition: background-color 0.2s ease;
     }
 
     th {
@@ -115,65 +130,161 @@
     td:not(.guruh-ustuni):hover {
         background-color: rgba(255, 255, 255, 0.02);
         color: #ffffff;
-        cursor: pointer;
     }
 
     tr:nth-child(even) td:not(.guruh-ustuni) {
         background-color: rgba(255, 255, 255, 0.005);
     }
 
+    .time-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(0, 242, 254, 0.08);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 12.5px;
+        padding: 4px 10px;
+        border-radius: 8px;
+    }
+    .time-badge i {
+        color: #00f2fe;
+        font-size: 11px;
+    }
+
     .dars-yoq {
         color: rgba(255, 255, 255, 0.25);
         font-style: italic;
-        font-size: 12.5px;
+        font-size: 12px;
+    }
+
+    /* Empty state */
+    .empty-state-card {
+        text-align: center;
+        padding: 50px 30px;
+        background: rgba(255, 255, 255, 0.015);
+        border: 1px dashed rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        width: 100%;
+        max-width: 550px;
+        margin: 40px auto;
+    }
+    .empty-state-card i {
+        font-size: 44px;
+        color: rgba(0, 242, 254, 0.2);
+        margin-bottom: 16px;
+    }
+    .empty-state-card h3 {
+        font-size: 18px;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 8px;
+    }
+    .empty-state-card p {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 13.5px;
     }
 
     /* --- 📱 TELEFON EKRANI UCHUN CARD LAYOUT --- */
     @media (max-width: 768px) {
+        .schedule-sticky-header {
+            position: sticky !important;
+            top: 58px !important;
+            z-index: 40 !important;
+            background: rgba(7, 10, 18, 0.96) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            margin: -12px -10px 14px -10px !important;
+            padding: 10px 10px 10px 10px !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+        }
+        .sarlavha-qatori {
+            margin-bottom: 8px !important;
+        }
+        .sarlavha {
+            font-size: 17px !important;
+            border-left-width: 3px !important;
+            padding-left: 8px !important;
+        }
+        .hafta-nav-wrap {
+            gap: 8px !important;
+        }
+        .hafta-btn {
+            flex: 1 1 0 !important;
+            justify-content: center !important;
+            padding: 8px 10px !important;
+            font-size: 11.5px !important;
+            border-radius: 9px !important;
+        }
+
         .jadval-container {
-            padding: 0;
-            background: transparent;
-            border: none;
-            box-shadow: none;
-            overflow: visible;
+            padding: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            overflow: visible !important;
+            max-height: none !important;
+            min-height: auto !important;
+            margin-bottom: 25px !important;
         }
 
         table, thead, tbody, th, td, tr {
-            display: block;
+            display: block !important;
             width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            white-space: normal !important;
         }
 
         thead {
-            display: none;
+            display: none !important;
         }
 
         tr.jadval-qatori {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            padding: 18px;
-            margin-bottom: 24px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-radius: 18px !important;
+            padding: 14px 12px !important;
+            margin-bottom: 14px !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            box-sizing: border-box !important;
+        }
+        tr.jadval-qatori:last-child {
+            margin-bottom: 25px !important;
         }
 
         .guruh-ustuni {
-            text-align: center !important;
-            font-size: 16px !important;
+            text-align: left !important;
+            font-size: 15px !important;
+            font-weight: 800 !important;
             color: #00f2fe !important;
-            border: none !important;
-            border-bottom: 1px solid rgba(0, 242, 254, 0.2) !important;
-            padding-bottom: 12px !important;
-            margin-bottom: 12px !important;
-            background: transparent !important;
+            border: 1px solid rgba(0, 242, 254, 0.2) !important;
+            border-radius: 10px !important;
+            padding: 10px 12px !important;
+            margin-bottom: 10px !important;
+            background: rgba(0, 242, 254, 0.06) !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
         }
 
         td:not(.guruh-ustuni) {
-            text-align: left !important;
-            padding: 12px 10px !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            text-align: right !important;
+            padding: 8px 10px !important;
             border: none !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+            border-radius: 8px !important;
+            font-size: 13px !important;
+            box-sizing: border-box !important;
         }
 
         td:not(.guruh-ustuni):last-child {
@@ -182,24 +293,60 @@
 
         td:not(.guruh-ustuni)::before {
             content: attr(data-label);
-            display: block;
+            display: inline-flex;
             font-weight: 700;
-            color: #4facfe;
+            color: rgba(255, 255, 255, 0.6);
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 6px;
+            text-align: left;
+            padding-right: 8px;
+            flex-shrink: 0;
         }
 
         td.today-td {
-            background: rgba(0, 242, 254, 0.04) !important;
-            border-left: 3px solid #00f2fe !important;
-            border-radius: 0 10px 10px 0;
-            padding-left: 14px !important;
+            background: rgba(0, 242, 254, 0.08) !important;
+            border: 1px solid rgba(0, 242, 254, 0.25) !important;
+            margin: 4px 0 !important;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.1) !important;
+        }
+        td.today-td::before {
+            color: #00f2fe !important;
+            font-weight: 800 !important;
+        }
+        td.today-td .time-badge {
+            background: rgba(0, 242, 254, 0.15) !important;
+            border-color: #00f2fe !important;
+            color: #ffffff !important;
         }
     }
 
     /* --- ☀️ LIGHT MODE SPECIFIC OVERRIDES --- */
+    body.light-mode .schedule-sticky-header {
+        background: rgba(241, 245, 249, 0.96) !important;
+        border-bottom-color: #cbd5e1 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    }
+    body.light-mode .sarlavha {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
+    }
+    body.light-mode .hafta-btn {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        color: #0284c7 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+    }
+    body.light-mode .hafta-btn:hover {
+        background: #0284c7 !important;
+        color: #ffffff !important;
+        border-color: transparent !important;
+    }
+    body.light-mode .jadval-container {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03) !important;
+    }
     body.light-mode #jadval th {
         background: #f8fafc !important;
         color: #475569 !important;
@@ -219,36 +366,66 @@
         color: #e0f2fe !important;
     }
     body.light-mode #jadval td.today-td {
-        background: #e0f2fe !important; /* Standout light blue background */
+        background: #e0f2fe !important;
         border: 1.5px solid #0284c7 !important;
     }
-    body.light-mode #jadval td.today-td div {
-        background: #ffffff !important;
+    body.light-mode #jadval td.today-td::before {
         color: #0284c7 !important;
-        border: 1px solid #cbd5e1 !important;
+    }
+    body.light-mode #jadval .time-badge {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    body.light-mode #jadval .time-badge i {
+        color: #0284c7 !important;
     }
     body.light-mode #jadval .guruh-ustuni {
         background: #f1f5f9 !important;
-        color: #0f172a !important;
-        border-right: 1.5px solid #cbd5e1 !important;
+        color: #0284c7 !important;
+        border: 1px solid #cbd5e1 !important;
     }
     body.light-mode #jadval .dars-yoq {
         color: #94a3b8 !important;
     }
     body.light-mode #jadval td:not(.guruh-ustuni):hover {
-        background-color: #f1f5f9 !important;
+        background-color: #f8fafc !important;
+    }
+    body.light-mode tr.jadval-qatori {
+        background: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important;
+    }
+    body.light-mode td:not(.guruh-ustuni)::before {
+        color: #475569 !important;
+    }
+    body.light-mode .empty-state-card {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+    }
+    body.light-mode .empty-state-card h3 {
+        color: #0f172a !important;
+    }
+    body.light-mode .empty-state-card p {
+        color: #64748b !important;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-    <h3 class="sarlavha">Dars reja</h3>
+    <!-- 📌 STICKY HEADER & WEEK CONTROLS -->
+    <div class="schedule-sticky-header">
+        <div class="sarlavha-qatori">
+            <h2 class="sarlavha">Dars jadvali</h2>
+        </div>
 
-    <div class="hafta-sur">
-        <button class="hafta-sur_bir" onclick="haftaniOldinga()"><i class="fas fa-chevron-left" style="margin-right: 6px;"></i> Oldingi hafta</button>
-        <button class="hafta-sur_ikki" onclick="haftaniOrtga()">Keyingi hafta <i class="fas fa-chevron-right" style="margin-left: 6px;"></i></button>
+        <div class="hafta-nav-wrap">
+            <button class="hafta-btn" onclick="haftaniOldinga()"><i class="fas fa-chevron-left"></i> Oldingi hafta</button>
+            <button class="hafta-btn" onclick="haftaniOrtga()">Keyingi hafta <i class="fas fa-chevron-right"></i></button>
+        </div>
     </div>
 
+    {% if jadval_data %}
     <div class="jadval-container">
         <table id="jadval">
             <thead>
@@ -262,16 +439,16 @@
             <tbody>
               {% for group in jadval_data %}
                 <tr class="jadval-qatori">
-                  <td class="guruh-ustuni">{{ group.name }}</td>
+                  <td class="guruh-ustuni"><i class="fas fa-users" style="margin-right: 6px; font-size: 13px;"></i> {{ group.name }}</td>
                   {% for kun in group.schedule_list %}
                     <td>
                       {% for vaqt in kun.vaqtlar %}
-                        <div style="padding: 4px 0; font-weight: 600; color: #ffffff;">{{ vaqt }}</div>
+                        <div class="time-badge"><i class="far fa-clock"></i> {{ vaqt }}</div>
                         {% if not forloop.last %}
-                          <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 4px 0;">
+                          <div style="height: 4px;"></div>
                         {% endif %}
                       {% empty %}
-                        <span class="dars-yoq">Dars yo'q</span>
+                        <span class="dars-yoq"><i class="fas fa-minus" style="font-size: 10px; margin-right: 3px;"></i> Dars yo'q</span>
                       {% endfor %}
                     </td>
                   {% endfor %}
@@ -280,6 +457,13 @@
             </tbody>
         </table>
     </div>
+    {% else %}
+    <div class="empty-state-card">
+        <i class="fas fa-calendar-times"></i>
+        <h3>Dars jadvali mavjud emas</h3>
+        <p>Sizga biriktirilgan guruhlar uchun hali dars jadvali belgilanmagan.</p>
+    </div>
+    {% endif %}
 {% endblock %}
 
 {% block extra_js %}

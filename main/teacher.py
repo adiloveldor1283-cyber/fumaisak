@@ -9,7 +9,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.utils import timezone
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Avg
 
 from . import student
 from .models import Group, CustomUser, Schedule, Quiz, Question, Answer, StudentQuizResult, Assignment, Attendance, \
@@ -556,10 +556,47 @@ def create_quiz(request):
 
     groups = teacher.teachers_groups.all()
 
-    quizzes = Quiz.objects.filter(teacher=teacher) \
-        .annotate(question_count=Count('questions')) \
+    quizzes = list(Quiz.objects.filter(teacher=teacher) \
+        .annotate(question_count=Count('questions', distinct=True)) \
         .select_related('group') \
-        .order_by('-created_at')
+        .order_by('-created_at'))
+
+    if quizzes:
+        # Har bir quiz bo'yicha topshirgan o'quvchilar soni va o'rtacha ball
+        results_agg = StudentQuizResult.objects.filter(quiz__in=quizzes).values('quiz_id').annotate(
+            submitted_count=Count('student_id', distinct=True),
+            avg_score=Avg('score')
+        )
+        results_dict = {r['quiz_id']: r for r in results_agg}
+
+        # Guruhlardagi jami o'quvchilar soni
+        group_ids = list({q.group_id for q in quizzes if q.group_id})
+        group_memberships = GroupStudentMembership.objects.filter(group_id__in=group_ids).values('group_id').annotate(
+            total_students=Count('student_id', distinct=True)
+        )
+        group_students_dict = {g['group_id']: g['total_students'] for g in group_memberships}
+
+        for quiz in quizzes:
+            res = results_dict.get(quiz.id, {})
+            quiz.submitted_count = res.get('submitted_count', 0)
+            quiz.avg_score = round(res.get('avg_score', 0), 1) if res.get('avg_score') is not None else 0
+            quiz.total_students = group_students_dict.get(quiz.group_id, 0)
+
+            if quiz.total_students > 0:
+                quiz.completion_percent = min(100, round((quiz.submitted_count / quiz.total_students) * 100))
+            else:
+                quiz.completion_percent = 100 if quiz.submitted_count > 0 else 0
+
+            # Status nishoni
+            if quiz.total_students > 0 and quiz.submitted_count >= quiz.total_students:
+                quiz.status_label = "To'liq topshirildi"
+                quiz.status_type = "completed"
+            elif quiz.submitted_count > 0:
+                quiz.status_label = "Jarayonda"
+                quiz.status_type = "active"
+            else:
+                quiz.status_label = "Kutilmoqda"
+                quiz.status_type = "pending"
 
     return render(request, 'create_quiz.html', {
         'groups': groups,
@@ -714,21 +751,73 @@ def teacher_view_results(request, quiz_id):
 
         result = result_map.get(student.id)
         if result:
-            correct_count = round((result.score / quiz.max_score) * total_questions)
+            correct_count = round((result.score / quiz.max_score) * total_questions) if quiz.max_score else 0
+            score_percent = round((result.score / quiz.max_score) * 100, 1) if quiz.max_score else 0
+            incorrect_count = max(0, total_questions - correct_count)
+            is_submitted = True
+            
+            if score_percent >= 80:
+                grade_class = 'success'
+                grade_label = "A'lo"
+            elif score_percent >= 60:
+                grade_class = 'info'
+                grade_label = "Yaxshi"
+            elif score_percent >= 40:
+                grade_class = 'warning'
+                grade_label = "Qoniqarli"
+            else:
+                grade_class = 'danger'
+                grade_label = "Qoniqarsiz"
         else:
-            correct_count = None  # hali bajarmagan
+            correct_count = None
+            score_percent = None
+            incorrect_count = None
+            is_submitted = False
+            grade_class = 'secondary'
+            grade_label = "Topshirmagan"
 
         students_data.append({
             'student': student,
             'result': result,
             'correct_count': correct_count,
-            'total_questions': total_questions
+            'incorrect_count': incorrect_count,
+            'total_questions': total_questions,
+            'score_percent': score_percent,
+            'is_submitted': is_submitted,
+            'grade_class': grade_class,
+            'grade_label': grade_label,
         })
+
+    # Statistika hisoblash
+    total_students = len(students_data)
+    submitted_count = sum(1 for s in students_data if s['is_submitted'])
+    not_submitted_count = total_students - submitted_count
+    submission_percent = round((submitted_count / total_students) * 100, 1) if total_students > 0 else 0
+    
+    submitted_scores = [s['result'].score for s in students_data if s['result']]
+    submitted_percents = [s['score_percent'] for s in students_data if s['score_percent'] is not None]
+    submitted_corrects = [s['correct_count'] for s in students_data if s['correct_count'] is not None]
+
+    avg_score = round(sum(submitted_scores) / submitted_count, 1) if submitted_count > 0 else 0
+    avg_percent = round(sum(submitted_percents) / submitted_count, 1) if submitted_count > 0 else 0
+    avg_correct = round(sum(submitted_corrects) / submitted_count, 1) if submitted_count > 0 else 0
+    highest_score = max(submitted_scores, default=0)
+    highest_percent = round((highest_score / quiz.max_score) * 100, 1) if (quiz.max_score and submitted_scores) else 0
 
     return render(request, 'teacher_quiz_results.html', {
         'teacher': teacher,
         'quiz': quiz,
         'students_data': students_data,
+        'total_students': total_students,
+        'submitted_count': submitted_count,
+        'not_submitted_count': not_submitted_count,
+        'submission_percent': submission_percent,
+        'avg_score': avg_score,
+        'avg_percent': avg_percent,
+        'avg_correct': avg_correct,
+        'highest_score': highest_score,
+        'highest_percent': highest_percent,
+        'total_questions': total_questions,
     })
 
 
@@ -738,7 +827,77 @@ def teacher_deadline(request):
     teacher = request.user
 
     groups = teacher.teachers_groups.all()
-    assignments = Assignment.objects.filter(teacher=teacher).select_related('group').order_by('-created_at')
+    assignments_qs = Assignment.objects.filter(teacher=teacher).select_related('group').prefetch_related('submissions', 'group__students').order_by('-created_at')
+
+    def get_enriched_context(assignments_list, error_msg=None):
+        now = timezone.now()
+        due_soon_threshold = now + timedelta(hours=24)
+
+        total_assignments = len(assignments_list)
+        active_assignments_count = 0
+        expired_assignments_count = 0
+        total_submissions_count = 0
+        total_graded_count = 0
+
+        for a in assignments_list:
+            submissions = list(a.submissions.all())
+            sub_count = len(submissions)
+            graded_count = sum(1 for s in submissions if s.grade is not None)
+            total_students = a.group.students.count()
+
+            total_submissions_count += sub_count
+            total_graded_count += graded_count
+
+            if a.deadline > now:
+                active_assignments_count += 1
+                if a.deadline <= due_soon_threshold:
+                    status_type = 'due_soon'
+                    status_label = "Muddati oz qoldi"
+                    status_border = 'status-border-warning'
+                else:
+                    status_type = 'active'
+                    status_label = "Faol"
+                    status_border = 'status-border-active'
+                
+                # Qolgan vaqtni hisoblash
+                diff = a.deadline - now
+                if diff.days > 0:
+                    time_remaining = f"{diff.days} kun {diff.seconds // 3600} soat qoldi"
+                else:
+                    time_remaining = f"{diff.seconds // 3600} soat qoldi"
+            else:
+                expired_assignments_count += 1
+                status_type = 'expired'
+                status_label = "Muddati o'tdi"
+                status_border = 'status-border-expired'
+                time_remaining = "Muddati tugagan"
+
+            a.sub_count = sub_count
+            a.graded_count = graded_count
+            a.total_students = total_students
+            a.has_submissions = sub_count > 0
+            a.status_type = status_type
+            a.status_label = status_label
+            a.status_border = status_border
+            a.time_remaining = time_remaining
+            if total_students > 0:
+                a.submission_percent = min(100, round((sub_count / total_students) * 100))
+            else:
+                a.submission_percent = 0
+
+        ctx = {
+            'teacher': teacher,
+            'groups': groups,
+            'assignments': assignments_list,
+            'total_assignments': total_assignments,
+            'active_assignments_count': active_assignments_count,
+            'expired_assignments_count': expired_assignments_count,
+            'total_submissions_count': total_submissions_count,
+            'total_graded_count': total_graded_count,
+        }
+        if error_msg:
+            ctx['error'] = error_msg
+        return ctx
 
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -747,6 +906,8 @@ def teacher_deadline(request):
         file = request.FILES.get('file')
         max_score = request.POST.get('max_score')
 
+        assignments_list = list(assignments_qs)
+
         # Barcha maydonlar to‘ldirilganini tekshirish
         if title and group_id and deadline_str and file and max_score:
             from main.validators import validate_document_file
@@ -754,31 +915,16 @@ def teacher_deadline(request):
             try:
                 validate_document_file(file)
             except ValidationError as ve:
-                return render(request, 'teacher-upload-deadline.html', {
-                    'teacher': teacher,
-                    'groups': groups,
-                    'assignments': assignments,
-                    'error': ve.message
-                })
+                return render(request, 'teacher-upload-deadline.html', get_enriched_context(assignments_list, ve.message))
             try:
                 deadline = timezone.datetime.fromisoformat(deadline_str)
                 deadline = timezone.make_aware(deadline)  # timezone bilan
             except Exception:
-                return render(request, 'teacher-upload-deadline.html', {
-                    'teacher': teacher,
-                    'groups': groups,
-                    'assignments': assignments,
-                    'error': "Noto‘g‘ri sana kiritildi."
-                })
+                return render(request, 'teacher-upload-deadline.html', get_enriched_context(assignments_list, "Noto‘g‘ri sana kiritildi."))
 
             # Muddat kamida 3 kun oldinga bo‘lishi kerak
             if deadline < timezone.now() + timedelta(days=3):
-                return render(request, 'teacher-upload-deadline.html', {
-                    'teacher': teacher,
-                    'groups': groups,
-                    'assignments': assignments,
-                    'error': "Topshiriq muddati kamida 3 kun keyingi sana bo‘lishi kerak."
-                })
+                return render(request, 'teacher-upload-deadline.html', get_enriched_context(assignments_list, "Topshiriq muddati kamida 3 kun keyingi sana bo‘lishi kerak."))
 
             group = get_object_or_404(Group, id=group_id, teachers=teacher)
             assignment = Assignment.objects.create(
@@ -793,11 +939,8 @@ def teacher_deadline(request):
             messages.success(request, "Topshiriq muvaffaqiyatli qo‘shildi!", extra_tags='topshir_modal')
             return redirect('teacher_deadline')
 
-    return render(request, 'teacher-upload-deadline.html', {
-        'teacher': teacher,
-        'groups': groups,
-        'assignments': assignments
-    })
+    assignments_list = list(assignments_qs)
+    return render(request, 'teacher-upload-deadline.html', get_enriched_context(assignments_list))
 
 
 @teacher_required
@@ -987,12 +1130,12 @@ def teacher_assignment_submissions(request, assignment_id):
     # Ushbu topshiriq sanasidan oldin guruhga qo‘shilgan o‘quvchilarni olamiz
     memberships = GroupStudentMembership.objects.filter(
         group=group,
-        joined_at__lte=assignment.created_at  # yoki created_date bo'lsa
+        joined_at__lte=assignment.created_at
     ).select_related('student')
 
     # Barcha mavjud topshirilgan topshiriqlar
     submissions = AssignmentSubmission.objects.filter(assignment=assignment)
-    submissions_dict = {s.student_id: s for s in submissions}  # tez izlash uchun
+    submissions_dict = {s.student_id: s for s in submissions}
 
     student_data = []
     for membership in memberships:
@@ -1000,13 +1143,35 @@ def teacher_assignment_submissions(request, assignment_id):
         submission = submissions_dict.get(student.id)
         student_data.append({
             'student': student,
-            'submission': submission  # None bo‘lishi ham mumkin
+            'submission': submission
         })
+
+    # Statistika hisoblash
+    total_students = len(student_data)
+    submitted_count = sum(1 for s in student_data if s['submission'])
+    graded_count = sum(1 for s in student_data if s['submission'] and s['submission'].grade is not None)
+    ungraded_count = submitted_count - graded_count
+    not_submitted_count = total_students - submitted_count
+    submission_percent = round((submitted_count / total_students) * 100, 1) if total_students > 0 else 0
+
+    graded_scores = [s['submission'].grade for s in student_data if s['submission'] and s['submission'].grade is not None]
+    avg_score = round(sum(graded_scores) / len(graded_scores), 1) if graded_scores else 0
+    avg_percent = round((avg_score / assignment.max_score) * 100, 1) if (assignment.max_score and graded_scores) else 0
+    highest_score = max(graded_scores, default=0)
 
     return render(request, 'teacher_assignment_submissions.html', {
         'assignment': assignment,
         'student_data': student_data,
         'teacher': teacher,
+        'total_students': total_students,
+        'submitted_count': submitted_count,
+        'graded_count': graded_count,
+        'ungraded_count': ungraded_count,
+        'not_submitted_count': not_submitted_count,
+        'submission_percent': submission_percent,
+        'avg_score': avg_score,
+        'avg_percent': avg_percent,
+        'highest_score': highest_score,
     })
 
 @teacher_required
@@ -1084,15 +1249,23 @@ def quick_grade_view(request):
         return redirect('quick_grade')
 
     # Baholanmagan topshiriqlarni olamiz
-    pending_submissions = AssignmentSubmission.objects.filter(
+    pending_submissions = list(AssignmentSubmission.objects.filter(
         assignment__group__teachers=teacher,
         student__student_groups__teachers=teacher,
         grade__isnull=True
-    ).distinct().select_related('student', 'assignment', 'assignment__group').order_by('-submitted_at')
+    ).distinct().select_related('student', 'assignment', 'assignment__group').order_by('-submitted_at'))
+
+    pending_count = len(pending_submissions)
+    unique_groups = sorted(list({s.assignment.group for s in pending_submissions}), key=lambda g: g.name)
+    unique_assignments_count = len(set(s.assignment_id for s in pending_submissions))
 
     return render(request, 'teacher_quick_grade.html', {
         'submissions': pending_submissions,
-        'teacher': teacher
+        'teacher': teacher,
+        'pending_count': pending_count,
+        'unique_groups': unique_groups,
+        'unique_groups_count': len(unique_groups),
+        'unique_assignments_count': unique_assignments_count,
     })
 
 
@@ -1115,7 +1288,13 @@ def teacher_media_gallery(request):
     teacher = request.user
 
     groups = teacher.teachers_groups.all()
-    videos = GroupVideo.objects.filter(group__in=groups).select_related('group', 'teacher').order_by('-created_at')
+    videos_list = list(GroupVideo.objects.filter(group__in=groups).select_related('group', 'teacher').order_by('-created_at'))
+
+    total_videos = len(videos_list)
+    total_groups_with_video = len(set(v.group_id for v in videos_list))
+    youtube_count = sum(1 for v in videos_list if v.youtube_link)
+    local_file_count = sum(1 for v in videos_list if v.video_file)
+    unique_groups = sorted(list({v.group for v in videos_list}), key=lambda g: g.name)
 
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -1125,18 +1304,18 @@ def teacher_media_gallery(request):
         youtube_link = request.POST.get('youtube_link')
 
         if not title or not group_id:
-            messages.error(request, "Sarlavha va Guruh tanlanishi majburiy!")
+            messages.error(request, "Sarlavha va Guruh tanlanishi majburiy!", extra_tags='video_toast')
             return redirect('teacher_media_gallery')
 
         if not video_file and not youtube_link:
-            messages.error(request, "Iltimos, video fayl yuklang yoki YouTube havola kiriting!")
+            messages.error(request, "Iltimos, video fayl yuklang yoki YouTube havola kiriting!", extra_tags='video_toast')
             return redirect('teacher_media_gallery')
 
         if video_file:
             from main.validators import check_file_upload, validate_video_file
             is_valid, err_msg = check_file_upload(video_file, validate_video_file)
             if not is_valid:
-                messages.error(request, err_msg)
+                messages.error(request, err_msg, extra_tags='video_toast')
                 return redirect('teacher_media_gallery')
 
         group = get_object_or_404(Group, id=group_id, teachers=teacher)
@@ -1156,7 +1335,12 @@ def teacher_media_gallery(request):
     return render(request, 'teacher_media_gallery.html', {
         'teacher': teacher,
         'groups': groups,
-        'videos': videos
+        'videos': videos_list,
+        'total_videos': total_videos,
+        'total_groups_with_video': total_groups_with_video,
+        'youtube_count': youtube_count,
+        'local_file_count': local_file_count,
+        'unique_groups': unique_groups,
     })
 
 

@@ -1,363 +1,1705 @@
 {% extends 'baseteacher.html' %}
 {% load static %}
 
-{% block title %}Topshiriqlar{% endblock %}
+{% block title %}Topshiriqlar boshqaruvi{% endblock %}
 
 {% block extra_css %}
     <style>
+        /* =========================================================
+           ✨ TOPSHIRIQLAR BOSHQARUVI — 1-TO-1 LIGHT & DARK MODE DESIGN
+           ========================================================= */
+
+        /* --- 🔍 SARLAVHA VA TEPA PANELI --- */
+        .sarlavha-qatori {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .sarlavha-text-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
         .sarlavha {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 800;
-            margin-bottom: 20px;
             color: #ffffff;
             border-left: 4px solid #00f2fe;
-            padding-left: 12px;
-            letter-spacing: -0.5px;
+            padding-left: 14px;
+            letter-spacing: -0.4px;
+            margin: 0;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sarlavha i.title-icon {
+            color: #00f2fe;
+            font-size: 20px;
+        }
+        .sarlavha-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin: 0;
+            padding-left: 18px;
         }
 
-        .guruhlar-qatori {
+        body.light-mode .sarlavha {
+            color: #0f172a !important;
+            border-left-color: #0284c7 !important;
+        }
+        body.light-mode .sarlavha i.title-icon {
+            color: #0284c7 !important;
+        }
+        body.light-mode .sarlavha-subtitle {
+            color: #64748b !important;
+        }
+
+        .header-action-group {
             display: flex;
+            align-items: center;
             gap: 12px;
             flex-wrap: wrap;
-            margin-top: 10px;
-            margin-bottom: 25px;
         }
 
-        /* Kiber Tugma */
-        .guruh-btn {
-            display: inline-block;
-            padding: 12px 24px;
+        /* --- 🚀 YUKLASH TUGMASI --- */
+        .btn-create-assignment {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
             background: linear-gradient(135deg, #00f2fe, #4facfe);
             color: #070a12;
             text-decoration: none;
-            border-radius: 10px;
-            font-size: 14px;
+            border-radius: 12px;
+            font-size: 13.5px;
             font-weight: 800;
-            transition: 0.3s;
+            transition: all 0.25s ease;
             border: none;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.25);
+            white-space: nowrap;
         }
-        .guruh-btn:hover {
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
-            transform: translateY(-1px);
+        .btn-create-assignment:hover {
+            box-shadow: 0 0 22px rgba(0, 242, 254, 0.45);
+            transform: translateY(-2px);
+            color: #070a12;
+        }
+        body.light-mode .btn-create-assignment {
+            background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
+        }
+        body.light-mode .btn-create-assignment:hover {
+            background: linear-gradient(135deg, #0369a1, #0284c7) !important;
+            color: #ffffff !important;
+            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.4) !important;
         }
 
-        .hr-joy {
-            border: none;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            margin: 25px 0;
+        /* --- 📊 4 TA STATISTIKA KARTALARI --- */
+        .stats-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
         }
-
-        .jadval-container {
-            flex-grow: 1;
-            overflow-y: auto !important;
-            overflow-x: auto !important;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.01);
+        .stat-card {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            max-height: calc(100vh - 200px);
-            min-height: 300px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.25s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        body.light-mode .stat-card {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .stat-card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06) !important;
         }
 
-        /* Skrolbar dizayni */
+        .stat-icon-wrap {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            flex-shrink: 0;
+        }
+        .stat-card.blue .stat-icon-wrap {
+            background: rgba(0, 242, 254, 0.1);
+            color: #00f2fe;
+            border: 1px solid rgba(0, 242, 254, 0.25);
+        }
+        .stat-card.green .stat-icon-wrap {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+        .stat-card.amber .stat-icon-wrap {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+        .stat-card.purple .stat-icon-wrap {
+            background: rgba(168, 85, 247, 0.1);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.25);
+        }
+
+        body.light-mode .stat-card.blue .stat-icon-wrap {
+            background: #e0f2fe !important;
+            color: #0284c7 !important;
+            border-color: #bae6fd !important;
+        }
+        body.light-mode .stat-card.green .stat-icon-wrap {
+            background: #dcfce7 !important;
+            color: #16a34a !important;
+            border-color: #bbf7d0 !important;
+        }
+        body.light-mode .stat-card.amber .stat-icon-wrap {
+            background: #fef3c7 !important;
+            color: #d97706 !important;
+            border-color: #fde68a !important;
+        }
+        body.light-mode .stat-card.purple .stat-icon-wrap {
+            background: #f3e8ff !important;
+            color: #9333ea !important;
+            border-color: #e9d5ff !important;
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+        body.light-mode .stat-value {
+            color: #0f172a !important;
+        }
+        .stat-label {
+            font-size: 11.5px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        body.light-mode .stat-label {
+            color: #64748b !important;
+        }
+
+        /* --- 🔍 FILTER VA QIDIRUV QATORI --- */
+        .toolbar-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .filter-pills-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-pill {
+            padding: 7px 15px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.65);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+        .filter-pill:hover {
+            color: #ffffff;
+            border-color: rgba(0, 242, 254, 0.3);
+            background: rgba(0, 242, 254, 0.05);
+        }
+        .filter-pill.active {
+            background: rgba(0, 242, 254, 0.12);
+            border-color: #00f2fe;
+            color: #00f2fe;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+        }
+        .filter-pill .pill-badge {
+            padding: 1px 6px;
+            border-radius: 6px;
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .filter-pill.active .pill-badge {
+            background: rgba(0, 242, 254, 0.25);
+            color: #ffffff;
+        }
+
+        body.light-mode .filter-pill {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #475569 !important;
+        }
+        body.light-mode .filter-pill:hover {
+            background: #f8fafc !important;
+            color: #0284c7 !important;
+            border-color: #0284c7 !important;
+        }
+        body.light-mode .filter-pill.active {
+            background: #e0f2fe !important;
+            border-color: #0284c7 !important;
+            color: #0284c7 !important;
+            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.15) !important;
+        }
+        body.light-mode .filter-pill .pill-badge {
+            background: #e2e8f0 !important;
+            color: #334155 !important;
+        }
+        body.light-mode .filter-pill.active .pill-badge {
+            background: #0284c7 !important;
+            color: #ffffff !important;
+        }
+
+        /* Qidiruv formasi */
+        .search-form {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 4px 14px;
+            transition: all 0.25s ease;
+            width: 280px;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        .search-form:focus-within {
+            border-color: #00f2fe !important;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.2) !important;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        body input[type="text"].search-input,
+        body .search-form input,
+        .search-input {
+            background: transparent !important;
+            border: 0 !important;
+            border-style: none !important;
+            outline: none !important;
+            color: #ffffff !important;
+            font-size: 13px !important;
+            width: 100% !important;
+            padding: 6px 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+        body input[type="text"].search-input:focus,
+        body .search-form input:focus,
+        .search-input:focus {
+            background: transparent !important;
+            border: 0 !important;
+            border-style: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .search-btn {
+            background: none !important;
+            border: none !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+            padding: 0 0 0 8px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none !important;
+        }
+        .search-btn:hover {
+            color: #00f2fe !important;
+        }
+
+        body.light-mode .search-form {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .search-form:focus-within {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode input[type="text"].search-input,
+        body.light-mode .search-form input,
+        body.light-mode .search-input {
+            color: #0f172a !important;
+            background: transparent !important;
+            border: 0 !important;
+            border-style: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        body.light-mode input[type="text"].search-input:focus,
+        body.light-mode .search-form input:focus,
+        body.light-mode .search-input:focus {
+            border: 0 !important;
+            box-shadow: none !important;
+            outline: none !important;
+            background: transparent !important;
+        }
+        body.light-mode .search-input::placeholder {
+            color: #94a3b8 !important;
+        }
+        body.light-mode .search-btn {
+            color: #64748b !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        body.light-mode .search-btn:hover {
+            color: #0284c7 !important;
+        }
+
+        /* --- 📋 JADVAL KONTEYNERI (DESKTOP) --- */
+        .jadval-container {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            overflow-x: auto;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-height: calc(100vh - 330px);
+            position: relative;
+            scroll-behavior: smooth;
+            margin-bottom: 25px;
+            box-sizing: border-box;
+        }
+
         .jadval-container::-webkit-scrollbar {
+            height: 7px;
             width: 6px;
-            height: 6px;
         }
         .jadval-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .jadval-container::-webkit-scrollbar-thumb {
-            background: rgba(0, 242, 254, 0.12);
+            background: rgba(8, 13, 26, 0.8);
             border-radius: 10px;
         }
+        .jadval-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
+        }
         .jadval-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 242, 254, 0.3);
+            background: #00f2fe;
+        }
+
+        body.light-mode .jadval-container {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .jadval-container::-webkit-scrollbar-track {
+            background: #f8fafc !important;
+        }
+        body.light-mode .jadval-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1 !important;
+            box-shadow: none !important;
+        }
+        body.light-mode .jadval-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8 !important;
         }
 
         table {
-            width: max-content !important;
-            min-width: 100% !important;
-            white-space: nowrap;
+            width: 100% !important;
             border-collapse: collapse;
             text-align: left;
         }
         th {
-            padding: 16px 18px;
+            padding: 14px 18px;
             font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.5);
             letter-spacing: 0.5px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            position: sticky; /* Tepa qismi qotib turadi */
+            position: sticky;
             top: 0;
             background: #080d1a;
             z-index: 2;
+            white-space: nowrap;
         }
+        body.light-mode th {
+            background: #f8fafc !important;
+            color: #475569 !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
         td {
             padding: 14px 18px;
             font-size: 13.5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-            color: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.85);
             vertical-align: middle;
+            transition: background 0.2s ease;
         }
         tr:hover td {
-            background: rgba(255, 255, 255, 0.01);
+            background: rgba(255, 255, 255, 0.02);
             color: #ffffff;
         }
-
-        .btn-otish, .edit-assignment-btn {
-            display: inline-block;
-            padding: 8px 16px;
-            background: rgba(0, 242, 254, 0.07);
-            border: 1px solid rgba(0, 242, 254, 0.2);
-            color: #00f2fe;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            transition: 0.3s;
-            text-align: center;
-            cursor: pointer;
-            margin-left: 10px;
+        body.light-mode td {
+            color: #0f172a !important;
+            border-bottom: 1px solid #f1f5f9 !important;
         }
-        .btn-otish:hover, .edit-assignment-btn:hover {
-            background: linear-gradient(135deg, #00f2fe, #4facfe);
-            color: #070a12;
-            border-color: transparent;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        body.light-mode tr:hover td {
+            background: rgba(2, 132, 199, 0.02) !important;
+        }
+
+        /* --- 🏷️ NISHONLAR VA MA'LUMOT BLOKLARI --- */
+        .assignment-title-text {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 14px;
+        }
+        body.light-mode .assignment-title-text {
+            color: #0f172a !important;
         }
 
         
+        .row-index-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 6px;
+            border-radius: 8px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.22);
+            color: #00f2fe;
+            font-weight: 800;
+            font-size: 12.5px;
+            font-family: 'JetBrains Mono', monospace, sans-serif;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+        body.light-mode .row-index-pill {
+            background: #e0f2fe !important;
+            border-color: #bae6fd !important;
+            color: #0284c7 !important;
+        }
+
+        .group-pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #00f2fe;
+            white-space: nowrap;
+        }
+        body.light-mode 
+        .row-index-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 6px;
+            border-radius: 8px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.22);
+            color: #00f2fe;
+            font-weight: 800;
+            font-size: 12.5px;
+            font-family: 'JetBrains Mono', monospace, sans-serif;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+        body.light-mode .row-index-pill {
+            background: #e0f2fe !important;
+            border-color: #bae6fd !important;
+            color: #0284c7 !important;
+        }
+
+        .group-pill-badge {
+            background: #e0f2fe !important;
+            border-color: #bae6fd !important;
+            color: #0284c7 !important;
+        }
+
+        .date-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'JetBrains Mono', monospace, sans-serif;
+            font-size: 12.5px;
+            color: rgba(255, 255, 255, 0.7);
+            white-space: nowrap;
+        }
+        .date-chip i {
+            font-size: 11px;
+            opacity: 0.6;
+        }
+        body.light-mode .date-chip {
+            color: #475569 !important;
+        }
+
+        /* Muddat holati pill */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .status-pill.active {
+            background: rgba(0, 242, 254, 0.1);
+            color: #00f2fe;
+            border: 1px solid rgba(0, 242, 254, 0.25);
+        }
+        .status-pill.due_soon {
+            background: rgba(245, 158, 11, 0.12);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .status-pill.expired {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        body.light-mode .status-pill.active {
+            background: #e0f2fe !important;
+            color: #0284c7 !important;
+            border-color: #bae6fd !important;
+        }
+        body.light-mode .status-pill.due_soon {
+            background: #fef3c7 !important;
+            color: #b45309 !important;
+            border-color: #fde68a !important;
+        }
+        body.light-mode .status-pill.expired {
+            background: #fee2e2 !important;
+            color: #b91c1c !important;
+            border-color: #fecaca !important;
+        }
+
+        /* Maksimal ball pill */
+        .score-pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 800;
+            color: #10b981;
+            white-space: nowrap;
+        }
+        body.light-mode .score-pill-badge {
+            background: #dcfce7 !important;
+            border-color: #bbf7d0 !important;
+            color: #15803d !important;
+        }
+
+        /* Topshiriq topshirilishi progressi */
+        .submission-progress-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 110px;
+        }
+        .sub-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .sub-count-text {
+            color: #ffffff;
+            font-family: monospace;
+        }
+        body.light-mode .sub-count-text {
+            color: #0f172a !important;
+        }
+        .sub-graded-tag {
+            font-size: 10.5px;
+            color: #10b981;
+            font-weight: 600;
+        }
+        body.light-mode .sub-graded-tag {
+            color: #16a34a !important;
+        }
+
+        .mini-progress-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        body.light-mode .mini-progress-track {
+            background: #e2e8f0 !important;
+        }
+        .mini-progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #00f2fe, #4facfe);
+            box-shadow: 0 0 6px rgba(0, 242, 254, 0.4);
+            transition: width 0.4s ease;
+        }
+        body.light-mode .mini-progress-fill {
+            background: linear-gradient(90deg, #0284c7, #38bdf8) !important;
+            box-shadow: none !important;
+        }
+
+        /* --- 🔘 AMALLAR TUGMALARI --- */
+        .btn-action-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            color: #00f2fe;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            transition: all 0.25s ease;
+            text-align: center;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-action-primary:hover {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border-color: transparent;
+            box-shadow: 0 0 14px rgba(0, 242, 254, 0.4);
+            transform: translateY(-1px);
+        }
+        body.light-mode .btn-action-primary {
+            background: rgba(2, 132, 199, 0.08) !important;
+            border: 1px solid rgba(2, 132, 199, 0.3) !important;
+            color: #0284c7 !important;
+            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.08) !important;
+        }
+        body.light-mode .btn-action-primary:hover {
+            background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+            border-color: transparent !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
+        }
+
+        .btn-action-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            text-align: center;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-action-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+        body.light-mode .btn-action-secondary {
+            background: #f8fafc !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #334155 !important;
+        }
+        body.light-mode .btn-action-secondary:hover {
+            background: #e2e8f0 !important;
+            color: #0f172a !important;
+            border-color: #94a3b8 !important;
+        }
+
+        .btn-action-disabled {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            font-size: 12px;
+            cursor: not-allowed;
+            white-space: nowrap;
+        }
+        body.light-mode .btn-action-disabled {
+            background: #f1f5f9 !important;
+            border-color: #e2e8f0 !important;
+            color: #94a3b8 !important;
+        }
+
+        .actions-cell-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
         /* --- 👾 MODAL OYNALAR (CYBER GLASS) --- */
-        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(7, 10, 18, 0.8); backdrop-filter: blur(10px); z-index: 1998; }
-        .custom-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 550px; background: #0c101d; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); z-index: 1999; padding: 30px; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 12px; }
-        .modal-header h3 { font-size: 18px; font-weight: 800; color: #ffffff; }
-        .close-modal { background: rgba(255, 255, 255, 0.05); border: none; font-size: 14px; cursor: pointer; color: #ffffff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .close-modal:hover { background: rgba(255, 0, 85, 0.2); color: #ff0055; }
-        .modal-content label { display: block; margin-top: 15px; color: rgba(255, 255, 255, 0.4); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .modal-content input, .modal-content select { width: 100%; padding: 12px 16px; margin-top: 6px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; box-sizing: border-box; background-color: rgba(255, 255, 255, 0.01); color: white; outline: none; transition: 0.3s; }
-        .modal-content input:focus, .modal-content select:focus { border-color: #00f2fe; background: rgba(255, 255, 255, 0.04); box-shadow: 0 0 12px rgba(0, 242, 254, 0.15); }
-        .modal-content button[type="submit"] { margin-top: 25px; padding: 12px; width: 100%; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; border: none; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.3s; box-shadow: 0 5px 15px rgba(0, 242, 254, 0.2); }
-        .modal-content button[type="submit"]:hover { box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); }
-
-        /* --- 📱 MOBIL REJIMDA RESPONSIVE MANTIQLARI --- */
-        @media (max-width: 768px) {
-            .konteyner { height: auto !important; overflow: visible !important; padding: 15px !important; }
-            .guruh-btn { width: 100%; text-align: center; }
-            .search-input { width: 130px; margin-left: 10px; padding: 8px 12px; }
-            .search-btn { padding: 8px 14px; }
-
-            .jadval-container { border: none; background: transparent; box-shadow: none; overflow: visible; max-height: none; }
-            table, thead, tbody, th, td, tr { display: block; }
-            thead { display: none; }
-            tbody tr { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-            tbody td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.03); text-align: right; font-size: 13px; }
-            tbody td:last-child { border-bottom: none; padding-top: 14px; }
-            tbody td::before { content: attr(data-label); float: left; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
-            .btn-otish, .edit-assignment-btn { width: 100%; padding: 10px; }
-            .custom-modal { padding: 20px; }
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(7, 10, 18, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1998;
+        }
+        .custom-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 92%;
+            max-width: 540px;
+            background: #0d1322;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+            z-index: 1999;
+            padding: 26px;
+            box-sizing: border-box;
+            animation: modalFadeIn 0.25s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translate(-50%, -48%) scale(0.96); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
 
-        /* --- ☀️ LIGHT MODE OVERRIDES --- */
-        body.light-mode .guruh-btn,
-        body.light-mode .edit-assignment-btn {
-            background: #0284c7 !important;
+        body.light-mode .custom-modal {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15) !important;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 14px;
+        }
+        body.light-mode .modal-header {
+            border-bottom-color: #e2e8f0 !important;
+        }
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        body.light-mode .modal-header h3 {
+            color: #0f172a !important;
+        }
+        .close-modal {
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            color: #ffffff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .close-modal:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        body.light-mode .close-modal {
+            background: #f1f5f9 !important;
+            color: #475569 !important;
+        }
+        body.light-mode .close-modal:hover {
+            background: #fee2e2 !important;
+            color: #ef4444 !important;
+        }
+
+        .modal-content label {
+            display: block;
+            margin-top: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        body.light-mode .modal-content label {
+            color: #475569 !important;
+        }
+
+        .modal-content input[type="text"],
+        .modal-content input[type="number"],
+        .modal-content input[type="datetime-local"],
+        .modal-content select {
+            width: 100%;
+            padding: 11px 15px;
+            margin-top: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-sizing: border-box;
+            background-color: rgba(255, 255, 255, 0.03);
+            color: #ffffff;
+            font-size: 13.5px;
+            outline: none;
+            transition: 0.25s;
+        }
+        .modal-content input:focus,
+        .modal-content select:focus {
+            border-color: #00f2fe;
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.2);
+        }
+        body.light-mode .modal-content input[type="text"],
+        body.light-mode .modal-content input[type="number"],
+        body.light-mode .modal-content input[type="datetime-local"],
+        body.light-mode .modal-content select {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        body.light-mode .modal-content input:focus,
+        body.light-mode .modal-content select:focus {
             border-color: #0284c7 !important;
-            color: #ffffff !important;
-            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15) !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
         }
-        body.light-mode .guruh-btn:hover,
-        body.light-mode .edit-assignment-btn:hover {
-            background: #0369a1 !important;
-            border-color: #0369a1 !important;
-            color: #ffffff !important;
+
+        /* Custom File Upload Box */
+        .file-upload-box {
+            border: 1.5px dashed rgba(0, 242, 254, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-top: 6px;
+            background: rgba(0, 242, 254, 0.02);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
         }
+        .file-upload-box:hover {
+            border-color: #00f2fe;
+            background: rgba(0, 242, 254, 0.05);
+        }
+        body.light-mode .file-upload-box {
+            border-color: rgba(2, 132, 199, 0.35) !important;
+            background: rgba(2, 132, 199, 0.02) !important;
+        }
+        body.light-mode .file-upload-box:hover {
+            border-color: #0284c7 !important;
+            background: rgba(2, 132, 199, 0.06) !important;
+        }
+        .file-upload-box input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .file-box-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 4px;
+        }
+        body.light-mode .file-box-text {
+            color: #334155 !important;
+        }
+
+        .modal-content button[type="submit"] {
+            margin-top: 24px;
+            padding: 12px;
+            width: 100%;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.25);
+        }
+        .modal-content button[type="submit"]:hover {
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.45);
+            transform: translateY(-1px);
+        }
+        body.light-mode .modal-content button[type="submit"] {
+            background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
+        }
+        body.light-mode .modal-content button[type="submit"]:hover {
+            background: linear-gradient(135deg, #0369a1, #0284c7) !important;
+        }
+
+        /* --- ⚠️ XATOLIK VA OGOHLANTIRISH BLOKI --- */
+        .alert-toast {
+            padding: 12px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 13.5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-toast.error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+        .alert-toast.success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+        body.light-mode .alert-toast.error {
+            background: #fee2e2 !important;
+            border-color: #fca5a5 !important;
+            color: #b91c1c !important;
+        }
+        body.light-mode .alert-toast.success {
+            background: #dcfce7 !important;
+            border-color: #86efac !important;
+            color: #15803d !important;
+        }
+
+        /* --- 🚫 NATIJA TOPILMADI VA BO'SH HOLAT --- */
+        .empty-state-box {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-style: italic;
+            font-size: 14px;
+        }
+        .empty-state-box i {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+        body.light-mode .empty-state-box {
+            color: #64748b !important;
+        }
+
+        /* ========================================================
+           📱 1-VARIANT: "EDTECH DASHBOARD CARDS" (MOBIL REJIM)
+           ======================================================== */
+        @media (max-width: 768px) {
+            .konteyner {
+                height: auto !important;
+                overflow: visible !important;
+                padding: 12px 14px 35px 14px !important;
+            }
+            .sarlavha-qatori {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 14px !important;
+                margin-bottom: 16px !important;
+            }
+            .sarlavha {
+                font-size: 18px !important;
+                border-left-width: 3.5px !important;
+                padding-left: 10px !important;
+            }
+            .sarlavha-subtitle {
+                font-size: 12px !important;
+                padding-left: 14px !important;
+            }
+            .btn-create-assignment {
+                width: 100% !important;
+                justify-content: center !important;
+                padding: 11px !important;
+            }
+
+            .stats-overview-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 10px !important;
+                margin-bottom: 18px !important;
+            }
+            .stat-card {
+                padding: 12px 14px !important;
+                gap: 12px !important;
+                border-radius: 14px !important;
+            }
+            .stat-icon-wrap {
+                width: 38px !important;
+                height: 38px !important;
+                font-size: 16px !important;
+                border-radius: 10px !important;
+            }
+            .stat-value {
+                font-size: 17px !important;
+            }
+            .stat-label {
+                font-size: 10px !important;
+            }
+
+            .toolbar-panel {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 10px !important;
+            }
+            .filter-pills-group {
+                overflow-x: auto;
+                padding-bottom: 4px;
+                flex-wrap: nowrap !important;
+            }
+            .filter-pill {
+                padding: 6px 12px !important;
+                font-size: 11.5px !important;
+                white-space: nowrap !important;
+            }
+            .search-form {
+                width: 100% !important;
+            }
+
+            .jadval-container {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                overflow: visible !important;
+                max-height: none !important;
+                margin-bottom: 30px !important;
+            }
+
+            table, thead, tbody, th, td, tr {
+                display: block !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            thead {
+                display: none !important;
+            }
+
+            /* 🌟 EDTECH DASHBOARD CARD (MOBIL) */
+            #assignment-table tbody tr.assignment-item-row {
+                background: rgba(255, 255, 255, 0.02) !important;
+                border: 1px solid rgba(255, 255, 255, 0.06) !important;
+                border-radius: 18px !important;
+                padding: 16px !important;
+                margin-bottom: 16px !important;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.18) !important;
+                backdrop-filter: blur(10px) !important;
+                -webkit-backdrop-filter: blur(10px) !important;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                position: relative !important;
+                overflow: hidden !important;
+            }
+
+            #assignment-table tbody tr.assignment-item-row.status-border-active {
+                border-left: 5px solid #00f2fe !important;
+            }
+            #assignment-table tbody tr.assignment-item-row.status-border-warning {
+                border-left: 5px solid #f59e0b !important;
+            }
+            #assignment-table tbody tr.assignment-item-row.status-border-expired {
+                border-left: 5px solid #ef4444 !important;
+            }
+
+            body.light-mode #assignment-table tbody tr.assignment-item-row {
+                background: #ffffff !important;
+                border: 1px solid #e2e8f0 !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+            }
+            body.light-mode #assignment-table tbody tr.assignment-item-row.status-border-active {
+                border-left: 5px solid #0284c7 !important;
+            }
+            body.light-mode #assignment-table tbody tr.assignment-item-row.status-border-warning {
+                border-left: 5px solid #d97706 !important;
+            }
+            body.light-mode #assignment-table tbody tr.assignment-item-row.status-border-expired {
+                border-left: 5px solid #dc2626 !important;
+            }
+
+            #assignment-table tbody td {
+                padding: 0 !important;
+                border: none !important;
+                background: transparent !important;
+                width: 100% !important;
+            }
+
+            /* Mobil Card Elements */
+            .mobile-card-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+            }
+            .mobile-title-wrap {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+            .mobile-assignment-title {
+                font-size: 16px;
+                font-weight: 800;
+                color: #ffffff;
+                line-height: 1.3;
+            }
+            body.light-mode .mobile-assignment-title {
+                color: #0f172a !important;
+            }
+
+            .mobile-meta-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px 12px;
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(255, 255, 255, 0.04);
+                border-radius: 12px;
+                padding: 10px 12px;
+            }
+            body.light-mode .mobile-meta-grid {
+                background: #f8fafc !important;
+                border-color: #e2e8f0 !important;
+            }
+
+            .mobile-meta-item {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+            .mobile-meta-label {
+                font-size: 10px;
+                font-weight: 700;
+                text-transform: uppercase;
+                color: rgba(255, 255, 255, 0.4);
+                letter-spacing: 0.3px;
+            }
+            body.light-mode .mobile-meta-label {
+                color: #64748b !important;
+            }
+            .mobile-meta-value {
+                font-size: 12px;
+                font-weight: 700;
+                color: #ffffff;
+            }
+            body.light-mode .mobile-meta-value {
+                color: #0f172a !important;
+            }
+
+            .mobile-actions-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-top: 4px;
+            }
+            .mobile-actions-grid .btn-action-primary,
+            .mobile-actions-grid .btn-action-secondary,
+            .mobile-actions-grid .btn-action-disabled {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 9px 8px !important;
+                font-size: 12px !important;
+            }
+            .mobile-actions-grid .grade-action-btn {
+                grid-column: span 2;
+                padding: 10px 8px !important;
+                font-size: 13px !important;
+            }
+
+            .custom-modal {
+                padding: 20px !important;
+                width: 95% !important;
+            }
+        }
+            .d-row-hidden { display: none !important; }
     </style>
 {% endblock %}
 
-
-
 {% block content %}
-    
+    <!-- Xatolik yoki muvaffaqiyat xabari -->
+    {% if error %}
+        <div class="alert-toast error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>{{ error }}</span>
+        </div>
+    {% endif %}
 
-    <h2 class="sarlavha">Topshiriq yuklash uchun guruh tanlang:</h2>
-    <div class="guruhlar-qatori">
-        <a href="javascript:void(0);" onclick="openModall()" class="guruh-btn"><i class="fas fa-plus" style="margin-right: 8px;"></i>Topshiriq yuklash</a>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-toast {% if 'error' in message.tags %}error{% else %}success{% endif %}">
+                <i class="fas {% if 'error' in message.tags %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- SARLAVHA VA TUGMA -->
+    <div class="sarlavha-qatori">
+        <div class="sarlavha-text-wrap">
+            <h2 class="sarlavha">
+                <i class="fas fa-tasks title-icon"></i>
+                Topshiriqlar boshqaruvi
+            </h2>
+            <p class="sarlavha-subtitle">Guruhlarga biriktirilgan amaliy vazifalar, muddatlar va o'quvchilar javoblarini tekshirish</p>
+        </div>
+        <div class="header-action-group">
+            <button type="button" onclick="openCreateModal()" class="btn-create-assignment">
+                <i class="fas fa-plus-circle"></i>
+                Yangi topshiriq yuklash
+            </button>
+        </div>
     </div>
 
-    <!-- Modal orqa fon -->
-    <div id="modalBackdrop" class="modal-backdrop"></div>
+    <!-- 4 TA STATISTIKA KARTASI -->
+    <div class="stats-overview-grid">
+        <div class="stat-card blue">
+            <div class="stat-icon-wrap">
+                <i class="fas fa-folder-open"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ total_assignments|default:"0" }}</span>
+                <span class="stat-label">Jami topshiriqlar</span>
+            </div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon-wrap">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ active_assignments_count|default:"0" }}</span>
+                <span class="stat-label">Faol topshiriqlar</span>
+            </div>
+        </div>
+        <div class="stat-card amber">
+            <div class="stat-icon-wrap">
+                <i class="fas fa-calendar-times"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ expired_assignments_count|default:"0" }}</span>
+                <span class="stat-label">Muddati o'tgan</span>
+            </div>
+        </div>
+        <div class="stat-card purple">
+            <div class="stat-icon-wrap">
+                <i class="fas fa-file-signature"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ total_submissions_count|default:"0" }} <small style="font-size: 11px; opacity: 0.7;">({{ total_graded_count|default:"0" }} baholandi)</small></span>
+                <span class="stat-label">Topshirilgan javoblar</span>
+            </div>
+        </div>
+    </div>
 
-    <!-- Yangi topshiriq yuklash modal oynasi -->
+    <!-- TOOLBAR: FILTERLAR VA QIDIRUV -->
+    <div class="toolbar-panel">
+        <div class="filter-pills-group">
+            <div class="filter-pill active" data-filter="all" onclick="filterAssignments('all', this)">
+                <i class="fas fa-layer-group"></i> Barchasi <span class="pill-badge">{{ total_assignments|default:"0" }}</span>
+            </div>
+            <div class="filter-pill" data-filter="active" onclick="filterAssignments('active', this)">
+                <i class="fas fa-play-circle"></i> Faol <span class="pill-badge">{{ active_assignments_count|default:"0" }}</span>
+            </div>
+            <div class="filter-pill" data-filter="due_soon" onclick="filterAssignments('due_soon', this)">
+                <i class="fas fa-exclamation-circle"></i> Muddati oz qoldi
+            </div>
+            <div class="filter-pill" data-filter="expired" onclick="filterAssignments('expired', this)">
+                <i class="fas fa-history"></i> Muddati o'tgan <span class="pill-badge">{{ expired_assignments_count|default:"0" }}</span>
+            </div>
+        </div>
+
+        <form class="search-form" onsubmit="event.preventDefault()">
+            <input type="text" class="search-input" placeholder="Topshiriq yoki guruh bo'yicha qidiruv..." id="assignment-search-input">
+            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
+
+    <!-- JADVAL KONTEYNERI (DESKTOP VA MOBIL) -->
+    <div class="jadval-container">
+        <table id="assignment-table">
+            <thead>
+                <tr>
+                    <th style="width: 50px; text-align: center;">№</th>
+                    <th>Topshiriq nomi</th>
+                    <th>Guruh</th>
+                    <th>Yaratilgan sana</th>
+                    <th>Muddati</th>
+                    <th style="text-align: center;">Maksimal ball</th>
+                    <th style="min-width: 130px;">Topshirganlar</th>
+                    <th style="width: 100px; text-align: center;">Fayl</th>
+                    <th style="width: 180px; text-align: center;">Amallar</th>
+                </tr>
+            </thead>
+            <tbody id="jadval-qatorlari">
+                {% for assignment in assignments %}
+                    <tr class="assignment-item-row {{ assignment.status_border }}"
+                        data-status="{{ assignment.status_type }}"
+                        data-title="{{ assignment.title|lower }}"
+                        data-group="{{ assignment.group.name|lower }}">
+                        
+                        <!-- DESKTOP CELL 1: Tartib raqam -->
+                        <td class="desktop-only-cell" style="text-align: center; font-weight: 700; color: rgba(255,255,255,0.4);">
+                            <span class="row-index-pill row-num-span">{{ forloop.counter }}</span>
+                        </td>
+
+                        <!-- MOBIL UCHUN 1-VARIANT: EDTECH DASHBOARD CARD (MOBILDA KO'RINADI) -->
+                        <td class="mobile-only-cell" style="display: none;">
+                            <div class="mobile-card-header">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="row-index-pill mobile-row-num">{{ forloop.counter }}</span>
+                                    <span class="group-pill-badge">
+                                        <i class="fas fa-users"></i> {{ assignment.group.name }}
+                                    </span>
+                                </div>
+                                <span class="status-pill {{ assignment.status_type }}">
+                                    {% if assignment.status_type == 'active' %}
+                                        <i class="fas fa-clock"></i> {{ assignment.time_remaining }}
+                                    {% elif assignment.status_type == 'due_soon' %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ assignment.time_remaining }}
+                                    {% else %}
+                                        <i class="fas fa-calendar-times"></i> {{ assignment.status_label }}
+                                    {% endif %}
+                                </span>
+                            </div>
+
+                            <div class="mobile-title-wrap">
+                                <span class="mobile-assignment-title">{{ assignment.title }}</span>
+                            </div>
+
+                            <div class="mobile-meta-grid">
+                                <div class="mobile-meta-item">
+                                    <span class="mobile-meta-label">Maksimal ball</span>
+                                    <span class="mobile-meta-value" style="color: #10b981;">💎 {{ assignment.max_score }} ball</span>
+                                </div>
+                                <div class="mobile-meta-item">
+                                    <span class="mobile-meta-label">Muddat</span>
+                                    <span class="mobile-meta-value">{{ assignment.deadline|date:"d.m.Y H:i" }}</span>
+                                </div>
+                                <div class="mobile-meta-item" style="grid-column: span 2;">
+                                    <div class="sub-progress-header" style="margin-bottom: 4px;">
+                                        <span class="mobile-meta-label">Topshirganlar: <b class="sub-count-text">{{ assignment.sub_count }}/{{ assignment.total_students }}</b></span>
+                                        <span class="sub-graded-tag">{{ assignment.graded_count }} baholandi</span>
+                                    </div>
+                                    <div class="mini-progress-track">
+                                        <div class="mini-progress-fill" style="width: {{ assignment.submission_percent }}%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mobile-actions-grid">
+                                {% if assignment.file %}
+                                    <a href="{{ assignment.file.url }}" target="_blank" class="btn-action-secondary">
+                                        <i class="fas fa-file-download"></i> Fayl
+                                    </a>
+                                {% else %}
+                                    <span class="btn-action-disabled"><i class="fas fa-file"></i> Fayl yo'q</span>
+                                {% endif %}
+
+                                {% if not assignment.has_submissions %}
+                                    <a href="javascript:void(0);" class="btn-action-secondary edit-assignment-btn"
+                                       data-assignment-id="{{ assignment.id }}"
+                                       data-title="{{ assignment.title }}"
+                                       data-group="{{ assignment.group.id }}"
+                                       data-deadline="{{ assignment.deadline|date:'Y-m-d\TH:i' }}"
+                                       data-max-score="{{ assignment.max_score }}">
+                                        <i class="fas fa-edit"></i> Tahrirlash
+                                    </a>
+                                {% else %}
+                                    <span class="btn-action-disabled" title="Javoblar topshirilganligi sababli bloklangan">
+                                        <i class="fas fa-lock"></i> Bloklangan
+                                    </span>
+                                {% endif %}
+
+                                <a href="{% url 'teacher_assignment_submissions' assignment.id %}" class="btn-action-primary grade-action-btn">
+                                    <i class="fas fa-graduation-cap"></i> Baholash & Natijalar ({{ assignment.sub_count }})
+                                </a>
+                            </div>
+                        </td>
+
+                        <!-- DESKTOP CELL 2: Topshiriq nomi -->
+                        <td class="desktop-only-cell">
+                            <span class="assignment-title-text">{{ assignment.title }}</span>
+                        </td>
+
+                        <!-- DESKTOP CELL 3: Guruh -->
+                        <td class="desktop-only-cell">
+                            <span class="group-pill-badge">
+                                <i class="fas fa-users"></i> {{ assignment.group.name }}
+                            </span>
+                        </td>
+
+                        <!-- DESKTOP CELL 4: Yaratilgan sana -->
+                        <td class="desktop-only-cell">
+                            <span class="date-chip">
+                                <i class="fas fa-calendar-alt"></i> {{ assignment.created_at|date:"d.m.Y H:i" }}
+                            </span>
+                        </td>
+
+                        <!-- DESKTOP CELL 5: Muddati va status -->
+                        <td class="desktop-only-cell">
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <span class="date-chip" style="font-weight: 700;">
+                                    <i class="fas fa-clock"></i> {{ assignment.deadline|date:"d.m.Y H:i" }}
+                                </span>
+                                <span class="status-pill {{ assignment.status_type }}" style="align-self: flex-start;">
+                                    {% if assignment.status_type == 'active' %}
+                                        <i class="fas fa-check-circle"></i> {{ assignment.time_remaining }}
+                                    {% elif assignment.status_type == 'due_soon' %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ assignment.time_remaining }}
+                                    {% else %}
+                                        <i class="fas fa-calendar-times"></i> {{ assignment.status_label }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </td>
+
+                        <!-- DESKTOP CELL 6: Maksimal ball -->
+                        <td class="desktop-only-cell" style="text-align: center;">
+                            <span class="score-pill-badge">
+                                <i class="fas fa-gem"></i> {{ assignment.max_score }}
+                            </span>
+                        </td>
+
+                        <!-- DESKTOP CELL 7: Topshirganlar progressi -->
+                        <td class="desktop-only-cell">
+                            <div class="submission-progress-cell">
+                                <div class="sub-progress-header">
+                                    <span class="sub-count-text">{{ assignment.sub_count }} / {{ assignment.total_students }}</span>
+                                    <span class="sub-graded-tag">{{ assignment.graded_count }} baholandi</span>
+                                </div>
+                                <div class="mini-progress-track">
+                                    <div class="mini-progress-fill" style="width: {{ assignment.submission_percent }}%;"></div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- DESKTOP CELL 8: Fayl -->
+                        <td class="desktop-only-cell" style="text-align: center;">
+                            {% if assignment.file %}
+                                <a href="{{ assignment.file.url }}" target="_blank" class="btn-action-secondary" style="padding: 6px 12px; font-size: 12px;">
+                                    <i class="fas fa-file-download"></i> Ko'rish
+                                </a>
+                            {% else %}
+                                <span style="color: rgba(255,255,255,0.3); font-style: italic; font-size: 12px;">Fayl yo'q</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- DESKTOP CELL 9: Amallar -->
+                        <td class="desktop-only-cell" style="text-align: center;">
+                            <div class="actions-cell-wrap" style="justify-content: center;">
+                                {% if not assignment.has_submissions %}
+                                    <a href="javascript:void(0);" class="btn-action-secondary edit-assignment-btn"
+                                       data-assignment-id="{{ assignment.id }}"
+                                       data-title="{{ assignment.title }}"
+                                       data-group="{{ assignment.group.id }}"
+                                       data-deadline="{{ assignment.deadline|date:'Y-m-d\TH:i' }}"
+                                       data-max-score="{{ assignment.max_score }}">
+                                        <i class="fas fa-edit"></i> Tahrirlash
+                                    </a>
+                                {% else %}
+                                    <span class="btn-action-disabled" title="Javoblar topshirilganligi sababli tahrirlab bo'lmaydi">
+                                        <i class="fas fa-lock"></i> Bloklangan
+                                    </span>
+                                {% endif %}
+
+                                <a href="{% url 'teacher_assignment_submissions' assignment.id %}" class="btn-action-primary">
+                                    <i class="fas fa-graduation-cap"></i> Baholash
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr id="empty-row-initial">
+                        <td colspan="9">
+                            <div class="empty-state-box">
+                                <i class="fas fa-folder-open"></i>
+                                <span>Hozircha birorta ham topshiriq kiritilmagan. Yuqoridagi "+ Yangi topshiriq yuklash" tugmasi orqali yangi topshiriq qo'shing.</span>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                <tr id="no-search-results-row" style="display: none;">
+                    <td colspan="9">
+                        <div class="empty-state-box">
+                            <i class="fas fa-search"></i>
+                            <span>Qidiruv yoki filtr bo'yicha hech qanday topshiriq topilmadi.</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ========================================================
+         👾 MODAL: YANGI TOPSHIRIQ YUKLASH
+         ======================================================== -->
+    <div id="modalBackdrop" class="modal-backdrop" onclick="closeCreateModal()"></div>
+
     <div id="assignmentModal" class="custom-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Topshiriq yuklash</h3>
-                <button class="close-modal" onclick="closeModal()">✖</button>
+                <h3><i class="fas fa-plus-circle" style="color: #00f2fe;"></i> Yangi topshiriq yuklash</h3>
+                <button class="close-modal" onclick="closeCreateModal()">✖</button>
             </div>
             <form method="post" enctype="multipart/form-data" action="{% url 'teacher_deadline' %}">
                 {% csrf_token %}
-                <label>Topshiriq nomi:</label>
-                <input type="text" name="title" placeholder="Topshiriq nomini kiriting" required>
+                <label><i class="fas fa-heading" style="margin-right: 4px;"></i> Topshiriq nomi:</label>
+                <input type="text" name="title" placeholder="Masalan: 3-Laboratoriya ishi / Amaliy mashg'ulot" required autocomplete="off">
 
-                <label>Guruh:</label>
+                <label><i class="fas fa-users" style="margin-right: 4px;"></i> Guruhni tanlang:</label>
                 <select name="group_id" required>
+                    <option value="" disabled selected>Guruhni tanlang...</option>
                     {% for group in groups %}
                         <option value="{{ group.id }}">{{ group.name }}</option>
                     {% endfor %}
                 </select>
 
-                <label>Topshiriq uchun eng yuqori ball:</label>
-                <input type="number" name="max_score" placeholder="Maksimal ball" required min="1">
+                <label><i class="fas fa-gem" style="margin-right: 4px;"></i> Eng yuqori ball (Maksimal):</label>
+                <input type="number" name="max_score" placeholder="Masalan: 100 yoki 50" required min="1" max="1000" value="100">
 
-                <label>Topshiriq muddati:</label>
-                <input type="datetime-local" name="deadline" required>
+                <label><i class="fas fa-calendar-alt" style="margin-right: 4px;"></i> Topshirish muddati (Deadline):</label>
+                <input type="datetime-local" name="deadline" id="create-deadline-input" required>
+                <small style="display: block; margin-top: 4px; font-size: 11px; opacity: 0.6;">Topshiriq muddati kamida 3 kun keyingi sana bo'lishi lozim.</small>
 
-                <label>Topshiriq fayli:</label>
-                <input type="file" name="file" required>
+                <label><i class="fas fa-file-upload" style="margin-right: 4px;"></i> Topshiriq fayli (PDF, DOCX, ZIP va b.):</label>
+                <div class="file-upload-box" onclick="document.getElementById('createFileInput').click()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 26px; color: #00f2fe; margin-bottom: 6px;"></i>
+                    <div class="file-box-text" id="createFileLabel">Faylni tanlash uchun bosing</div>
+                    <input type="file" name="file" id="createFileInput" required onchange="handleFileSelect(this, 'createFileLabel')">
+                </div>
 
-                <button type="submit">Yuklash</button>
+                <button type="submit">
+                    <i class="fas fa-upload" style="margin-right: 6px;"></i> Topshiriqni yuklash
+                </button>
             </form>
         </div>
     </div>
 
-    <!-- Tahrirlash Modal oynasi -->
+    <!-- ========================================================
+         👾 MODAL: TOPSHIRIQNI TAHRIRLASH
+         ======================================================== -->
+    <div id="editModalBackdrop" class="modal-backdrop" onclick="closeEditAssignmentModal()"></div>
+
     <div id="editAssignmentModal" class="custom-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Topshiriqni tahrirlash</h3>
+                <h3><i class="fas fa-edit" style="color: #00f2fe;"></i> Topshiriqni tahrirlash</h3>
                 <button class="close-modal" onclick="closeEditAssignmentModal()">✖</button>
             </div>
             <form id="editForm" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                <label>Topshiriq nomi:</label>
-                <input type="text" name="title" id="editTitle" required>
+                <label><i class="fas fa-heading" style="margin-right: 4px;"></i> Topshiriq nomi:</label>
+                <input type="text" name="title" id="editTitle" required autocomplete="off">
 
-                <label>Guruh:</label>
+                <label><i class="fas fa-users" style="margin-right: 4px;"></i> Guruh:</label>
                 <select name="group_id" id="editGroup" required>
                     {% for group in groups %}
                         <option value="{{ group.id }}">{{ group.name }}</option>
                     {% endfor %}
                 </select>
 
-                <label>Topshiriq uchun eng yuqori ball:</label>
-                <input type="number" name="max_score" id="editScore" required min="1">
+                <label><i class="fas fa-gem" style="margin-right: 4px;"></i> Eng yuqori ball:</label>
+                <input type="number" name="max_score" id="editScore" required min="1" max="1000">
 
-                <label>Topshiriq muddati:</label>
+                <label><i class="fas fa-calendar-alt" style="margin-right: 4px;"></i> Topshirish muddati:</label>
                 <input type="datetime-local" name="deadline" id="editDeadline" required>
 
-                <label>Topshiriq fayli (ixtiyoriy):</label>
-                <input type="file" name="file">
+                <label><i class="fas fa-file-upload" style="margin-right: 4px;"></i> Yangi fayl (ixtiyoriy):</label>
+                <div class="file-upload-box" onclick="document.getElementById('editFileInput').click()">
+                    <i class="fas fa-sync-alt" style="font-size: 24px; color: #4facfe; margin-bottom: 6px;"></i>
+                    <div class="file-box-text" id="editFileLabel">Yangi fayl yuklash uchun bosing (eski fayl saqlanadi)</div>
+                    <input type="file" name="file" id="editFileInput" onchange="handleFileSelect(this, 'editFileLabel')">
+                </div>
 
-                <button type="submit">Saqlash</button>
+                <button type="submit">
+                    <i class="fas fa-save" style="margin-right: 6px;"></i> O'zgarishlarni saqlash
+                </button>
             </form>
         </div>
-    </div>
-    <div id="editModalBackdrop" class="modal-backdrop"></div>
-
-    <hr class="hr-joy">
-
-    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
-        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0;">Yuklangan topshiriqlar to'plami</h2>
-        <!-- QIDIRUV FORMASI -->
-        <form class="search-form" onsubmit="event.preventDefault()">
-            <input type="text" class="search-input" placeholder="Topshiriq nomi bo'yicha..." id="assignment-title-search">
-            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
-        </form>
-    </div>
-    <div class="jadval-container">
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50px;">No</th>
-                    <th>Nomi</th>
-                    <th>Guruh</th>
-                    <th>Yaratilgan sana</th>
-                    <th>Muddati</th>
-                    <th>Maksimal ball</th>
-                    <th style="width: 100px; text-align: center;">Fayl</th>
-                    <th style="width: 120px; text-align: center;">Tahrirlash</th>
-                    <th style="width: 100px; text-align: center;">Baholash</th>
-                </tr>
-            </thead>
-            <tbody id="jadval-qatorlari">
-                {% for assignment in assignments %}
-                    <tr>
-                        <td data-label="No">{{ forloop.counter }}</td>
-                        <td data-label="Nomi" style="font-weight: 700; color: #ffffff;">{{ assignment.title }}</td>
-                        <td data-label="Guruh">{{ assignment.group.name }}</td>
-                        <td data-label="Yaratilgan sana" style="color: #4facfe; font-family: monospace;">{{ assignment.created_at|date:"d.m.Y H:i" }}</td>
-                        <td data-label="Muddati" style="color: #ff808b; font-family: monospace; font-weight: 600;">{{ assignment.deadline|date:"d.m.Y H:i" }}</td>
-                        <td data-label="Maksimal ball" style="font-weight: 700; color: #00ffaa;">{{ assignment.max_score }}</td>
-                        <td data-label="Fayl" style="text-align: center;">
-                            {% if assignment.file %}
-                                <a href="{{ assignment.file.url }}" target="_blank" class="btn-otish"><i class="fas fa-file-download" style="margin-right: 6px;"></i>Ko'rish</a>
-                            {% else %}
-                                <span style="color: rgba(255,255,255,0.3); font-style: italic;">Fayl yo'q</span>
-                            {% endif %}
-                        </td>
-                        <td data-label="Tahrirlash" style="text-align: center;">
-                            {% if not assignment.submissions.exists %}
-                                <a href="javascript:void(0);" class="edit-assignment-btn"
-                                   data-assignment-id="{{ assignment.id }}"
-                                   data-title="{{ assignment.title }}"
-                                   data-group="{{ assignment.group.id }}"
-                                   data-deadline="{{ assignment.deadline|date:'Y-m-d\TH:i' }}"
-                                   data-max-score="{{ assignment.max_score }}"><i class="fas fa-edit" style="margin-right: 6px;"></i>Tahrirlash</a>
-                            {% else %}
-                                <span style="color: rgba(255,255,255,0.3); font-style: italic;">Bajarilgan (bloklangan)</span>
-                            {% endif %}
-                        </td>
-                        <td data-label="Baholash" style="text-align: center;">
-                            <a class="btn-otish" href="{% url 'teacher_assignment_submissions' assignment.id %}"><i class="fas fa-graduation-cap" style="margin-right: 6px;"></i>Baholash</a>
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="9" style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; padding: 30px 0;">Hozircha hech qanday topshiriq kiritilmagan.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
 {% endblock %}
 
 {% block extra_js %}
     <script>
-        function openModall() {
+        // --- 1. MODAL OYNALAR BOSHQARUVI ---
+        function openCreateModal() {
             document.getElementById('assignmentModal').style.display = 'block';
             document.getElementById('modalBackdrop').style.display = 'block';
         }
 
-        function closeModal() {
+        function closeCreateModal() {
             document.getElementById('assignmentModal').style.display = 'none';
             document.getElementById('modalBackdrop').style.display = 'none';
         }
 
-        // Sana minimal chegarasini belgilash
-        const deadlineInput = document.querySelector('input[name="deadline"]');
-        if (deadlineInput) {
-            const now = new Date();
-            now.setDate(now.getDate() + 3);
-
-            const y = now.getFullYear();
-            const m = String(now.getMonth() + 1).padStart(2, '0');
-            const d = String(now.getDate()).padStart(2, '0');
-            const h = String(now.getHours()).padStart(2, '0');
-            const min = String(now.getMinutes()).padStart(2, '0');
-
-            deadlineInput.min = `${y}-${m}-${d}T${h}:${min}`;
-        }
-
-        // Tahrirlash modal elementlari va mantiqlari
         const editModalEl = document.getElementById("editAssignmentModal");
         const editBackdropEl = document.getElementById("editModalBackdrop");
         const editFormEl = document.getElementById("editForm");
@@ -366,19 +1708,6 @@
         const inputEditGroup = document.getElementById("editGroup");
         const inputEditDeadline = document.getElementById("editDeadline");
         const inputEditScore = document.getElementById("editScore");
-        const tableRows = document.querySelectorAll('table tbody tr');
-
-        function updateRowNumbers() {
-            let visibleIndex = 1;
-            tableRows.forEach(row => {
-                if (row.style.display !== "none" && row.cells.length > 1) {
-                    const firstCell = row.querySelector("td");
-                    if (firstCell) {
-                        firstCell.textContent = visibleIndex++;
-                    }
-                }
-            });
-        }
 
         document.querySelectorAll(".edit-assignment-btn").forEach(button => {
             button.addEventListener("click", () => {
@@ -394,6 +1723,9 @@
                 inputEditDeadline.value = deadline;
                 inputEditScore.value = score;
 
+                // Reset file label
+                document.getElementById('editFileLabel').textContent = "Yangi fayl yuklash uchun bosing (eski fayl saqlanadi)";
+
                 editModalEl.style.display = "block";
                 editBackdropEl.style.display = "block";
             });
@@ -404,34 +1736,94 @@
             editBackdropEl.style.display = "none";
         }
 
-        window.addEventListener("click", (e) => {
-            if (e.target === editBackdropEl) {
-                closeEditAssignmentModal();
+        // Fayl tanlanganda nomini ko'rsatish
+        function handleFileSelect(input, labelId) {
+            const labelEl = document.getElementById(labelId);
+            if (input.files && input.files[0]) {
+                const fName = input.files[0].name;
+                const fSize = (input.files[0].size / (1024 * 1024)).toFixed(2);
+                labelEl.innerHTML = `<strong style="color: #00f2fe;"><i class="fas fa-check-circle"></i> ${fName}</strong> <span style="opacity: 0.7;">(${fSize} MB)</span>`;
             }
-            if (e.target === document.getElementById('modalBackdrop')) {
-                closeModal();
+        }
+
+        // Sana minimal chegarasini belgilash (+3 kun)
+        function initMinDate() {
+            const now = new Date();
+            now.setDate(now.getDate() + 3);
+
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const h = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+
+            const minFormatted = `${y}-${m}-${d}T${h}:${min}`;
+
+            const createInput = document.getElementById('create-deadline-input');
+            if (createInput) {
+                createInput.min = minFormatted;
+                createInput.value = minFormatted;
             }
-        });
 
-        // Topshiriq nomi bo'yicha qidiruv filtri + tartib raqamlarini to'g'rilash
-        document.getElementById('assignment-title-search')?.addEventListener('input', function () {
-            const searchTerm = this.value.toLowerCase().trim();
+            const editInput = document.getElementById('editDeadline');
+            if (editInput) {
+                editInput.min = minFormatted;
+            }
+        }
+        initMinDate();
 
-            tableRows.forEach(row => {
-                const titleCell = row.cells[1];
-                if (titleCell) {
-                    const titleText = titleCell.textContent.toLowerCase().trim();
-                    if (titleText.includes(searchTerm)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
+        // --- 2. QIDIRUV VA STATUS BO'YICHA FILTRLASH ---
+        let currentFilter = 'all';
+        const assignmentRows = document.querySelectorAll('#assignment-table tbody tr.assignment-item-row');
+        const searchInput = document.getElementById('assignment-search-input');
+        const noResultsRow = document.getElementById('no-search-results-row');
+
+        function applyFilters() {
+            const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+            let visibleCount = 0;
+
+            assignmentRows.forEach(row => {
+                const title = row.getAttribute('data-title') || '';
+                const group = row.getAttribute('data-group') || '';
+                const status = row.getAttribute('data-status') || '';
+
+                const matchesSearch = !searchTerm || title.includes(searchTerm) || group.includes(searchTerm);
+                const matchesFilter = (currentFilter === 'all') || (status === currentFilter);
+
+                if (matchesSearch && matchesFilter) {
+                    row.classList.remove('d-row-hidden');
+                    row.style.removeProperty('display');
+                    visibleCount++;
+                    const numSpan = row.querySelector('.row-num-span');
+                    const mobileNum = row.querySelector('.mobile-row-num');
+                    if (numSpan) numSpan.textContent = visibleCount;
+                    if (mobileNum) mobileNum.textContent = visibleCount;
+                } else {
+                    row.classList.add('d-row-hidden');
+                    row.style.setProperty('display', 'none', 'important');
                 }
             });
 
-            updateRowNumbers();
-        });
+            if (noResultsRow) {
+                noResultsRow.style.display = (visibleCount === 0 && assignmentRows.length > 0) ? '' : 'none';
+            }
+        }
 
-    
+        function filterAssignments(filterKey, element) {
+            currentFilter = filterKey;
+
+            document.querySelectorAll('.filter-pill').forEach(pill => {
+                pill.classList.remove('active');
+            });
+            if (element) {
+                element.classList.add('active');
+            }
+
+            applyFilters();
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', applyFilters);
+        }
     </script>
 {% endblock %}

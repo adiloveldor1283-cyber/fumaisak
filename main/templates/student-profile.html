@@ -5,23 +5,24 @@
 
 {% block extra_css %}
 <style>
-    /* --- ⚙️ FAQAT PROFIL SOZLAMALARI VA TAB ELEMENTLARI STILLARI --- */
+    /* --- ⚙️ PROFIL SOZLAMALARI ASOSIY KONTEYNERI --- */
     .profil-konteyner {
-        background: rgba(255, 255, 255, 0.01);
+        background: rgba(11, 15, 25, 0.4);
         border: 1px solid rgba(255, 255, 255, 0.04);
-        box-shadow: 0 40px 80px rgba(0,0,0,0.2);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        max-width: 600px;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        max-width: 650px;
         width: 100%;
-        margin: 0;
-        padding: 30px;
+        margin: 0 auto;
+        padding: 28px;
         border-radius: 24px;
+        box-sizing: border-box;
     }
     .profil-konteyner h2 {
         font-size: 22px;
         font-weight: 800;
-        margin-bottom: 25px;
+        margin-bottom: 22px;
         color: #ffffff;
         border-left: 4px solid #00f2fe;
         padding-left: 12px;
@@ -31,34 +32,36 @@
     /* Cyber Tabs */
     .profil-tablar {
         display: flex;
-        gap: 15px;
-        margin-bottom: 30px;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        gap: 8px;
+        margin-bottom: 25px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         padding-bottom: 2px;
     }
     .profil-tab-btn {
-        color: rgba(255,255,255,0.5);
+        color: rgba(255, 255, 255, 0.5);
         background: none;
         border: none;
         font-weight: 700;
-        font-size: 14px;
+        font-size: 13.5px;
         cursor: pointer;
-        padding: 10px 16px;
+        padding: 10px 14px;
         transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         border-radius: 10px 10px 0 0;
         position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
     .profil-tab-btn i {
-        margin-right: 8px;
         font-size: 13px;
     }
     .profil-tab-btn:hover {
         color: #ffffff;
-        background: rgba(255,255,255,0.02);
+        background: rgba(255, 255, 255, 0.02);
     }
     .aktiv-tab, .profil-tab-btn.aktiv-tab {
         color: #00f2fe !important;
-        background: rgba(0, 242, 254, 0.03);
+        background: rgba(0, 242, 254, 0.04);
     }
     .profil-tab-btn.aktiv-tab::after {
         content: '';
@@ -76,156 +79,671 @@
     }
     .profil-tarkib.aktiv {
         display: block;
+        animation: fadeInTab 0.3s ease;
+    }
+    @keyframes fadeInTab {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Form Controls Setup */
+    /* Form Controls */
     .profil-konteyner label {
         display: block;
-        margin-top: 18px;
-        color: rgba(255,255,255,0.4);
+        margin-top: 16px;
+        margin-bottom: 6px;
+        color: rgba(255, 255, 255, 0.6);
         font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    .form_input input[type="password"], input[type="file"] {
+    .password-input-wrap {
+        position: relative;
         width: 100%;
-        padding: 12px 16px;
+        margin-top: 4px;
+    }
+    .form_input input[type="password"],
+    .form_input input[type="text"] {
+        width: 100%;
+        padding: 12px 42px 12px 16px;
         font-size: 14px;
-        margin-top: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px;
         box-sizing: border-box;
-        background-color: rgba(255, 255, 255, 0.01);
-        color: white;
-        outline: none;
+        background-color: rgba(255, 255, 255, 0.02);
+        color: #ffffff;
+        outline: none !important;
+        box-shadow: none !important;
+        -webkit-appearance: none !important;
         transition: 0.3s;
     }
-    .form_input input[type="password"]:focus {
+    .form_input input[type="password"]:focus,
+    .form_input input[type="text"]:focus {
         border-color: #00f2fe;
-        background: rgba(255,255,255,0.04);
-        box-shadow: 0 0 12px rgba(0, 242, 254, 0.15);
+        background: rgba(255, 255, 255, 0.04);
+        box-shadow: 0 0 12px rgba(0, 242, 254, 0.15) !important;
+    }
+    .toggle-password-btn {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.4);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+    }
+    .toggle-password-btn:hover {
+        color: #00f2fe;
     }
 
     /* Styled Action Button */
     .profil-btn {
         margin-top: 25px;
-        padding: 12px 24px;
+        padding: 13px 24px;
         background: linear-gradient(135deg, #00f2fe, #4facfe);
         color: #070a12;
         border: none;
-        border-radius: 10px;
+        border-radius: 12px;
         cursor: pointer;
         font-size: 14px;
         font-weight: 800;
-        text-uppercase: uppercase;
+        text-transform: uppercase;
         letter-spacing: 0.5px;
         transition: 0.3s;
-        box-shadow: 0 5px 15px rgba(0, 242, 254, 0.2);
+        box-shadow: 0 6px 20px rgba(0, 242, 254, 0.25);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        box-sizing: border-box;
     }
     .profil-btn:hover {
-        box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        box-shadow: 0 0 25px rgba(0, 242, 254, 0.45);
         transform: translateY(-1px);
     }
-
-    /* Profile image view block */
-    img.profil-rasm {
-        margin-top: 12px;
-        border-radius: 14px;
-        width: 110px;
-        height: 110px;
-        object-fit: cover;
-        border: 2px solid rgba(0, 242, 254, 0.2);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    .profil-btn:active {
+        transform: translateY(0);
     }
 
-        
+    /* --- 📸 RASMLAR TAQQOSLASH (HOZIRGI VS NAMUNA 3x4) --- */
+    .photo-comparison-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 14px;
+        margin-bottom: 20px;
+    }
+    .photo-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 16px;
+        padding: 16px 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        transition: 0.3s;
+    }
+    .photo-card.sample-card {
+        background: rgba(0, 255, 170, 0.02);
+        border-color: rgba(0, 255, 170, 0.15);
+    }
+    .photo-card-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+    .current-badge {
+        background: rgba(0, 242, 254, 0.1);
+        color: #00f2fe;
+        border: 1px solid rgba(0, 242, 254, 0.25);
+    }
+    .sample-badge {
+        background: rgba(0, 255, 170, 0.1);
+        color: #00ffaa;
+        border: 1px solid rgba(0, 255, 170, 0.25);
+    }
+
+    .photo-preview-box {
+        width: 110px;
+        height: 140px; /* 3:4 nisbat */
+        border-radius: 14px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        background: #0d1322;
+        border: 2px solid rgba(255, 255, 255, 0.08);
+    }
+    .photo-card.sample-card .photo-preview-box {
+        border-color: rgba(0, 255, 170, 0.3);
+    }
+    img.profil-rasm {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .no-photo-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        color: rgba(255, 255, 255, 0.3);
+    }
+    .no-photo-placeholder i {
+        font-size: 38px;
+    }
+    .no-photo-placeholder span {
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    /* 3x4 Namuna Grafikasi */
+    .sample-avatar-container {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, #f0f4f8 0%, #e2e8f0 100%);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        overflow: hidden;
+    }
+    .sample-badge-3x4 {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        background: rgba(15, 23, 42, 0.8);
+        color: #00ffaa;
+        font-size: 9px;
+        font-weight: 800;
+        padding: 2px 6px;
+        border-radius: 4px;
+        letter-spacing: 0.5px;
+        z-index: 2;
+    }
+    .sample-silhouette {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .sample-head {
+        width: 44px;
+        height: 52px;
+        background: #64748b;
+        border-radius: 50% 50% 45% 45%;
+        margin-top: 8px;
+        position: relative;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .sample-head::after {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 18px;
+        height: 10px;
+        background: #475569;
+        border-radius: 0 0 4px 4px;
+    }
+    .sample-body {
+        width: 82px;
+        height: 42px;
+        background: #334155;
+        border-radius: 36px 36px 0 0;
+        margin-top: 4px;
+    }
+    .sample-guide-lines {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+    .guide-corner {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-color: rgba(0, 255, 170, 0.6);
+    }
+    .guide-corner.top-left { top: 6px; left: 6px; border-top: 2px solid; border-left: 2px solid; }
+    .guide-corner.top-right { top: 6px; right: 6px; border-top: 2px solid; border-right: 2px solid; }
+    .guide-corner.bottom-left { bottom: 6px; left: 6px; border-bottom: 2px solid; border-left: 2px solid; }
+    .guide-corner.bottom-right { bottom: 6px; right: 6px; border-bottom: 2px solid; border-right: 2px solid; }
+
+    .photo-card-label {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 10px;
+    }
+
+    /* Rasm yo'riqnomasi bloki */
+    .photo-guide-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 20px;
+    }
+    .guide-title {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .guide-title i {
+        color: #00f2fe;
+    }
+    .guide-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .guide-list li {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.7);
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        line-height: 1.4;
+    }
+    .guide-list li i {
+        margin-top: 2px;
+        font-size: 11px;
+        flex-shrink: 0;
+    }
+
+    /* Custom File Upload Box */
+    .custom-file-upload {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    .file-input-hidden {
+        display: none;
+    }
+    .file-upload-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 18px;
+        border: 1px dashed rgba(0, 242, 254, 0.3);
+        border-radius: 12px;
+        background: rgba(0, 242, 254, 0.03);
+        color: #00f2fe;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+        transition: 0.3s;
+    }
+    .file-upload-btn:hover {
+        background: rgba(0, 242, 254, 0.08);
+        border-color: #00f2fe;
+    }
+    .file-name-preview {
+        font-size: 11.5px;
+        color: rgba(255, 255, 255, 0.5);
+        text-align: center;
+        word-break: break-all;
+    }
+
+    /* --- ☀️ LIGHT MODE OVERRIDES --- */
+    body.light-mode .profil-konteyner {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.04) !important;
+    }
+    body.light-mode .profil-konteyner h2 {
+        color: #0f172a !important;
+        border-left-color: #0284c7 !important;
+    }
+    body.light-mode .profil-tablar {
+        border-bottom-color: #e2e8f0 !important;
+    }
+    body.light-mode .profil-tab-btn {
+        color: #64748b !important;
+    }
+    body.light-mode .profil-tab-btn:hover {
+        color: #0f172a !important;
+        background: #f8fafc !important;
+    }
+    body.light-mode .aktiv-tab, body.light-mode .profil-tab-btn.aktiv-tab {
+        color: #0284c7 !important;
+        background: rgba(2, 132, 199, 0.05) !important;
+    }
+    body.light-mode .profil-tab-btn.aktiv-tab::after {
+        background: #0284c7 !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.4) !important;
+    }
+    body.light-mode .profil-konteyner label {
+        color: #475569 !important;
+    }
+    body.light-mode .form_input input[type="password"],
+    body.light-mode .form_input input[type="text"] {
+        background-color: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    body.light-mode .form_input input[type="password"]:focus,
+    body.light-mode .form_input input[type="text"]:focus {
+        border-color: #0284c7 !important;
+        background-color: #ffffff !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.15) !important;
+    }
+    body.light-mode .toggle-password-btn {
+        color: #64748b !important;
+    }
+    body.light-mode .toggle-password-btn:hover {
+        color: #0284c7 !important;
+    }
+    body.light-mode .profil-btn {
+        background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3) !important;
+    }
+    body.light-mode .photo-card {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+    }
+    body.light-mode .photo-card.sample-card {
+        background: #f0fdf4 !important;
+        border-color: #bbf7d0 !important;
+    }
+    body.light-mode .current-badge {
+        background: #e0f2fe !important;
+        color: #0284c7 !important;
+        border-color: #bae6fd !important;
+    }
+    body.light-mode .sample-badge {
+        background: #dcfce7 !important;
+        color: #16a34a !important;
+        border-color: #86efac !important;
+    }
+    body.light-mode .photo-preview-box {
+        background: #e2e8f0 !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06) !important;
+    }
+    body.light-mode .photo-card.sample-card .photo-preview-box {
+        border-color: #86efac !important;
+    }
+    body.light-mode .photo-card-label {
+        color: #475569 !important;
+    }
+    body.light-mode .photo-guide-card {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+    }
+    body.light-mode .guide-title {
+        color: #0f172a !important;
+    }
+    body.light-mode .guide-title i {
+        color: #0284c7 !important;
+    }
+    body.light-mode .guide-list li {
+        color: #334155 !important;
+    }
+    body.light-mode .file-upload-btn {
+        border-color: #0284c7 !important;
+        background: rgba(2, 132, 199, 0.04) !important;
+        color: #0284c7 !important;
+    }
+    body.light-mode .file-upload-btn:hover {
+        background: rgba(2, 132, 199, 0.08) !important;
+    }
+    body.light-mode .file-name-preview {
+        color: #64748b !important;
+    }
+    body.light-mode .instruction-box {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+        color: #334155 !important;
+    }
+    body.light-mode .instruction-box span {
+        color: #0f172a !important;
+    }
+    body.light-mode .telegram-title {
+        color: #0f172a !important;
+    }
+    body.light-mode .otp-box {
+        background: #f0fdf4 !important;
+        border-color: #86efac !important;
+    }
 
     /* --- 📱 MOBIL QURILMALAR MEDIA REJIMI --- */
     @media (max-width: 768px) {
         .profil-konteyner {
-            padding: 20px;
-            border-radius: 18px;
+            padding: 20px 16px;
+            border-radius: 20px;
+            margin-bottom: 45px !important;
         }
         .profil-tablar {
-            gap: 5px;
+            gap: 4px;
         }
         .profil-tab-btn {
-            padding: 8px 10px;
-            font-size: 12.5px;
+            padding: 8px 6px;
+            font-size: 11.5px;
             flex: 1;
             text-align: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .profil-tab-btn i {
+            font-size: 14px;
+        }
+        .photo-comparison-grid {
+            gap: 10px;
+        }
+        .photo-card {
+            padding: 12px 8px;
+        }
+        .photo-preview-box {
+            width: 95px;
+            height: 122px;
+        }
+        .photo-card-badge {
+            font-size: 9.5px;
+            padding: 3px 6px;
+            margin-bottom: 8px;
+        }
+        .photo-card-label {
+            font-size: 10.5px;
+            margin-top: 6px;
+        }
+        .photo-guide-card {
+            padding: 12px;
+        }
+        .guide-title {
+            font-size: 11.5px;
+        }
+        .guide-list li {
+            font-size: 11px;
         }
         .profil-btn {
-            width: 100%;
-            text-align: center;
+            font-size: 13.5px;
+            padding: 12px 18px;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-    
-
     <div class="profil-konteyner">
         <h2>Profil sozlamalari</h2>
 
         <!-- TABS CONTROL CONTAINER -->
         <div class="profil-tablar">
-            <button class="profil-tab-btn aktiv-tab" onclick="ochTab(event, 'parol')"><i class="fas fa-lock"></i>Parolni o'zgartirish</button>
-            <button class="profil-tab-btn" onclick="ochTab(event, 'rasm')"><i class="fas fa-image"></i>Rasmni saqlash</button>
-            <button class="profil-tab-btn" onclick="ochTab(event, 'telegram')"><i class="fab fa-telegram-plane"></i>Telegram ulanishi</button>
+            <button type="button" class="profil-tab-btn aktiv-tab" onclick="ochTab(event, 'parol')">
+                <i class="fas fa-lock"></i>
+                <span>Parol</span>
+            </button>
+            <button type="button" class="profil-tab-btn" onclick="ochTab(event, 'rasm')">
+                <i class="fas fa-camera"></i>
+                <span>Rasm yuklash</span>
+            </button>
+            <button type="button" class="profil-tab-btn" onclick="ochTab(event, 'telegram')">
+                <i class="fab fa-telegram-plane"></i>
+                <span>Telegram</span>
+            </button>
         </div>
 
-        <!-- Parol o'zgartirish bo'limi -->
+        <!-- 🔒 1. Parol o'zgartirish bo'limi -->
         <div id="parol" class="profil-tarkib aktiv">
             <form method="post" class="form_input">
                 {% csrf_token %}
                 <input type="hidden" name="form_type" value="change_password">
 
                 <label>Eski parol:</label>
-                <input type="password" name="old_password" placeholder="Eski parolni kiriting">
+                <div class="password-input-wrap">
+                    <input type="password" id="old_password" name="old_password" placeholder="Eski parolni kiriting" required>
+                    <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('old_password', this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
 
                 <label>Yangi parol:</label>
-                <input type="password" name="new_password1" placeholder="Yangi parolni kiriting">
+                <div class="password-input-wrap">
+                    <input type="password" id="new_password1" name="new_password1" placeholder="Yangi parol (kamida 8 belgi)" required minlength="8">
+                    <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('new_password1', this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
 
                 <label>Yangi parolni tasdiqlang:</label>
-                <input type="password" name="new_password2" placeholder="Yangi parolni tasdiqlang">
+                <div class="password-input-wrap">
+                    <input type="password" id="new_password2" name="new_password2" placeholder="Yangi parolni qayta kiriting" required minlength="8">
+                    <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('new_password2', this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
 
-                <button type="submit" class="profil-btn">Saqlash</button>
+                <button type="submit" class="profil-btn">
+                    <i class="fas fa-shield-alt"></i> Parolni saqlash
+                </button>
             </form>
         </div>
 
-        <!-- Rasm yuklash bo'limi -->
+        <!-- 📸 2. Rasm yuklash bo'limi (Namunaviy 3x4 rasm bilan) -->
         <div id="rasm" class="profil-tarkib">
             <form method="post" enctype="multipart/form-data" class="form_input">
                 {% csrf_token %}
                 <input type="hidden" name="form_type" value="upload_image">
 
-                <label>Hozirgi rasm:</label>
-                {% if student.profile_image %}
-                    <img src="{{ student.profile_image.url }}?v={{ student.last_login|default:student.date_joined|date:'U' }}" class="profil-rasm">
-                {% else %}
-                    <img src="{{ default_profile_image }}" class="profil-rasm">
-                {% endif %}
+                <label>Profil rasmi taqqoslanishi:</label>
+                
+                <!-- Rasmlar taqqoslash kartalari (Hozirgi vs Namuna 3x4) -->
+                <div class="photo-comparison-grid">
+                    <!-- Hozirgi rasm -->
+                    <div class="photo-card">
+                        <div class="photo-card-badge current-badge"><i class="fas fa-user"></i> Hozirgi rasm</div>
+                        <div class="photo-preview-box">
+                            {% if student.profile_image %}
+                                <img id="currentPhotoImg" src="{{ student.profile_image.url }}?v={{ student.last_login|default:student.date_joined|date:'U' }}" class="profil-rasm" alt="Hozirgi profil rasmi">
+                            {% else %}
+                                <div id="noPhotoPlaceholder" class="no-photo-placeholder">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>Rasm yo'q</span>
+                                </div>
+                                <img id="currentPhotoImg" src="" class="profil-rasm" alt="Yangi yuklanayotgan rasm" style="display: none;">
+                            {% endif %}
+                        </div>
+                        <span class="photo-card-label" id="photoStatusLabel">{% if student.profile_image %}Yuklangan{% else %}O'rnatilmagan{% endif %}</span>
+                    </div>
 
-                <label>Yangi rasmni yuklash:</label>
-                <input type="file" name="profile_image" accept="image/*">
+                    <!-- Namunaviy rasm (3x4 format) -->
+                    <div class="photo-card sample-card">
+                        <div class="photo-card-badge sample-badge"><i class="fas fa-check-circle"></i> Namuna (3x4)</div>
+                        <div class="photo-preview-box">
+                            <div class="sample-avatar-container">
+                                <div class="sample-badge-3x4">3x4</div>
+                                <div class="sample-silhouette">
+                                    <div class="sample-head"></div>
+                                    <div class="sample-body"></div>
+                                </div>
+                                <div class="sample-guide-lines">
+                                    <div class="guide-corner top-left"></div>
+                                    <div class="guide-corner top-right"></div>
+                                    <div class="guide-corner bottom-left"></div>
+                                    <div class="guide-corner bottom-right"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="photo-card-label" style="color: #00ffaa; font-weight: 700;">To'g'ri namuna</span>
+                    </div>
+                </div>
 
-                <button type="submit" class="profil-btn">Rasmni saqlash</button>
+                <!-- Rasm talablari bo'yicha yo'riqnoma -->
+                <div class="photo-guide-card">
+                    <div class="guide-title"><i class="fas fa-info-circle"></i> Rasm uchun talablar:</div>
+                    <ul class="guide-list">
+                        <li><i class="fas fa-check-circle" style="color: #00ffaa;"></i> Yuz qismi to'g'ri qaragan, markazda va aniq yoritilgan bo'lishi lozim.</li>
+                        <li><i class="fas fa-check-circle" style="color: #00ffaa;"></i> Oq yoki och rangdagi bir xil neytral fon tavsiya etiladi (3x4 proporsiya).</li>
+                        <li><i class="fas fa-times-circle" style="color: #ff4a5a;"></i> Qora ko'zoynak, bosh kiyim yoki yuzni to'sadigan narsalar taqiqlanadi.</li>
+                    </ul>
+                </div>
+
+                <!-- Yangi fayl tanlash -->
+                <label>Yangi rasm tanlash:</label>
+                <div class="custom-file-upload">
+                    <input type="file" id="profileImageInput" name="profile_image" accept="image/*" class="file-input-hidden" onchange="previewSelectedImage(this)" required>
+                    <label for="profileImageInput" class="file-upload-btn">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Rasmni tanlash (JPG, PNG)</span>
+                    </label>
+                    <div id="selectedFileName" class="file-name-preview">Hali rasm tanlanmadi</div>
+                </div>
+
+                <button type="submit" class="profil-btn">
+                    <i class="fas fa-save"></i> Rasmni saqlash
+                </button>
             </form>
         </div>
 
-        <!-- Telegram ulanishi bo'limi -->
+        <!-- ✈️ 3. Telegram ulanishi bo'limi -->
         <div id="telegram" class="profil-tarkib">
             {% if not student.telegram_chat_id %}
-            <div style="text-align: center; padding: 20px 0;">
-                <div style="width: 60px; height: 60px; background: rgba(0, 242, 254, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 28px; color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.25);">
+            <div style="text-align: center; padding: 10px 0;">
+                <div style="width: 56px; height: 56px; background: rgba(0, 242, 254, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 26px; color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.25);">
                     <i class="fab fa-telegram-plane"></i>
                 </div>
-                <h4 style="color: white; font-size: 16px; margin-bottom: 8px;">Telegram bildirishnomalarini yoqish</h4>
+                <h4 class="telegram-title" style="color: white; font-size: 16px; font-weight: 800; margin-bottom: 8px;">Telegram bildirishnomalarini yoqish</h4>
                 
-                <div style="text-align: left; max-width: 400px; margin: 0 auto 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.65);">
+                <div class="instruction-box" style="text-align: left; max-width: 440px; margin: 0 auto 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 14px; font-size: 12.5px; line-height: 1.6; color: rgba(255,255,255,0.7);">
                     <span style="font-weight: 700; color: white;">Bog'lash yo'riqnomasi:</span>
                     <ol style="margin: 8px 0 0 18px; padding: 0;">
                         <li>Telegramda <a href="https://t.me/lms_tizim_bot" target="_blank" style="color: #00f2fe; text-decoration: underline; font-weight: 700;">@lms_tizim_bot</a> ni ochib, <b>Start</b> bosing.</li>
@@ -234,27 +752,27 @@
                     </ol>
                 </div>
 
-                <button type="button" onclick="generateOtpCode(this)" class="profil-btn" style="padding: 12px 35px; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);">
-                    Kod shakllantirish
+                <button type="button" onclick="generateOtpCode(this)" class="profil-btn" style="box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);">
+                    <i class="fas fa-key"></i> Kod shakllantirish
                 </button>
 
-                <div id="otp-display-container" style="display: none; max-width: 320px; margin: 25px auto 0; padding: 15px; border-radius: 12px; background: rgba(0, 242, 254, 0.03); border: 1px dashed rgba(0, 242, 254, 0.3); box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
-                    <div style="font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Sizning ulanish kodingiz:</div>
+                <div id="otp-display-container" class="otp-box" style="display: none; max-width: 320px; margin: 22px auto 0; padding: 16px; border-radius: 14px; background: rgba(0, 242, 254, 0.03); border: 1px dashed rgba(0, 242, 254, 0.35); box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
+                    <div style="font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Sizning ulanish kodingiz:</div>
                     <div id="otp-code-val" style="font-size: 36px; font-weight: 900; color: #00f2fe; margin: 10px 0; letter-spacing: 6px; font-family: monospace;">000000</div>
                     <div id="otp-countdown" style="font-size: 12px; color: #00ffaa; font-weight: 700;">Amal qilish muddati: 60 soniya</div>
                 </div>
             </div>
             {% else %}
-            <div style="text-align: center; padding: 20px 0;">
-                <div style="width: 60px; height: 60px; background: rgba(0, 255, 170, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 28px; color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.25); box-shadow: 0 0 15px rgba(0, 255, 170, 0.15);">
-                    <i class="fab fa-telegram-plane"></i>
+            <div style="text-align: center; padding: 15px 0;">
+                <div style="width: 56px; height: 56px; background: rgba(0, 255, 170, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 26px; color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.25); box-shadow: 0 0 15px rgba(0, 255, 170, 0.15);">
+                    <i class="fas fa-check-circle"></i>
                 </div>
-                <h4 style="color: white; font-size: 16px; margin-bottom: 8px;">Telegram bot ulandi</h4>
-                <p style="color: rgba(255,255,255,0.5); font-size: 13px; line-height: 1.5; margin-bottom: 20px;">Sizning profilingiz Telegram hisobingizga muvaffaqiyatli ulangan va bildirishnomalar yoqilgan.</p>
+                <h4 class="telegram-title" style="color: white; font-size: 16px; font-weight: 800; margin-bottom: 8px;">Telegram bot muvaffaqiyatli ulangan</h4>
+                <p style="color: rgba(255,255,255,0.6); font-size: 13px; line-height: 1.5; margin-bottom: 22px;">Sizning profilingiz Telegram botga ulangan. Barcha muhim bildirishnomalar profilingizga yuborib turiladi.</p>
                 <form method="POST" action="{% url 'disconnect_telegram' %}" style="margin: 0;">
                     {% csrf_token %}
-                    <button type="submit" class="profil-btn" style="background: rgba(255, 74, 90, 0.1); border: 1px solid rgba(255, 74, 90, 0.3); color: #ff4a5a; box-shadow: none; padding: 12px 30px;">
-                        Ulanishni uzish
+                    <button type="submit" class="profil-btn" style="background: rgba(255, 74, 90, 0.1); border: 1px solid rgba(255, 74, 90, 0.3); color: #ff4a5a; box-shadow: none;">
+                        <i class="fas fa-unlink"></i> Ulanishni uzish
                     </button>
                 </form>
             </div>
@@ -265,7 +783,7 @@
 
 {% block extra_js %}
 <script>
-    /* --- 🔄 FAQAT TABS BOSHQARUVI VA TOAST TIMEOUT LOGIKALARI --- */
+    /* --- 🔄 TABLARNI ALMASHTIRISH --- */
     function ochTab(e, id) {
         var barchaTarkib = document.querySelectorAll('.profil-tarkib');
         var barchaBtn = document.querySelectorAll('.profil-tab-btn');
@@ -277,7 +795,10 @@
             btn.classList.remove('aktiv-tab');
         });
 
-        document.getElementById(id).classList.add('aktiv');
+        const targetPanel = document.getElementById(id);
+        if (targetPanel) {
+            targetPanel.classList.add('aktiv');
+        }
 
         const targetBtn = e.target.closest('.profil-tab-btn');
         if (targetBtn) {
@@ -285,13 +806,67 @@
         }
     }
 
+    /* --- 👁️ PAROL KO'RINISHINI O'ZGARTIRISH --- */
+    function togglePasswordVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (!input) return;
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            if (icon) {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        } else {
+            input.type = 'password';
+            if (icon) {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    }
+
+    /* --- 🖼️ TANLANGAN RASMNI JONLI KO'RISH (PREVIEW) --- */
+    function previewSelectedImage(input) {
+        const fileNameEl = document.getElementById('selectedFileName');
+        const imgEl = document.getElementById('currentPhotoImg');
+        const placeholderEl = document.getElementById('noPhotoPlaceholder');
+        const statusLabel = document.getElementById('photoStatusLabel');
+
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            if (fileNameEl) {
+                fileNameEl.textContent = "Tanlandi: " + file.name;
+                fileNameEl.style.color = "#00f2fe";
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (imgEl) {
+                    imgEl.src = e.target.result;
+                    imgEl.style.display = "block";
+                }
+                if (placeholderEl) {
+                    placeholderEl.style.display = "none";
+                }
+                if (statusLabel) {
+                    statusLabel.textContent = "Yangi tanlangan rasm";
+                    statusLabel.style.color = "#00f2fe";
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    /* --- 📱 TELEGRAM OTP GENERATSIYA --- */
     let otpInterval = null;
     function generateOtpCode(btn) {
         if (otpInterval) clearInterval(otpInterval);
         
-        const originalText = btn.textContent;
+        const originalHtml = btn.innerHTML;
         btn.disabled = true;
-        btn.textContent = "Yuklanmoqda...";
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yuklanmoqda...';
         
         function getCookie(name) {
             let cookieValue = null;
@@ -319,27 +894,35 @@
         })
         .then(response => response.json())
         .then(data => {
-            btn.textContent = "Kodni yangilash";
+            btn.innerHTML = '<i class="fas fa-sync-alt"></i> Kodni yangilash';
             btn.disabled = false;
             if (data.status === 'success') {
-                document.getElementById('otp-display-container').style.display = 'block';
-                document.getElementById('otp-code-val').textContent = data.otp_code;
+                const displayContainer = document.getElementById('otp-display-container');
+                if (displayContainer) displayContainer.style.display = 'block';
+                
+                const codeVal = document.getElementById('otp-code-val');
+                if (codeVal) {
+                    codeVal.textContent = data.otp_code;
+                    codeVal.style.color = '#00f2fe';
+                }
                 
                 let timeLeft = data.expires_in || 60;
                 const countdownEl = document.getElementById('otp-countdown');
-                countdownEl.style.color = '#00ffaa';
-                countdownEl.textContent = `Amal qilish muddati: ${timeLeft} soniya`;
+                if (countdownEl) {
+                    countdownEl.style.color = '#00ffaa';
+                    countdownEl.textContent = `Amal qilish muddati: ${timeLeft} soniya`;
+                }
                 
                 otpInterval = setInterval(() => {
                     timeLeft--;
-                    if (timeLeft <= 10) {
+                    if (timeLeft <= 10 && countdownEl) {
                         countdownEl.style.color = '#ff4a5a';
                     }
                     if (timeLeft <= 0) {
                         clearInterval(otpInterval);
-                        countdownEl.textContent = "Kod muddati tugadi. Iltimos kodni yangilang.";
-                        document.getElementById('otp-code-val').style.color = 'rgba(255,255,255,0.2)';
-                    } else {
+                        if (countdownEl) countdownEl.textContent = "Kod muddati tugadi. Iltimos kodni yangilang.";
+                        if (codeVal) codeVal.style.color = 'rgba(255,255,255,0.2)';
+                    } else if (countdownEl) {
                         countdownEl.textContent = `Amal qilish muddati: ${timeLeft} soniya`;
                     }
                 }, 1000);
@@ -348,7 +931,7 @@
             }
         })
         .catch(err => {
-            btn.textContent = originalText;
+            btn.innerHTML = originalHtml;
             btn.disabled = false;
             alert("Xatolik: " + err.message);
         });

@@ -471,8 +471,11 @@
             flex-direction: column;
             flex-grow: 1;
             height: calc(100vh - 69px);
+            height: calc(100dvh - 69px);
             overflow-y: auto;
             overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
         }
         /* --- 🤖 FAOL (ACTIVE) MENYU UCHUN MAXSUS NEON STILLAR --- */
         .sidebar ul li.active {
@@ -489,11 +492,69 @@
 
         /* Umumiy Media Queries */
         @media (max-width: 768px) {
-            body { overflow: hidden; }
-            body.sidebar-open { overflow: hidden !important; height: 100vh !important; }
+            body { 
+                overflow-x: hidden !important; 
+                overflow-y: auto !important;
+                height: auto !important; 
+                min-height: 100vh;
+                min-height: 100dvh;
+                -webkit-overflow-scrolling: touch;
+            }
+            body.sidebar-open { 
+                overflow: hidden !important; 
+                height: 100vh !important; 
+                height: 100dvh !important; 
+            }
+            .header {
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 1000 !important;
+                height: 58px;
+                min-height: 58px;
+                padding: 0 10px;
+                backdrop-filter: blur(15px);
+                -webkit-backdrop-filter: blur(15px);
+            }
+            .user-profile {
+                gap: 12px;
+                padding-right: 4px;
+            }
+            .user_profile_img {
+                width: 36px;
+                height: 36px;
+            }
+            #themeToggleBtn {
+                font-size: 16px;
+                margin-right: 2px;
+            }
+            #bell-btn i {
+                font-size: 17px;
+            }
+            .toggle-main {
+                margin-left: 6px;
+                font-size: 18px;
+            }
+            .dropdown-panel {
+                top: 52px;
+            }
+            #bell-panel {
+                right: 8px !important;
+                width: min(310px, calc(100vw - 16px)) !important;
+            }
+            #profile-panel {
+                right: 8px !important;
+                width: 170px !important;
+            }
+            .main {
+                height: auto !important;
+                min-height: 100vh;
+                min-height: 100dvh;
+                overflow: visible !important;
+            }
             .sidebar {
                 position: fixed !important;
                 height: 100vh !important;
+                height: 100dvh !important;
                 transform: translateX(-100%);
                 z-index: 1005;
                 background: rgba(11, 15, 25, 0.96);
@@ -511,9 +572,51 @@
                 display: inline !important;
             }
             .content {
-                padding: 15px;
-                height: calc(100vh - 69px);
-                overflow-y: auto;
+                display: block !important;
+                padding: 12px 10px calc(45px + env(safe-area-inset-bottom, 15px)) 10px !important;
+                height: auto !important;
+                min-height: calc(100vh - 58px) !important;
+                min-height: calc(100dvh - 58px) !important;
+                overflow: visible !important;
+                scroll-padding-bottom: 45px;
+                padding-bottom: calc(45px + env(safe-area-inset-bottom, 15px)) !important;
+            }
+            .content::after {
+                display: none !important;
+            }
+            /* Mobil ekranlarda barcha konteynerlar avtomatik vertikal moslashishi uchun */
+            .jadval-container,
+            .profil-konteyner,
+            .konteyner,
+            .quiz-container,
+            .dashboard-container,
+            .flipbook-container,
+            .exam-grid {
+                max-height: none;
+                min-height: auto;
+                height: auto;
+                width: 100% !important;
+            }
+
+            .exam-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Har bir asosiy blok tagida qulay vertikal oraliq (oxirgisi ostida 10px qoladi) */
+            .jadval-container,
+            .profil-konteyner,
+            .konteyner,
+            .quiz-container,
+            .dashboard-container,
+            .kartalar,
+            .left_right_panel,
+            .group-payment-block,
+            .exam-card,
+            .chiqish_sahifa {
+                margin-bottom: 12px !important;
+            }
+            .content > *:last-child {
+                margin-bottom: 0 !important;
             }
         }
 

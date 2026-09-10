@@ -273,6 +273,49 @@
             color: rgba(255, 255, 255, 0.5);
         }
 
+        /* --- 📱 MOBIL QURILMALAR UCHUN --- */
+        @media (max-width: 768px) {
+            .sarlavha {
+                font-size: 17px !important;
+                border-left-width: 3px !important;
+                padding-left: 8px !important;
+                margin-bottom: 16px !important;
+            }
+            .jadval-container {
+                max-height: none !important;
+                overflow: visible !important;
+                padding: 0 !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+            .exam-grid {
+                grid-template-columns: 1fr !important;
+                gap: 14px !important;
+                margin-bottom: 45px !important;
+            }
+            .exam-card {
+                padding: 16px 14px !important;
+                border-radius: 18px !important;
+                margin-bottom: 0 !important;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+            }
+            .exam-title {
+                font-size: 15px !important;
+            }
+            .score-number {
+                font-size: 22px !important;
+            }
+            .score-display {
+                padding: 12px 14px !important;
+                border-radius: 14px !important;
+            }
+            .reg-info-box {
+                padding: 12px 14px !important;
+                border-radius: 14px !important;
+            }
+        }
+
         /* --- KUN REJIMI (LIGHT MODE) OVERRIDES --- */
         body.light-mode .sarlavha {
             color: #0f172a !important;
@@ -353,11 +396,32 @@
         body.light-mode .btn-primary {
             background: linear-gradient(135deg, #0284c7, #0369a1) !important;
             color: #ffffff !important;
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.25) !important;
         }
         body.light-mode .btn-secondary {
             background: #f1f5f9 !important;
             border-color: #cbd5e1 !important;
             color: #475569 !important;
+        }
+        body.light-mode .badge-completed {
+            background: rgba(22, 163, 74, 0.08) !important;
+            color: #15803d !important;
+            border-color: rgba(22, 163, 74, 0.25) !important;
+        }
+        body.light-mode .badge-registered {
+            background: rgba(2, 132, 199, 0.08) !important;
+            color: #0284c7 !important;
+            border-color: rgba(2, 132, 199, 0.25) !important;
+        }
+        body.light-mode .badge-open {
+            background: #fffbeb !important;
+            color: #b45309 !important;
+            border-color: #fde68a !important;
+        }
+        body.light-mode .badge-expired {
+            background: #f1f5f9 !important;
+            color: #64748b !important;
+            border-color: #cbd5e1 !important;
         }
     </style>
 {% endblock %}

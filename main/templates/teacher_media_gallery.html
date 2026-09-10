@@ -1,242 +1,967 @@
 {% extends 'baseteacher.html' %}
 {% load static %}
 
-{% block title %}Video darslar{% endblock %}
+{% block title %}Video darslar boshqaruvi{% endblock %}
 
 {% block extra_css %}
     <style>
-        /* --- 🔍 QIDIRUV PANELI - SPLIT DESIGN --- */
-        .search-form {
-            display: flex;
-            position: relative;
-        }
-        .search-input {
-            padding: 10px 16px;
-            font-size: 13px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px 0 0 12px;
-            outline: none;
-            width: 25vw;
-            background-color: rgba(255, 255, 255, 0.02);
-            color: #ffffff;
-            margin-left: 20px;
-            border-right: none;
-            transition: 0.3s;
-        }
-        .search-input:focus {
-            border-color: #00f2fe;
-            background: rgba(255, 255, 255, 0.06);
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
-        }
-        .search-btn {
-            background-color: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-left: none;
-            padding: 10px 18px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 13px;
-            border-radius: 0 12px 12px 0;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .search-btn:hover {
-            background-color: rgba(0, 242, 254, 0.1);
-            color: #00f2fe;
-            border-color: rgba(0, 242, 254, 0.2);
-        }
+        /* =========================================================
+           ✨ VIDEO DARSLAR — 1-TO-1 LIGHT & DARK MODE DESIGN
+           ========================================================= */
 
+        /* --- 🔍 SARLAVHA VA TEPA PANELI --- */
+        .sarlavha-qatori {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .sarlavha-text-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
         .sarlavha {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 800;
-            margin-bottom: 20px;
             color: #ffffff;
             border-left: 4px solid #00f2fe;
-            padding-left: 12px;
-            letter-spacing: -0.5px;
+            padding-left: 14px;
+            letter-spacing: -0.4px;
+            margin: 0;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sarlavha i.title-icon {
+            color: #00f2fe;
+            font-size: 20px;
+        }
+        .sarlavha-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin: 0;
+            padding-left: 18px;
         }
 
-        .guruhlar-qatori {
+        body.light-mode .sarlavha {
+            color: #0f172a !important;
+            border-left-color: #0284c7 !important;
+        }
+        body.light-mode .sarlavha i.title-icon {
+            color: #0284c7 !important;
+        }
+        body.light-mode .sarlavha-subtitle {
+            color: #64748b !important;
+        }
+
+        .header-action-group {
             display: flex;
+            align-items: center;
             gap: 12px;
             flex-wrap: wrap;
-            margin-top: 10px;
-            margin-bottom: 25px;
         }
 
-        .guruh-btn {
-            display: inline-block;
-            padding: 12px 24px;
+        /* --- 🚀 YUKLASH TUGMASI --- */
+        .btn-create-video {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
             background: linear-gradient(135deg, #00f2fe, #4facfe);
             color: #070a12;
             text-decoration: none;
-            border-radius: 10px;
-            font-size: 14px;
+            border-radius: 12px;
+            font-size: 13.5px;
             font-weight: 800;
-            transition: 0.3s;
+            transition: all 0.25s ease;
             border: none;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.25);
+            white-space: nowrap;
         }
-        .guruh-btn:hover {
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
-            transform: translateY(-1px);
+        .btn-create-video:hover {
+            box-shadow: 0 0 22px rgba(0, 242, 254, 0.45);
+            transform: translateY(-2px);
+            color: #070a12;
+        }
+        body.light-mode .btn-create-video {
+            background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
+        }
+        body.light-mode .btn-create-video:hover {
+            background: linear-gradient(135deg, #0369a1, #0284c7) !important;
+            color: #ffffff !important;
+            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.4) !important;
         }
 
-        .hr-joy {
-            border: none;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            margin: 25px 0;
+        /* --- 📊 4 TA STATISTIKA KARTALARI --- */
+        .stats-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
         }
-
-        .jadval-container {
-            flex-grow: 1;
-            overflow-y: auto !important;
-            overflow-x: auto !important;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.01);
+        .stat-card {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.25s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        body.light-mode .stat-card {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .stat-card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        .stat-icon-wrap {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            flex-shrink: 0;
+        }
+        .stat-card.blue .stat-icon-wrap {
+            background: rgba(0, 242, 254, 0.1);
+            color: #00f2fe;
+            border: 1px solid rgba(0, 242, 254, 0.25);
+        }
+        .stat-card.green .stat-icon-wrap {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+        .stat-card.red .stat-icon-wrap {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+        .stat-card.purple .stat-icon-wrap {
+            background: rgba(168, 85, 247, 0.1);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.25);
+        }
+
+        body.light-mode .stat-card.blue .stat-icon-wrap {
+            background: #e0f2fe !important;
+            color: #0284c7 !important;
+            border-color: #bae6fd !important;
+        }
+        body.light-mode .stat-card.green .stat-icon-wrap {
+            background: #dcfce7 !important;
+            color: #16a34a !important;
+            border-color: #bbf7d0 !important;
+        }
+        body.light-mode .stat-card.red .stat-icon-wrap {
+            background: #fee2e2 !important;
+            color: #dc2626 !important;
+            border-color: #fecaca !important;
+        }
+        body.light-mode .stat-card.purple .stat-icon-wrap {
+            background: #f3e8ff !important;
+            color: #9333ea !important;
+            border-color: #e9d5ff !important;
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+        body.light-mode .stat-value {
+            color: #0f172a !important;
+        }
+        .stat-label {
+            font-size: 11.5px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        body.light-mode .stat-label {
+            color: #64748b !important;
+        }
+
+        /* --- 🔍 FILTER VA QIDIRUV QATORI --- */
+        .toolbar-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .filter-pills-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-pill {
+            padding: 7px 15px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.65);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+        .filter-pill:hover {
+            color: #ffffff;
+            border-color: rgba(0, 242, 254, 0.3);
+            background: rgba(0, 242, 254, 0.05);
+        }
+        .filter-pill.active {
+            background: rgba(0, 242, 254, 0.12);
+            border-color: #00f2fe;
+            color: #00f2fe;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+        }
+        .filter-pill .pill-badge {
+            padding: 1px 6px;
+            border-radius: 6px;
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .filter-pill.active .pill-badge {
+            background: rgba(0, 242, 254, 0.25);
+            color: #ffffff;
+        }
+
+        body.light-mode .filter-pill {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #475569 !important;
+        }
+        body.light-mode .filter-pill:hover {
+            background: #f8fafc !important;
+            color: #0284c7 !important;
+            border-color: #0284c7 !important;
+        }
+        body.light-mode .filter-pill.active {
+            background: #e0f2fe !important;
+            border-color: #0284c7 !important;
+            color: #0284c7 !important;
+            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.15) !important;
+        }
+        body.light-mode .filter-pill .pill-badge {
+            background: #e2e8f0 !important;
+            color: #334155 !important;
+        }
+        body.light-mode .filter-pill.active .pill-badge {
+            background: #0284c7 !important;
+            color: #ffffff !important;
+        }
+
+        /* Qidiruv formasi */
+        .search-form {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 4px 14px;
+            transition: all 0.25s ease;
+            width: 280px;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        .search-form:focus-within {
+            border-color: #00f2fe !important;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.2) !important;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        body input[type="text"].search-input,
+        body .search-form input,
+        .search-input {
+            background: transparent !important;
+            border: 0 !important;
+            border-style: none !important;
+            outline: none !important;
+            color: #ffffff !important;
+            font-size: 13px !important;
+            width: 100% !important;
+            padding: 6px 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+        body input[type="text"].search-input:focus,
+        body .search-form input:focus,
+        .search-input:focus {
+            background: transparent !important;
+            border: 0 !important;
+            border-style: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .search-btn {
+            background: none !important;
+            border: none !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+            padding: 0 0 0 8px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none !important;
+        }
+        .search-btn:hover {
+            color: #00f2fe !important;
+        }
+
+        body.light-mode .search-form {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .search-form:focus-within {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode input[type="text"].search-input,
+        body.light-mode .search-form input,
+        body.light-mode .search-input {
+            color: #0f172a !important;
+            background: transparent !important;
+            border: 0 !important;
+            border-style: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        body.light-mode input[type="text"].search-input:focus,
+        body.light-mode .search-form input:focus,
+        body.light-mode .search-input:focus {
+            border: 0 !important;
+            box-shadow: none !important;
+            outline: none !important;
+            background: transparent !important;
+        }
+        body.light-mode .search-input::placeholder {
+            color: #94a3b8 !important;
+        }
+        body.light-mode .search-btn {
+            color: #64748b !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        body.light-mode .search-btn:hover {
+            color: #0284c7 !important;
+        }
+
+        /* --- 📋 JADVAL KONTEYNERI (DESKTOP) --- */
+        .jadval-container {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            overflow-x: auto;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            max-height: calc(100vh - 300px);
-            min-height: 300px;
+            max-height: calc(100vh - 330px);
+            position: relative;
+            scroll-behavior: smooth;
+            margin-bottom: 25px;
+            box-sizing: border-box;
         }
 
         .jadval-container::-webkit-scrollbar {
+            height: 7px;
             width: 6px;
-            height: 6px;
         }
         .jadval-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .jadval-container::-webkit-scrollbar-thumb {
-            background: rgba(0, 242, 254, 0.12);
+            background: rgba(8, 13, 26, 0.8);
             border-radius: 10px;
         }
+        .jadval-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
+        }
         .jadval-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 242, 254, 0.3);
+            background: #00f2fe;
+        }
+
+        body.light-mode .jadval-container {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .jadval-container::-webkit-scrollbar-track {
+            background: #f8fafc !important;
+        }
+        body.light-mode .jadval-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1 !important;
+            box-shadow: none !important;
+        }
+        body.light-mode .jadval-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8 !important;
         }
 
         table {
-            width: max-content !important;
-            min-width: 100% !important;
-            white-space: nowrap;
+            width: 100% !important;
             border-collapse: collapse;
             text-align: left;
         }
         th {
-            padding: 16px 18px;
+            padding: 14px 18px;
             font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.5);
             letter-spacing: 0.5px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             position: sticky;
             top: 0;
             background: #080d1a;
             z-index: 2;
+            white-space: nowrap;
         }
+        body.light-mode th {
+            background: #f8fafc !important;
+            color: #475569 !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
         td {
             padding: 14px 18px;
             font-size: 13.5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-            color: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.85);
             vertical-align: middle;
+            transition: background 0.2s ease;
         }
         tr:hover td {
-            background: rgba(255, 255, 255, 0.01);
+            background: rgba(255, 255, 255, 0.02);
             color: #ffffff;
         }
+        body.light-mode td {
+            color: #0f172a !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+        }
+        body.light-mode tr:hover td {
+            background: rgba(2, 132, 199, 0.02) !important;
+        }
 
-        .btn-otish, .edit-assignment-btn {
-            display: inline-block;
-            padding: 8px 16px;
-            background: rgba(0, 242, 254, 0.07);
+        /* --- 🏷️ NISHONLAR VA MA'LUMOT BLOKLARI --- */
+        .video-title-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .video-title-text {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 14px;
+        }
+        body.light-mode .video-title-text {
+            color: #0f172a !important;
+        }
+        .video-desc-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.45);
+            max-width: 320px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        body.light-mode .video-desc-text {
+            color: #64748b !important;
+        }
+
+        
+        .row-index-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 6px;
+            border-radius: 8px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.22);
+            color: #00f2fe;
+            font-weight: 800;
+            font-size: 12.5px;
+            font-family: 'JetBrains Mono', monospace, sans-serif;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+        body.light-mode .row-index-pill {
+            background: #e0f2fe !important;
+            border-color: #bae6fd !important;
+            color: #0284c7 !important;
+        }
+
+        .group-pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background: rgba(0, 242, 254, 0.08);
             border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #00f2fe;
+            white-space: nowrap;
+        }
+        body.light-mode 
+        .row-index-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 6px;
+            border-radius: 8px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.22);
+            color: #00f2fe;
+            font-weight: 800;
+            font-size: 12.5px;
+            font-family: 'JetBrains Mono', monospace, sans-serif;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+        body.light-mode .row-index-pill {
+            background: #e0f2fe !important;
+            border-color: #bae6fd !important;
+            color: #0284c7 !important;
+        }
+
+        .group-pill-badge {
+            background: #e0f2fe !important;
+            border-color: #bae6fd !important;
+            color: #0284c7 !important;
+        }
+
+        .type-badge-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .type-badge.youtube {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.28);
+            color: #ef4444;
+        }
+        .type-badge.file {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.28);
+            color: #10b981;
+        }
+        body.light-mode .type-badge.youtube {
+            background: #fee2e2 !important;
+            border-color: #fecaca !important;
+            color: #dc2626 !important;
+        }
+        body.light-mode .type-badge.file {
+            background: #dcfce7 !important;
+            border-color: #bbf7d0 !important;
+            color: #15803d !important;
+        }
+
+        .date-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'JetBrains Mono', monospace, sans-serif;
+            font-size: 12.5px;
+            color: rgba(255, 255, 255, 0.7);
+            white-space: nowrap;
+        }
+        .date-chip i {
+            font-size: 11px;
+            opacity: 0.6;
+        }
+        body.light-mode .date-chip {
+            color: #475569 !important;
+        }
+
+        /* --- 🔘 AMALLAR TUGMALARI --- */
+        .btn-action-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.25);
             color: #00f2fe;
             text-decoration: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            transition: 0.3s;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            transition: all 0.25s ease;
             text-align: center;
             cursor: pointer;
+            white-space: nowrap;
         }
-        .btn-otish:hover, .edit-assignment-btn:hover {
+        .btn-action-primary:hover {
             background: linear-gradient(135deg, #00f2fe, #4facfe);
             color: #070a12;
             border-color: transparent;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+            box-shadow: 0 0 14px rgba(0, 242, 254, 0.4);
+            transform: translateY(-1px);
+        }
+        body.light-mode .btn-action-primary {
+            background: rgba(2, 132, 199, 0.08) !important;
+            border: 1px solid rgba(2, 132, 199, 0.3) !important;
+            color: #0284c7 !important;
+            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.08) !important;
+        }
+        body.light-mode .btn-action-primary:hover {
+            background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+            border-color: transparent !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
         }
 
-        .btn-delete {
-            display: inline-block;
-            padding: 8px 16px;
-            background: rgba(255, 0, 85, 0.07);
-            border: 1px solid rgba(255, 0, 85, 0.2);
-            color: #ff0055;
+        .btn-action-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.85);
             text-decoration: none;
-            border-radius: 8px;
-            font-size: 13px;
+            border-radius: 10px;
+            font-size: 12.5px;
             font-weight: 600;
-            transition: 0.3s;
+            transition: all 0.25s ease;
             text-align: center;
             cursor: pointer;
+            white-space: nowrap;
         }
-        .btn-delete:hover {
-            background: #ff0055;
-            color: white;
+        .btn-action-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+        body.light-mode .btn-action-secondary {
+            background: #f8fafc !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #334155 !important;
+        }
+        body.light-mode .btn-action-secondary:hover {
+            background: #e2e8f0 !important;
+            color: #0f172a !important;
+            border-color: #94a3b8 !important;
+        }
+
+        .btn-action-danger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #ef4444;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            text-align: center;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-action-danger:hover {
+            background: #ef4444;
+            color: #ffffff;
             border-color: transparent;
-            box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+            box-shadow: 0 0 14px rgba(239, 68, 68, 0.4);
+            transform: translateY(-1px);
+        }
+        body.light-mode .btn-action-danger {
+            background: rgba(220, 38, 38, 0.08) !important;
+            border-color: rgba(220, 38, 38, 0.25) !important;
+            color: #dc2626 !important;
+        }
+        body.light-mode .btn-action-danger:hover {
+            background: #dc2626 !important;
+            color: #ffffff !important;
+        }
+
+        .actions-cell-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         /* --- 👾 MODAL OYNALAR (CYBER GLASS) --- */
-        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(7, 10, 18, 0.8); backdrop-filter: blur(10px); z-index: 1998; }
-        .custom-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 550px; background: #0c101d; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); z-index: 1999; padding: 30px; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 12px; }
-        .modal-header h3 { font-size: 18px; font-weight: 800; color: #ffffff; }
-        .close-modal { background: rgba(255, 255, 255, 0.05); border: none; font-size: 14px; cursor: pointer; color: #ffffff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .close-modal:hover { background: rgba(255, 0, 85, 0.2); color: #ff0055; }
-        .modal-content label { display: block; margin-top: 15px; color: rgba(255, 255, 255, 0.4); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .modal-content input, .modal-content select { width: 100%; padding: 12px 16px; margin-top: 6px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; box-sizing: border-box; background-color: rgba(255, 255, 255, 0.01); color: white; outline: none; transition: 0.3s; }
-        .modal-content input:focus, .modal-content select:focus { border-color: #00f2fe; background: rgba(255, 255, 255, 0.04); box-shadow: 0 0 12px rgba(0, 242, 254, 0.15); }
-        .modal-content button[type="submit"] { margin-top: 25px; padding: 12px; width: 100%; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; border: none; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.3s; box-shadow: 0 5px 15px rgba(0, 242, 254, 0.2); }
-        .modal-content button[type="submit"]:hover { box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); }
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(7, 10, 18, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1998;
+        }
+        .custom-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 92%;
+            max-width: 550px;
+            background: #0d1322;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+            z-index: 1999;
+            padding: 26px;
+            box-sizing: border-box;
+            animation: modalFadeIn 0.25s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translate(-50%, -48%) scale(0.96); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
 
-        /* --- ☀️ LIGHT MODE OVERRIDES --- */
-        body.light-mode .guruh-btn,
-        body.light-mode .edit-assignment-btn,
-        body.light-mode .btn-otish {
-            background: #0284c7 !important;
+        body.light-mode .custom-modal {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15) !important;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 14px;
+        }
+        body.light-mode .modal-header {
+            border-bottom-color: #e2e8f0 !important;
+        }
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        body.light-mode .modal-header h3 {
+            color: #0f172a !important;
+        }
+        .close-modal {
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            color: #ffffff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .close-modal:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        body.light-mode .close-modal {
+            background: #f1f5f9 !important;
+            color: #475569 !important;
+        }
+        body.light-mode .close-modal:hover {
+            background: #fee2e2 !important;
+            color: #ef4444 !important;
+        }
+
+        .modal-content label {
+            display: block;
+            margin-top: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        body.light-mode .modal-content label {
+            color: #475569 !important;
+        }
+
+        .modal-content input[type="text"],
+        .modal-content input[type="url"],
+        .modal-content select,
+        .modal-content textarea {
+            width: 100%;
+            padding: 11px 15px;
+            margin-top: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-sizing: border-box;
+            background-color: rgba(255, 255, 255, 0.03);
+            color: #ffffff;
+            font-size: 13.5px;
+            outline: none;
+            transition: 0.25s;
+        }
+        .modal-content input:focus,
+        .modal-content select:focus,
+        .modal-content textarea:focus {
+            border-color: #00f2fe;
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.2);
+        }
+        body.light-mode .modal-content input[type="text"],
+        body.light-mode .modal-content input[type="url"],
+        body.light-mode .modal-content select,
+        body.light-mode .modal-content textarea {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        body.light-mode .modal-content input:focus,
+        body.light-mode .modal-content select:focus,
+        body.light-mode .modal-content textarea:focus {
             border-color: #0284c7 !important;
-            color: #ffffff !important;
-            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15) !important;
-        }
-        body.light-mode .guruh-btn:hover,
-        body.light-mode .edit-assignment-btn:hover,
-        body.light-mode .btn-otish:hover {
-            background: #0369a1 !important;
-            border-color: #0369a1 !important;
-            color: #ffffff !important;
-            box-shadow: none !important;
-        }
-        body.light-mode .btn-delete {
-            background: #dc2626 !important;
-            border-color: #dc2626 !important;
-            color: #ffffff !important;
-            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15) !important;
-        }
-        body.light-mode .btn-delete:hover {
-            background: #b91c1c !important;
-            border-color: #b91c1c !important;
-            color: #ffffff !important;
-            box-shadow: none !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
         }
 
+        /* Custom File Upload Box */
+        .file-upload-box {
+            border: 1.5px dashed rgba(0, 242, 254, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-top: 6px;
+            background: rgba(0, 242, 254, 0.02);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .file-upload-box:hover {
+            border-color: #00f2fe;
+            background: rgba(0, 242, 254, 0.05);
+        }
+        body.light-mode .file-upload-box {
+            border-color: rgba(2, 132, 199, 0.35) !important;
+            background: rgba(2, 132, 199, 0.02) !important;
+        }
+        body.light-mode .file-upload-box:hover {
+            border-color: #0284c7 !important;
+            background: rgba(2, 132, 199, 0.06) !important;
+        }
+        .file-upload-box input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .file-box-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 4px;
+        }
+        body.light-mode .file-box-text {
+            color: #334155 !important;
+        }
+
+        .modal-content button[type="submit"] {
+            margin-top: 24px;
+            padding: 12px;
+            width: 100%;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.25);
+        }
+        .modal-content button[type="submit"]:hover {
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.45);
+            transform: translateY(-1px);
+        }
+        body.light-mode .modal-content button[type="submit"] {
+            background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
+        }
+        body.light-mode .modal-content button[type="submit"]:hover {
+            background: linear-gradient(135deg, #0369a1, #0284c7) !important;
+        }
+
+        /* Cinema Video Player Modal */
         .source-tab-btn {
             padding: 5px 12px;
             border-radius: 8px;
@@ -256,277 +981,640 @@
             border-color: #00f2fe;
             color: #00f2fe;
         }
+        body.light-mode .source-tab-btn {
+            background: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+            color: #475569 !important;
+        }
+        body.light-mode .source-tab-btn.active {
+            background: #e0f2fe !important;
+            border-color: #0284c7 !important;
+            color: #0284c7 !important;
+        }
 
-        /* --- 📱 MOBIL REJIMDA RESPONSIVE MANTIQLARI --- */
+        /* --- ⚠️ XATOLIK VA OGOHLANTIRISH BLOKI --- */
+        .alert-toast {
+            padding: 12px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 13.5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-toast.error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+        .alert-toast.success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+        body.light-mode .alert-toast.error {
+            background: #fee2e2 !important;
+            border-color: #fca5a5 !important;
+            color: #b91c1c !important;
+        }
+        body.light-mode .alert-toast.success {
+            background: #dcfce7 !important;
+            border-color: #86efac !important;
+            color: #15803d !important;
+        }
+
+        /* --- 🚫 BO'SH HOLAT --- */
+        .empty-state-box {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-style: italic;
+            font-size: 14px;
+        }
+        .empty-state-box i {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+        body.light-mode .empty-state-box {
+            color: #64748b !important;
+        }
+
+        /* ========================================================
+           📱 1-VARIANT: "EDTECH DASHBOARD CARDS" (MOBIL REJIM)
+           ======================================================== */
         @media (max-width: 768px) {
             .konteyner {
                 height: auto !important;
                 overflow: visible !important;
-                padding: 15px !important;
+                padding: 12px 14px 35px 14px !important;
+            }
+            .sarlavha-qatori {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 14px !important;
+                margin-bottom: 16px !important;
             }
             .sarlavha {
-                font-size: 18px;
+                font-size: 18px !important;
+                border-left-width: 3.5px !important;
+                padding-left: 10px !important;
             }
-            .guruhlar-qatori {
-                flex-direction: column;
-                gap: 10px;
-                align-items: stretch;
+            .sarlavha-subtitle {
+                font-size: 12px !important;
+                padding-left: 14px !important;
             }
-            .guruh-btn {
-                width: 100%;
-                text-align: center;
-                box-sizing: border-box;
+            .btn-create-video {
+                width: 100% !important;
+                justify-content: center !important;
+                padding: 11px !important;
             }
-            .search-input {
-                width: 130px;
-                margin-left: 10px;
-                padding: 8px 12px;
+
+            .stats-overview-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 10px !important;
+                margin-bottom: 18px !important;
             }
-            .search-btn {
-                padding: 8px 14px;
+            .stat-card {
+                padding: 12px 14px !important;
+                gap: 12px !important;
+                border-radius: 14px !important;
+            }
+            .stat-icon-wrap {
+                width: 38px !important;
+                height: 38px !important;
+                font-size: 16px !important;
+                border-radius: 10px !important;
+            }
+            .stat-value {
+                font-size: 17px !important;
+            }
+            .stat-label {
+                font-size: 10px !important;
+            }
+
+            .toolbar-panel {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 10px !important;
+            }
+            .filter-pills-group {
+                overflow-x: auto;
+                padding-bottom: 4px;
+                flex-wrap: nowrap !important;
+            }
+            .filter-pill {
+                padding: 6px 12px !important;
+                font-size: 11.5px !important;
+                white-space: nowrap !important;
+            }
+            .search-form {
+                width: 100% !important;
             }
 
             .jadval-container {
-                border: none;
-                background: transparent;
-                box-shadow: none;
-                overflow: visible;
-                max-height: none;
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                overflow: visible !important;
+                max-height: none !important;
+                margin-bottom: 30px !important;
             }
+
             table, thead, tbody, th, td, tr {
-                display: block;
+                display: block !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
             }
             thead {
-                display: none;
+                display: none !important;
             }
-            tbody tr {
-                background: rgba(255, 255, 255, 0.02);
-                border: 1px solid rgba(255, 255, 255, 0.05);
-                border-radius: 16px;
-                padding: 16px;
-                margin-bottom: 16px;
-                box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-                backdrop-filter: blur(10px);
-                -webkit-backdrop-filter: blur(10px);
-            }
-            tbody td {
+
+            /* 🌟 EDTECH DASHBOARD CARD (MOBIL) */
+            #video-table tbody tr.video-item-row {
+                background: rgba(255, 255, 255, 0.02) !important;
+                border: 1px solid rgba(255, 255, 255, 0.06) !important;
+                border-left: 5px solid #00f2fe !important;
+                border-radius: 18px !important;
+                padding: 16px !important;
+                margin-bottom: 16px !important;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.18) !important;
+                backdrop-filter: blur(10px) !important;
+                -webkit-backdrop-filter: blur(10px) !important;
                 display: flex;
-                justify-content: space-between;
+                flex-direction: column;
+                gap: 12px;
+                position: relative !important;
+                overflow: hidden !important;
+            }
+
+            body.light-mode #video-table tbody tr.video-item-row {
+                background: #ffffff !important;
+                border: 1px solid #e2e8f0 !important;
+                border-left: 5px solid #0284c7 !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+            }
+
+            #video-table tbody td {
+                padding: 0 !important;
+                border: none !important;
+                background: transparent !important;
+                width: 100% !important;
+            }
+
+            /* Mobil Card Elements */
+            .mobile-card-header {
+                display: flex;
                 align-items: center;
-                padding: 10px 0;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-                text-align: right;
-                font-size: 13px;
+                justify-content: space-between;
+                gap: 8px;
             }
-            tbody td[data-label="Ko'rish"],
-            tbody td[data-label="Tahrirlash"],
-            tbody td[data-label="O'chirish"] {
-                justify-content: center;
-                padding: 6px 0;
-                border-bottom: none;
+            .mobile-title-wrap {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
             }
-            tbody td::before {
-                content: attr(data-label);
-                float: left;
-                font-weight: 700;
-                color: rgba(255, 255, 255, 0.4);
-                text-transform: uppercase;
-                font-size: 11px;
-                letter-spacing: 0.5px;
+            .mobile-video-title {
+                font-size: 16px;
+                font-weight: 800;
+                color: #ffffff;
+                line-height: 1.3;
             }
-            tbody td[data-label="No"]::before,
-            tbody td[data-label="Ko'rish"]::before,
-            tbody td[data-label="Tahrirlash"]::before,
-            tbody td[data-label="O'chirish"]::before {
-                display: none;
+            body.light-mode .mobile-video-title {
+                color: #0f172a !important;
             }
-            tbody td[data-label="No"] {
-                font-size: 14px;
-                color: #4facfe;
-                border-bottom: 1px solid rgba(0, 242, 254, 0.15);
-                padding-bottom: 6px;
-                justify-content: center;
+            .mobile-video-desc {
+                font-size: 12.5px;
+                color: rgba(255, 255, 255, 0.6);
+                line-height: 1.4;
             }
-            .btn-otish, .edit-assignment-btn, .btn-delete {
+            body.light-mode .mobile-video-desc {
+                color: #475569 !important;
+            }
+
+            .mobile-meta-grid {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(255, 255, 255, 0.04);
+                border-radius: 12px;
+                padding: 10px 12px;
+            }
+            body.light-mode .mobile-meta-grid {
+                background: #f8fafc !important;
+                border-color: #e2e8f0 !important;
+            }
+
+            .mobile-actions-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-top: 4px;
+            }
+            .mobile-actions-grid .btn-action-primary,
+            .mobile-actions-grid .btn-action-secondary,
+            .mobile-actions-grid .btn-action-danger {
                 width: 100%;
-                padding: 10px;
-                text-align: center;
                 box-sizing: border-box;
+                padding: 9px 8px !important;
+                font-size: 12px !important;
             }
+            .mobile-actions-grid .play-action-btn {
+                grid-column: span 2;
+                padding: 10px 8px !important;
+                font-size: 13px !important;
+            }
+
             .custom-modal {
-                padding: 20px;
-                width: 95%;
+                padding: 20px !important;
+                width: 95% !important;
             }
         }
+            .d-row-hidden { display: none !important; }
     </style>
 {% endblock %}
 
 {% block content %}
-    <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
-        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">Video darslar va Havolalar</h2>
-        <!-- QIDIRUV FORMASI -->
-        <form class="search-form" onsubmit="event.preventDefault()" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 280px; margin: 0;">
-            <input type="text" class="search-input" placeholder="Mavzu bo'yicha qidiruv..." id="video-title-search" style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
-            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+    <!-- Xabarlar / Toasts -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-toast {% if 'error' in message.tags %}error{% else %}success{% endif %}">
+                <i class="fas {% if 'error' in message.tags %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- SARLAVHA VA TUGMA -->
+    <div class="sarlavha-qatori">
+        <div class="sarlavha-text-wrap">
+            <h2 class="sarlavha">
+                <i class="fas fa-video title-icon"></i>
+                Video darslar boshqaruvi
+            </h2>
+            <p class="sarlavha-subtitle">Guruhlarga biriktirilgan video darsliklar, amaliy videolar va YouTube darslarini boshqarish</p>
+        </div>
+        <div class="header-action-group">
+            <button type="button" onclick="openAddModal()" class="btn-create-video">
+                <i class="fas fa-plus-circle"></i>
+                Yangi video yuklash
+            </button>
+        </div>
+    </div>
+
+    <!-- 4 TA STATISTIKA KARTASI -->
+    <div class="stats-overview-grid">
+        <div class="stat-card blue">
+            <div class="stat-icon-wrap">
+                <i class="fas fa-film"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ total_videos|default:"0" }}</span>
+                <span class="stat-label">Jami video darslar</span>
+            </div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon-wrap">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ total_groups_with_video|default:"0" }}</span>
+                <span class="stat-label">Qamrab olingan guruhlar</span>
+            </div>
+        </div>
+        <div class="stat-card red">
+            <div class="stat-icon-wrap">
+                <i class="fab fa-youtube"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ youtube_count|default:"0" }}</span>
+                <span class="stat-label">YouTube darsliklar</span>
+            </div>
+        </div>
+        <div class="stat-card purple">
+            <div class="stat-icon-wrap">
+                <i class="fas fa-file-video"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ local_file_count|default:"0" }}</span>
+                <span class="stat-label">Yuklangan video fayllar</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOOLBAR: FILTERLAR VA QIDIRUV -->
+    <div class="toolbar-panel">
+        <div class="filter-pills-group">
+            <div class="filter-pill active" data-filter="all" onclick="filterVideos('all', this)">
+                <i class="fas fa-layer-group"></i> Barchasi <span class="pill-badge">{{ total_videos|default:"0" }}</span>
+            </div>
+            <div class="filter-pill" data-filter="youtube" onclick="filterVideos('youtube', this)">
+                <i class="fab fa-youtube" style="color: #ef4444;"></i> YouTube <span class="pill-badge">{{ youtube_count|default:"0" }}</span>
+            </div>
+            <div class="filter-pill" data-filter="file" onclick="filterVideos('file', this)">
+                <i class="fas fa-file-video" style="color: #10b981;"></i> Video Fayl <span class="pill-badge">{{ local_file_count|default:"0" }}</span>
+            </div>
+            {% for g in unique_groups %}
+                <div class="filter-pill" data-filter="group-{{ g.id }}" onclick="filterVideos('group-{{ g.id }}', this)">
+                    <i class="fas fa-users"></i> {{ g.name }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <form class="search-form" onsubmit="event.preventDefault()">
+            <input type="text" class="search-input" placeholder="Mavzu yoki guruh bo'yicha qidiruv..." id="video-search-input">
+            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
         </form>
     </div>
-    
-    <div class="guruhlar-qatori">
-        <a href="javascript:void(0);" onclick="openAddModal()" class="guruh-btn"><i class="fas fa-plus" style="margin-right: 8px;"></i>Video yuklash</a>
-    </div>
 
-    <!-- Yangi Video yuklash modal oynasi -->
-    <div id="addVideoModal" class="custom-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Video dars yuklash</h3>
-                <button class="close-modal" onclick="closeAddModal()">✖</button>
-            </div>
-            <form method="post" enctype="multipart/form-data" action="{% url 'teacher_media_gallery' %}" onsubmit="return validateForm(this)">
-                {% csrf_token %}
-                <label>Sarlavha:</label>
-                <input type="text" name="title" placeholder="Dars mavzusini kiriting" required>
-
-                <label>Tavsif (ixtiyoriy):</label>
-                <textarea name="description" placeholder="Dars bo'yicha qisqacha ma'lumot..." style="width: 100%; padding: 12px 16px; margin-top: 6px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; background-color: rgba(255, 255, 255, 0.01); color: white; outline: none; transition: 0.3s; height: 80px;"></textarea>
-
-                <label>Guruh:</label>
-                <select name="group_id" required>
-                    {% for group in groups %}
-                        <option value="{{ group.id }}">{{ group.name }}</option>
-                    {% endfor %}
-                </select>
-
-                <label>Video fayl (ixtiyoriy):</label>
-                <input type="file" name="video_file" accept="video/*">
-
-                <label>YouTube havola (ixtiyoriy):</label>
-                <input type="url" name="youtube_link" placeholder="https://www.youtube.com/watch?v=...">
-
-                <button type="submit">Yuklash</button>
-            </form>
-        </div>
-    </div>
-    <div id="addModalBackdrop" class="modal-backdrop"></div>
-
-    <!-- Tahrirlash Modal oynasi -->
-    <div id="editVideoModal" class="custom-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Video darsni tahrirlash</h3>
-                <button class="close-modal" onclick="closeEditModal()">✖</button>
-            </div>
-            <form id="editForm" method="post" enctype="multipart/form-data" onsubmit="return validateForm(this)">
-                {% csrf_token %}
-                <label>Sarlavha:</label>
-                <input type="text" name="title" id="editTitle" required>
-
-                <label>Tavsif (ixtiyoriy):</label>
-                <textarea name="description" id="editDescription" style="width: 100%; padding: 12px 16px; margin-top: 6px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; background-color: rgba(255, 255, 255, 0.01); color: white; outline: none; transition: 0.3s; height: 80px;"></textarea>
-
-                <label>Guruh:</label>
-                <select name="group_id" id="editGroup" required>
-                    {% for group in groups %}
-                        <option value="{{ group.id }}">{{ group.name }}</option>
-                    {% endfor %}
-                </select>
-
-                <label>Video fayl (almashtirish uchun ixtiyoriy):</label>
-                <input type="file" name="video_file" accept="video/*">
-
-                <label>YouTube havola (ixtiyoriy):</label>
-                <input type="url" name="youtube_link" id="editYoutubeLink" placeholder="https://www.youtube.com/watch?v=...">
-
-                <button type="submit">Saqlash</button>
-            </form>
-        </div>
-    </div>
-    <div id="editModalBackdrop" class="modal-backdrop"></div>
-
-    <!-- Premium Video Tomosha Qilish Modali -->
-    <div id="videoPlayModal" class="custom-modal" style="max-width: 800px; display: none;">
-        <div class="modal-content" style="padding: 0;">
-            <div class="modal-header" style="padding: 20px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 15px;">
-                <div style="display: flex; align-items: center; gap: 10px; min-width: 0; max-width: 60%;">
-                    <i class="fas fa-play-circle" style="color: #00f2fe; font-size: 18px; flex-shrink: 0;"></i>
-                    <h3 id="videoPlayTitle" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">Video Dars</h3>
-                </div>
-                <div id="videoSourceTabs" style="display: none; align-items: center; gap: 8px;">
-                    <button type="button" id="tabNative" class="source-tab-btn active" onclick="switchVideoSource('native')"><i class="fas fa-file-video"></i> Fayl</button>
-                    <button type="button" id="tabYoutube" class="source-tab-btn" onclick="switchVideoSource('youtube')"><i class="fab fa-youtube"></i> YouTube</button>
-                </div>
-                <button class="close-modal" onclick="closePlayModal()">✖</button>
-            </div>
-            <div class="modal-body" style="display: flex; justify-content: center; align-items: center; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 0 0 20px 20px; overflow: hidden; position: relative;">
-                <video id="nativePlayer" controls style="width: 100%; height: 100%; display: none;"></video>
-                <iframe id="youtubePlayer" style="width: 100%; height: 100%; border: none; display: none;" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
-            </div>
-        </div>
-    </div>
-    <div id="playModalBackdrop" class="modal-backdrop"></div>
-
-    <hr class="hr-joy">
-
-    <h2 class="sarlavha">Yuklangan video darslar ro'yxati</h2>
+    <!-- JADVAL KONTEYNERI (DESKTOP VA MOBIL) -->
     <div class="jadval-container">
-        <table>
+        <table id="video-table">
             <thead>
                 <tr>
-                    <th style="width: 50px;">No</th>
-                    <th>Sarlavha</th>
+                    <th style="width: 50px; text-align: center;">№</th>
+                    <th>Dars sarlavhasi & Tavsifi</th>
                     <th>Guruh</th>
-                    <th>Turi</th>
+                    <th>Manba turi</th>
                     <th>Yuklangan sana</th>
-                    <th style="width: 120px; text-align: center;">Ko'rish</th>
+                    <th style="width: 120px; text-align: center;">Tomosha qilish</th>
                     <th style="width: 120px; text-align: center;">Tahrirlash</th>
                     <th style="width: 120px; text-align: center;">O'chirish</th>
                 </tr>
             </thead>
             <tbody id="jadval-qatorlari">
                 {% for video in videos %}
-                    <tr>
-                        <td data-label="No">{{ forloop.counter }}</td>
-                        <td data-label="Sarlavha" style="font-weight: 700; color: #ffffff;">{{ video.title }}</td>
-                        <td data-label="Guruh">{{ video.group.name }}</td>
-                        <td data-label="Turi">
-                            {% if video.video_file %}
-                                <span style="color: #00ffaa;"><i class="fas fa-file-video" style="margin-right: 6px;"></i>Fayl</span>
-                            {% endif %}
-                            {% if video.video_file and video.youtube_link %}
-                                <span style="color: rgba(255,255,255,0.4)">/</span>
-                            {% endif %}
-                            {% if video.youtube_link %}
-                                <span style="color: #ff0055;"><i class="fab fa-youtube" style="margin-right: 6px;"></i>YouTube</span>
-                            {% endif %}
+                    <tr class="video-item-row"
+                        data-type="{% if video.youtube_link and video.video_file %}both{% elif video.youtube_link %}youtube{% elif video.video_file %}file{% endif %}"
+                        data-group-id="group-{{ video.group.id }}"
+                        data-title="{{ video.title|lower }}"
+                        data-group="{{ video.group.name|lower }}"
+                        data-desc="{{ video.description|default:''|lower }}">
+                        
+                        <!-- DESKTOP CELL 1: Tartib raqam -->
+                        <td class="desktop-only-cell" style="text-align: center; font-weight: 700; color: rgba(255,255,255,0.4);">
+                            <span class="row-index-pill row-num-span">{{ forloop.counter }}</span>
                         </td>
-                        <td data-label="Yuklangan sana" style="color: #4facfe; font-family: monospace;">
-                            {{ video.created_at|date:"d.m.Y" }}
-                            <span style="margin-left: 12px;">{{ video.created_at|date:"H:i" }}</span>
+
+                        <!-- MOBIL UCHUN 1-VARIANT: EDTECH DASHBOARD CARD (MOBILDA KO'RINADI) -->
+                        <td class="mobile-only-cell" style="display: none;">
+                            <div class="mobile-card-header">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="row-index-pill mobile-row-num">{{ forloop.counter }}</span>
+                                    <span class="group-pill-badge">
+                                        <i class="fas fa-users"></i> {{ video.group.name }}
+                                    </span>
+                                </div>
+                                <div class="type-badge-group">
+                                    {% if video.youtube_link %}
+                                        <span class="type-badge youtube"><i class="fab fa-youtube"></i> YouTube</span>
+                                    {% endif %}
+                                    {% if video.video_file %}
+                                        <span class="type-badge file"><i class="fas fa-file-video"></i> Fayl</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mobile-title-wrap">
+                                <span class="mobile-video-title">{{ video.title }}</span>
+                                {% if video.description %}
+                                    <span class="mobile-video-desc">{{ video.description }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="mobile-meta-grid">
+                                <span class="date-chip">
+                                    <i class="fas fa-calendar-alt"></i> {{ video.created_at|date:"d.m.Y H:i" }}
+                                </span>
+                            </div>
+
+                            <div class="mobile-actions-grid">
+                                <button type="button" class="btn-action-primary play-action-btn"
+                                        onclick="playVideo('{{ video.title|escapejs }}', '{% if video.video_file %}{{ video.video_file.url }}{% endif %}', '{{ video.get_youtube_embed|default:'' }}')">
+                                    <i class="fas fa-play-circle"></i> Video darsni tomosha qilish
+                                </button>
+
+                                <a href="javascript:void(0);" class="btn-action-secondary edit-video-btn"
+                                   data-id="{{ video.id }}"
+                                   data-title="{{ video.title }}"
+                                   data-desc="{{ video.description|default:'' }}"
+                                   data-group="{{ video.group.id }}"
+                                   data-youtube="{{ video.youtube_link|default:'' }}">
+                                    <i class="fas fa-edit"></i> Tahrirlash
+                                </a>
+
+                                <a href="{% url 'teacher_delete_video' video.id %}" class="btn-action-danger"
+                                   onclick="return confirm('Haqiqatan ham bu video darsni o'chirmoqchisiz?')">
+                                    <i class="fas fa-trash-alt"></i> O'chirish
+                                </a>
+                            </div>
                         </td>
-                        <td data-label="Ko'rish" style="text-align: center;">
-                            <a href="javascript:void(0);" class="btn-otish" onclick="playVideo('{{ video.title|escapejs }}', '{% if video.video_file %}{{ video.video_file.url }}{% endif %}', '{{ video.get_youtube_embed|default:'' }}')">
-                                <i class="fas fa-play" style="margin-right: 6px;"></i>Ko'rish
+
+                        <!-- DESKTOP CELL 2: Sarlavha & Tavsif -->
+                        <td class="desktop-only-cell">
+                            <div class="video-title-wrap">
+                                <span class="video-title-text">{{ video.title }}</span>
+                                {% if video.description %}
+                                    <span class="video-desc-text" title="{{ video.description }}">{{ video.description }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <!-- DESKTOP CELL 3: Guruh -->
+                        <td class="desktop-only-cell">
+                            <span class="group-pill-badge">
+                                <i class="fas fa-users"></i> {{ video.group.name }}
+                            </span>
+                        </td>
+
+                        <!-- DESKTOP CELL 4: Manba turi -->
+                        <td class="desktop-only-cell">
+                            <div class="type-badge-group">
+                                {% if video.youtube_link %}
+                                    <span class="type-badge youtube"><i class="fab fa-youtube"></i> YouTube</span>
+                                {% endif %}
+                                {% if video.video_file %}
+                                    <span class="type-badge file"><i class="fas fa-file-video"></i> Fayl</span>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <!-- DESKTOP CELL 5: Yuklangan sana -->
+                        <td class="desktop-only-cell">
+                            <span class="date-chip">
+                                <i class="fas fa-calendar-alt"></i> {{ video.created_at|date:"d.m.Y H:i" }}
+                            </span>
+                        </td>
+
+                        <!-- DESKTOP CELL 6: Tomosha qilish -->
+                        <td class="desktop-only-cell" style="text-align: center;">
+                            <button type="button" class="btn-action-primary"
+                                    onclick="playVideo('{{ video.title|escapejs }}', '{% if video.video_file %}{{ video.video_file.url }}{% endif %}', '{{ video.get_youtube_embed|default:'' }}')">
+                                <i class="fas fa-play"></i> Ko'rish
+                            </button>
+                        </td>
+
+                        <!-- DESKTOP CELL 7: Tahrirlash -->
+                        <td class="desktop-only-cell" style="text-align: center;">
+                            <a href="javascript:void(0);" class="btn-action-secondary edit-video-btn"
+                               data-id="{{ video.id }}"
+                               data-title="{{ video.title }}"
+                               data-desc="{{ video.description|default:'' }}"
+                               data-group="{{ video.group.id }}"
+                               data-youtube="{{ video.youtube_link|default:'' }}">
+                                <i class="fas fa-edit"></i> Tahrirlash
                             </a>
                         </td>
-                        <td data-label="Tahrirlash" style="text-align: center;">
-                            <a href="javascript:void(0);" class="edit-assignment-btn" onclick="openEditModal('{{ video.id }}', '{{ video.title|escapejs }}', '{{ video.description|escapejs }}', '{{ video.group.id }}', '{{ video.youtube_link|default:'' }}')"><i class="fas fa-edit" style="margin-right: 6px;"></i>Tahrirlash</a>
-                        </td>
-                        <td data-label="O'chirish" style="text-align: center;">
-                            <a href="{% url 'teacher_delete_video' video.id %}" class="btn-delete" onclick="return confirm('Haqiqatan ham bu video darsni o\'chirmoqchisiz?')"><i class="fas fa-trash-alt" style="margin-right: 6px;"></i>O'chirish</a>
+
+                        <!-- DESKTOP CELL 8: O'chirish -->
+                        <td class="desktop-only-cell" style="text-align: center;">
+                            <a href="{% url 'teacher_delete_video' video.id %}" class="btn-action-danger"
+                               onclick="return confirm('Haqiqatan ham bu video darsni o'chirmoqchisiz?')">
+                                <i class="fas fa-trash-alt"></i> O'chirish
+                            </a>
                         </td>
                     </tr>
                 {% empty %}
-                    <tr>
-                        <td colspan="8" style="text-align: center; color: rgba(255,255,255,0.3); font-style: italic; padding: 30px 0;">Hozircha hech qanday video dars yuklanmagan.</td>
+                    <tr id="empty-row-initial">
+                        <td colspan="8">
+                            <div class="empty-state-box">
+                                <i class="fas fa-film"></i>
+                                <span>Hozircha birorta ham video dars yuklanmagan. Yuqoridagi "+ Yangi video yuklash" tugmasi orqali yangi dars qo'shing.</span>
+                            </div>
+                        </td>
                     </tr>
                 {% endfor %}
+                <tr id="no-search-results-row" style="display: none;">
+                    <td colspan="8">
+                        <div class="empty-state-box">
+                            <i class="fas fa-search"></i>
+                            <span>Qidiruv yoki filtr bo'yicha hech qanday video dars topilmadi.</span>
+                        </div>
+                    </td>
+                </tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- ========================================================
+         👾 MODAL: YANGI VIDEO DARSLIK YUKLASH
+         ======================================================== -->
+    <div id="addModalBackdrop" class="modal-backdrop" onclick="closeAddModal()"></div>
+
+    <div id="addVideoModal" class="custom-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle" style="color: #00f2fe;"></i> Yangi video dars yuklash</h3>
+                <button class="close-modal" onclick="closeAddModal()">✖</button>
+            </div>
+            <form method="post" enctype="multipart/form-data" action="{% url 'teacher_media_gallery' %}" onsubmit="return validateVideoUpload(this)">
+                {% csrf_token %}
+                <label><i class="fas fa-heading" style="margin-right: 4px;"></i> Dars mavzusi / Sarlavha:</label>
+                <input type="text" name="title" placeholder="Masalan: 5-Mavzu: Optika asoslari" required autocomplete="off">
+
+                <label><i class="fas fa-users" style="margin-right: 4px;"></i> Guruhni tanlang:</label>
+                <select name="group_id" required>
+                    <option value="" disabled selected>Guruhni tanlang...</option>
+                    {% for group in groups %}
+                        <option value="{{ group.id }}">{{ group.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <label><i class="fas fa-align-left" style="margin-right: 4px;"></i> Dars tavsifi (ixtiyoriy):</label>
+                <textarea name="description" placeholder="Dars bo'yicha qisqacha ma'lumot yoki yo'riqnoma..." style="height: 70px; resize: vertical;"></textarea>
+
+                <label><i class="fas fa-file-video" style="margin-right: 4px;"></i> Video fayl (MP4, MKV va b.):</label>
+                <div class="file-upload-box" onclick="document.getElementById('addFileInput').click()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 24px; color: #00f2fe; margin-bottom: 6px;"></i>
+                    <div class="file-box-text" id="addFileLabel">Video faylni tanlash uchun bosing</div>
+                    <input type="file" name="video_file" id="addFileInput" accept="video/*" onchange="handleFileSelect(this, 'addFileLabel')">
+                </div>
+
+                <label><i class="fab fa-youtube" style="margin-right: 4px; color: #ef4444;"></i> Yoki YouTube havola:</label>
+                <input type="url" name="youtube_link" placeholder="https://www.youtube.com/watch?v=... yoki youtu.be/...">
+
+                <button type="submit">
+                    <i class="fas fa-upload" style="margin-right: 6px;"></i> Video darsni yuklash
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================
+         👾 MODAL: VIDEO DARSNI TAHRIRLASH
+         ======================================================== -->
+    <div id="editModalBackdrop" class="modal-backdrop" onclick="closeEditModal()"></div>
+
+    <div id="editVideoModal" class="custom-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit" style="color: #00f2fe;"></i> Video darsni tahrirlash</h3>
+                <button class="close-modal" onclick="closeEditModal()">✖</button>
+            </div>
+            <form id="editForm" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label><i class="fas fa-heading" style="margin-right: 4px;"></i> Sarlavha:</label>
+                <input type="text" name="title" id="editTitle" required autocomplete="off">
+
+                <label><i class="fas fa-users" style="margin-right: 4px;"></i> Guruh:</label>
+                <select name="group_id" id="editGroup" required>
+                    {% for group in groups %}
+                        <option value="{{ group.id }}">{{ group.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <label><i class="fas fa-align-left" style="margin-right: 4px;"></i> Tavsif (ixtiyoriy):</label>
+                <textarea name="description" id="editDescription" style="height: 70px; resize: vertical;"></textarea>
+
+                <label><i class="fas fa-file-video" style="margin-right: 4px;"></i> Video fayl (almashtirish uchun ixtiyoriy):</label>
+                <div class="file-upload-box" onclick="document.getElementById('editFileInput').click()">
+                    <i class="fas fa-sync-alt" style="font-size: 24px; color: #4facfe; margin-bottom: 6px;"></i>
+                    <div class="file-box-text" id="editFileLabel">Yangi video fayl tanlash (eski fayl saqlanadi)</div>
+                    <input type="file" name="video_file" id="editFileInput" accept="video/*" onchange="handleFileSelect(this, 'editFileLabel')">
+                </div>
+
+                <label><i class="fab fa-youtube" style="margin-right: 4px; color: #ef4444;"></i> YouTube havola:</label>
+                <input type="url" name="youtube_link" id="editYoutubeLink" placeholder="https://www.youtube.com/watch?v=...">
+
+                <button type="submit">
+                    <i class="fas fa-save" style="margin-right: 6px;"></i> O'zgarishlarni saqlash
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================
+         🎬 CINEMA VIDEO PLAYER MODALI
+         ======================================================== -->
+    <div id="playModalBackdrop" class="modal-backdrop" onclick="closePlayModal()"></div>
+
+    <div id="videoPlayModal" class="custom-modal" style="max-width: 840px; padding: 0; overflow: hidden;">
+        <div class="modal-content" style="padding: 0;">
+            <div class="modal-header" style="padding: 16px 20px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px; min-width: 0; max-width: 65%;">
+                    <i class="fas fa-play-circle" style="color: #00f2fe; font-size: 20px; flex-shrink: 0;"></i>
+                    <h3 id="videoPlayTitle" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; font-size: 16px;">Video Dars</h3>
+                </div>
+                <div id="videoSourceTabs" style="display: none; align-items: center; gap: 8px;">
+                    <button type="button" id="tabNative" class="source-tab-btn active" onclick="switchVideoSource('native')"><i class="fas fa-file-video"></i> Fayl</button>
+                    <button type="button" id="tabYoutube" class="source-tab-btn" onclick="switchVideoSource('youtube')"><i class="fab fa-youtube" style="color: #ef4444;"></i> YouTube</button>
+                </div>
+                <button class="close-modal" onclick="closePlayModal()">✖</button>
+            </div>
+            <div class="modal-body" style="display: flex; justify-content: center; align-items: center; width: 100%; aspect-ratio: 16/9; background: #000; overflow: hidden; position: relative;">
+                <video id="nativePlayer" controls style="width: 100%; height: 100%; display: none;"></video>
+                <iframe id="youtubePlayer" style="width: 100%; height: 100%; border: none; display: none;" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            </div>
+        </div>
     </div>
 {% endblock %}
 
 {% block extra_js %}
     <script>
+        // --- 1. MODAL OYNALAR BOSHQARUVI ---
         function openAddModal() {
             document.getElementById('addVideoModal').style.display = 'block';
             document.getElementById('addModalBackdrop').style.display = 'block';
@@ -537,26 +1625,58 @@
             document.getElementById('addModalBackdrop').style.display = 'none';
         }
 
-        function openEditModal(id, title, desc, groupId, youtubeLink) {
-            const editModal = document.getElementById('editVideoModal');
-            const editBackdrop = document.getElementById('editModalBackdrop');
-            const editForm = document.getElementById('editForm');
+        const editModal = document.getElementById('editVideoModal');
+        const editBackdrop = document.getElementById('editModalBackdrop');
+        const editForm = document.getElementById('editForm');
 
-            editForm.action = `/teacher/media/edit/${id}/`;
-            document.getElementById('editTitle').value = title;
-            document.getElementById('editDescription').value = desc;
-            document.getElementById('editGroup').value = groupId;
-            document.getElementById('editYoutubeLink').value = youtubeLink;
+        document.querySelectorAll(".edit-video-btn").forEach(button => {
+            button.addEventListener("click", () => {
+                const id = button.getAttribute("data-id");
+                const title = button.getAttribute("data-title");
+                const desc = button.getAttribute("data-desc");
+                const group = button.getAttribute("data-group");
+                const youtube = button.getAttribute("data-youtube");
 
-            editModal.style.display = 'block';
-            editBackdrop.style.display = 'block';
-        }
+                editForm.action = `/teacher/media/edit/${id}/`;
+                document.getElementById('editTitle').value = title;
+                document.getElementById('editDescription').value = desc;
+                document.getElementById('editGroup').value = group;
+                document.getElementById('editYoutubeLink').value = youtube;
+
+                document.getElementById('editFileLabel').textContent = "Yangi video fayl tanlash (eski fayl saqlanadi)";
+
+                editModal.style.display = 'block';
+                editBackdrop.style.display = 'block';
+            });
+        });
 
         function closeEditModal() {
-            document.getElementById('editVideoModal').style.display = 'none';
-            document.getElementById('editModalBackdrop').style.display = 'none';
+            editModal.style.display = 'none';
+            editBackdrop.style.display = 'none';
         }
 
+        // Fayl tanlanganda nomini chiqarish
+        function handleFileSelect(input, labelId) {
+            const labelEl = document.getElementById(labelId);
+            if (input.files && input.files[0]) {
+                const fName = input.files[0].name;
+                const fSize = (input.files[0].size / (1024 * 1024)).toFixed(2);
+                labelEl.innerHTML = `<strong style="color: #00f2fe;"><i class="fas fa-check-circle"></i> ${fName}</strong> <span style="opacity: 0.7;">(${fSize} MB)</span>`;
+            }
+        }
+
+        function validateVideoUpload(form) {
+            const fileInput = form.querySelector('input[name="video_file"]');
+            const urlInput = form.querySelector('input[name="youtube_link"]');
+
+            if (!fileInput.files.length && !urlInput.value.trim()) {
+                alert("Iltimos, video fayl tanlang yoki YouTube havola kiriting!");
+                return false;
+            }
+            return true;
+        }
+
+        // --- 2. CINEMA VIDEO PLAYER ---
         let currentLocalUrl = '';
         let currentYoutubeUrl = '';
 
@@ -633,7 +1753,6 @@
             document.getElementById('videoPlayModal').style.display = 'none';
             document.getElementById('playModalBackdrop').style.display = 'none';
             
-            // Stop playing
             const nativePlayer = document.getElementById('nativePlayer');
             nativePlayer.pause();
             nativePlayer.src = '';
@@ -642,54 +1761,68 @@
             youtubePlayer.src = '';
         }
 
-        function validateForm(form) {
-            const fileInput = form.querySelector('input[name="video_file"]');
-            const urlInput = form.querySelector('input[name="youtube_link"]');
-            
-            // Edit modalda edit_file tanlanmagan bo'lishi mumkin, shuning uchun faqat toza upload bo'lsa yoki form talabi bo'lsa
-            const isEdit = form.id === 'editForm';
+        // --- 3. QIDIRUV VA FILTRLASH ---
+        let currentFilter = 'all';
+        const videoRows = document.querySelectorAll('#video-table tbody tr.video-item-row');
+        const searchInput = document.getElementById('video-search-input');
+        const noResultsRow = document.getElementById('no-search-results-row');
 
-            if (!isEdit && !fileInput.files.length && !urlInput.value.trim()) {
-                alert("Iltimos, video fayl yuklang yoki YouTube havola kiriting!");
-                return false;
+        function applyVideoFilters() {
+            const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+            let visibleCount = 0;
+
+            videoRows.forEach(row => {
+                const title = row.getAttribute('data-title') || '';
+                const desc = row.getAttribute('data-desc') || '';
+                const group = row.getAttribute('data-group') || '';
+                const type = row.getAttribute('data-type') || '';
+                const groupId = row.getAttribute('data-group-id') || '';
+
+                const matchesSearch = !searchTerm || title.includes(searchTerm) || desc.includes(searchTerm) || group.includes(searchTerm);
+                
+                let matchesFilter = false;
+                if (currentFilter === 'all') {
+                    matchesFilter = true;
+                } else if (currentFilter === 'youtube') {
+                    matchesFilter = (type === 'youtube' || type === 'both');
+                } else if (currentFilter === 'file') {
+                    matchesFilter = (type === 'file' || type === 'both');
+                } else if (currentFilter.startsWith('group-')) {
+                    matchesFilter = (groupId === currentFilter);
+                }
+
+                if (matchesSearch && matchesFilter) {
+                    row.style.display = '';
+                    visibleCount++;
+                    const numSpan = row.querySelector('.row-num-span');
+                    const mobileNum = row.querySelector('.mobile-row-num');
+                    if (numSpan) numSpan.textContent = visibleCount;
+                    if (mobileNum) mobileNum.textContent = visibleCount;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (noResultsRow) {
+                noResultsRow.style.display = (visibleCount === 0 && videoRows.length > 0) ? '' : 'none';
             }
-            return true;
         }
 
-        // Close modal clicking outside
-        window.addEventListener("click", (e) => {
-            if (e.target === document.getElementById('addModalBackdrop')) closeAddModal();
-            if (e.target === document.getElementById('editModalBackdrop')) closeEditModal();
-            if (e.target === document.getElementById('playModalBackdrop')) closePlayModal();
-        });
+        function filterVideos(filterKey, element) {
+            currentFilter = filterKey;
 
-        // Search Filter
-        const tableRows = document.querySelectorAll('#jadval-qatorlari tr');
-        function updateRowNumbers() {
-            let visibleIndex = 1;
-            tableRows.forEach(row => {
-                if (row.style.display !== "none" && row.cells.length > 1) {
-                    const firstCell = row.querySelector("td");
-                    if (firstCell) firstCell.textContent = visibleIndex++;
-                }
+            document.querySelectorAll('.filter-pill').forEach(pill => {
+                pill.classList.remove('active');
             });
+            if (element) {
+                element.classList.add('active');
+            }
+
+            applyVideoFilters();
         }
 
-        document.getElementById('video-title-search')?.addEventListener('input', function () {
-            const searchTerm = this.value.toLowerCase().trim();
-
-            tableRows.forEach(row => {
-                const titleCell = row.cells[1];
-                if (titleCell) {
-                    const titleText = titleCell.textContent.toLowerCase().trim();
-                    if (titleText.includes(searchTerm)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                }
-            });
-            updateRowNumbers();
-        });
+        if (searchInput) {
+            searchInput.addEventListener('input', applyVideoFilters);
+        }
     </script>
 {% endblock %}

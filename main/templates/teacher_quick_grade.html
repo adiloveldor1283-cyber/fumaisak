@@ -4,339 +4,1264 @@
 {% block title %}Tezkor baholash{% endblock %}
 
 {% block extra_css %}
-<style>
-    /* Content Container */
-    .sarlavha {
-        font-size: 22px;
-        font-weight: 800;
-        margin-bottom: 20px;
-        color: #ffffff;
-        border-left: 4px solid #00f2fe;
-        padding-left: 12px;
-        letter-spacing: -0.5px;
-    }
+    <style>
+        /* =========================================================
+           ✨ TEZKOR BAHOLASH — 1-TO-1 LIGHT & DARK MODE DESIGN
+           ========================================================= */
 
-    /* Grader Card style */
-    .submission-card {
-        background: rgba(11, 15, 25, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 20px;
-        padding: 24px;
-        margin-bottom: 20px;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-        transition: transform 0.2s, border-color 0.2s;
-    }
-    .submission-card:hover {
-        border-color: rgba(0, 242, 254, 0.2);
-        transform: translateY(-2px);
-    }
-
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-        padding-bottom: 12px;
-        margin-bottom: 16px;
-    }
-
-    .group-badge {
-        background: rgba(0, 242, 254, 0.07);
-        border: 1px solid rgba(0, 242, 254, 0.2);
-        color: #00f2fe;
-        padding: 4px 10px;
-        border-radius: 8px;
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .form-control {
-        padding: 10px 14px;
-        border-radius: 8px;
-        background: #0c101d;
-        border: 1px solid rgba(255,255,255,0.08);
-        color: #ffffff;
-        font-size: 13.5px;
-        outline: none;
-        transition: 0.3s;
-    }
-    .form-control:focus {
-        border-color: #00f2fe;
-        box-shadow: 0 0 10px rgba(0,242,254,0.15);
-    }
-
-    .grade-btn {
-        padding: 10px 18px;
-        background: linear-gradient(135deg, #00f2fe, #4facfe);
-        color: #070a12;
-        border: none;
-        border-radius: 8px;
-        font-weight: 800;
-        font-size: 13px;
-        cursor: pointer;
-        transition: 0.3s;
-        box-shadow: 0 4px 12px rgba(0, 242, 254, 0.2);
-    }
-    .grade-btn:hover {
-        box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
-    }
-
-    /* Scrollable panel */
-    .submissions-wrapper {
-        max-height: calc(100vh - 300px);
-        min-height: 300px;
-        overflow-y: auto;
-        padding-right: 8px;
-    }
-    .submissions-wrapper::-webkit-scrollbar {
-        width: 6px;
-    }
-    .submissions-wrapper::-webkit-scrollbar-thumb {
-        background: rgba(0, 242, 254, 0.15);
-        border-radius: 4px;
-    }
-    .submissions-wrapper::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 242, 254, 0.4);
-    }
-
-    .text-preview {
-        background: rgba(255,255,255,0.02);
-        border: 1px solid rgba(255,255,255,0.04);
-        padding: 14px;
-        border-radius: 12px;
-        font-size: 13.5px;
-        color: rgba(255,255,255,0.8);
-        line-height: 1.6;
-        margin-top: 10px;
-        word-wrap: break-word;
-    }
-
-    /* --- ☀️ LIGHT MODE OVERRIDES FOR QUICK GRADE --- */
-    body.light-mode .submission-card {
-        background: #ffffff !important;
-        border: 1px solid #cbd5e1 !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
-    }
-    body.light-mode .submission-card:hover {
-        border-color: #0284c7 !important;
-    }
-    body.light-mode .card-header {
-        border-bottom-color: #e2e8f0 !important;
-    }
-    body.light-mode .group-badge {
-        background: rgba(2, 132, 199, 0.05) !important;
-        border-color: rgba(2, 132, 199, 0.2) !important;
-        color: #0284c7 !important;
-    }
-    body.light-mode .form-control {
-        background: #ffffff !important;
-        color: #0f172a !important;
-        border: 1px solid #cbd5e1 !important;
-    }
-    body.light-mode .form-control:focus {
-        border-color: #0284c7 !important;
-        box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15) !important;
-    }
-    body.light-mode .grade-btn {
-        background: linear-gradient(135deg, #0284c7, #0369a1) !important;
-        color: #ffffff !important;
-        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2) !important;
-    }
-    body.light-mode .grade-btn:hover {
-        box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3) !important;
-    }
-    body.light-mode .text-preview {
-        background: #f8fafc !important;
-        border: 1px solid #e2e8f0 !important;
-        color: #334155 !important;
-    }
-    body.light-mode .submissions-wrapper::-webkit-scrollbar-thumb {
-        background: rgba(2, 132, 199, 0.2) !important;
-    }
-    body.light-mode .submissions-wrapper::-webkit-scrollbar-thumb:hover {
-        background: rgba(2, 132, 199, 0.4) !important;
-    }
-    
-    /* Inline styles overrides in light mode */
-    body.light-mode .sarlavha {
-        color: #0f172a !important;
-        border-left-color: #0284c7 !important;
-    }
-    body.light-mode p[style*="color: rgba(255,255,255,0.4)"] {
-        color: #64748b !important;
-    }
-    body.light-mode .card-header span[style*="color: rgba(255,255,255,0.3)"] {
-        color: #cbd5e1 !important;
-    }
-    body.light-mode .card-header strong[style*="color: #ffffff"] {
-        color: #0f172a !important;
-    }
-    body.light-mode .card-header div[style*="color: rgba(255,255,255,0.4)"] {
-        color: #64748b !important;
-    }
-    body.light-mode h4[style*="color: #ffffff"] {
-        color: #0f172a !important;
-    }
-    body.light-mode span[style*="color: rgba(255,255,255,0.4)"] {
-        color: #64748b !important;
-    }
-    body.light-mode div[style*="color: rgba(255,255,255,0.4)"] {
-        color: #64748b !important;
-    }
-    body.light-mode div[style*="background: rgba(255,255,255,0.01)"] {
-        background: #f8fafc !important;
-        border-color: #e2e8f0 !important;
-    }
-    body.light-mode label[style*="color: rgba(255,255,255,0.5)"] {
-        color: #64748b !important;
-    }
-
-    .btn-otish {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 16px;
-        background: rgba(0, 242, 254, 0.07);
-        border: 1px solid rgba(0, 242, 254, 0.2);
-        color: #00f2fe;
-        text-decoration: none;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        transition: 0.3s;
-        cursor: pointer;
-    }
-    .btn-otish:hover {
-        background: linear-gradient(135deg, #00f2fe, #4facfe);
-        color: #070a12;
-        border-color: transparent;
-        box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
-    }
-
-    /* --- 📱 MOBILE VIEWS --- */
-    @media (max-width: 768px) {
-        .konteyner {
-            height: auto !important;
-            overflow: visible !important;
-            padding: 15px !important;
+        /* --- 🔍 SARLAVHA VA TEPA PANELI --- */
+        .sarlavha-qatori {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
         }
-        .submissions-wrapper {
-            max-height: none !important;
-            overflow: visible !important;
-            padding-right: 0 !important;
+        .sarlavha-text-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
+        .sarlavha {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            border-left: 4px solid #00f2fe;
+            padding-left: 14px;
+            letter-spacing: -0.4px;
+            margin: 0;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sarlavha i.title-icon {
+            color: #00f2fe;
+            font-size: 20px;
+        }
+        .sarlavha-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        body.light-mode .sarlavha {
+            color: #0f172a !important;
+            border-left-color: #0284c7 !important;
+        }
+        body.light-mode .sarlavha i.title-icon {
+            color: #0284c7 !important;
+        }
+        body.light-mode .sarlavha-subtitle {
+            color: #64748b !important;
+        }
+
+        .header-action-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-link-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            color: #00f2fe;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        .btn-link-action:hover {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.35);
+            transform: translateY(-2px);
+        }
+        body.light-mode .btn-link-action {
+            background: rgba(2, 132, 199, 0.08) !important;
+            border-color: rgba(2, 132, 199, 0.25) !important;
+            color: #0284c7 !important;
+        }
+        body.light-mode .btn-link-action:hover {
+            background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+            color: #ffffff !important;
+            border-color: transparent !important;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
+        }
+
+        /* --- 📊 4 TA STATISTIKA KARTALARI --- */
+        .stats-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.25s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        body.light-mode .stat-card {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .stat-card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        .stat-icon-wrap {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            flex-shrink: 0;
+        }
+        .stat-card.blue .stat-icon-wrap {
+            background: rgba(0, 242, 254, 0.1);
+            color: #00f2fe;
+            border: 1px solid rgba(0, 242, 254, 0.25);
+        }
+        .stat-card.green .stat-icon-wrap {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+        .stat-card.purple .stat-icon-wrap {
+            background: rgba(168, 85, 247, 0.1);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.25);
+        }
+        .stat-card.amber .stat-icon-wrap {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+
+        body.light-mode .stat-card.blue .stat-icon-wrap {
+            background: #e0f2fe !important;
+            color: #0284c7 !important;
+            border-color: #bae6fd !important;
+        }
+        body.light-mode .stat-card.green .stat-icon-wrap {
+            background: #dcfce7 !important;
+            color: #16a34a !important;
+            border-color: #bbf7d0 !important;
+        }
+        body.light-mode .stat-card.purple .stat-icon-wrap {
+            background: #f3e8ff !important;
+            color: #9333ea !important;
+            border-color: #e9d5ff !important;
+        }
+        body.light-mode .stat-card.amber .stat-icon-wrap {
+            background: #fef3c7 !important;
+            color: #d97706 !important;
+            border-color: #fde68a !important;
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+        body.light-mode .stat-value {
+            color: #0f172a !important;
+        }
+        .stat-label {
+            font-size: 11.5px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        body.light-mode .stat-label {
+            color: #64748b !important;
+        }
+
+        /* --- 🔍 FILTER VA QIDIRUV QATORI --- */
+        .toolbar-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .filter-pills-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-pill {
+            padding: 7px 15px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.65);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+        .filter-pill:hover {
+            color: #ffffff;
+            border-color: rgba(0, 242, 254, 0.3);
+            background: rgba(0, 242, 254, 0.05);
+        }
+        .filter-pill.active {
+            background: rgba(0, 242, 254, 0.12);
+            border-color: #00f2fe;
+            color: #00f2fe;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+        }
+        .filter-pill .pill-badge {
+            padding: 1px 6px;
+            border-radius: 6px;
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .filter-pill.active .pill-badge {
+            background: rgba(0, 242, 254, 0.25);
+            color: #ffffff;
+        }
+
+        body.light-mode .filter-pill {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #475569 !important;
+        }
+        body.light-mode .filter-pill:hover {
+            background: #f8fafc !important;
+            color: #0284c7 !important;
+            border-color: #0284c7 !important;
+        }
+        body.light-mode .filter-pill.active {
+            background: #e0f2fe !important;
+            border-color: #0284c7 !important;
+            color: #0284c7 !important;
+            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.15) !important;
+        }
+        body.light-mode .filter-pill .pill-badge {
+            background: #e2e8f0 !important;
+            color: #334155 !important;
+        }
+        body.light-mode .filter-pill.active .pill-badge {
+            background: #0284c7 !important;
+            color: #ffffff !important;
+        }
+
+        /* Qidiruv formasi */
+        .search-form {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 4px 14px;
+            transition: all 0.25s ease;
+            width: 300px;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        .search-form:focus-within {
+            border-color: #00f2fe !important;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.2) !important;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        body input[type="text"].search-input,
+        body .search-form input,
+        .search-input {
+            background: transparent !important;
+            border: 0 !important;
+            border-style: none !important;
+            outline: none !important;
+            color: #ffffff !important;
+            font-size: 13px !important;
+            width: 100% !important;
+            padding: 6px 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+        body input[type="text"].search-input:focus,
+        body .search-form input:focus,
+        .search-input:focus {
+            background: transparent !important;
+            border: 0 !important;
+            border-style: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .search-btn {
+            background: none !important;
+            border: none !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+            padding: 0 0 0 8px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none !important;
+        }
+        .search-btn:hover {
+            color: #00f2fe !important;
+        }
+
+        body.light-mode .search-form {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+        }
+        body.light-mode .search-form:focus-within {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+        }
+        body.light-mode input[type="text"].search-input,
+        body.light-mode .search-form input,
+        body.light-mode .search-input {
+            color: #0f172a !important;
+            background: transparent !important;
+            border: 0 !important;
+            border-style: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        body.light-mode input[type="text"].search-input:focus,
+        body.light-mode .search-form input:focus,
+        body.light-mode .search-input:focus {
+            border: 0 !important;
+            box-shadow: none !important;
+            outline: none !important;
+            background: transparent !important;
+        }
+        body.light-mode .search-input::placeholder {
+            color: #94a3b8 !important;
+        }
+        body.light-mode .search-btn {
+            color: #64748b !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        body.light-mode .search-btn:hover {
+            color: #0284c7 !important;
+        }
+
+        /* --- 🌟 BAHOLASH RO'YXATI VA KARTALARI (EDTECH DASHBOARD CARDS) --- */
+        .submissions-feed-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-bottom: 35px;
+        }
+
         .submission-card {
-            padding: 16px !important;
-            border-radius: 16px !important;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-left: 5px solid #00f2fe;
+            border-radius: 18px;
+            padding: 22px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.25s ease;
+            position: relative;
+            box-sizing: border-box;
         }
-        .card-header {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 8px !important;
+        .submission-card:hover {
+            border-color: rgba(0, 242, 254, 0.25);
+            border-left-color: #00f2fe;
+            transform: translateY(-2px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
         }
-        .card-header div:last-child {
-            margin-top: 4px;
+
+        body.light-mode .submission-card {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-left: 5px solid #0284c7 !important;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
         }
-        /* Make inner flex blocks stack perfectly and fill width */
-        .submission-card > div[style*="display: flex"] {
-            flex-direction: column !important;
-            gap: 16px !important;
+        body.light-mode .submission-card:hover {
+            border-color: #cbd5e1 !important;
+            border-left-color: #0284c7 !important;
+            box-shadow: 0 8px 24px rgba(2, 132, 199, 0.08) !important;
         }
-        .submission-card > div[style*="display: flex"] > div {
-            min-width: 100% !important;
-            width: 100% !important;
+
+        /* Karta Yuqori Paneli */
+        .card-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 14px;
+            margin-bottom: 18px;
         }
-        /* Full width for buttons in mobile grading box */
-        .grade-btn {
-            width: 100% !important;
-            padding: 12px !important;
+        body.light-mode .card-top-bar {
+            border-bottom-color: #e2e8f0 !important;
+        }
+
+        .badges-left-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .group-pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #00f2fe;
+            white-space: nowrap;
+        }
+        body.light-mode .group-pill-badge {
+            background: #e0f2fe !important;
+            border-color: #bae6fd !important;
+            color: #0284c7 !important;
+        }
+
+        .assignment-title-badge {
+            font-size: 14px;
+            font-weight: 800;
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        body.light-mode .assignment-title-badge {
+            color: #0f172a !important;
+        }
+
+        .time-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'JetBrains Mono', monospace, sans-serif;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 3px 9px;
+            border-radius: 8px;
+        }
+        body.light-mode .time-badge {
+            background: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+            color: #64748b !important;
+        }
+
+        /* Asosiy 2 Ustunli Tarkib */
+        .card-main-body {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 24px;
+        }
+
+        /* Chap Ustun: O'quvchi va javob */
+        .student-sub-content {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .student-profile-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .student-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1.5px solid rgba(0, 242, 254, 0.3);
+            background: #0f172a;
+        }
+        .student-avatar-placeholder {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(79, 172, 254, 0.15));
+            border: 1.5px solid rgba(0, 242, 254, 0.3);
+            color: #00f2fe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            font-weight: 800;
+        }
+        body.light-mode .student-avatar-placeholder {
+            background: #e0f2fe !important;
+            border-color: #bae6fd !important;
+            color: #0284c7 !important;
+        }
+
+        .student-meta-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .student-name {
+            font-size: 15px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+        body.light-mode .student-name {
+            color: #0f172a !important;
+        }
+        .student-subtext {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        body.light-mode .student-subtext {
+            color: #64748b !important;
+        }
+
+        /* Topshiriq matni va fayl */
+        .text-preview-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 13.5px;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.6;
+            word-wrap: break-word;
+        }
+        body.light-mode .text-preview-box {
+            background: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+            color: #334155 !important;
+        }
+
+        .file-attachment-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            background: rgba(0, 242, 254, 0.05);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 12px;
+            text-decoration: none;
+            color: #00f2fe;
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.25s ease;
+            width: fit-content;
+        }
+        .file-attachment-card:hover {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+            transform: translateY(-1px);
+        }
+        body.light-mode .file-attachment-card {
+            background: #e0f2fe !important;
+            border-color: #bae6fd !important;
+            color: #0284c7 !important;
+        }
+        body.light-mode .file-attachment-card:hover {
+            background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+            color: #ffffff !important;
+        }
+
+        /* O'ng Ustun: Baholash Formasi */
+        .grading-panel-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        body.light-mode .grading-panel-box {
+            background: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+        }
+
+        .grade-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        body.light-mode .form-label-row {
+            color: #475569 !important;
+        }
+
+        .score-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .score-input-control {
+            width: 100%;
+            padding: 10px 65px 10px 14px;
+            border-radius: 10px;
+            background: #090d19;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 800;
+            outline: none;
+            transition: all 0.25s ease;
+            box-sizing: border-box;
+        }
+        .score-input-control:focus {
+            border-color: #00f2fe;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
+            background: #0d1424;
+        }
+        body.light-mode .score-input-control {
+            background: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        body.light-mode .score-input-control:focus {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+        }
+
+        .score-max-badge {
+            position: absolute;
+            right: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #10b981;
+            pointer-events: none;
+        }
+        body.light-mode .score-max-badge {
+            color: #15803d !important;
+        }
+
+        /* Tezkor Foiz Tugmalari (Quick Presets) */
+        .quick-presets-row {
+            display: flex;
+            gap: 6px;
+        }
+        .preset-btn {
+            flex: 1;
+            padding: 4px 6px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.2s ease;
             text-align: center;
         }
-    }
-</style>
+        .preset-btn:hover {
+            background: rgba(0, 242, 254, 0.12);
+            border-color: #00f2fe;
+            color: #00f2fe;
+        }
+        body.light-mode .preset-btn {
+            background: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #475569 !important;
+        }
+        body.light-mode .preset-btn:hover {
+            background: #e0f2fe !important;
+            border-color: #0284c7 !important;
+            color: #0284c7 !important;
+        }
+
+        .feedback-textarea-control {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #090d19;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.25s ease;
+            resize: vertical;
+            min-height: 55px;
+            box-sizing: border-box;
+        }
+        .feedback-textarea-control:focus {
+            border-color: #00f2fe;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+        }
+        body.light-mode .feedback-textarea-control {
+            background: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        body.light-mode .feedback-textarea-control:focus {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+        }
+
+        .btn-submit-grade {
+            padding: 11px 18px;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border: none;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 14px rgba(0, 242, 254, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .btn-submit-grade:hover {
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.45);
+            transform: translateY(-1px);
+        }
+        body.light-mode .btn-submit-grade {
+            background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3) !important;
+        }
+        body.light-mode .btn-submit-grade:hover {
+            background: linear-gradient(135deg, #0369a1, #0284c7) !important;
+        }
+
+        /* --- ⚠️ XATOLIK VA OGOHLANTIRISH BLOKI --- */
+        .alert-toast {
+            padding: 12px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 13.5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-toast.error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+        .alert-toast.success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+        body.light-mode .alert-toast.error {
+            background: #fee2e2 !important;
+            border-color: #fca5a5 !important;
+            color: #b91c1c !important;
+        }
+        body.light-mode .alert-toast.success {
+            background: #dcfce7 !important;
+            border-color: #86efac !important;
+            color: #15803d !important;
+        }
+
+        /* --- 🎉 BO'SH HOLAT (HAMMA TOPSHIRIQ BAHOLANDI) --- */
+        .celebration-empty-card {
+            text-align: center;
+            padding: 60px 24px;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+        body.light-mode .celebration-empty-card {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        .celebration-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.12);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+        }
+        body.light-mode .celebration-icon {
+            background: #dcfce7 !important;
+            border-color: #86efac !important;
+            color: #16a34a !important;
+        }
+
+        .celebration-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0;
+        }
+        body.light-mode .celebration-title {
+            color: #0f172a !important;
+        }
+        .celebration-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            max-width: 480px;
+            line-height: 1.5;
+            margin: 0;
+        }
+        body.light-mode .celebration-subtitle {
+            color: #64748b !important;
+        }
+
+        /* --- 📱 MOBIL REJIMDA RESPONSIVE MANTIQLARI --- */
+        @media (max-width: 768px) {
+            .konteyner {
+                height: auto !important;
+                overflow: visible !important;
+                padding: 12px 14px 35px 14px !important;
+            }
+            .sarlavha-qatori {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 14px !important;
+                margin-bottom: 16px !important;
+            }
+            .sarlavha {
+                font-size: 18px !important;
+                border-left-width: 3.5px !important;
+                padding-left: 10px !important;
+            }
+            .sarlavha-subtitle {
+                font-size: 12px !important;
+                padding-left: 14px !important;
+            }
+            .btn-link-action {
+                width: 100% !important;
+                justify-content: center !important;
+                padding: 11px !important;
+            }
+
+            .stats-overview-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 10px !important;
+                margin-bottom: 18px !important;
+            }
+            .stat-card {
+                padding: 12px 14px !important;
+                gap: 12px !important;
+                border-radius: 14px !important;
+            }
+            .stat-icon-wrap {
+                width: 38px !important;
+                height: 38px !important;
+                font-size: 16px !important;
+                border-radius: 10px !important;
+            }
+            .stat-value {
+                font-size: 17px !important;
+            }
+            .stat-label {
+                font-size: 10px !important;
+            }
+
+            .toolbar-panel {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 10px !important;
+            }
+            .filter-pills-group {
+                overflow-x: auto;
+                padding-bottom: 4px;
+                flex-wrap: nowrap !important;
+            }
+            .filter-pill {
+                padding: 6px 12px !important;
+                font-size: 11.5px !important;
+                white-space: nowrap !important;
+            }
+            .search-form {
+                width: 100% !important;
+            }
+
+            .card-main-body {
+                grid-template-columns: 1fr !important;
+                gap: 16px !important;
+            }
+            .submission-card {
+                padding: 16px !important;
+                border-radius: 16px !important;
+            }
+            .card-top-bar {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px !important;
+            }
+        }
+            .d-row-hidden { display: none !important; }
+    </style>
 {% endblock %}
 
 {% block content %}
-    <h2 class="sarlavha">Tezkor Baholash Paneli</h2>
-    <p style="color: rgba(255,255,255,0.4); font-size: 13.5px; margin-top: -15px; margin-bottom: 25px;">Barcha guruhlardan kelgan tekshirilmagan uy vazifalari va topshiriqlarni baholash</p>
+    <!-- Xabarlar / Toasts -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-toast {% if 'error' in message.tags %}error{% else %}success{% endif %}">
+                <i class="fas {% if 'error' in message.tags %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
 
-    <div class="submissions-wrapper">
+    <!-- SARLAVHA VA TEPA PANELI -->
+    <div class="sarlavha-qatori">
+        <div class="sarlavha-text-wrap">
+            <h2 class="sarlavha">
+                <i class="fas fa-bolt title-icon"></i>
+                Tezkor baholash paneli
+            </h2>
+            <p class="sarlavha-subtitle">Barcha guruhlardan kelib tushgan tekshirilmagan uy vazifalarini tezkor ko'rib chiqish va baholash</p>
+        </div>
+        <div class="header-action-group">
+            <a href="{% url 'teacher_deadline' %}" class="btn-link-action">
+                <i class="fas fa-tasks"></i>
+                Barcha topshiriqlar
+            </a>
+        </div>
+    </div>
+
+    <!-- 4 TA STATISTIKA KARTASI -->
+    <div class="stats-overview-grid">
+        <div class="stat-card blue">
+            <div class="stat-icon-wrap">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ pending_count|default:"0" }}</span>
+                <span class="stat-label">Kutilayotgan javoblar</span>
+            </div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon-wrap">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ unique_groups_count|default:"0" }}</span>
+                <span class="stat-label">Guruhlar soni</span>
+            </div>
+        </div>
+        <div class="stat-card purple">
+            <div class="stat-icon-wrap">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ unique_assignments_count|default:"0" }}</span>
+                <span class="stat-label">Topshiriq turlari</span>
+            </div>
+        </div>
+        <div class="stat-card amber">
+            <div class="stat-icon-wrap">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">Faol</span>
+                <span class="stat-label">Tezkor rejim</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOOLBAR: GURUHLAR BO'YICHA FILTR VA QIDIRUV -->
+    <div class="toolbar-panel">
+        <div class="filter-pills-group">
+            <div class="filter-pill active" data-filter="all" onclick="filterGroupSubmissions('all', this)">
+                <i class="fas fa-layer-group"></i> Barchasi <span class="pill-badge">{{ pending_count|default:"0" }}</span>
+            </div>
+            {% for g in unique_groups %}
+                <div class="filter-pill" data-filter="{{ g.name|lower }}" onclick="filterGroupSubmissions('{{ g.name|lower }}', this)">
+                    <i class="fas fa-users"></i> {{ g.name }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <form class="search-form" onsubmit="event.preventDefault()">
+            <input type="text" class="search-input" placeholder="O'quvchi, topshiriq yoki guruh bo'yicha..." id="quick-grade-search-input">
+            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
+
+    <!-- BAHOLASH KARTALARI RO'YXATI -->
+    <div class="submissions-feed-wrap" id="submissions-feed">
         {% if submissions %}
             {% for sub in submissions %}
-                <div class="submission-card">
-                    <!-- Sarlavha paneli -->
-                    <div class="card-header">
-                        <div>
-                            <span class="group-badge">{{ sub.assignment.group.name }}</span>
-                            <span style="color: rgba(255,255,255,0.3); margin: 0 8px;">/</span>
-                            <strong style="color: #ffffff; font-size: 15px;">{{ sub.assignment.title }}</strong>
+                <div class="submission-card quick-sub-item"
+                     data-student="{{ sub.student.get_full_name|lower }}"
+                     data-assignment="{{ sub.assignment.title|lower }}"
+                     data-group="{{ sub.assignment.group.name|lower }}">
+                    
+                    <!-- Karta Tepa Paneli -->
+                    <div class="card-top-bar">
+                        <div class="badges-left-group">
+                            <span class="group-pill-badge">
+                                <i class="fas fa-users"></i> {{ sub.assignment.group.name }}
+                            </span>
+                            <span class="assignment-title-badge">
+                                <i class="fas fa-file-alt" style="color: #00f2fe;"></i> {{ sub.assignment.title }}
+                            </span>
                         </div>
-                        <div style="font-family: monospace; font-size: 12.5px; color: rgba(255,255,255,0.4);">
-                            <i class="far fa-clock" style="margin-right: 6px;"></i> Topshirildi: {{ sub.submitted_at|date:"d.m.Y H:i" }}
+                        <div class="time-badge">
+                            <i class="far fa-clock" style="color: #00f2fe;"></i> {{ sub.submitted_at|date:"d.m.Y H:i" }}
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 24px; flex-wrap: wrap;">
-                        <!-- O'quvchi ma'lumoti va topshiriq javobi -->
-                        <div style="flex: 2; min-width: 300px;">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                    <!-- 2 Ustunli Asosiy Qism -->
+                    <div class="card-main-body">
+                        <!-- Chap: O'quvchi profili va topshiriq javobi -->
+                        <div class="student-sub-content">
+                            <div class="student-profile-header">
                                 {% if sub.student.profile_image %}
-                                    <img src="{{ sub.student.profile_image.url }}" alt="Profile" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+                                    <img src="{{ sub.student.profile_image.url }}" alt="Avatar" class="student-avatar">
                                 {% else %}
-                                    <img src="{{ default_profile_image }}" alt="Profile" style="width: 36px; height: 36px; border-radius: 50%;">
+                                    <div class="student-avatar-placeholder">
+                                        {{ sub.student.first_name|slice:":1" }}{{ sub.student.last_name|slice:":1" }}
+                                    </div>
                                 {% endif %}
-                                <div>
-                                    <h4 style="color: #ffffff; margin: 0; font-size: 14.5px;">{{ sub.student.get_full_name }}</h4>
-                                    <span style="font-size: 12px; color: rgba(255,255,255,0.4);">Guruh a'zosi</span>
+                                <div class="student-meta-wrap">
+                                    <span class="student-name">{{ sub.student.get_full_name }}</span>
+                                    <span class="student-subtext">
+                                        <i class="fas fa-user-tag" style="margin-right: 4px;"></i> {{ sub.student.username }}
+                                        {% if sub.student.phone_number %} • {{ sub.student.phone_number }}{% endif %}
+                                    </span>
                                 </div>
                             </div>
 
-                            <!-- Javob matni yoki fayl -->
+                            <!-- Javob matni (agar mavjud bo'lsa) -->
                             {% if sub.submission_text %}
-                                <div style="color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;">O'quvchi javobi</div>
-                                <div class="text-preview">{{ sub.submission_text|linebreaksbr }}</div>
+                                <div>
+                                    <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 6px; letter-spacing: 0.4px;">
+                                        <i class="fas fa-comment-dots" style="margin-right: 4px;"></i> O'quvchi javobi
+                                    </div>
+                                    <div class="text-preview-box">
+                                        {{ sub.submission_text|linebreaksbr }}
+                                    </div>
+                                </div>
                             {% endif %}
 
+                            <!-- Fayl yuklangan bo'lsa -->
                             {% if sub.file %}
-                                <div style="margin-top: 15px;">
-                                    <a href="{{ sub.file.url }}" target="_blank" class="btn-otish">
-                                        <i class="fas fa-file-download"></i> Faylni yuklab olish
+                                <div>
+                                    <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 6px; letter-spacing: 0.4px;">
+                                        <i class="fas fa-paperclip" style="margin-right: 4px;"></i> Biriktirilgan fayl
+                                    </div>
+                                    <a href="{{ sub.file.url }}" target="_blank" class="file-attachment-card">
+                                        <i class="fas fa-file-download" style="font-size: 17px;"></i>
+                                        <span>Faylni ko'rish / yuklab olish</span>
                                     </a>
                                 </div>
                             {% endif %}
                         </div>
 
-                        <!-- Baholash formasi -->
-                        <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: center; height: fit-content; align-self: center;">
-                            <form method="POST" style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- O'ng: Tezkor Baholash Paneli -->
+                        <div class="grading-panel-box">
+                            <form method="POST" action="{% url 'quick_grade' %}" class="grade-form-group">
                                 {% csrf_token %}
                                 <input type="hidden" name="submission_id" value="{{ sub.id }}">
-                                
+
                                 <div>
-                                    <label style="display: block; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">Baho qo'yish (Max: {{ sub.assignment.max_score }})</label>
-                                    <input type="number" name="score" required min="0" max="{{ sub.assignment.max_score }}" placeholder="Baho (masalan: 95)" class="form-control" style="width: 100%;">
+                                    <div class="form-label-row" style="margin-bottom: 6px;">
+                                        <span>Baho qo'yish:</span>
+                                        <span style="color: #10b981; font-weight: 800;">Max: {{ sub.assignment.max_score }} ball</span>
+                                    </div>
+                                    <div class="score-input-wrap">
+                                        <input type="number" 
+                                               name="score" 
+                                               required 
+                                               min="0" 
+                                               max="{{ sub.assignment.max_score }}" 
+                                               placeholder="0 - {{ sub.assignment.max_score }}" 
+                                               class="score-input-control"
+                                               id="score-input-{{ sub.id }}">
+                                        <span class="score-max-badge">/ {{ sub.assignment.max_score }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Tezkor Foiz Tugmalari -->
+                                <div class="quick-presets-row">
+                                    <button type="button" class="preset-btn" onclick="setQuickScore('score-input-{{ sub.id }}', {{ sub.assignment.max_score }}, 1.0)">100%</button>
+                                    <button type="button" class="preset-btn" onclick="setQuickScore('score-input-{{ sub.id }}', {{ sub.assignment.max_score }}, 0.85)">85%</button>
+                                    <button type="button" class="preset-btn" onclick="setQuickScore('score-input-{{ sub.id }}', {{ sub.assignment.max_score }}, 0.70)">70%</button>
+                                    <button type="button" class="preset-btn" onclick="setQuickScore('score-input-{{ sub.id }}', {{ sub.assignment.max_score }}, 0.50)">50%</button>
                                 </div>
 
                                 <div>
-                                    <label style="display: block; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">Izoh (Feedback)</label>
-                                    <textarea name="feedback" placeholder="O'quvchiga izoh yozing..." class="form-control" style="width: 100%; height: 60px; resize: vertical;"></textarea>
+                                    <div class="form-label-row" style="margin-bottom: 6px;">
+                                        <span>Izoh (ixtiyoriy):</span>
+                                    </div>
+                                    <textarea name="feedback" 
+                                              placeholder="O'quvchiga tavsiya yoki fikringizni yozing..." 
+                                              class="feedback-textarea-control"></textarea>
                                 </div>
 
-                                <button type="submit" class="grade-btn"><i class="fas fa-check-circle" style="margin-right: 6px;"></i> Baholash</button>
+                                <button type="submit" class="btn-submit-grade">
+                                    <i class="fas fa-check-circle"></i>
+                                    Bahoni saqlash
+                                </button>
                             </form>
                         </div>
                     </div>
                 </div>
             {% endfor %}
         {% else %}
-            <div style="text-align: center; font-style: italic; padding: 60px 20px; background: rgba(11,15,25,0.2); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px;">
-                <i class="fas fa-check-double" style="font-size: 48px; color: rgba(0, 255, 170, 0.2); display: block; margin-bottom: 16px;"></i>
-                Ajoyib! Barcha topshiriqlar baholanib bo'lingan. Tekshirilmagan yangi vazifalar yo'q.
+            <!-- Ajoyib Bo'sh Holat -->
+            <div class="celebration-empty-card">
+                <div class="celebration-icon">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <h3 class="celebration-title">Ajoyib! Barcha topshiriqlar baholandi</h3>
+                <p class="celebration-subtitle">Hozirda tekshirilmagan yangi topshiriq javoblari mavjud emas. Yangi topshiriqlar topshirilganda ular shu yerda paydo bo'ladi.</p>
+                <a href="{% url 'teacher_deadline' %}" class="btn-link-action" style="margin-top: 6px;">
+                    <i class="fas fa-tasks"></i> Topshiriqlar ro'yxatiga o'tish
+                </a>
             </div>
         {% endif %}
+
+        <div id="no-quick-results-card" style="display: none;">
+            <div class="celebration-empty-card" style="padding: 40px 20px;">
+                <i class="fas fa-search" style="font-size: 36px; opacity: 0.3; color: #00f2fe;"></i>
+                <h3 class="celebration-title" style="font-size: 17px;">Qidiruv bo'yicha topshiriq topilmadi</h3>
+                <p class="celebration-subtitle">Kiritilgan qidiruv so'zi yoki tanlangan guruh bo'yicha hech qanday natija mavjud emas.</p>
+            </div>
+        </div>
     </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        // Tezkor foiz hisoblash orqali baho inputiga qiymat yozish
+        function setQuickScore(inputId, maxScore, factor) {
+            const el = document.getElementById(inputId);
+            if (el) {
+                const calculated = Math.round(maxScore * factor);
+                el.value = calculated;
+                el.focus();
+            }
+        }
+
+        // Qidiruv va Guruh bo'yicha jonli filtrlash
+        let currentGroupFilter = 'all';
+        const searchInput = document.getElementById('quick-grade-search-input');
+        const subCards = document.querySelectorAll('.quick-sub-item');
+        const noResultsCard = document.getElementById('no-quick-results-card');
+
+        function applyQuickFilters() {
+            const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+            let visibleCount = 0;
+
+            subCards.forEach(card => {
+                const student = card.getAttribute('data-student') || '';
+                const assignment = card.getAttribute('data-assignment') || '';
+                const group = card.getAttribute('data-group') || '';
+
+                const matchesSearch = !query || student.includes(query) || assignment.includes(query) || group.includes(query);
+                const matchesGroup = (currentGroupFilter === 'all') || (group === currentGroupFilter);
+
+                if (matchesSearch && matchesGroup) {
+                    card.classList.remove('d-row-hidden');
+                    card.style.removeProperty('display');
+                    visibleCount++;
+                } else {
+                    card.classList.add('d-row-hidden');
+                    card.style.setProperty('display', 'none', 'important');
+                }
+            });
+
+            if (noResultsCard) {
+                noResultsCard.style.display = (visibleCount === 0 && subCards.length > 0) ? '' : 'none';
+            }
+        }
+
+        function filterGroupSubmissions(groupKey, pillElement) {
+            currentGroupFilter = groupKey;
+            document.querySelectorAll('.filter-pill').forEach(pill => {
+                pill.classList.remove('active');
+            });
+            if (pillElement) {
+                pillElement.classList.add('active');
+            }
+            applyQuickFilters();
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', applyQuickFilters);
+        }
+    </script>
 {% endblock %}
