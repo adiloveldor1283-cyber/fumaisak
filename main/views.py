@@ -177,13 +177,16 @@ def circular_favicon_view(request):
     if cached_favicon:
         return HttpResponse(cached_favicon, content_type="image/png")
 
-    setting = SiteSetting.objects.first()
     image_path = None
-    if setting and setting.image:
-        try:
-            image_path = setting.image.path
-        except Exception:
-            pass
+    try:
+        setting = SiteSetting.objects.first()
+        if setting and setting.image:
+            try:
+                image_path = setting.image.path
+            except Exception:
+                pass
+    except Exception:
+        pass
 
     if not image_path or not os.path.exists(image_path):
         image_path = os.path.join(settings.BASE_DIR, 'static', 'imgs', 'images_9.webp')
