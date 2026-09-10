@@ -3898,6 +3898,20 @@ def admin_settings_view(request):
                 profile.save()
             messages.success(request, "Standart profil rasmi muvaffaqiyatli o'zgartirildi.")
 
+        login_bg_image = request.FILES.get('login_bg_image')
+        if login_bg_image:
+            from main.validators import check_file_upload, validate_image_file
+            is_valid, err_msg = check_file_upload(login_bg_image, validate_image_file)
+            if not is_valid:
+                messages.error(request, err_msg)
+                return redirect('admin_settings')
+            if not setting:
+                setting = SiteSetting.objects.create(login_bg_image=login_bg_image)
+            else:
+                setting.login_bg_image = login_bg_image
+                setting.save()
+            messages.success(request, "Login sahifasi fon rasmi muvaffaqiyatli o'zgartirildi.")
+
         from django.core.cache import cache
         cache.delete('site_global_images')
         return redirect('admin_settings')

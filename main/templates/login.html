@@ -552,13 +552,13 @@
   <div class="cyber-grid-layer"></div>
   <div class="neon-glow-orb"></div>
   <div class="neon-glow-orb orb-right"></div>
-  <img src="{% static 'imgs/login_illustration.png' %}" alt="Fon Rasmi" class="global-bg-art" onerror="this.style.display='none'">
+  <img src="{% if login_bg_image %}{{ login_bg_image }}{% else %}{% static 'imgs/login_illustration.png' %}{% endif %}" alt="Fon Rasmi" class="global-bg-art" onerror="this.style.display='none'">
 
   <div class="login-wrapper">
 
     <!-- 🎨 CHAP TOMON: DESKTOP VIZUAL BLOK -->
     <div class="login-visual">
-      <img src="{% static 'imgs/login_illustration.png' %}" alt="Tizim Fon Grafikasi" class="visual-bg-hero" onerror="this.src='https://cdni.iconscout.com/illustration/premium/thumb/online-educational-platform-illustration-download-in-svg-png-gif-file-formats--e-learning-course-study-education-pack-school-illustrations-7789721.png?f=webp&h=700'">
+      <img src="{% if login_bg_image %}{{ login_bg_image }}{% else %}{% static 'imgs/login_illustration.png' %}{% endif %}" alt="Tizim Fon Grafikasi" class="visual-bg-hero" onerror="this.src='https://cdni.iconscout.com/illustration/premium/thumb/online-educational-platform-illustration-download-in-svg-png-gif-file-formats--e-learning-course-study-education-pack-school-illustrations-7789721.png?f=webp&h=700'">
       
       <div class="visual-overlay"></div>
 
@@ -570,7 +570,6 @@
         <p class="visual-text">O'quv rejalari, guruhlar monitoringi, onlayn imtihonlar va o'qituvchilar kabinetiga xush kelibsiz. Davom etish uchun shaxsiy profilingizga kiring.</p>
         
         <div class="visual-features-list">
-          <div class="visual-feature-pill"><i class="fas fa-shield-alt"></i> 100% Xavfsiz tizim</div>
           <div class="visual-feature-pill"><i class="fas fa-bolt"></i> Tezkor monitoring</div>
           <div class="visual-feature-pill"><i class="fas fa-mobile-alt"></i> Mobil moslashuvchan</div>
         </div>

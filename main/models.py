@@ -231,7 +231,8 @@ class Attendance(models.Model):
 
 class SiteSetting(models.Model):
     site_name = models.CharField(max_length=255, default="Tizim", verbose_name="Brend nomi / Sayt nomi")
-    image = models.ImageField(upload_to='global/', blank=True, null=True, validators=[validate_image_file])
+    image = models.ImageField(upload_to='global/', blank=True, null=True, validators=[validate_image_file], verbose_name="Logotip")
+    login_bg_image = models.ImageField(upload_to='global/', blank=True, null=True, validators=[validate_image_file], verbose_name="Login fon rasmi")
 
     def __str__(self):
         return f"Sayt sozlamalari ({self.site_name})"

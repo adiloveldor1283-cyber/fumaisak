@@ -110,6 +110,7 @@ def site_images(request):
     data = {
         'site_name': setting.site_name if setting and setting.site_name else "Tizim",
         'global_image': setting.image.url if setting and setting.image else None,
+        'login_bg_image': setting.login_bg_image.url if setting and setting.login_bg_image else None,
         'default_profile_image': profile.image.url if profile and profile.image else None
     }
     cache.set('site_global_images', data, 300)
