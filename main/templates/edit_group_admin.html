@@ -1,7 +1,7 @@
 {% extends 'baseadmin.html' %}
 {% load static %}
 
-{% block title %}Guruhni tahrirlash{% endblock %}
+{% block title %}Guruhni tahrirlash: {{ group.name }} | VLE Tizimi{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -169,9 +169,7 @@
     }
 </style>
 {% endblock %}
-
-{% block title %}Guruhni tahrirlash: {{ group.name }} | VLE Tizimi{% endblock %}
-
+ 
 {% block content %}
 <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
     <div style="display: flex; align-items: center; gap: 15px;">
