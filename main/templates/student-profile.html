@@ -674,6 +674,8 @@
                         <div class="photo-preview-box">
                             {% if student.profile_image %}
                                 <img id="currentPhotoImg" src="{{ student.profile_image.url }}?v={{ student.last_login|default:student.date_joined|date:'U' }}" class="profil-rasm" alt="Hozirgi profil rasmi">
+                            {% elif user.profile_image %}
+                                <img id="currentPhotoImg" src="{{ user.profile_image.url }}?v={{ user.last_login|default:user.date_joined|date:'U' }}" class="profil-rasm" alt="Hozirgi profil rasmi">
                             {% else %}
                                 <div id="noPhotoPlaceholder" class="no-photo-placeholder">
                                     <i class="fas fa-user-circle"></i>
@@ -682,7 +684,7 @@
                                 <img id="currentPhotoImg" src="" class="profil-rasm" alt="Yangi yuklanayotgan rasm" style="display: none;">
                             {% endif %}
                         </div>
-                        <span class="photo-card-label" id="photoStatusLabel">{% if student.profile_image %}Yuklangan{% else %}O'rnatilmagan{% endif %}</span>
+                        <span class="photo-card-label" id="photoStatusLabel">{% if student.profile_image or user.profile_image %}Yuklangan{% else %}O'rnatilmagan{% endif %}</span>
                     </div>
 
                     <!-- Namunaviy rasm (3x4 format) -->

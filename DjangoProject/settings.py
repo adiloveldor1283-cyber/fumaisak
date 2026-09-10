@@ -155,8 +155,30 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'main.CustomUser'
 
+# ==============================================================================
+# 📂 MEDIA & RAILWAY VOLUME SOZLAMALARI
+# ==============================================================================
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Railway volume ulanish yo'llari:
+# 1. Custom env MEDIA_ROOT (masalan, /app/media yoki /data/media)
+# 2. RAILWAY_VOLUME_MOUNT_PATH muhit o'zgaruvchisi
+# 3. Standart BASE_DIR / 'media'
+_railway_vol = env('RAILWAY_VOLUME_MOUNT_PATH', default=None)
+if _railway_vol and os.path.exists(_railway_vol):
+    _default_media_root = _railway_vol
+else:
+    _default_media_root = os.path.join(BASE_DIR, 'media')
+
+MEDIA_ROOT = env('MEDIA_ROOT', default=_default_media_root)
+
+# Papkalarni avtomatik yaratish (Permission va yo'l xatolarining oldini olish uchun)
+try:
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
+    for _sub in ['profiles', 'subject_materials', 'books', 'assignments', 'submissions', 'videos']:
+        os.makedirs(os.path.join(MEDIA_ROOT, _sub), exist_ok=True)
+except Exception:
+    pass
 
 LOGIN_URL = 'login'
 
