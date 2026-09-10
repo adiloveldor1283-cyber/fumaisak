@@ -100,20 +100,57 @@ def teacher_notifications(request):
 
 def site_images(request):
     # Cache global site settings for 300 seconds to prevent DB hits on every single page load
-    cached_data = cache.get('site_global_images')
-    if cached_data is not None:
-        return cached_data
+    try:
+        cached_data = cache.get('site_global_images')
+        if cached_data is not None:
+            return cached_data
+    except Exception:
+        pass
 
-    setting = SiteSetting.objects.first()
-    profile = ProfileSetting.objects.first()
+    site_name = "Tizim"
+    global_image = None
+    login_bg_image = None
+    default_profile_image = None
+
+    try:
+        setting = SiteSetting.objects.first()
+        if setting:
+            if getattr(setting, 'site_name', None):
+                site_name = setting.site_name
+            try:
+                if setting.image and hasattr(setting.image, 'url'):
+                    global_image = setting.image.url
+            except Exception:
+                pass
+            try:
+                if getattr(setting, 'login_bg_image', None) and hasattr(setting.login_bg_image, 'url') and setting.login_bg_image:
+                    login_bg_image = setting.login_bg_image.url
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    try:
+        profile = ProfileSetting.objects.first()
+        if profile and getattr(profile, 'image', None):
+            try:
+                if profile.image and hasattr(profile.image, 'url'):
+                    default_profile_image = profile.image.url
+            except Exception:
+                pass
+    except Exception:
+        pass
 
     data = {
-        'site_name': setting.site_name if setting and setting.site_name else "Tizim",
-        'global_image': setting.image.url if setting and setting.image else None,
-        'login_bg_image': setting.login_bg_image.url if setting and setting.login_bg_image else None,
-        'default_profile_image': profile.image.url if profile and profile.image else None
+        'site_name': site_name,
+        'global_image': global_image,
+        'login_bg_image': login_bg_image,
+        'default_profile_image': default_profile_image
     }
-    cache.set('site_global_images', data, 300)
+    try:
+        cache.set('site_global_images', data, 300)
+    except Exception:
+        pass
     return data
 
 

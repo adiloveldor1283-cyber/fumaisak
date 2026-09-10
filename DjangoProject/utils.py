@@ -3,15 +3,18 @@ from django.http import HttpResponse
 from functools import wraps
 import time
 
-def rate_limit(limit=5, period=60):
+def rate_limit(limit=20, period=60):
     """
-    Simple IP-based rate limiting decorator using Django cache.
+    Simple IP-based rate limiting decorator using Django cache for POST requests.
     limit: max requests allowed
     period: time window in seconds
     """
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
+            if request.method != 'POST':
+                return view_func(request, *args, **kwargs)
+
             # Get IP address
             x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
             if x_forwarded_for:
