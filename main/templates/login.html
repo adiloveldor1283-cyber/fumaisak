@@ -23,19 +23,20 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
+    /* 🖥️ DESKTOP: PREMIUM DARK CYBERPUNK THEME */
     body {
-      background-color: #f8fafc;
-      color: #0f172a;
+      background-color: #070a12;
+      color: #ffffff;
       height: 100vh;
-      overflow: hidden; /* Desktopda umumiy skrol o'chiq turadi */
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
     }
 
-    /* Fon uchun nozik geometrik va nurli dekorativ qatlam */
-    .bg-pattern {
+    /* Cyberpunk Orqa Fon Chiziqlari */
+    .cyber-bg {
       position: fixed;
       top: 0;
       left: 0;
@@ -43,25 +44,26 @@
       height: 100%;
       z-index: 0;
       pointer-events: none;
-      opacity: 0.6;
-      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-      background-size: 28px 28px;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Cpath d='M0,150 Q200,80 500,200 T1000,80 T1500,250' fill='none' stroke='%2300f2fe' stroke-width='3'/%3E%3C/svg%3E");
+      background-size: cover;
     }
 
-    .light-glow {
+    /* Fon uchun neon nurlar */
+    .blur-glow {
       position: absolute;
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(2, 132, 199, 0.08) 0%, rgba(2, 132, 199, 0) 70%);
-      top: -15%;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(0, 242, 254, 0.08) 0%, rgba(79, 172, 254, 0) 70%);
+      top: -10%;
       left: -10%;
       z-index: 0;
       pointer-events: none;
     }
-    .light-glow.right {
-      top: 50%;
-      left: 65%;
-      background: radial-gradient(circle, rgba(14, 165, 233, 0.06) 0%, rgba(14, 165, 233, 0) 70%);
+    .blur-glow.right {
+      top: 60%;
+      left: 70%;
+      background: radial-gradient(circle, rgba(255, 0, 85, 0.05) 0%, rgba(255, 0, 85, 0) 70%);
     }
 
     /* Ikki qismli asosiy konteyner */
@@ -73,11 +75,11 @@
       z-index: 1;
     }
 
-    /* 🎨 CHAP TOMON — TOZA VA ZAMONAVIY KUNDUZGI VIZUAL BLOK */
+    /* 🎨 CHAP TOMON — PROFESSIONAL KIBER VIZUAL BLOK */
     .login-visual {
       flex: 1.2;
-      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%);
-      border-right: 1px solid #e2e8f0;
+      background: radial-gradient(circle at 20% 30%, #0d1527 0%, #070a12 100%);
+      border-right: 1px solid rgba(255, 255, 255, 0.03);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -86,7 +88,7 @@
       overflow: hidden;
     }
 
-    /* Orqa Fon Illyustratsiyasi */
+    /* Shaffof Orqa Fon Illyustratsiyasi */
     .visual-bg-hero {
       position: absolute;
       inset: 0;
@@ -94,18 +96,18 @@
       height: 100%;
       object-fit: cover;
       object-position: center;
-      opacity: 0.35;
+      opacity: 0.28;
       z-index: 1;
       pointer-events: none;
-      filter: contrast(105%) brightness(100%);
-      animation: bgHeroPulse 14s ease-in-out infinite alternate;
+      filter: contrast(110%) brightness(90%);
+      animation: bgHeroPulse 12s ease-in-out infinite alternate;
     }
 
-    /* Oqartiruvchi Gradiyent Qatlam */
+    /* Qorong'u Gradiyent Qatlam */
     .visual-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(240, 249, 255, 0.92) 0%, rgba(224, 242, 254, 0.75) 50%, rgba(248, 250, 252, 0.88) 100%);
+      background: linear-gradient(135deg, rgba(7, 10, 18, 0.9) 0%, rgba(13, 21, 39, 0.65) 50%, rgba(7, 10, 18, 0.85) 100%);
       z-index: 2;
       pointer-events: none;
     }
@@ -118,74 +120,49 @@
     }
 
     .visual-brand {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 900;
       letter-spacing: -0.5px;
-      color: #0284c7;
-      margin-bottom: 22px;
-      display: inline-flex;
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      display: flex;
       align-items: center;
       gap: 10px;
-      background: rgba(2, 132, 199, 0.08);
-      border: 1px solid rgba(2, 132, 199, 0.18);
-      padding: 8px 18px;
-      border-radius: 30px;
     }
 
     .visual-title {
-      font-size: 42px;
+      font-size: 44px;
       font-weight: 800;
-      line-height: 1.22;
-      color: #0f172a;
+      line-height: 1.2;
+      color: #ffffff;
       letter-spacing: -1px;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
     }
     .visual-title span {
-      background: linear-gradient(135deg, #0284c7, #0369a1);
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
     .visual-text {
-      font-size: 15.5px;
-      color: #475569;
-      line-height: 1.65;
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.6;
       max-width: 480px;
-      margin-bottom: 30px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
     }
 
-    /* Afzalliklar nishonlari (Pills) */
-    .visual-features-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .visual-feature-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 20px;
-      font-size: 12.5px;
-      font-weight: 700;
-      color: #334155;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-    }
-    .visual-feature-pill i {
-      color: #0284c7;
-    }
-
-    /* Mayin Fon Animatsiyasi */
     @keyframes bgHeroPulse {
       0% {
         transform: scale(1) translateY(0);
-        opacity: 0.3;
+        opacity: 0.25;
       }
       100% {
-        transform: scale(1.05) translateY(-6px);
-        opacity: 0.42;
+        transform: scale(1.06) translateY(-8px);
+        opacity: 0.38;
       }
     }
 
@@ -198,15 +175,15 @@
       overflow: hidden;
       line-height: 0;
       z-index: 3;
-      opacity: 0.6;
+      opacity: 0.35;
       pointer-events: none;
     }
     .cyber-wave-svg {
       position: relative;
       display: block;
       width: calc(150% + 1.3px);
-      height: 60px;
-      animation: waveMove 14s linear infinite;
+      height: 70px;
+      animation: waveMove 12s linear infinite;
     }
 
     @keyframes waveMove {
@@ -215,57 +192,60 @@
       100% { transform: translateX(0); }
     }
 
-    /* 🔐 O'NG TOMON — KUNDUZGI TOZA FORMA */
+    /* 🔐 O'NG TOMON — GLASSMORPHISM FORMA */
     .login-container {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 40px;
-      background: #f8fafc;
+      background: rgba(11, 15, 25, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .register {
       width: 100%;
-      max-width: 420px;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.06);
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
       border-radius: 24px;
-      padding: 42px 36px;
+      padding: 45px 35px;
       position: relative;
     }
 
-    /* Mobilda ko'rinadigan tepa brend sarlavhasi (Desktopda yashirin) */
     .mobile-login-header {
       display: none;
     }
 
     h1 {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 800;
       text-align: left;
-      color: #0f172a;
+      color: #ffffff;
       letter-spacing: -0.5px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .subtitle-login {
       font-size: 13.5px;
-      color: #64748b;
-      margin-bottom: 30px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 35px;
     }
 
     /* Formalar va Kiritish Maydoni */
     .form-group {
-      margin-bottom: 22px;
+      margin-bottom: 24px;
       position: relative;
     }
 
     label {
       font-size: 12px;
       font-weight: 700;
-      color: #475569;
+      color: rgba(255, 255, 255, 0.4);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       display: block;
@@ -278,24 +258,20 @@
       width: 100%;
       height: 48px;
       padding: 0 16px;
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 12px;
       outline: none;
-      color: #0f172a;
+      color: #ffffff;
       font-size: 14.5px;
-      transition: 0.25s ease;
+      transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .register input[type="text"]:focus,
     .register input[type="password"]:focus {
-      border-color: #0284c7;
-      background: #ffffff;
-      box-shadow: 0 0 12px rgba(2, 132, 199, 0.18);
-    }
-    .register input[type="text"]::placeholder,
-    .register input[type="password"]::placeholder {
-      color: #94a3b8;
+      border-color: #00f2fe;
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.15);
     }
 
     /* Parol Konteyneri va Ko'rish Ko'rsatkichi */
@@ -304,18 +280,18 @@
       width: 100%;
     }
     .password-container input {
-      padding-right: 48px !important;
+      padding-right: 50px !important;
     }
 
     .toggle-password {
       position: absolute;
-      right: 10px;
+      right: 12px;
       top: 50%;
       transform: translateY(-50%);
       cursor: pointer;
       user-select: none;
-      font-size: 15px;
-      color: #64748b;
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.4);
       width: 32px;
       height: 32px;
       display: flex;
@@ -325,35 +301,32 @@
       transition: 0.2s;
     }
     .toggle-password:hover {
-      color: #0284c7;
-      background: #f1f5f9;
+      color: #00f2fe;
+      background: rgba(255, 255, 255, 0.05);
     }
 
-    /* Tugma */
+    /* Premium Kiber-Tugma */
     .register input[type="submit"] {
       width: 100%;
       height: 48px;
-      margin-top: 12px;
+      margin-top: 15px;
       border: none;
       outline: none;
       border-radius: 12px;
-      background: linear-gradient(135deg, #0284c7, #0369a1);
-      color: #ffffff;
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      color: #070a12;
       font-size: 14.5px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       cursor: pointer;
-      transition: 0.25s ease;
-      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.28);
+      transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 5px 20px rgba(0, 242, 254, 0.25);
     }
 
     .register input[type="submit"]:hover {
-      box-shadow: 0 8px 25px rgba(2, 132, 199, 0.42);
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.45);
       transform: translateY(-1px);
-    }
-    .register input[type="submit"]:active {
-      transform: translateY(0);
     }
 
     /* Tizim Bildirishnomalari (Alerts) */
@@ -371,18 +344,18 @@
     }
 
     .alert-danger {
-      background: #fef2f2;
-      color: #dc2626;
-      border: 1px solid #fecaca;
+      background: rgba(255, 0, 85, 0.04);
+      color: #ff808b;
+      border: 1px solid rgba(255, 0, 85, 0.15);
     }
 
     .alert-success {
-      background: #f0fdf4;
-      color: #16a34a;
-      border: 1px solid #bbf7d0;
+      background: rgba(0, 255, 170, 0.04);
+      color: #00ffaa;
+      border: 1px solid rgba(0, 255, 170, 0.15);
     }
 
-    /* --- 📱 TELEFON EKRANLARI REJIMI --- */
+    /* --- 📱 TELEFON EKRANI UCHUN NOZIK OQROQ (SOFT LIGHT) REJIM --- */
     @media (max-width: 768px) {
       body {
         overflow-y: auto;
@@ -392,7 +365,14 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        background-color: #f1f5f9;
+        background-color: #0c1222; /* Haddan tashqari oppoq ko'r qilmaydigan yumshoq fon */
+      }
+
+      .cyber-bg {
+        opacity: 0.03;
+      }
+      .blur-glow {
+        display: none;
       }
 
       .login-wrapper {
@@ -410,111 +390,150 @@
       .login-container {
         padding: 0;
         background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
         width: 100%;
         max-width: 400px;
       }
 
-      /* ✨ MOBIL TEPASIDAGI ZAMONAVIY EMBLEMA / BANNER */
+      /* ✨ MOBIL TEPASIDAGI CHIROYLI EMBLEMA VA BREND BANNERI */
       .mobile-login-header {
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 18px;
       }
       .mobile-logo-badge {
-        width: 58px;
-        height: 58px;
-        border-radius: 18px;
-        background: linear-gradient(135deg, #0284c7, #38bdf8);
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #ffffff;
-        font-size: 26px;
-        box-shadow: 0 10px 25px rgba(2, 132, 199, 0.3);
-        margin-bottom: 12px;
+        color: #070a12;
+        font-size: 24px;
+        box-shadow: 0 8px 25px rgba(0, 242, 254, 0.35);
+        margin-bottom: 10px;
       }
       .mobile-brand-title {
-        font-size: 22px;
-        font-weight: 900;
-        color: #0f172a;
+        font-size: 21px;
+        font-weight: 800;
+        color: #ffffff;
         letter-spacing: -0.5px;
         line-height: 1.2;
       }
       .mobile-brand-tagline {
         font-size: 12.5px;
-        color: #64748b;
+        color: rgba(255, 255, 255, 0.6);
         font-weight: 600;
-        margin-top: 4px;
+        margin-top: 3px;
       }
 
+      /* ✨ MOBILDA NOZIK OQROQ (SOFT WHITE) ZAMONAVIY KARTA */
       .register {
         max-width: 100%;
         margin: 0 auto;
         padding: 30px 22px;
         border-radius: 20px;
-        background: #ffffff;
+        background: #ffffff; /* Mobilda nozik oq karta */
         border: 1px solid #e2e8f0;
-        box-shadow: 0 15px 35px rgba(15, 23, 42, 0.05);
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
       }
 
-      h1 {
+      .register h1 {
         font-size: 22px;
+        color: #0f172a;
+        font-weight: 800;
       }
 
-      .subtitle-login {
+      .register .subtitle-login {
         margin-bottom: 22px;
         font-size: 13px;
+        color: #64748b;
       }
 
-      .form-group {
+      .register .form-group {
         margin-bottom: 16px;
+      }
+
+      .register label {
+        color: #475569;
+        font-size: 11.5px;
       }
 
       .register input[type="text"],
       .register input[type="password"] {
         height: 46px;
         font-size: 14px;
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        color: #0f172a;
+      }
+
+      .register input[type="text"]:focus,
+      .register input[type="password"]:focus {
+        border-color: #0284c7;
+        background: #ffffff;
+        box-shadow: 0 0 12px rgba(2, 132, 199, 0.18);
+      }
+      .register input[type="text"]::placeholder,
+      .register input[type="password"]::placeholder {
+        color: #94a3b8;
+      }
+
+      .register .toggle-password {
+        color: #64748b;
+      }
+      .register .toggle-password:hover {
+        color: #0284c7;
+        background: #f1f5f9;
       }
 
       .register input[type="submit"] {
         height: 46px;
         font-size: 14px;
         margin-top: 6px;
+        background: linear-gradient(135deg, #0284c7, #0369a1);
+        color: #ffffff;
+        box-shadow: 0 6px 20px rgba(2, 132, 199, 0.3);
+      }
+
+      .register .alert-danger {
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+      }
+      .register .alert-success {
+        background: #f0fdf4;
+        color: #16a34a;
+        border: 1px solid #bbf7d0;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="bg-pattern"></div>
-  <div class="light-glow"></div>
-  <div class="light-glow right"></div>
+  <div class="cyber-bg"></div>
+  <div class="blur-glow"></div>
+  <div class="blur-glow right"></div>
 
   <div class="login-wrapper">
 
-    <!-- 🎨 CHAP TOMON: KUNDUZGI BRAND VA VIZUAL ILUSTRATSIYA -->
+    <!-- 🎨 CHAP TOMON: DESKTOP KIBER VIZUAL ILUSTRATSIYA -->
     <div class="login-visual">
-      <!-- Fullscreen Semi-transparent Illustration -->
+      <!-- Fullscreen Semi-transparent Background Animated Illustration -->
       <img src="{% static 'imgs/login_illustration.png' %}" alt="Tizim Fon Grafikasi" class="visual-bg-hero" onerror="this.src='https://cdni.iconscout.com/illustration/premium/thumb/online-educational-platform-illustration-download-in-svg-png-gif-file-formats--e-learning-course-study-education-pack-school-illustrations-7789721.png?f=webp&h=700'">
       
-      <!-- Gradient Overlay -->
+      <!-- Gradient Overlay for Contrast -->
       <div class="visual-overlay"></div>
 
-      <!-- Text Content Layer -->
+      <!-- Text Content Layer on Top -->
       <div class="visual-content-box">
-        <div class="visual-brand">
-          <i class="fas fa-graduation-cap"></i> {{ site_name|default:"VLE Tizimi" }}
-        </div>
+        <div class="visual-brand">⚡ {{ site_name|default:"Tizim" }}</div>
         <h2 class="visual-title">Kelajak ta'limi va <span>intellektual</span> boshqaruv tizimi</h2>
-        <p class="visual-text">O'quv rejalari, guruhlar monitoringi, onlayn imtihonlar va o'qituvchilar kabinetiga xush kelibsiz. Davom etish uchun shaxsiy profilingizga kiring.</p>
-        
-        <div class="visual-features-list">
-          <div class="visual-feature-pill"><i class="fas fa-shield-alt"></i> 100% Xavfsiz tizim</div>
-          <div class="visual-feature-pill"><i class="fas fa-bolt"></i> Tezkor monitoring</div>
-          <div class="visual-feature-pill"><i class="fas fa-mobile-alt"></i> Mobil moslashuvchan</div>
-        </div>
+        <p class="visual-text">Onlayn dars rejalari, imtihon topshirish modullari va guruhlar mukammalligi ekotizimiga xush kelibsiz. Davom etish uchun shaxsiy profilingizga kiring.</p>
       </div>
 
       <!-- Moving Wave Effect at Bottom -->
@@ -523,24 +542,25 @@
           <path d="M0,0 C150,90 350,-40 500,40 C650,120 900,10 1200,40 L1200,120 L0,120 Z" fill="url(#waveGradient)"></path>
           <defs>
             <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#0284c7" stop-opacity="0.15" />
-              <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.05" />
+              <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.3" />
+              <stop offset="100%" stop-color="#4facfe" stop-opacity="0.1" />
             </linearGradient>
           </defs>
         </svg>
       </div>
     </div>
 
-    <!-- 🔐 O'NG TOMON: KUNDUZGI AVTORIZATSIYA FORMASI -->
+    <!-- 🔐 O'NG TOMON: AVTORIZATSIYA FORMASI -->
     <div class="login-container">
-      <div>
-        <!-- ✨ TELEFONDA TEPADAGI LOGO VA BRAND BANNERI -->
+      <div style="width: 100%; max-width: 400px;">
+        
+        <!-- ✨ MOBILDA TEPADAGI EMBLEMA VA LOGO -->
         <div class="mobile-login-header">
           <div class="mobile-logo-badge">
             <i class="fas fa-graduation-cap"></i>
           </div>
           <h2 class="mobile-brand-title">{{ site_name|default:"VLE Tizimi" }}</h2>
-          <p class="mobile-brand-tagline">O'quv markazi boshqaruv platformasi</p>
+          <p class="mobile-brand-tagline">O'quv markazi boshqaruv tizimi</p>
         </div>
 
         <div class="register">
@@ -579,6 +599,7 @@
             <input type="submit" value="Tizimga kirish" />
           </form>
         </div>
+
       </div>
     </div>
 
@@ -594,12 +615,12 @@
         passwordField.type = "text";
         eyeIcon.classList.remove("fa-eye");
         eyeIcon.classList.add("fa-eye-slash");
-        eyeIcon.style.color = "#0284c7";
+        eyeIcon.style.color = "#00f2fe";
       } else {
         passwordField.type = "password";
         eyeIcon.classList.remove("fa-eye-slash");
         eyeIcon.classList.add("fa-eye");
-        eyeIcon.style.color = "#64748b";
+        eyeIcon.style.color = "rgba(255, 255, 255, 0.4)";
       }
     }
   </script>
