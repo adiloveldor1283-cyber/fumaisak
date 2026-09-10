@@ -606,7 +606,7 @@ def edit_teacher(request, teacher_id):
             except ValidationError as ve:
                 messages.error(request, ve.message, extra_tags='teacher_list')
                 return redirect('edit_teacher', teacher_id=teacher.id)
-            teacher.image = profile_image
+            teacher.profile_image = profile_image
 
         teacher.save()
         
