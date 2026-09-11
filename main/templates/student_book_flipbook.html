@@ -486,7 +486,7 @@
         }
     </style>
 </head>
-<body>
+<body class="light-mode">
 
     <!-- Header -->
     <header>
@@ -916,7 +916,7 @@
         themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
-            themeToggle.innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            themeToggle.innerHTML = isLight ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-moon"></i>';
         });
 
         // Fullscreen Toggle

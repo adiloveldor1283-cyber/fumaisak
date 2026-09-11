@@ -1,7 +1,8 @@
 {% extends 'baseadmin.html' %}
 {% load static %}
 
-{% block title %}Fanni tahrirlash: {{ subject.name }} | VLE Tizimi{% endblock %}
+{% block title %}Fanni tahrirlash: {{ subject.name }} | VLE Tizimi{% include 'book_reader_modal.html' %}
+{% endblock %}
 
 {% block content %}
 <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
@@ -151,7 +152,7 @@
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 12px;">
-                            <a href="{% url 'student_book_flipbook' book.id %}" target="_blank" style="color: #00f2fe; font-size: 14px; text-decoration: none;" title="Varaqalab ko'rish"><i class="fas fa-book-open"></i></a>
+                            <button type="button" onclick="openBookReaderModal('{{ book.title|escapejs }}', '{{ subject.name|escapejs }}', '{{ book.file.url }}')" style="background: none; border: none; color: #00f2fe; font-size: 14px; cursor: pointer; padding: 0;" title="Shu yerda varaqlab o'qish"><i class="fas fa-book-open"></i></button>
                             <a href="{% url 'delete_book_admin' book.id %}" onclick="return confirm('Ushbu kitobni o\'chirmoqchimisiz?');" style="color: rgba(255,79,79,0.6); font-size: 14px; transition: color 0.2s; cursor: pointer; text-decoration: none;" onmouseover="this.style.color='#ff4f4f'" onmouseout="this.style.color='rgba(255,79,79,0.6)'"><i class="fas fa-trash"></i></a>
                         </div>
                     </div>

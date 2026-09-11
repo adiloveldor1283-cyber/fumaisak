@@ -1,7 +1,8 @@
 {% extends 'basestudent.html' %}
 {% load static %}
 
-{% block title %}Mening fanlarim{% endblock %}
+{% block title %}Mening fanlarim{% include 'book_reader_modal.html' %}
+{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -640,10 +641,10 @@
                                     <span class="book-title" title="{{ book.title }}">{{ book.title }}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
-                                    <!-- 3D Varaqalab ko'rish -->
-                                    <a href="{% url 'student_book_flipbook' book.id %}" target="_blank" class="action-btn-view" title="Varaqalab ko'rish">
+                                    <!-- 3D Varaqalab ko'rish (In-Page Modal) -->
+                                    <button type="button" onclick="openBookReaderModal('{{ book.title|escapejs }}', '{{ item.subject.name|escapejs }}', '{{ book.file.url }}')" class="action-btn-view" style="cursor: pointer; border: none;" title="Shu yerda varaqlab o'qish">
                                         <i class="fas fa-book-open"></i> <span>O'qish</span>
-                                    </a>
+                                    </button>
                                     <!-- Yuklab olish -->
                                     <a href="{{ book.file.url }}" download class="action-btn-download" title="Yuklab olish">
                                         <i class="fas fa-download"></i>

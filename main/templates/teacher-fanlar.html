@@ -1,7 +1,8 @@
 {% extends 'baseteacher.html' %}
 {% load static %}
 
-{% block title %}Mening fanlarim{% endblock %}
+{% block title %}Mening fanlarim{% include 'book_reader_modal.html' %}
+{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -708,9 +709,9 @@
                                         </div>
                                     </div>
                                     <div class="material-actions-box">
-                                        <a href="{% url 'student_book_flipbook' book.id %}" target="_blank" class="btn-action-icon" title="Varaqalab ko'rish">
+                                        <button type="button" onclick="openBookReaderModal('{{ book.title|escapejs }}', '{{ item.subject.name|escapejs }}', '{{ book.file.url }}')" class="btn-action-icon" style="cursor: pointer; border: none; background: rgba(0, 242, 254, 0.1); color: #00f2fe;" title="Shu yerda varaqlab o'qish">
                                             <i class="fas fa-book-open"></i>
-                                        </a>
+                                        </button>
                                         <a href="{{ book.file.url }}" target="_blank" download class="btn-action-icon" title="Yuklab olish">
                                             <i class="fas fa-download"></i>
                                         </a>
