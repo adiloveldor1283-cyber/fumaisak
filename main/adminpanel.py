@@ -2598,8 +2598,32 @@ def delete_quiz(request, quiz_id):
 @admin_required
 @transaction.atomic
 def import_students_csv(request):
+    import secrets
+
+    # Sample CSV download handler
+    if request.GET.get('download_sample'):
+        role_type = request.GET.get('role', 'student')
+        filename = f"{'o_quvchilar' if role_type == 'student' else 'o_qituvchilar'}_namuna.csv"
+        response = HttpResponse(content_type='text/csv; charset=utf-8')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        response.write('\ufeff')  # UTF-8 BOM for Excel compatibility
+
+        writer = csv.writer(response)
+        writer.writerow(['first_name', 'last_name', 'phone_number', 'username', 'password'])
+        if role_type == 'student':
+            writer.writerow(['Ali', 'Karimov', '+998901234567', '', ''])
+            writer.writerow(['Vali', 'Rustamov', '+998931234568', 'vali_student', ''])
+            writer.writerow(['Zuhra', 'Sobirova', '+998941234569', '', 'Parol1234'])
+        else:
+            writer.writerow(['Jasur', 'Abdullayev', '+998901234567', '', ''])
+            writer.writerow(['Malika', 'Qosimova', '+998931234568', 't_malika', ''])
+        return response
+
+    imported_summary = request.session.pop('last_imported_users', None)
+    setting = SiteSetting.objects.first()
+
     if request.method == "POST":
-        role = request.POST.get("role")  # student yoki teacher
+        role = request.POST.get("role", "student")
         if role not in ['student', 'teacher']:
             messages.error(request, "Xavfsizlik xatosi: Faqat talaba yoki o'qituvchi import qilinishi mumkin!", extra_tags='import_error')
             return redirect("import_students_csv")
@@ -2613,59 +2637,116 @@ def import_students_csv(request):
             messages.error(request, "Faqat .csv fayl yuklashingiz mumkin!", extra_tags='import_error')
             return redirect("import_students_csv")
 
+        send_sms_flag = request.POST.get("send_sms") == "on"
+
         try:
             data_set = csv_file.read().decode("utf-8-sig")
             io_string = io.StringIO(data_set)
             reader = csv.reader(io_string)
 
-            headers = next(reader)
-            headers = [h.strip().lower() for h in headers]
-
-            expected_headers = ["username", "first_name", "last_name", "phone_number", "password"]
-            if headers != expected_headers:
-                messages.error(request, f"CSV ustunlari noto‘g‘ri! Kerakli format: {', '.join(expected_headers)}",
-                               extra_tags='import_error')
+            raw_headers = next(reader, None)
+            if not raw_headers:
+                messages.error(request, "CSV fayl bo'sh!", extra_tags='import_error')
                 return redirect("import_students_csv")
 
+            headers = [h.strip().lower().replace(" ", "_") for h in raw_headers]
+
+            # Flexible column mapping
+            fn_idx = headers.index('first_name') if 'first_name' in headers else (headers.index('ism') if 'ism' in headers else (1 if len(headers) >= 2 else 0))
+            ln_idx = headers.index('last_name') if 'last_name' in headers else (headers.index('familiya') if 'familiya' in headers else (2 if len(headers) >= 3 else 1))
+            ph_idx = headers.index('phone_number') if 'phone_number' in headers else (headers.index('telefon') if 'telefon' in headers else (headers.index('phone') if 'phone' in headers else (3 if len(headers) >= 4 else 2)))
+            un_idx = headers.index('username') if 'username' in headers else (headers.index('login') if 'login' in headers else (0 if 'username' in headers else None))
+            pw_idx = headers.index('password') if 'password' in headers else (headers.index('parol') if 'parol' in headers else None)
+
+            site_name = setting.site_name if setting and setting.site_name else "VLE Tizimi"
+            site_url = request.build_absolute_uri('/')
+
             existing_usernames = set(CustomUser.objects.values_list('username', flat=True))
-            users_to_create = []
+            imported_list = []
+            created_count = 0
+            sms_sent_count = 0
 
-            for row in reader:
-                if len(row) != 5:
+            for row_num, row in enumerate(reader, start=2):
+                if not row or all(not cell.strip() for cell in row):
                     continue
 
-                username, first_name, last_name, phone_number, password = [x.strip() for x in row]
+                first_name = row[fn_idx].strip() if fn_idx < len(row) else ''
+                last_name = row[ln_idx].strip() if ln_idx < len(row) else ''
+                phone_raw = row[ph_idx].strip() if ph_idx < len(row) else ''
 
-                if not username or not phone_number or not password:
+                if not (first_name or last_name) and not phone_raw:
                     continue
 
-                if username not in existing_usernames:
-                    user_obj = CustomUser(
-                        username=username,
-                        first_name=first_name,
-                        last_name=last_name,
-                        phone_number=phone_number,
-                        role=role,
-                        password=make_password(password)
-                    )
-                    users_to_create.append(user_obj)
-                    existing_usernames.add(username)  # CSV ichidagi dublikatlarni ham oldini olamiz
+                phone_clean = clean_phone_number(phone_raw)
 
-            if users_to_create:
-                CustomUser.objects.bulk_create(users_to_create)
-                count = len(users_to_create)
-            else:
-                count = 0
+                # Username resolution
+                username = row[un_idx].strip() if (un_idx is not None and un_idx < len(row)) else ''
+                if not username:
+                    phone_suffix = phone_clean[3:] if len(phone_clean) >= 12 else (phone_clean or str(secrets.randbelow(899999) + 100000))
+                    username = f"{'std' if role == 'student' else 't'}_{phone_suffix}"
 
-            messages.success(request, f"{count} ta { 'talaba' if role == 'student' else 'o‘qituvchi' } muvaffaqiyatli qo‘shildi!",
-                             extra_tags='import_success')
+                orig_un = username
+                c = 1
+                while username in existing_usernames or CustomUser.objects.filter(username=username).exists():
+                    username = f"{orig_un}_{c}"
+                    c += 1
+
+                # Password resolution (auto-generate if empty)
+                raw_password = row[pw_idx].strip() if (pw_idx is not None and pw_idx < len(row)) else ''
+                if not raw_password:
+                    raw_password = generate_random_password(8)
+
+                user = CustomUser.objects.create(
+                    username=username,
+                    first_name=first_name,
+                    last_name=last_name,
+                    phone_number=phone_raw or (f"+{phone_clean}" if phone_clean else ""),
+                    role=role,
+                    password=make_password(raw_password),
+                    is_active=True
+                )
+                existing_usernames.add(username)
+                created_count += 1
+
+                # Send SMS if enabled & requested
+                sms_status = "Yuborilmadi"
+                if send_sms_flag and phone_clean and len(phone_clean) == 12:
+                    sms_text = f"Assalomu alaykum, {first_name}! {site_name} tizimiga muvaffaqiyatli ro'yxatdan o'tdingiz.\nLogin: {username}\nParol: {raw_password}\nKirish: {site_url}"
+                    sms_res = send_sms(phone_clean, sms_text, check_enabled=False)
+                    if sms_res.get('success'):
+                        sms_status = "Yuborildi"
+                        sms_sent_count += 1
+                    else:
+                        sms_status = f"Xato: {sms_res.get('message')}"
+
+                imported_list.append({
+                    'name': f"{first_name} {last_name}".strip() or username,
+                    'username': username,
+                    'phone': phone_raw,
+                    'password': raw_password,
+                    'sms_status': sms_status
+                })
+
+            log_action(request.user, "CSV Import", f"{created_count} ta {role} CSV orqali import qilindi.", request)
+
+            request.session['last_imported_users'] = {
+                'count': created_count,
+                'role': role,
+                'sms_sent_count': sms_sent_count,
+                'users': imported_list
+            }
+
+            messages.success(request, f"{created_count} ta {'o‘quvchi' if role == 'student' else 'o‘qituvchi'} muvaffaqiyatli import qilindi!", extra_tags='import_success')
         except Exception as e:
-            messages.error(request, f"Xatolik: {e}", extra_tags='import_error')
+            messages.error(request, f"Importda xatolik: {str(e)}", extra_tags='import_error')
 
         return redirect("import_students_csv")
 
+    return render(request, "import_students.html", {
+        'setting': setting,
+        'imported_summary': imported_summary
+    })
 
-    return render(request, "import_students.html")
 
 @subadmin_permission_required('manage_payments')
 def group_payment_list(request):

@@ -5,21 +5,22 @@
 
 {% block extra_css %}
 <style>
-    .grid-layout {
+    .import-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1.1fr 1fr;
         gap: 30px;
         width: 100%;
+        margin-bottom: 35px;
     }
 
     .form-card {
-        background: rgba(255, 255, 255, 0.01);
-        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: var(--bg-card);
+        border: 1px solid var(--border-card);
         border-radius: 20px;
         padding: 30px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        box-shadow: var(--shadow-panel);
+        display: flex;
+        flex-direction: column;
     }
 
     .form-group {
@@ -30,7 +31,7 @@
         display: block;
         font-size: 12px;
         font-weight: 700;
-        color: rgba(255, 255, 255, 0.4);
+        color: var(--text-secondary);
         text-transform: uppercase;
         margin-bottom: 8px;
         letter-spacing: 0.5px;
@@ -40,26 +41,26 @@
         width: 100%;
         padding: 12px 18px;
         font-size: 14px;
-        background: rgba(255,255,255,0.02);
-        border: 1px solid rgba(255,255,255,0.08);
+        background: var(--bg-input);
+        border: 1px solid var(--border-input);
         border-radius: 12px;
-        color: white;
+        color: var(--text-primary);
         outline: none;
         transition: 0.3s;
     }
     .form-control:focus {
-        border-color: #00f2fe;
+        border-color: var(--accent-primary);
         box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
     }
     select.form-control option {
-        background: #0c101d;
-        color: white;
+        background: var(--bg-dropdown);
+        color: var(--text-primary);
     }
 
     .btn-submit {
         width: 100%;
-        padding: 12px 24px;
-        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        padding: 13px 24px;
+        background: var(--accent-gradient);
         color: #070a12;
         font-weight: 800;
         border: none;
@@ -68,21 +69,30 @@
         transition: 0.3s;
         text-transform: uppercase;
         text-align: center;
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 13.5px;
+    }
+    html.light-theme .btn-submit {
+        color: #ffffff;
     }
     .btn-submit:hover {
-        box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        box-shadow: var(--shadow-card-hover);
     }
 
     .namuna-panel {
-        background: rgba(0, 255, 170, 0.02);
-        border: 1px dashed rgba(0, 255, 170, 0.2);
+        background: var(--bg-card);
+        border: 1px dashed var(--accent-border-glow);
         border-radius: 20px;
         padding: 30px;
+        display: flex;
+        flex-direction: column;
     }
     .namuna-panel h3 {
-        color: #00ffaa;
-        font-size: 16px;
+        color: var(--accent-primary);
+        font-size: 15px;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -92,56 +102,90 @@
         gap: 8px;
     }
     .namuna-panel p {
-        font-size: 13.5px;
-        color: rgba(255, 255, 255, 0.7);
+        font-size: 13px;
+        color: var(--text-secondary);
         line-height: 1.6;
         margin-bottom: 12px;
     }
     .namuna-panel ul {
         list-style: none;
         margin-bottom: 20px;
+        padding-left: 0;
     }
     .namuna-panel ul li {
-        font-size: 13px;
-        color: rgba(255, 255, 255, 0.8);
-        margin-bottom: 6px;
+        font-size: 12.5px;
+        color: var(--text-primary);
+        margin-bottom: 8px;
         display: flex;
         align-items: center;
         gap: 8px;
     }
     .namuna-panel ul li i {
-        color: #00ffaa;
+        color: var(--accent-primary);
         font-size: 10px;
     }
-    .namuna-panel pre {
-        background: rgba(7, 10, 18, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 15px;
-        border-radius: 12px;
-        color: #ffffff;
-        font-family: monospace;
+
+    .btn-download-sample {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--accent-bg-glow);
+        border: 1px solid var(--accent-border-glow);
+        color: var(--accent-primary);
+        border-radius: 10px;
         font-size: 12.5px;
-        overflow-x: auto;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+    .btn-download-sample:hover {
+        background: var(--accent-primary);
+        color: #070a12;
     }
 
-    @media (max-width: 768px) {
-        .sarlavha-qatori {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 15px;
-        }
-        .btn-otish {
-            width: 100%;
-        }
-        .grid-layout {
+    .sample-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        margin-top: 15px;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border-input);
+    }
+    .sample-table th {
+        background: var(--bg-input);
+        color: var(--accent-primary);
+        padding: 8px 10px;
+        text-align: left;
+        font-weight: 700;
+    }
+    .sample-table td {
+        background: var(--bg-card);
+        color: var(--text-secondary);
+        padding: 8px 10px;
+        border-top: 1px solid var(--border-input);
+    }
+
+    .copy-btn {
+        background: none;
+        border: 1px solid var(--border-input);
+        color: var(--text-secondary);
+        border-radius: 6px;
+        padding: 3px 8px;
+        cursor: pointer;
+        font-size: 11px;
+        transition: 0.2s;
+    }
+    .copy-btn:hover {
+        color: var(--accent-primary);
+        border-color: var(--accent-primary);
+    }
+
+    @media (max-width: 900px) {
+        .import-grid {
             grid-template-columns: 1fr;
             gap: 20px;
-        }
-        .form-card {
-            padding: 20px;
-        }
-        .namuna-panel {
-            padding: 20px;
         }
     }
 </style>
@@ -150,50 +194,216 @@
 {% block content %}
 <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
     <div style="display: flex; align-items: center; gap: 15px;">
-        <a href="{% url 'students_list_admin' %}" class="back-arrow-btn" title="Orqaga">
-            <i class="fas fa-chevron-left" style="font-size: 16px;"></i>
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: var(--text-primary); border-left: 4px solid var(--accent-primary); padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">CSV orqali ommaviy import qilish</h2>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="{% url 'students_list_admin' %}" class="btn-download-sample" style="background: var(--bg-input); border-color: var(--border-input); color: var(--text-primary);">
+            <i class="fas fa-arrow-left"></i> O'quvchilar ro'yxatiga qaytish
         </a>
-        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">CSV orqali import qilish</h2>
     </div>
 </div>
 
-<div class="grid-layout">
+{% if messages %}
+    <div style="margin-bottom: 25px;">
+        {% for message in messages %}
+            <div style="background: {% if 'success' in message.tags %}rgba(0, 255, 170, 0.1){% else %}rgba(239, 68, 68, 0.1){% endif %}; border: 1px solid {% if 'success' in message.tags %}rgba(0, 255, 170, 0.3){% else %}rgba(239, 68, 68, 0.3){% endif %}; border-radius: 12px; padding: 14px 20px; color: {% if 'success' in message.tags %}#00ffaa{% else %}#ff6b6b{% endif %}; font-size: 13.5px; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; gap: 12px;">
+                <i class="fas {% if 'success' in message.tags %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}" style="font-size: 18px;"></i>
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- Agar yaqinda foydalanuvchilar import qilingan bo'lsa, ularning parollari jadvali chiqadi -->
+{% if imported_summary and imported_summary.users %}
+<div class="form-card" style="margin-bottom: 30px; border-color: rgba(0, 255, 170, 0.3); background: rgba(0, 255, 170, 0.02);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <div>
+            <h3 style="font-size: 17px; font-weight: 800; color: #00ffaa; margin: 0; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-key"></i> Import qilingan foydalanuvchilar va ularning yangi parollari ({{ imported_summary.count }} ta)
+            </h3>
+            <p style="font-size: 12.5px; color: var(--text-secondary); margin: 4px 0 0 0;">Ushbu parollarni saqlab oling yoki nusxalang. Foydalanuvchilar tizimga shu login va parol orqali kirishadi.</p>
+        </div>
+        <button onclick="window.print()" class="btn-download-sample" style="cursor: pointer;">
+            <i class="fas fa-print"></i> Ro'yxatni chop etish / PDF
+        </button>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="sample-table" style="font-size: 13px;">
+            <thead>
+                <tr>
+                    <th style="padding: 10px 14px;">#</th>
+                    <th style="padding: 10px 14px;">F.I.SH.</th>
+                    <th style="padding: 10px 14px;">LOGIN (USERNAME)</th>
+                    <th style="padding: 10px 14px;">TELEFON RAQAMI</th>
+                    <th style="padding: 10px 14px; color: #00ffaa;">PAROL</th>
+                    <th style="padding: 10px 14px; text-align: right;">SMS HOLATI</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in imported_summary.users %}
+                <tr>
+                    <td style="padding: 10px 14px; color: var(--text-muted);">{{ forloop.counter }}</td>
+                    <td style="padding: 10px 14px; font-weight: 700; color: var(--text-primary);">{{ u.name }}</td>
+                    <td style="padding: 10px 14px; color: var(--accent-primary); font-weight: 600;">@{{ u.username }}</td>
+                    <td style="padding: 10px 14px; color: var(--text-secondary);">{{ u.phone|default:"-" }}</td>
+                    <td style="padding: 10px 14px;">
+                        <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; padding: 3px 10px; border-radius: 8px; font-family: monospace; font-weight: 800; font-size: 13.5px;">
+                            {{ u.password }}
+                            <button class="copy-btn" onclick="copyToClipboard('{{ u.password }}', this)" title="Paroldan nusxa olish">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </span>
+                    </td>
+                    <td style="padding: 10px 14px; text-align: right;">
+                        {% if u.sms_status == 'Yuborildi' %}
+                            <span style="color: #00ffaa; font-weight: 700; font-size: 12px;"><i class="fas fa-check"></i> SMS yuborildi</span>
+                        {% else %}
+                            <span style="color: var(--text-muted); font-size: 11.5px;">{{ u.sms_status }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div class="import-grid">
+    <!-- Chap tomon: Yuklash formasi -->
     <div class="form-card">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 25px; border-bottom: 1px solid var(--border-card); padding-bottom: 15px;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--accent-bg-glow); border: 1px solid var(--accent-border-glow); display: flex; align-items: center; justify-content: center; color: var(--accent-primary); font-size: 20px;">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <div>
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">CSV Faylni yuklash</h3>
+                <span style="font-size: 12px; color: var(--text-secondary);">O'quvchi yoki o'qituvchilar ro'yxatini yuklang</span>
+            </div>
+        </div>
+
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
             <div class="form-group">
                 <label for="role">Foydalanuvchi turi *</label>
                 <select name="role" id="role" class="form-control" required>
-                    <option value="student">O'quvchi</option>
-                    <option value="teacher">O'qituvchi</option>
+                    <option value="student" selected>O'quvchilar (Talabalar)</option>
+                    <option value="teacher">O'qituvchilar</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="csv_file">CSV faylni tanlang *</label>
+                <label for="csv_file">CSV faylni tanlang (.csv format) *</label>
                 <input type="file" name="csv_file" id="csv_file" class="form-control" accept=".csv" required style="padding: 10px;">
+                <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 6px;">
+                    <i class="fas fa-info-circle"></i> Excel yoki Google Sheets dasturidan "CSV (UTF-8)" shaklida saqlangan faylni yuklang.
+                </span>
             </div>
 
-            <button type="submit" class="btn-submit"><i class="fas fa-file-import" style="margin-right: 6px;"></i> Import qilish</button>
+            <!-- SMS Yuborish Tanlovi -->
+            <div class="form-group" style="background: var(--bg-input); border: 1px solid var(--border-input); border-radius: 12px; padding: 14px 16px; margin-bottom: 25px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-primary); font-size: 13px; font-weight: 600; margin: 0; text-transform: none;">
+                    <input type="checkbox" name="send_sms" style="accent-color: var(--accent-primary); width: 18px; height: 18px;" {% if setting.sms_enabled and setting.sms_on_register %}checked{% endif %}>
+                    <span>Yaratilgan login va parollarni telefon raqamlariga SMS orqali yuborish</span>
+                </label>
+                <span style="display: block; font-size: 11px; color: var(--text-secondary); margin-top: 6px; margin-left: 28px;">
+                    Telefon raqam kiritilgan bo'lsa, har bir o'quvchiga kirish ma'lumotlari SMS xabarnoma qilinadi.
+                </span>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-file-import"></i> Foydalanuvchilarni import qilish
+            </button>
         </form>
     </div>
 
+    <!-- O'ng tomon: Yo'riqnoma va Namunaviy CSV fayllar -->
     <div class="namuna-panel">
-        <h3><i class="fas fa-file-csv"></i> CSV fayl namunasi</h3>
-        <p>Fayl quyidagi ustunlar tartibida bo'lishi shart:</p>
+        <h3><i class="fas fa-file-csv"></i> CSV fayl qoidalari va namunasi</h3>
+        <p>CSV faylingizda quyidagi ustunlar bo'lishi mumkin:</p>
+        
         <ul>
-            <li><i class="fas fa-chevron-right"></i> <b>username</b> – Foydalanuvchi logini</li>
-            <li><i class="fas fa-chevron-right"></i> <b>first_name</b> – Ismi</li>
-            <li><i class="fas fa-chevron-right"></i> <b>last_name</b> – Familiyasi</li>
-            <li><i class="fas fa-chevron-right"></i> <b>phone_number</b> – Telefon raqami (+998 formatda)</li>
-            <li><i class="fas fa-chevron-right"></i> <b>password</b> – Paroli</li>
+            <li><i class="fas fa-check-circle"></i> <b>first_name</b> (Ism) — <span style="color: #00ffaa;">Majburiy</span></li>
+            <li><i class="fas fa-check-circle"></i> <b>last_name</b> (Familiya) — <span style="color: #00ffaa;">Majburiy</span></li>
+            <li><i class="fas fa-check-circle"></i> <b>phone_number</b> (Telefon raqam) — <span style="color: #00ffaa;">Majburiy</span> (+998901234567)</li>
+            <li><i class="fas fa-shield-alt"></i> <b>username</b> (Login) — <em>Ixtiyoriy (bo'sh qolsa, tizim o'zi yaratadi)</em></li>
+            <li><i class="fas fa-key"></i> <b>password</b> (Parol) — <em>Ixtiyoriy (bo'sh qolsa, xavfsiz parol avtomatik yaratiladi)</em></li>
         </ul>
-        <p><b>CSV fayl tarkibi namunasi:</b></p>
-        <pre>username,first_name,last_name,phone_number,password
-student01,Ali,Karimov,+998901111111,123456
-student02,Vali,Islomov,+998901111112,123456
-teacher01,Anvar,Abdullayev,+998901111116,teacherpass</pre>
+
+        <div style="background: rgba(0, 242, 254, 0.04); border: 1px solid var(--accent-border-glow); border-radius: 12px; padding: 12px 16px; margin-bottom: 20px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--accent-primary); margin-bottom: 4px;">
+                <i class="fas fa-magic"></i> Avtomatik Login va Parol generatsiyasi:
+            </div>
+            <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.45;">
+                CSV faylda <strong>password</strong> va <strong>username</strong> ustunlarini <u>bo'sh qoldirishingiz mumkin</u>. Tizim o'zi har bir o'quvchi uchun avtomatik mustahkam parol yaratadi va ularni sizga jadvalda taqdim etadi!
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+            <a href="?download_sample=1&role=student" class="btn-download-sample">
+                <i class="fas fa-download"></i> O'quvchilar uchun namuna CSV
+            </a>
+            <a href="?download_sample=1&role=teacher" class="btn-download-sample" style="background: rgba(0, 255, 170, 0.08); border-color: rgba(0, 255, 170, 0.3); color: #00ffaa;">
+                <i class="fas fa-download"></i> O'qituvchilar uchun namuna CSV
+            </a>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">CSV matn namunasi:</span>
+            <table class="sample-table">
+                <thead>
+                    <tr>
+                        <th>first_name</th>
+                        <th>last_name</th>
+                        <th>phone_number</th>
+                        <th>username</th>
+                        <th>password</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Ali</td>
+                        <td>Karimov</td>
+                        <td>+998901234567</td>
+                        <td><em>(avtomatik)</em></td>
+                        <td><em>(avtomatik)</em></td>
+                    </tr>
+                    <tr>
+                        <td>Vali</td>
+                        <td>Rustamov</td>
+                        <td>+998931234568</td>
+                        <td>vali_student</td>
+                        <td><em>(avtomatik)</em></td>
+                    </tr>
+                    <tr>
+                        <td>Zuhra</td>
+                        <td>Sobirova</td>
+                        <td>+998941234569</td>
+                        <td><em>(avtomatik)</em></td>
+                        <td>Parol1234</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function copyToClipboard(text, btn) {
+        navigator.clipboard.writeText(text).then(() => {
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check" style="color: #00ffaa;"></i>';
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+            }, 1500);
+        }).catch(err => {
+            alert("Nusxalab bo'lmadi: " + err);
+        });
+    }
+</script>
 {% endblock %}
