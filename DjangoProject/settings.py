@@ -151,6 +151,8 @@ STATICFILES_DIRS = [_STATIC_DIR] if os.path.exists(_STATIC_DIR) else []
 
 # ✅ WhiteNoise static storage
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_MANIFEST_STRICT = False
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
