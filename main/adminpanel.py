@@ -2619,7 +2619,7 @@ def import_students_csv(request):
             writer.writerow(['Malika', 'Qosimova', '+998931234568', 't_malika', ''])
         return response
 
-    imported_summary = request.session.pop('last_imported_users', None)
+    imported_summary = request.session.get('last_imported_users', None)
     setting = SiteSetting.objects.first()
 
     if request.method == "POST":
@@ -6913,3 +6913,281 @@ def get_eskiz_balance_ajax(request):
     """
     bal_res = get_eskiz_balance()
     return JsonResponse(bal_res)
+
+
+@subadmin_permission_required('manage_students')
+def export_imported_users_pdf(request):
+    """
+    CSV orqali import qilingan o'quvchi va o'qituvchilarning login va yangi parollari ro'yxatini
+    rasmiy, xavfsiz va chiroyli PDF hujjati shaklida yuklab olish.
+    """
+    imported_data = request.session.get('last_imported_users')
+    if not imported_data or not imported_data.get('users'):
+        messages.error(request, "Eksport qilish uchun yaqinda import qilingan foydalanuvchilar topilmadi.", extra_tags='import_error')
+        return redirect('import_students_csv')
+
+    setting = SiteSetting.objects.first()
+    site_name = setting.site_name if setting and setting.site_name else "VLE Tizimi"
+    role_title = "O'quvchilar" if imported_data.get('role') == 'student' else "O'qituvchilar"
+
+    admin_user = request.user
+    admin_name = f"{admin_user.first_name} {admin_user.last_name}".strip() if (admin_user.first_name or admin_user.last_name) else (admin_user.username or "Administrator")
+    now_local = timezone.localtime(timezone.now())
+    today_str = now_local.strftime("%d.%m.%Y %H:%M")
+    doc_reg_id = f"IMP-{now_local.strftime('%y%m%d%H%M')}"
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        leftMargin=12 * mm,
+        rightMargin=12 * mm,
+        topMargin=12 * mm,
+        bottomMargin=14 * mm
+    )
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Custom styles
+    title_main_style = ParagraphStyle(
+        'ImpMainTitle',
+        parent=styles['Normal'],
+        fontName=FONT_BOLD,
+        fontSize=13,
+        leading=16,
+        textColor=colors.HexColor('#0F172A'),
+        alignment=1,
+        spaceAfter=3
+    )
+    title_sub_style = ParagraphStyle(
+        'ImpSubTitle',
+        parent=styles['Normal'],
+        fontName=FONT_BOLD,
+        fontSize=8.5,
+        leading=11,
+        textColor=colors.HexColor('#0284C7'),
+        alignment=1,
+        spaceAfter=10
+    )
+    inst_name_style = ParagraphStyle(
+        'ImpInstName',
+        parent=styles['Normal'],
+        fontName=FONT_BOLD,
+        fontSize=11,
+        leading=13,
+        textColor=colors.HexColor('#0F172A')
+    )
+    inst_sub_style = ParagraphStyle(
+        'ImpInstSub',
+        parent=styles['Normal'],
+        fontName=FONT_NAME,
+        fontSize=7.5,
+        leading=10,
+        textColor=colors.HexColor('#64748B')
+    )
+    reg_style = ParagraphStyle(
+        'ImpReg',
+        parent=styles['Normal'],
+        fontName=FONT_NAME,
+        fontSize=7.5,
+        leading=10,
+        textColor=colors.HexColor('#64748B'),
+        alignment=2
+    )
+
+    cell_style = ParagraphStyle(
+        'ImpCell',
+        parent=styles['Normal'],
+        fontName=FONT_NAME,
+        fontSize=8,
+        leading=10.5,
+        textColor=colors.HexColor('#1E293B')
+    )
+    cell_bold = ParagraphStyle(
+        'ImpCellBold',
+        parent=styles['Normal'],
+        fontName=FONT_BOLD,
+        fontSize=8,
+        leading=10.5,
+        textColor=colors.HexColor('#0F172A')
+    )
+    cell_login = ParagraphStyle(
+        'ImpCellLogin',
+        parent=styles['Normal'],
+        fontName=FONT_BOLD,
+        fontSize=8,
+        leading=10.5,
+        textColor=colors.HexColor('#0284C7')
+    )
+    cell_pwd = ParagraphStyle(
+        'ImpCellPwd',
+        parent=styles['Normal'],
+        fontName=FONT_BOLD,
+        fontSize=8.5,
+        leading=11,
+        textColor=colors.HexColor('#0D9488')
+    )
+    cell_center = ParagraphStyle(
+        'ImpCellCenter',
+        parent=styles['Normal'],
+        fontName=FONT_NAME,
+        fontSize=8,
+        leading=10.5,
+        textColor=colors.HexColor('#475569'),
+        alignment=1
+    )
+    cell_header = ParagraphStyle(
+        'ImpCellHeader',
+        parent=styles['Normal'],
+        fontName=FONT_BOLD,
+        fontSize=8,
+        leading=10.5,
+        textColor=colors.white,
+        alignment=1
+    )
+
+    # 1. HEADER (Logo & Institution Info)
+    logo_element = None
+    if setting and setting.image and os.path.exists(setting.image.path):
+        try:
+            logo_element = RLImage(setting.image.path, width=20 * mm, height=20 * mm)
+        except Exception:
+            logo_element = None
+
+    inst_cell = [
+        Paragraph(site_name.upper(), inst_name_style),
+        Spacer(1, 1 * mm),
+        Paragraph("AVTOMATLASHTIRILGAN O'QUV JARAYONI VA VLE TIZIMI", inst_sub_style),
+    ]
+
+    reg_cell = [
+        Paragraph(f"<b>Hujjat ID:</b> {doc_reg_id}", reg_style),
+        Spacer(1, 1 * mm),
+        Paragraph(f"<b>Sana:</b> {today_str}", reg_style),
+        Paragraph(f"<b>Mas'ul:</b> {admin_name}", reg_style),
+    ]
+
+    if logo_element:
+        header_table_data = [[logo_element, inst_cell, reg_cell]]
+        header_col_widths = [24 * mm, 96 * mm, 66 * mm]
+    else:
+        header_table_data = [[inst_cell, reg_cell]]
+        header_col_widths = [116 * mm, 70 * mm]
+
+    header_table = Table(header_table_data, colWidths=header_col_widths)
+    header_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+        ('TOPPADDING', (0, 0), (-1, -1), 0),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+    ]))
+    elements.append(header_table)
+    elements.append(Spacer(1, 3 * mm))
+    elements.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor('#0F172A'), spaceAfter=8))
+
+    # 2. DOCUMENT TITLE
+    elements.append(Paragraph(f"CSV ORQALI IMPORT QILINGAN {role_title.upper()}NING KIRISH MA'LUMOTLARI VA PAROLLARI", title_main_style))
+    elements.append(Paragraph(f"Jami foydalanuvchilar: {imported_data.get('count', 0)} ta | SMS yuborildi: {imported_data.get('sms_sent_count', 0)} ta", title_sub_style))
+
+    # 3. METADATA SUMMARY BAR
+    meta_box_data = [
+        [
+            Paragraph(f"<b>Toifa:</b> {role_title}", cell_style),
+            Paragraph(f"<b>Import sanasi:</b> {imported_data.get('imported_at', today_str)}", cell_style),
+            Paragraph(f"<b>Jami qabul qilindi:</b> {imported_data.get('count', 0)} ta", cell_style),
+            Paragraph(f"<b>Holat:</b> Muvaffaqiyatli", cell_style),
+        ]
+    ]
+    meta_table = Table(meta_box_data, colWidths=[44 * mm, 48 * mm, 48 * mm, 46 * mm])
+    meta_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#F1F5F9')),
+        ('BOX', (0, 0), (-1, -1), 0.5, colors.HexColor('#CBD5E1')),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+    ]))
+    elements.append(meta_table)
+    elements.append(Spacer(1, 4 * mm))
+
+    # 4. USERS TABLE
+    table_data = [
+        [
+            Paragraph("№", cell_header),
+            Paragraph("F.I.SH.", cell_header),
+            Paragraph("LOGIN (USERNAME)", cell_header),
+            Paragraph("TELEFON RAQAMI", cell_header),
+            Paragraph("YARATILGAN PAROL", cell_header),
+            Paragraph("SMS HOLATI", cell_header)
+        ]
+    ]
+
+    for idx, u in enumerate(imported_data.get('users', []), start=1):
+        sms_st = u.get('sms_status', 'Yuborilmadi')
+        sms_text = "Yuborildi" if sms_st == "Yuborildi" else ("Xato" if "Xato" in sms_st else "-")
+        table_data.append([
+            Paragraph(str(idx), cell_center),
+            Paragraph(u.get('name', '-'), cell_bold),
+            Paragraph(f"@{u.get('username', '-')}", cell_login),
+            Paragraph(u.get('phone', '-') or '-', cell_center),
+            Paragraph(u.get('password', '-'), cell_pwd),
+            Paragraph(sms_text, cell_center)
+        ])
+
+    col_widths = [10 * mm, 50 * mm, 38 * mm, 32 * mm, 32 * mm, 24 * mm]
+    main_table = Table(table_data, colWidths=col_widths, repeatRows=1)
+
+    table_style_commands = [
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0F172A')),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 4.5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4.5),
+        ('LEFTPADDING', (0, 0), (-1, -1), 5),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 5),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#E2E8F0')),
+    ]
+
+    for row_idx in range(1, len(table_data)):
+        if row_idx % 2 == 0:
+            table_style_commands.append(('BACKGROUND', (0, row_idx), (-1, row_idx), colors.HexColor('#F8FAFC')))
+
+    main_table.setStyle(TableStyle(table_style_commands))
+    elements.append(main_table)
+    elements.append(Spacer(1, 6 * mm))
+
+    # 5. FOOTER & CONFIDENTIALITY NOTICE
+    notice_style = ParagraphStyle(
+        'ImpNotice',
+        parent=styles['Normal'],
+        fontName=FONT_ITALIC,
+        fontSize=7.5,
+        leading=10,
+        textColor=colors.HexColor('#64748B')
+    )
+    elements.append(Paragraph("<b>DIQQAT:</b> Ushbu ro'yxat maxfiy hisob ma'lumotlari va parollarni o'z ichiga oladi. Hujjatni faqat vakolatli xodimlar saqlashi va begona shaxslarga bermasligi shart.", notice_style))
+    elements.append(Spacer(1, 4 * mm))
+
+    sign_data = [
+        [
+            Paragraph(f"<b>Mas'ul admin:</b> {admin_name}", cell_style),
+            Paragraph("<b>Imzo:</b> ___________________", cell_center),
+            Paragraph(f"<b>Tasdiqlangan sana:</b> {today_str}", cell_style)
+        ]
+    ]
+    sign_table = Table(sign_data, colWidths=[66 * mm, 60 * mm, 60 * mm])
+    sign_table.setStyle(TableStyle([
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+    ]))
+    elements.append(KeepTogether(sign_table))
+
+    doc.build(elements)
+    buffer.seek(0)
+
+    filename = f"import_parollar_{imported_data.get('role', 'users')}_{now_local.strftime('%Y%m%d_%H%M')}.pdf"
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response

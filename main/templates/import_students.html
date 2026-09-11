@@ -224,9 +224,9 @@
             </h3>
             <p style="font-size: 12.5px; color: var(--text-secondary); margin: 4px 0 0 0;">Ushbu parollarni saqlab oling yoki nusxalang. Foydalanuvchilar tizimga shu login va parol orqali kirishadi.</p>
         </div>
-        <button onclick="window.print()" class="btn-download-sample" style="cursor: pointer;">
-            <i class="fas fa-print"></i> Ro'yxatni chop etish / PDF
-        </button>
+        <a href="{% url 'export_imported_users_pdf' %}" class="btn-download-sample" style="background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; font-weight: 800; border: none; text-decoration: none; padding: 10px 20px; font-size: 13px;">
+            <i class="fas fa-file-pdf" style="font-size: 15px;"></i> Parollar ro'yxatini PDF yuklab olish
+        </a>
     </div>
 
     <div style="overflow-x: auto;">

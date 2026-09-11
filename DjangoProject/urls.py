@@ -169,6 +169,7 @@ urlpatterns = [
 
 
     path('adminpanel/import-students/', adminpanel.import_students_csv, name='import_students_csv'),
+    path('adminpanel/import-students/export-pdf/', adminpanel.export_imported_users_pdf, name='export_imported_users_pdf'),
     path('groups/<int:group_id>/payment/add/', adminpanel.add_group_payment, name='add_group_payment'),
 
     path('adminpanel/group-payment/', adminpanel.group_payment_list, name='group_payment_list'),
