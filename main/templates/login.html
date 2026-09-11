@@ -48,40 +48,29 @@
       height: 100%;
       z-index: 0;
       pointer-events: none;
-      opacity: 0.06;
+      opacity: 0.05;
       background-size: 36px 36px;
       background-image: 
         linear-gradient(to right, rgba(0, 242, 254, 0.4) 1px, transparent 1px),
         linear-gradient(to bottom, rgba(0, 242, 254, 0.4) 1px, transparent 1px);
     }
 
-    /* 🔮 Fon Neon Nurlari */
+    /* 🔮 Fon Neon Nurlari (Mayin va Yengil) */
     .neon-glow-orb {
       position: absolute;
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(0, 242, 254, 0.12) 0%, rgba(79, 172, 254, 0.02) 60%, transparent 70%);
-      top: -15%;
-      left: -10%;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(0, 242, 254, 0.1) 0%, rgba(79, 172, 254, 0.02) 60%, transparent 70%);
+      top: -10%;
+      left: -5%;
       z-index: 0;
       pointer-events: none;
       filter: blur(40px);
-      animation: orbFloat1 16s ease-in-out infinite alternate;
     }
     .neon-glow-orb.orb-right {
-      top: 55%;
-      left: 65%;
-      background: radial-gradient(circle, rgba(138, 43, 226, 0.1) 0%, rgba(0, 242, 254, 0.02) 60%, transparent 70%);
-      animation: orbFloat2 20s ease-in-out infinite alternate;
-    }
-
-    @keyframes orbFloat1 {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(40px, 30px) scale(1.1); }
-    }
-    @keyframes orbFloat2 {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(-30px, -40px) scale(1.15); }
+      top: 60%;
+      left: 70%;
+      background: radial-gradient(circle, rgba(138, 43, 226, 0.08) 0%, rgba(0, 242, 254, 0.02) 60%, transparent 70%);
     }
 
     /* 🖼️ Mobilda ham ko'rinadigan global orqa fon illyustratsiyasi */
@@ -93,7 +82,7 @@
       height: 100%;
       object-fit: cover;
       object-position: center;
-      opacity: 0.18;
+      opacity: 0.16;
       z-index: 0;
       pointer-events: none;
       filter: contrast(115%) brightness(85%) saturate(120%);
@@ -108,17 +97,19 @@
       z-index: 1;
     }
 
-    /* 🎨 CHAP TOMON — KIBER VIZUAL BLOK (DESKTOP) */
+    /* 🎨 CHAP TOMON — ULTRA-MINIMAL VIZUAL BLOK (DESKTOP) */
     .login-visual {
       flex: 1.2;
-      background: radial-gradient(circle at 20% 30%, rgba(13, 21, 39, 0.8) 0%, rgba(7, 10, 18, 0.95) 100%);
+      background: radial-gradient(circle at 20% 30%, rgba(13, 21, 39, 0.75) 0%, rgba(7, 10, 18, 0.95) 100%);
       border-right: 1px solid rgba(255, 255, 255, 0.05);
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 80px;
+      align-items: center;
+      padding: 60px;
       position: relative;
       overflow: hidden;
+      text-align: center;
     }
 
     .visual-bg-hero {
@@ -128,17 +119,16 @@
       height: 100%;
       object-fit: cover;
       object-position: center;
-      opacity: 0.32;
+      opacity: 0.35;
       z-index: 1;
       pointer-events: none;
       filter: contrast(110%) brightness(95%);
-      animation: bgHeroPulse 14s ease-in-out infinite alternate;
     }
 
     .visual-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(7, 10, 18, 0.88) 0%, rgba(13, 21, 39, 0.6) 50%, rgba(7, 10, 18, 0.85) 100%);
+      background: linear-gradient(135deg, rgba(7, 10, 18, 0.82) 0%, rgba(13, 21, 39, 0.55) 50%, rgba(7, 10, 18, 0.85) 100%);
       z-index: 2;
       pointer-events: none;
     }
@@ -146,107 +136,50 @@
     .visual-content-box {
       position: relative;
       z-index: 5;
-      max-width: 540px;
-    }
-
-    .visual-brand {
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #00f2fe, #4facfe);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 22px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background-color: rgba(0, 242, 254, 0.05);
-      border: 1px solid rgba(0, 242, 254, 0.2);
-      padding: 8px 18px;
-      border-radius: 30px;
-    }
-
-    .visual-title {
-      font-size: 44px;
-      font-weight: 800;
-      line-height: 1.2;
-      color: #ffffff;
-      letter-spacing: -1px;
-      margin-bottom: 20px;
-      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
-    }
-    .visual-title span {
-      background: linear-gradient(135deg, #00f2fe, #4facfe);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .visual-text {
-      font-size: 15px;
-      color: rgba(255, 255, 255, 0.7);
-      line-height: 1.6;
-      max-width: 480px;
-      margin-bottom: 25px;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
-    }
-
-    .visual-features-list {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .visual-feature-pill {
-      display: inline-flex;
+      flex-direction: column;
       align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
-      font-size: 12.5px;
-      font-weight: 700;
-      color: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(10px);
+      animation: visualFadeIn 0.8s ease-out;
     }
-    .visual-feature-pill i {
+
+    @keyframes visualFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .visual-brand-emblem {
+      width: 80px;
+      height: 80px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(79, 172, 254, 0.05));
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: #00f2fe;
+      font-size: 36px;
+      box-shadow: 0 15px 35px rgba(0, 242, 254, 0.2), inset 0 0 20px rgba(0, 242, 254, 0.1);
+      margin-bottom: 24px;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
     }
 
-    @keyframes bgHeroPulse {
-      0% {
-        transform: scale(1) translateY(0);
-        opacity: 0.28;
-      }
-      100% {
-        transform: scale(1.06) translateY(-8px);
-        opacity: 0.42;
-      }
-    }
-
-    /* Wave Bottom Animation */
-    .cyber-wave-container {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      overflow: hidden;
-      line-height: 0;
-      z-index: 3;
-      opacity: 0.35;
-      pointer-events: none;
-    }
-    .cyber-wave-svg {
-      position: relative;
-      display: block;
-      width: calc(150% + 1.3px);
-      height: 70px;
-      animation: waveMove 12s linear infinite;
-    }
-
-    @keyframes waveMove {
-      0% { transform: translateX(0); }
-      50% { transform: translateX(-25%); }
-      100% { transform: translateX(0); }
+    .visual-brand-title {
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      color: #ffffff;
+      line-height: 1.15;
+      text-shadow: 0 4px 25px rgba(0, 0, 0, 0.8);
+      background: linear-gradient(135deg, #ffffff 40%, rgba(0, 242, 254, 0.9) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     /* 🔐 O'NG TOMON — GLASSMORPHISM FORMA */
@@ -433,7 +366,7 @@
       }
 
       .global-bg-art {
-        opacity: 0.14; /* Mobilda orqa fonda chiroyli illyustratsiya */
+        opacity: 0.14;
       }
 
       .cyber-grid-layer {
@@ -449,7 +382,7 @@
       }
 
       .login-visual {
-        display: none; /* Mobilda chap panel yashirinadi */
+        display: none;
       }
 
       .login-container {
@@ -496,7 +429,6 @@
         margin-top: 4px;
       }
 
-      /* 📱 MOBIL KARTA: QORONG'U SHAFFOF GLASSMORPHISM (OPPOQ EMAS, CHIROYLI ZAMONAVIY) */
       .register {
         max-width: 100%;
         margin: 0 auto;
@@ -556,36 +488,17 @@
 
   <div class="login-wrapper">
 
-    <!-- 🎨 CHAP TOMON: DESKTOP VIZUAL BLOK -->
+    <!-- 🎨 CHAP TOMON: ULTRA-MINIMAL VIZUAL BLOK (DESKTOP) -->
     <div class="login-visual">
       <img src="{% if login_bg_image %}{{ login_bg_image }}{% else %}{% static 'imgs/login_illustration.png' %}{% endif %}" alt="Tizim Fon Grafikasi" class="visual-bg-hero" onerror="this.src='https://cdni.iconscout.com/illustration/premium/thumb/online-educational-platform-illustration-download-in-svg-png-gif-file-formats--e-learning-course-study-education-pack-school-illustrations-7789721.png?f=webp&h=700'">
       
       <div class="visual-overlay"></div>
 
       <div class="visual-content-box">
-        <div class="visual-brand">
-          <i class="fas fa-graduation-cap"></i> {{ site_name|default:"VLE Tizimi" }}
+        <div class="visual-brand-emblem">
+          <i class="fas fa-graduation-cap"></i>
         </div>
-        <h2 class="visual-title">Kelajak ta'limi va <span>intellektual</span> boshqaruv tizimi</h2>
-        <p class="visual-text">O'quv rejalari, guruhlar monitoringi, onlayn imtihonlar va o'qituvchilar kabinetiga xush kelibsiz. Davom etish uchun shaxsiy profilingizga kiring.</p>
-        
-        <div class="visual-features-list">
-          <div class="visual-feature-pill"><i class="fas fa-bolt"></i> Tezkor monitoring</div>
-          <div class="visual-feature-pill"><i class="fas fa-mobile-alt"></i> Mobil moslashuvchan</div>
-        </div>
-      </div>
-
-      <!-- Moving Wave Effect at Bottom -->
-      <div class="cyber-wave-container">
-        <svg class="cyber-wave-svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M0,0 C150,90 350,-40 500,40 C650,120 900,10 1200,40 L1200,120 L0,120 Z" fill="url(#waveGradient)"></path>
-          <defs>
-            <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.3" />
-              <stop offset="100%" stop-color="#4facfe" stop-opacity="0.1" />
-            </linearGradient>
-          </defs>
-        </svg>
+        <h2 class="visual-brand-title">{{ site_name|default:"VLE Tizimi" }}</h2>
       </div>
     </div>
 
