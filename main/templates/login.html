@@ -23,13 +23,13 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* 🌌 ASOSIY ORQA FON */
+    /* 🌌 ASOSIY ORQA FON (CYBERPUNK / DEEP SPACE AESTHETICS) */
     body {
       background-color: #070a12;
       background-image: 
-        radial-gradient(at 10% 15%, rgba(0, 242, 254, 0.12) 0px, transparent 50%),
-        radial-gradient(at 90% 85%, rgba(79, 172, 254, 0.1) 0px, transparent 50%),
-        radial-gradient(at 50% 50%, rgba(13, 21, 39, 0.85) 0px, transparent 100%);
+        radial-gradient(at 10% 15%, rgba(0, 242, 254, 0.09) 0px, transparent 50%),
+        radial-gradient(at 90% 85%, rgba(79, 172, 254, 0.08) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(13, 21, 39, 0.9) 0px, transparent 100%);
       color: #ffffff;
       min-height: 100vh;
       overflow: hidden;
@@ -48,7 +48,7 @@
       height: 100%;
       z-index: 0;
       pointer-events: none;
-      opacity: 0.05;
+      opacity: 0.06;
       background-size: 36px 36px;
       background-image: 
         linear-gradient(to right, rgba(0, 242, 254, 0.4) 1px, transparent 1px),
@@ -61,19 +61,30 @@
       width: 500px;
       height: 500px;
       background: radial-gradient(circle, rgba(0, 242, 254, 0.12) 0%, rgba(79, 172, 254, 0.02) 60%, transparent 70%);
-      top: -10%;
-      left: -5%;
+      top: -15%;
+      left: -10%;
       z-index: 0;
       pointer-events: none;
-      filter: blur(45px);
+      filter: blur(40px);
+      animation: orbFloat1 16s ease-in-out infinite alternate;
     }
     .neon-glow-orb.orb-right {
       top: 55%;
       left: 65%;
       background: radial-gradient(circle, rgba(138, 43, 226, 0.1) 0%, rgba(0, 242, 254, 0.02) 60%, transparent 70%);
+      animation: orbFloat2 20s ease-in-out infinite alternate;
     }
 
-    /* 🖼️ Global orqa fon illyustratsiyasi */
+    @keyframes orbFloat1 {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, 30px) scale(1.1); }
+    }
+    @keyframes orbFloat2 {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(-30px, -40px) scale(1.15); }
+    }
+
+    /* 🖼️ Mobilda ham ko'rinadigan global orqa fon illyustratsiyasi */
     .global-bg-art {
       position: fixed;
       top: 0;
@@ -82,10 +93,10 @@
       height: 100%;
       object-fit: cover;
       object-position: center;
-      opacity: 0.22;
+      opacity: 0.18;
       z-index: 0;
       pointer-events: none;
-      filter: contrast(115%) brightness(90%) saturate(120%);
+      filter: contrast(115%) brightness(85%) saturate(120%);
     }
 
     /* Ikki qismli asosiy konteyner */
@@ -97,20 +108,19 @@
       z-index: 1;
     }
 
-    /* 🎨 CHAP TOMON — BOYITILGAN CHIROYLI VIZUAL BLOK (DESKTOP) */
+    /* 🎨 CHAP TOMON — KIBER VIZUAL BLOK (DESKTOP) */
     .login-visual {
-      flex: 1.25;
-      position: relative;
+      flex: 1.2;
+      background: radial-gradient(circle at 20% 30%, rgba(13, 21, 39, 0.8) 0%, rgba(7, 10, 18, 0.95) 100%);
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
       display: flex;
       flex-direction: column;
       justify-content: center;
-      align-items: flex-start;
-      padding: 60px 80px;
+      padding: 80px;
+      position: relative;
       overflow: hidden;
-      border-right: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    /* Aniq ko'rinib turadigan orqa fon rasmi */
     .visual-bg-hero {
       position: absolute;
       inset: 0;
@@ -118,116 +128,52 @@
       height: 100%;
       object-fit: cover;
       object-position: center;
-      opacity: 0.55; /* Aniq va chiroyli ochilib turadi */
+      opacity: 0.32;
       z-index: 1;
       pointer-events: none;
-      filter: contrast(110%) brightness(88%);
+      filter: contrast(110%) brightness(95%);
+      animation: bgHeroPulse 14s ease-in-out infinite alternate;
     }
 
     .visual-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(7, 10, 18, 0.82) 0%, rgba(13, 21, 39, 0.45) 50%, rgba(7, 10, 18, 0.8) 100%);
+      background: linear-gradient(135deg, rgba(7, 10, 18, 0.88) 0%, rgba(13, 21, 39, 0.6) 50%, rgba(7, 10, 18, 0.85) 100%);
       z-index: 2;
       pointer-events: none;
     }
 
-    /* Shaffof Glassmorphism Matn va Logo Kartasi */
-    .visual-glass-card {
+    .visual-content-box {
       position: relative;
       z-index: 5;
       max-width: 540px;
-      background: rgba(13, 21, 39, 0.45);
-      border: 1px solid rgba(0, 242, 254, 0.18);
-      border-radius: 28px;
-      padding: 40px;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 242, 254, 0.06);
-      animation: visualFadeIn 0.8s ease-out;
     }
 
-    @keyframes visualFadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(16px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Katta yorqin Logo / Emblema */
-    .visual-header-row {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      margin-bottom: 24px;
-    }
-
-    .visual-brand-emblem {
-      width: 72px;
-      height: 72px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, rgba(0, 242, 254, 0.18), rgba(79, 172, 254, 0.06));
-      border: 1.5px solid rgba(0, 242, 254, 0.35);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #00f2fe;
-      font-size: 32px;
-      box-shadow: 0 12px 30px rgba(0, 242, 254, 0.25), inset 0 0 15px rgba(0, 242, 254, 0.15);
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-    .visual-brand-emblem img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .visual-status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(0, 255, 170, 0.08);
-      border: 1px solid rgba(0, 255, 170, 0.25);
-      color: #00ffaa;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 11.5px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #00ffaa;
-      box-shadow: 0 0 8px #00ffaa;
-      animation: pulseDot 2s infinite ease-in-out;
-    }
-    @keyframes pulseDot {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.3); opacity: 0.7; }
-    }
-
-    .visual-brand-name {
-      font-size: 24px;
+    .visual-brand {
+      font-size: 26px;
       font-weight: 900;
       letter-spacing: -0.5px;
-      color: #ffffff;
-      margin-bottom: 2px;
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 22px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background-color: rgba(0, 242, 254, 0.05);
+      border: 1px solid rgba(0, 242, 254, 0.2);
+      padding: 8px 18px;
+      border-radius: 30px;
     }
 
     .visual-title {
-      font-size: 34px;
+      font-size: 44px;
       font-weight: 800;
-      line-height: 1.25;
+      line-height: 1.2;
       color: #ffffff;
-      letter-spacing: -0.8px;
-      margin-bottom: 14px;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
     }
     .visual-title span {
       background: linear-gradient(135deg, #00f2fe, #4facfe);
@@ -236,39 +182,71 @@
     }
 
     .visual-text {
-      font-size: 14px;
+      font-size: 15px;
       color: rgba(255, 255, 255, 0.7);
       line-height: 1.6;
-      margin-bottom: 24px;
+      max-width: 480px;
+      margin-bottom: 25px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
     }
 
-    /* Qo'shimcha zamonaviy nishonlar (Features) */
-    .visual-badges-row {
+    .visual-features-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
     }
-    .visual-pill {
+    .visual-feature-pill {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 7px 13px;
-      background: rgba(255, 255, 255, 0.04);
+      gap: 8px;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      font-size: 12px;
+      border-radius: 20px;
+      font-size: 12.5px;
       font-weight: 700;
       color: rgba(255, 255, 255, 0.85);
-      transition: 0.2s;
+      backdrop-filter: blur(10px);
     }
-    .visual-pill:hover {
-      background: rgba(0, 242, 254, 0.08);
-      border-color: rgba(0, 242, 254, 0.25);
-      color: #ffffff;
-    }
-    .visual-pill i {
+    .visual-feature-pill i {
       color: #00f2fe;
-      font-size: 11.5px;
+    }
+
+    @keyframes bgHeroPulse {
+      0% {
+        transform: scale(1) translateY(0);
+        opacity: 0.28;
+      }
+      100% {
+        transform: scale(1.06) translateY(-8px);
+        opacity: 0.42;
+      }
+    }
+
+    /* Wave Bottom Animation */
+    .cyber-wave-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      line-height: 0;
+      z-index: 3;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .cyber-wave-svg {
+      position: relative;
+      display: block;
+      width: calc(150% + 1.3px);
+      height: 70px;
+      animation: waveMove 12s linear infinite;
+    }
+
+    @keyframes waveMove {
+      0% { transform: translateX(0); }
+      50% { transform: translateX(-25%); }
+      100% { transform: translateX(0); }
     }
 
     /* 🔐 O'NG TOMON — GLASSMORPHISM FORMA */
@@ -455,7 +433,7 @@
       }
 
       .global-bg-art {
-        opacity: 0.14;
+        opacity: 0.14; /* Mobilda orqa fonda chiroyli illyustratsiya */
       }
 
       .cyber-grid-layer {
@@ -471,7 +449,7 @@
       }
 
       .login-visual {
-        display: none;
+        display: none; /* Mobilda chap panel yashirinadi */
       }
 
       .login-container {
@@ -492,23 +470,17 @@
         margin-bottom: 20px;
       }
       .mobile-logo-badge {
-        width: 58px;
-        height: 58px;
+        width: 54px;
+        height: 54px;
         border-radius: 18px;
         background: linear-gradient(135deg, #00f2fe, #4facfe);
         display: flex;
         align-items: center;
         justify-content: center;
         color: #070a12;
-        font-size: 26px;
+        font-size: 24px;
         box-shadow: 0 10px 25px rgba(0, 242, 254, 0.35);
         margin-bottom: 12px;
-        overflow: hidden;
-      }
-      .mobile-logo-badge img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
       }
       .mobile-brand-title {
         font-size: 22px;
@@ -524,6 +496,7 @@
         margin-top: 4px;
       }
 
+      /* 📱 MOBIL KARTA: QORONG'U SHAFFOF GLASSMORPHISM (OPPOQ EMAS, CHIROYLI ZAMONAVIY) */
       .register {
         max-width: 100%;
         margin: 0 auto;
@@ -583,40 +556,36 @@
 
   <div class="login-wrapper">
 
-    <!-- 🎨 CHAP TOMON: BOYITILGAN, ANIQ FON VA KATTA LOGOLI VIZUAL BLOK -->
+    <!-- 🎨 CHAP TOMON: DESKTOP VIZUAL BLOK -->
     <div class="login-visual">
       <img src="{% if login_bg_image %}{{ login_bg_image }}{% else %}{% static 'imgs/login_illustration.png' %}{% endif %}" alt="Tizim Fon Grafikasi" class="visual-bg-hero" onerror="this.src='https://cdni.iconscout.com/illustration/premium/thumb/online-educational-platform-illustration-download-in-svg-png-gif-file-formats--e-learning-course-study-education-pack-school-illustrations-7789721.png?f=webp&h=700'">
       
       <div class="visual-overlay"></div>
 
-      <div class="visual-glass-card">
-        <!-- Logo va Status qatori -->
-        <div class="visual-header-row">
-          <div class="visual-brand-emblem">
-            {% if global_image %}
-              <img src="{{ global_image }}" alt="Logo">
-            {% else %}
-              <i class="fas fa-graduation-cap"></i>
-            {% endif %}
-          </div>
-          <div>
-            <div class="visual-brand-name">{{ site_name|default:"DEVUP" }}</div>
-            <div class="visual-status-badge">
-              <span class="status-dot"></span> Tizim faol • Xavfsiz
-            </div>
-          </div>
+      <div class="visual-content-box">
+        <div class="visual-brand">
+          <i class="fas fa-graduation-cap"></i> {{ site_name|default:"VLE Tizimi" }}
         </div>
-
-        <!-- Asosiy Shior va Tavsif -->
         <h2 class="visual-title">Kelajak ta'limi va <span>intellektual</span> boshqaruv tizimi</h2>
-        <p class="visual-text">O'quv markazingiz jarayonlari, guruhlar monitoringi va onlayn ta'lim platformasi.</p>
+        <p class="visual-text">O'quv rejalari, guruhlar monitoringi, onlayn imtihonlar va o'qituvchilar kabinetiga xush kelibsiz. Davom etish uchun shaxsiy profilingizga kiring.</p>
         
-        <!-- Zamonaviy Xususiyat Nishonlari -->
-        <div class="visual-badges-row">
-          <div class="visual-pill"><i class="fas fa-bolt"></i> Tezkor monitoring</div>
-          <div class="visual-pill"><i class="fas fa-layer-group"></i> Guruhlar nazorati</div>
-          <div class="visual-pill"><i class="fas fa-mobile-screen"></i> Mobil moslashuvchan</div>
+        <div class="visual-features-list">
+          <div class="visual-feature-pill"><i class="fas fa-bolt"></i> Tezkor monitoring</div>
+          <div class="visual-feature-pill"><i class="fas fa-mobile-alt"></i> Mobil moslashuvchan</div>
         </div>
+      </div>
+
+      <!-- Moving Wave Effect at Bottom -->
+      <div class="cyber-wave-container">
+        <svg class="cyber-wave-svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+          <path d="M0,0 C150,90 350,-40 500,40 C650,120 900,10 1200,40 L1200,120 L0,120 Z" fill="url(#waveGradient)"></path>
+          <defs>
+            <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.3" />
+              <stop offset="100%" stop-color="#4facfe" stop-opacity="0.1" />
+            </linearGradient>
+          </defs>
+        </svg>
       </div>
     </div>
 
@@ -627,11 +596,7 @@
         <!-- ✨ MOBILDA TEPADAGI LOGO VA EMBLEMA BANNERI -->
         <div class="mobile-login-header">
           <div class="mobile-logo-badge">
-            {% if global_image %}
-              <img src="{{ global_image }}" alt="Logo">
-            {% else %}
-              <i class="fas fa-graduation-cap"></i>
-            {% endif %}
+            <i class="fas fa-graduation-cap"></i>
           </div>
           <h2 class="mobile-brand-title">{{ site_name|default:"VLE Tizimi" }}</h2>
           <p class="mobile-brand-tagline">O'quv markazi boshqaruv tizimi</p>
