@@ -223,6 +223,7 @@
                     <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a; white-space: nowrap;">LOGINI</th>
                     <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FAMILIYASI</th>
                     <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">ISMI</th>
+                    <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a; white-space: nowrap;">TELEFON RAQAMI</th>
                     <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a; white-space: nowrap;">QO'SHILGAN VAQTI</th>
                     <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FANLARI</th>
                     <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">GURUHLARI</th>
@@ -238,6 +239,13 @@
                     <td data-label="LOGINI" style="padding: 12px 10px; font-size: 13px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: #4facfe; white-space: nowrap;">{{ teacher.username }}</td>
                     <td data-label="FAMILIYASI" style="padding: 12px 10px; font-size: 13.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ teacher.last_name }}</td>
                     <td data-label="ISMI" style="padding: 12px 10px; font-size: 13.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ teacher.first_name }}</td>
+                    <td data-label="TELEFON RAQAMI" style="padding: 12px 10px; font-size: 12.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: #00f2fe; white-space: nowrap;">
+                        {% if teacher.phone_number %}
+                            <a href="tel:{{ teacher.phone_number }}" style="color: inherit; text-decoration: none;"><i class="fas fa-phone-alt" style="font-size: 10px; margin-right: 4px; opacity: 0.8;"></i>{{ teacher.phone_number }}</a>
+                        {% else %}
+                            <span style="color: rgba(255,255,255,0.3);">-</span>
+                        {% endif %}
+                    </td>
                     <td data-label="QO'SHILGAN VAQTI" style="padding: 12px 10px; font-size: 12.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6); white-space: nowrap;">{{ teacher.joined_at|date:"d.m.Y H:i" }}</td>
                     <td data-label="FANLARI" style="padding: 12px 10px; font-size: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
                         <div style="display: flex; flex-wrap: wrap; gap: 4px;">
@@ -405,22 +413,11 @@
         const selectedStatus = statusFilter.value;
 
         rows.forEach(row => {
-            const username = row.children[1] ? row.children[1].textContent.toLowerCase() : '';
-            const lastName = row.children[2] ? row.children[2].textContent.toLowerCase() : '';
-            const firstName = row.children[3] ? row.children[3].textContent.toLowerCase() : '';
-            const subjects = row.children[5] ? row.children[5].textContent.toLowerCase() : '';
-            const groups = row.children[6] ? row.children[6].textContent.toLowerCase() : '';
-
+            const rowText = row.textContent.toLowerCase();
             const statusSpan = row.querySelector('.status-badge');
             const status = statusSpan ? statusSpan.getAttribute('data-status') : '';
 
-            const matchesQuery = !query || 
-                lastName.includes(query) || 
-                firstName.includes(query) || 
-                username.includes(query) || 
-                subjects.includes(query) || 
-                groups.includes(query);
-
+            const matchesQuery = !query || rowText.includes(query);
             const matchesStatus = !selectedStatus || status === selectedStatus;
 
             row.style.display = (matchesQuery && matchesStatus) ? '' : 'none';

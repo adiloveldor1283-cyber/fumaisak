@@ -223,6 +223,7 @@
                     <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">LOGINI</th>
                     <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FAMILIYASI</th>
                     <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">ISMI</th>
+                    <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a; white-space: nowrap;">TELEFON RAQAMI</th>
                     <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">QO'SHILGAN VAQTI</th>
                     <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">GURUHLARI</th>
                     <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">HOLATI</th>
@@ -237,6 +238,13 @@
                     <td data-label="LOGINI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: #4facfe;">{{ student.username }}</td>
                     <td data-label="FAMILIYASI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ student.last_name }}</td>
                     <td data-label="ISMI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ student.first_name }}</td>
+                    <td data-label="TELEFON RAQAMI" style="padding: 16px 20px; font-size: 13.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: #00f2fe; white-space: nowrap;">
+                        {% if student.phone_number %}
+                            <a href="tel:{{ student.phone_number }}" style="color: inherit; text-decoration: none;"><i class="fas fa-phone-alt" style="font-size: 11px; margin-right: 5px; opacity: 0.8;"></i>{{ student.phone_number }}</a>
+                        {% else %}
+                            <span style="color: rgba(255,255,255,0.3);">-</span>
+                        {% endif %}
+                    </td>
                     <td data-label="QO'SHILGAN VAQTI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ student.joined_at|date:"d.m.Y H:i" }}</td>
                     <td data-label="GURUHLARI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
                         {% if student.student_groups.all %}
@@ -391,11 +399,11 @@
         const selectedStatus = statusFilter.value;
 
         rows.forEach(row => {
-            const lastName = row.children[2].textContent.toLowerCase(); // Familiya column
+            const rowText = row.textContent.toLowerCase();
             const statusSpan = row.querySelector('.status-badge');
             const status = statusSpan ? statusSpan.getAttribute('data-status') : '';
 
-            const matchesQuery = lastName.includes(query);
+            const matchesQuery = !query || rowText.includes(query);
             const matchesStatus = !selectedStatus || status === selectedStatus;
 
             row.style.display = (matchesQuery && matchesStatus) ? '' : 'none';
