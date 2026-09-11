@@ -402,8 +402,8 @@ def create_group_admin(request):
         'all_students': all_students,
         'all_subjects': all_subjects,
         'timezone': timezone,
-        'date_now': timezone.now().strftime('%d.%m.%Y'),
-        'time_now': timezone.now().strftime('%H:%M:%S'),
+        'date_now': timezone.localtime(timezone.now()).strftime('%d.%m.%Y'),
+        'time_now': timezone.localtime(timezone.now()).strftime('%H:%M:%S'),
     }
     return render(request, 'group_create_admin.html', context)
 
@@ -835,7 +835,7 @@ def export_students_pdf(request):
         subject_name = "Barcha fanlar"
         teachers_names = "Barcha o'qituvchilar"
         created_str = "-"
-        doc_reg_id = f"OQ-ALL-{timezone.now().strftime('%y%m%d%H%M')}"
+        doc_reg_id = f"OQ-ALL-{timezone.localtime(timezone.now()).strftime('%y%m%d%H%M')}"
         filename_prefix = "barcha_oquvchilar"
     else:
         try:
@@ -845,8 +845,8 @@ def export_students_pdf(request):
             subject_name = group.subject.name if group.subject else "-"
             teacher_list = group.teachers.all()
             teachers_names = ", ".join(f"{t.first_name} {t.last_name}".strip() for t in teacher_list) if teacher_list else "Biriktirilmagan"
-            created_str = group.created_at.strftime("%d.%m.%Y %H:%M") if group.created_at else "-"
-            doc_reg_id = f"OQ-G{group.id}-{timezone.now().strftime('%y%m%d%H%M')}"
+            created_str = timezone.localtime(group.created_at).strftime("%d.%m.%Y %H:%M") if group.created_at else "-"
+            doc_reg_id = f"OQ-G{group.id}-{timezone.localtime(timezone.now()).strftime('%y%m%d%H%M')}"
             filename_prefix = f"guruh_{group.id}"
         except Group.DoesNotExist:
             return HttpResponse("Guruh topilmadi", status=404)
@@ -1096,7 +1096,7 @@ def export_students_pdf(request):
         groups_qs = student.student_groups.all()
         groups_str = ", ".join(g.name for g in groups_qs) if groups_qs else "-"
         status_p = Paragraph("Faol", status_active_style) if student.is_active else Paragraph("Bloklangan", status_blocked_style)
-        joined_str = student.joined_at.strftime("%d.%m.%Y") if student.joined_at else "-"
+        joined_str = timezone.localtime(student.joined_at).strftime("%d.%m.%Y") if student.joined_at else "-"
 
         table_data.append([
             Paragraph(str(idx), td_center_style),
@@ -1174,7 +1174,7 @@ def export_students_pdf(request):
     doc.build(elements, canvasmaker=make_canvas(site_name))
     buffer.seek(0)
 
-    filename = f"rasmiy_royxat_{filename_prefix}_{timezone.now().strftime('%Y%m%d_%H%M')}.pdf"
+    filename = f"rasmiy_royxat_{filename_prefix}_{timezone.localtime(timezone.now()).strftime('%Y%m%d_%H%M')}.pdf"
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = f'inline; filename="{filename}"'
     return response
@@ -1233,7 +1233,7 @@ def export_students_excel(request):
     except ImportError:
         # Agar openpyxl kutubxonasi mavjud bo'lmasa, UTF-8 BOM bilan CSV formatida yuklab berish
         response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
-        response['Content-Disposition'] = f'attachment; filename="oquvchilar_{filename_prefix}_{timezone.now().strftime("%Y%m%d_%H%M")}.csv"'
+        response['Content-Disposition'] = f'attachment; filename="oquvchilar_{filename_prefix}_{timezone.localtime(timezone.now()).strftime("%Y%m%d_%H%M")}.csv"'
         writer = csv.writer(response)
         writer.writerow([f"{site_name.upper()} - O'QUVCHILAR RO'YXATI (QAYDNOMASI)"])
         writer.writerow([f"Guruh: {group_name}", f"Fan: {subject_name}", f"O'qituvchi: {teachers_names}", f"Sana: {today_str}"])
@@ -1243,7 +1243,7 @@ def export_students_excel(request):
             groups_qs = student.student_groups.all()
             groups_str = ", ".join(g.name for g in groups_qs) if groups_qs else "-"
             status_text = "Faol" if student.is_active else "Bloklangan"
-            joined_str = student.joined_at.strftime("%d.%m.%Y %H:%M") if student.joined_at else "-"
+            joined_str = timezone.localtime(student.joined_at).strftime("%d.%m.%Y %H:%M") if student.joined_at else "-"
             writer.writerow([idx, student.last_name, student.first_name, student.phone_number or "-", student.username, groups_str, status_text, joined_str])
         return response
 
@@ -1319,7 +1319,7 @@ def export_students_excel(request):
         groups_qs = student.student_groups.all()
         groups_str = ", ".join(g.name for g in groups_qs) if groups_qs else "-"
         status_text = "Faol" if student.is_active else "Bloklangan"
-        joined_str = student.joined_at.strftime("%d.%m.%Y %H:%M") if student.joined_at else "-"
+        joined_str = timezone.localtime(student.joined_at).strftime("%d.%m.%Y %H:%M") if student.joined_at else "-"
 
         row_values = [
             idx,
@@ -1402,7 +1402,7 @@ def export_students_excel(request):
     # Gridlines yoqish
     ws.views.sheetView[0].showGridLines = True
 
-    filename = f"oquvchilar_{filename_prefix}_{timezone.now().strftime('%Y%m%d_%H%M')}.xlsx"
+    filename = f"oquvchilar_{filename_prefix}_{timezone.localtime(timezone.now()).strftime('%Y%m%d_%H%M')}.xlsx"
     response = HttpResponse(
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
@@ -1434,7 +1434,7 @@ def export_teachers_pdf(request):
         teachers = CustomUser.objects.filter(role='teacher').prefetch_related('subjects', 'teachers_groups').order_by('last_name', 'first_name')
         category_name = "Barcha o'qituvchilar ro'yxati"
         subject_name = "Barcha fanlar / mutaxassisliklar"
-        doc_reg_id = f"OQT-ALL-{timezone.now().strftime('%y%m%d%H%M')}"
+        doc_reg_id = f"OQT-ALL-{timezone.localtime(timezone.now()).strftime('%y%m%d%H%M')}"
         filename_prefix = "barcha_oqituvchilar"
     else:
         try:
@@ -1442,7 +1442,7 @@ def export_teachers_pdf(request):
             teachers = CustomUser.objects.filter(role='teacher', subjects=subject).prefetch_related('subjects', 'teachers_groups').order_by('last_name', 'first_name')
             category_name = f"{subject.name} fani o'qituvchilari"
             subject_name = subject.name
-            doc_reg_id = f"OQT-S{subject.id}-{timezone.now().strftime('%y%m%d%H%M')}"
+            doc_reg_id = f"OQT-S{subject.id}-{timezone.localtime(timezone.now()).strftime('%y%m%d%H%M')}"
             filename_prefix = f"fan_{subject.id}"
         except Subject.DoesNotExist:
             return HttpResponse("Fan topilmadi", status=404)
@@ -1764,7 +1764,7 @@ def export_teachers_pdf(request):
     doc.build(elements, canvasmaker=make_canvas(site_name))
     buffer.seek(0)
 
-    filename = f"rasmiy_oqituvchilar_{filename_prefix}_{timezone.now().strftime('%Y%m%d_%H%M')}.pdf"
+    filename = f"rasmiy_oqituvchilar_{filename_prefix}_{timezone.localtime(timezone.now()).strftime('%Y%m%d_%H%M')}.pdf"
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = f'inline; filename="{filename}"'
     return response
@@ -1818,7 +1818,7 @@ def export_teachers_excel(request):
         ws.title = "O'qituvchilar"
     except ImportError:
         response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
-        response['Content-Disposition'] = f'attachment; filename="oqituvchilar_{filename_prefix}_{timezone.now().strftime("%Y%m%d_%H%M")}.csv"'
+        response['Content-Disposition'] = f'attachment; filename="oqituvchilar_{filename_prefix}_{timezone.localtime(timezone.now()).strftime("%Y%m%d_%H%M")}.csv"'
         writer = csv.writer(response)
         writer.writerow([f"{site_name.upper()} - O'QITUVCHILAR RO'YXATI (QAYDNOMASI)"])
         writer.writerow([f"Kategoriya: {category_name}", f"Fan: {subject_name}", f"Sana: {today_str}"])
@@ -1830,7 +1830,7 @@ def export_teachers_excel(request):
             groups_qs = teacher.teachers_groups.all()
             groups_str = ", ".join(g.name for g in groups_qs) if groups_qs else "-"
             status_text = "Faol" if teacher.is_active else "Bloklangan"
-            joined_str = teacher.joined_at.strftime("%d.%m.%Y %H:%M") if teacher.joined_at else "-"
+            joined_str = timezone.localtime(teacher.joined_at).strftime("%d.%m.%Y %H:%M") if teacher.joined_at else "-"
             writer.writerow([idx, teacher.last_name, teacher.first_name, teacher.phone_number or "-", teacher.username, subjects_str, groups_str, status_text, joined_str])
         return response
 
@@ -1904,7 +1904,7 @@ def export_teachers_excel(request):
         groups_qs = teacher.teachers_groups.all()
         groups_str = ", ".join(g.name for g in groups_qs) if groups_qs else "-"
         status_text = "Faol" if teacher.is_active else "Bloklangan"
-        joined_str = teacher.joined_at.strftime("%d.%m.%Y %H:%M") if teacher.joined_at else "-"
+        joined_str = timezone.localtime(teacher.joined_at).strftime("%d.%m.%Y %H:%M") if teacher.joined_at else "-"
 
         row_values = [
             idx,
@@ -1981,7 +1981,7 @@ def export_teachers_excel(request):
 
     ws.views.sheetView[0].showGridLines = True
 
-    filename = f"oqituvchilar_{filename_prefix}_{timezone.now().strftime('%Y%m%d_%H%M')}.xlsx"
+    filename = f"oqituvchilar_{filename_prefix}_{timezone.localtime(timezone.now()).strftime('%Y%m%d_%H%M')}.xlsx"
     response = HttpResponse(
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
@@ -3076,7 +3076,7 @@ def student_payment_pdf(request, student_id):
     right_meta = [
         [Paragraph("O'quvchi:", meta_label), Paragraph(f"{student.first_name} {student.last_name}", meta_value)],
         [Paragraph("Talaba ID:", meta_label), Paragraph(f"#{student.id}", meta_value)],
-        [Paragraph("Yaratildi:", meta_label), Paragraph(timezone.now().strftime("%d.%m.%Y %H:%M"), meta_value)]
+        [Paragraph("Yaratildi:", meta_label), Paragraph(timezone.localtime(timezone.now()).strftime("%d.%m.%Y %H:%M"), meta_value)]
     ]
     right_table = Table(right_meta, colWidths=[20 * mm, 55 * mm])
     right_table.setStyle(TableStyle([
@@ -3288,8 +3288,8 @@ def edit_announcement(request, announcement_id):
             messages.success(request, "Tizim xabari yangilandi.")
             return redirect('announcement_list')
 
-    st_iso = announcement.start_time.strftime('%Y-%m-%dT%H:%M') if announcement.start_time else ""
-    et_iso = announcement.end_time.strftime('%Y-%m-%dT%H:%M') if announcement.end_time else ""
+    st_iso = timezone.localtime(announcement.start_time).strftime('%Y-%m-%dT%H:%M') if announcement.start_time else ""
+    et_iso = timezone.localtime(announcement.end_time).strftime('%Y-%m-%dT%H:%M') if announcement.end_time else ""
 
     return render(request, 'announcement_form.html', {
         'announcement': announcement,
@@ -3489,7 +3489,7 @@ def export_payments_csv(request):
             payment.group.name,
             payment.month,
             float(payment.amount_paid),
-            payment.paid_at.strftime('%d.%m.%Y %H:%M')
+            timezone.localtime(payment.paid_at).strftime('%d.%m.%Y %H:%M')
         ])
 
     return response

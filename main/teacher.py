@@ -973,7 +973,7 @@ def edit_assignment(request, assignment_id):
     if new_max_score and str(assignment.max_score) != str(new_max_score):
         assignment.max_score = new_max_score
 
-    if new_deadline and assignment.deadline.strftime('%Y-%m-%dT%H:%M') != new_deadline:
+    if new_deadline and timezone.localtime(assignment.deadline).strftime('%Y-%m-%dT%H:%M') != new_deadline:
         try:
             parsed_deadline = timezone.datetime.fromisoformat(new_deadline)
             aware_deadline = timezone.make_aware(parsed_deadline)

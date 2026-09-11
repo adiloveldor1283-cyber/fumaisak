@@ -111,6 +111,26 @@ def get_ip_location(ip, session_key=None):
     return 'Unknown'
 
 
+class TimezoneMiddleware:
+    """
+    Har bir so'rov uchun O'zbekiston (Asia/Tashkent UTC+5) vaqt mintaqasini faollashtiradi.
+    Bu shablonlar ({{ date|date }}), formalar va barcha view'larda vaqt O'zbekiston
+    vaqti bilan to'g'ri ko'rinishini kafolatlaydi.
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+        try:
+            import zoneinfo
+            self.tz = zoneinfo.ZoneInfo('Asia/Tashkent')
+        except Exception:
+            import pytz
+            self.tz = pytz.timezone('Asia/Tashkent')
+
+    def __call__(self, request):
+        timezone.activate(self.tz)
+        return self.get_response(request)
+
+
 class NoCacheMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
