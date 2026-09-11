@@ -233,6 +233,15 @@ class SiteSetting(models.Model):
     site_name = models.CharField(max_length=255, default="Tizim", verbose_name="Brend nomi / Sayt nomi")
     image = models.ImageField(upload_to='global/', blank=True, null=True, validators=[validate_image_file], verbose_name="Logotip")
     login_bg_image = models.ImageField(upload_to='global/', blank=True, null=True, validators=[validate_image_file], verbose_name="Login fon rasmi")
+    
+    # SMS Xizmati (Eskiz.uz) sozlamalari
+    eskiz_email = models.CharField(max_length=255, blank=True, null=True, verbose_name="Eskiz.uz Email / Login")
+    eskiz_password = models.CharField(max_length=255, blank=True, null=True, verbose_name="Eskiz.uz Yashirin kalit / Parol")
+    eskiz_from_name = models.CharField(max_length=50, default="4546", verbose_name="Eskiz Alfa-nom (Yuboruvchi)")
+    sms_enabled = models.BooleanField(default=False, verbose_name="SMS xizmati faolmi")
+    sms_on_register = models.BooleanField(default=True, verbose_name="Ro'yxatdan o'tganda login/parol yuborish")
+    sms_on_payment = models.BooleanField(default=True, verbose_name="To'lov qabul qilinganda SMS yuborish")
+    sms_on_absence = models.BooleanField(default=True, verbose_name="Darsga kelmaganda SMS yuborish")
 
     def __str__(self):
         return f"Sayt sozlamalari ({self.site_name})"

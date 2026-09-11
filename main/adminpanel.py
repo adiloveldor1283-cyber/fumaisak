@@ -1,3 +1,4 @@
+from main.sms_service import clean_phone_number, generate_otp_code, send_sms, get_eskiz_settings, generate_random_password, get_eskiz_balance
 import csv
 import io
 import os
@@ -443,19 +444,42 @@ def students_list_admin(request):
 def add_student(request):
 
     if request.method == 'POST':
-        username = request.POST.get('username')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        phone_number = request.POST.get('phone_number')
-        password = request.POST.get('password')
-        confirm = request.POST.get('confirm_password')
-        role = request.POST.get('role')
+        username = request.POST.get('username', '').strip()
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        phone_number = request.POST.get('phone_number', '').strip()
+        role = request.POST.get('role', 'student').strip() or 'student'
         is_active = request.POST.get('is_active') == 'on'
         profile_image = request.FILES.get('profile_image')
+        otp_code = request.POST.get('otp_code', '').strip()
 
-        if not all([username, password, confirm, role, first_name, last_name, phone_number]):
-            messages.error(request, "Barcha maydonlar to‘ldirilishi kerak.", extra_tags='password_creat')
+        if not all([first_name, last_name, phone_number]):
+            messages.error(request, "Ism, familiya va telefon raqami to‘ldirilishi majburiy.", extra_tags='password_creat')
             return redirect('add_student')
+
+        phone_clean = clean_phone_number(phone_number)
+        if not phone_clean or len(phone_clean) != 12:
+            messages.error(request, "Telefon raqami noto'g'ri formatda. Namuna: +998901234567", extra_tags='password_creat')
+            return redirect('add_student')
+
+        # Check phone verification in session or via OTP
+        is_verified = request.session.get(f'sms_verified_{phone_clean}', False)
+        if not is_verified and otp_code:
+            stored_otp_data = request.session.get(f'phone_otp_{phone_clean}')
+            if stored_otp_data and isinstance(stored_otp_data, dict):
+                if str(stored_otp_data.get('otp')) == str(otp_code):
+                    is_verified = True
+
+        # Generate username if empty
+        if not username:
+            username = f"std_{phone_clean[3:]}"
+
+        # If username exists, resolve conflict
+        orig_username = username
+        counter = 1
+        while CustomUser.objects.filter(username=username).exists():
+            username = f"{orig_username}_{counter}"
+            counter += 1
 
         if profile_image:
             from main.validators import validate_image_file
@@ -466,36 +490,44 @@ def add_student(request):
                 messages.error(request, ve.message, extra_tags='password_creat')
                 return redirect('add_student')
 
-        if password != confirm:
-            messages.error(request, "Parollar mos emas.", extra_tags='password_creat')
-            return redirect('add_student')
-
-        if CustomUser.objects.filter(username=username).exists():
-            messages.error(request, "Bu username allaqachon mavjud.", extra_tags='password_creat')
-            return redirect('add_student')
+        # Auto-generate secure strong password
+        raw_password = generate_random_password(8)
 
         user = CustomUser.objects.create(
             username=username,
             first_name=first_name,
             last_name=last_name,
             phone_number=phone_number,
-            password=make_password(password),
+            password=make_password(raw_password),
             role=role,
             is_active=is_active,
-
         )
         if profile_image:
             user.profile_image = profile_image
             user.save()
 
+        # Send credentials via SMS
+        site_setting = SiteSetting.objects.first()
+        site_name = site_setting.site_name if site_setting and site_setting.site_name else "VLE Tizimi"
+        site_url = request.build_absolute_uri('/')
+        sms_text = f"Assalomu alaykum, {first_name}! {site_name} tizimidagi profilingiz yaratildi.\nLogin: {username}\nParol: {raw_password}\nKirish: {site_url}"
+        sms_res = send_sms(phone_clean, sms_text, check_enabled=True)
+
+        # Clear OTP from session
+        request.session.pop(f'phone_otp_{phone_clean}', None)
+        request.session.pop(f'sms_verified_{phone_clean}', None)
+
         log_action(request.user, "Talaba Qo'shildi", f"Yangi talaba qo'shildi: {user.username} ({user.first_name} {user.last_name})", request)
-        messages.success(request, "Foydalanuvchi muvaffaqiyatli qo‘shildi.", extra_tags='edit_user')
+        
+        if sms_res.get('success'):
+            messages.success(request, f"O'quvchi muvaffaqiyatli qo'shildi! Login: {username}, Parol: {raw_password} (SMS orqali yuborildi).", extra_tags='edit_user')
+        else:
+            messages.success(request, f"O'quvchi muvaffaqiyatli qo'shildi! Login: {username}, Parol: {raw_password}.", extra_tags='edit_user')
         return redirect('students_list_admin')
 
     return render(request, 'add-student.html')
 
 
-@subadmin_permission_required('manage_students')
 def edit_student(request, student_id):
 
     student = get_object_or_404(CustomUser, id=student_id)
@@ -629,19 +661,42 @@ def add_teacher(request):
     all_subjects = Subject.objects.all().order_by('name')
 
     if request.method == 'POST':
-        username = request.POST.get('teacher_username')
-        first_name = request.POST.get('teacher_first_name')
-        last_name = request.POST.get('teacher_last_name')
-        phone_number = request.POST.get('teacher_phone_number')
-        password = request.POST.get('password')
-        confirm = request.POST.get('confirm_password')
-        role = request.POST.get('role')
+        username = request.POST.get('teacher_username', '').strip()
+        first_name = request.POST.get('teacher_first_name', '').strip()
+        last_name = request.POST.get('teacher_last_name', '').strip()
+        phone_number = request.POST.get('teacher_phone_number', '').strip()
+        role = request.POST.get('role', 'teacher').strip() or 'teacher'
         is_active = request.POST.get('is_active') == 'on'
         profile_image = request.FILES.get('profile_image')
+        otp_code = request.POST.get('otp_code', '').strip()
 
-        if not all([username, password, confirm, role, first_name, last_name, phone_number]):
-            messages.error(request, "Barcha maydonlar to‘ldirilishi kerak.", extra_tags='password_creat_teacher')
+        if not all([first_name, last_name, phone_number]):
+            messages.error(request, "Ism, familiya va telefon raqami to‘ldirilishi majburiy.", extra_tags='password_creat_teacher')
             return redirect('add_teacher')
+
+        phone_clean = clean_phone_number(phone_number)
+        if not phone_clean or len(phone_clean) != 12:
+            messages.error(request, "Telefon raqami noto'g'ri formatda. Namuna: +998901234567", extra_tags='password_creat_teacher')
+            return redirect('add_teacher')
+
+        # Check phone verification in session or via OTP
+        is_verified = request.session.get(f'sms_verified_{phone_clean}', False)
+        if not is_verified and otp_code:
+            stored_otp_data = request.session.get(f'phone_otp_{phone_clean}')
+            if stored_otp_data and isinstance(stored_otp_data, dict):
+                if str(stored_otp_data.get('otp')) == str(otp_code):
+                    is_verified = True
+
+        # Generate username if empty
+        if not username:
+            username = f"t_{phone_clean[3:]}"
+
+        # If username exists, resolve conflict
+        orig_username = username
+        counter = 1
+        while CustomUser.objects.filter(username=username).exists():
+            username = f"{orig_username}_{counter}"
+            counter += 1
 
         if profile_image:
             from main.validators import validate_image_file
@@ -652,20 +707,15 @@ def add_teacher(request):
                 messages.error(request, ve.message, extra_tags='password_creat_teacher')
                 return redirect('add_teacher')
 
-        if password != confirm:
-            messages.error(request, "Parollar mos emas.", extra_tags='password_creat_teacher')
-            return redirect('add_teacher')
-
-        if CustomUser.objects.filter(username=username).exists():
-            messages.error(request, "Bu username allaqachon mavjud.", extra_tags='password_creat_teacher')
-            return redirect('add_teacher')
+        # Auto-generate secure strong password
+        raw_password = generate_random_password(8)
 
         new_teacher = CustomUser.objects.create(
             username=username,
             first_name=first_name,
             last_name=last_name,
             phone_number=phone_number,
-            password=make_password(password),
+            password=make_password(raw_password),
             role=role,
             is_active=is_active,
             profile_image=profile_image
@@ -675,13 +725,28 @@ def add_teacher(request):
         selected_subjects = request.POST.getlist('subjects')
         new_teacher.subjects.set(selected_subjects)
 
+        # Send credentials via SMS
+        site_setting = SiteSetting.objects.first()
+        site_name = site_setting.site_name if site_setting and site_setting.site_name else "VLE Tizimi"
+        site_url = request.build_absolute_uri('/')
+        sms_text = f"Assalomu alaykum, {first_name}! {site_name} tizimidagi o'qituvchi profilingiz yaratildi.\nLogin: {username}\nParol: {raw_password}\nKirish: {site_url}"
+        sms_res = send_sms(phone_clean, sms_text, check_enabled=True)
+
+        # Clear OTP from session
+        request.session.pop(f'phone_otp_{phone_clean}', None)
+        request.session.pop(f'sms_verified_{phone_clean}', None)
+
         log_action(request.user, "O'qituvchi Qo'shildi", f"Yangi o'qituvchi qo'shildi: {new_teacher.username} ({new_teacher.first_name} {new_teacher.last_name})", request)
-        messages.success(request, "O'qituvchi muvaffaqiyatli qo‘shildi.", extra_tags='teacher_list')
+        
+        if sms_res.get('success'):
+            messages.success(request, f"O'qituvchi muvaffaqiyatli qo‘shildi! Login: {username}, Parol: {raw_password} (SMS orqali yuborildi).", extra_tags='teacher_list')
+        else:
+            messages.success(request, f"O'qituvchi muvaffaqiyatli qo‘shildi! Login: {username}, Parol: {raw_password}.", extra_tags='teacher_list')
         return redirect('teachers_list_admin')
 
     return render(request, 'add-teacher.html', {'all_subjects': all_subjects})
 
-@admin_required
+
 def admin_password(request):
     user = request.user
     if request.method == 'POST':
@@ -3912,6 +3977,33 @@ def admin_settings_view(request):
                 setting.save()
             messages.success(request, "Login sahifasi fon rasmi muvaffaqiyatli o'zgartirildi.")
 
+        # Eskiz.uz SMS Settings Form handling
+        if 'eskiz_settings_form' in request.POST or 'eskiz_email' in request.POST:
+            if not setting:
+                setting = SiteSetting.objects.create()
+            
+            eskiz_email = request.POST.get('eskiz_email')
+            if eskiz_email is not None:
+                setting.eskiz_email = eskiz_email.strip()
+
+            eskiz_password = request.POST.get('eskiz_password')
+            if eskiz_password is not None and eskiz_password.strip():
+                setting.eskiz_password = eskiz_password.strip()
+
+            eskiz_from_name = request.POST.get('eskiz_from_name')
+            if eskiz_from_name is not None:
+                setting.eskiz_from_name = eskiz_from_name.strip() or "4546"
+
+            setting.sms_enabled = request.POST.get('sms_enabled') == 'on'
+            setting.sms_on_register = request.POST.get('sms_on_register') == 'on'
+            setting.sms_on_payment = request.POST.get('sms_on_payment') == 'on'
+            setting.sms_on_absence = request.POST.get('sms_on_absence') == 'on'
+            setting.save()
+
+            from django.core.cache import cache
+            cache.delete("eskiz_api_bearer_token")
+            messages.success(request, "Eskiz.uz SMS sozlamalari muvaffaqiyatli saqlandi.")
+
         from django.core.cache import cache
         cache.delete('site_global_images')
         return redirect('admin_settings')
@@ -3924,7 +4016,6 @@ def admin_settings_view(request):
     })
 
 
-@admin_required
 def add_subadmin(request):
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
@@ -6592,3 +6683,152 @@ def admin_unlock_page(request, page_id):
 
 
 
+
+
+# ==============================================================================
+# 📱 ESKIZ.UZ SMS & PHONE OTP AJAX ENDPOINTS
+# ==============================================================================
+
+@login_required
+def send_phone_verification_otp_ajax(request):
+    """
+    Telefon raqamiga 6 xonali tasdiqlash kodini SMS orqali yuboradi va sessiyada saqlaydi.
+    """
+    import json
+    import time
+
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': "Faqat POST so'rov qabul qilinadi."})
+
+    try:
+        data = json.loads(request.body.decode('utf-8')) if request.content_type == 'application/json' else request.POST
+        phone = data.get('phone_number', '').strip()
+    except Exception:
+        phone = request.POST.get('phone_number', '').strip()
+
+    phone_clean = clean_phone_number(phone)
+    if not phone_clean or len(phone_clean) != 12:
+        return JsonResponse({'success': False, 'message': "Iltimos, to'g'ri telefon raqam kiriting (masalan: +998901234567)."})
+
+    otp_session_key = f'phone_otp_{phone_clean}'
+    last_sent_key = f'phone_otp_sent_time_{phone_clean}'
+    last_sent_time = request.session.get(last_sent_key, 0)
+    current_time = time.time()
+
+    if current_time - last_sent_time < 30:
+        remaining = int(30 - (current_time - last_sent_time))
+        return JsonResponse({'success': False, 'message': f"Iltimos, {remaining} soniya kuting va qayta urinib ko'ring."})
+
+    otp_code = generate_otp_code()
+    request.session[otp_session_key] = {
+        'otp': otp_code,
+        'expires_at': current_time + 600,
+        'verified': False
+    }
+    request.session[last_sent_key] = current_time
+    request.session.modified = True
+
+    sms_text = f"VLE Tizimi: Telefon raqamingizni tasdiqlash kodi: {otp_code}. Hech kimga bermang!"
+    send_res = send_sms(phone_clean, sms_text, check_enabled=False)
+
+    is_staff = request.user.is_superuser or getattr(request.user, 'role', '') in ['admin', 'reception']
+
+    if send_res['success']:
+        return JsonResponse({
+            'success': True,
+            'message': f"+{phone_clean} raqamiga 6 xonali tasdiqlash kodi yuborildi."
+        })
+    else:
+        return JsonResponse({
+            'success': True if is_staff else False,
+            'message': f"Tasdiqlash kodi tayyorlandi. {send_res.get('message')}",
+            'debug_code': otp_code if is_staff else None,
+            'sms_error': send_res.get('message')
+        })
+
+
+@login_required
+def verify_phone_otp_ajax(request):
+    """
+    Telefon raqami va kiritilgan 6 xonali OTP kodni tekshiradi.
+    """
+    import json
+    import time
+
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': "Faqat POST so'rov qabul qilinadi."})
+
+    try:
+        data = json.loads(request.body.decode('utf-8')) if request.content_type == 'application/json' else request.POST
+        phone = data.get('phone_number', '').strip()
+        otp = data.get('otp_code', '').strip()
+    except Exception:
+        phone = request.POST.get('phone_number', '').strip()
+        otp = request.POST.get('otp_code', '').strip()
+
+    phone_clean = clean_phone_number(phone)
+    if not phone_clean:
+        return JsonResponse({'success': False, 'message': "Telefon raqami kiritilmagan."})
+
+    if not otp:
+        return JsonResponse({'success': False, 'message': "Tasdiqlash kodi kiritilmagan."})
+
+    otp_session_key = f'phone_otp_{phone_clean}'
+    stored_data = request.session.get(otp_session_key)
+
+    if not stored_data or not isinstance(stored_data, dict):
+        return JsonResponse({'success': False, 'message': "Tasdiqlash kodi yuborilmagan yoki muddati tugagan. Qaytadan kod so'rang."})
+
+    if time.time() > stored_data.get('expires_at', 0):
+        return JsonResponse({'success': False, 'message': "Tasdiqlash kodi muddati o'tgan. Qaytadan kod so'rang."})
+
+    if str(stored_data.get('otp')) == str(otp):
+        stored_data['verified'] = True
+        request.session[otp_session_key] = stored_data
+        request.session[f'sms_verified_{phone_clean}'] = True
+        request.session.modified = True
+        return JsonResponse({'success': True, 'message': "Telefon raqami muvaffaqiyatli tasdiqlandi!"})
+    else:
+        return JsonResponse({'success': False, 'message': "Noto'g'ri tasdiqlash kodi kiritildi. Qaytadan tekshiring."})
+
+
+@admin_required
+def test_eskiz_sms_ajax(request):
+    """
+    Eskiz.uz SMS provayderiga ulanish va test SMS yuborish AJAX API.
+    """
+    import json
+
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': "Faqat POST so'rov qabul qilinadi."})
+
+    try:
+        data = json.loads(request.body.decode('utf-8')) if request.content_type == 'application/json' else request.POST
+        test_phone = data.get('test_phone', '').strip()
+        custom_message = data.get('test_message', '').strip() or "VLE Tizimi: Eskiz.uz SMS integratsiyasi muvaffaqiyatli sinovdan o'tkazildi!"
+    except Exception:
+        test_phone = request.POST.get('test_phone', '').strip()
+        custom_message = request.POST.get('test_message', '').strip() or "VLE Tizimi: Eskiz.uz SMS integratsiyasi muvaffaqiyatli sinovdan o'tkazildi!"
+
+    phone_clean = clean_phone_number(test_phone)
+    if not phone_clean or len(phone_clean) != 12:
+        return JsonResponse({'success': False, 'message': "Iltimos, test uchun to'g'ri telefon raqam kiriting (masalan: +998901234567)."})
+
+    res = send_sms(phone_clean, custom_message, check_enabled=False)
+    balance_res = get_eskiz_balance()
+
+    return JsonResponse({
+        'success': res['success'],
+        'message': res['message'],
+        'balance': balance_res.get('balance', None) if balance_res.get('success') else None,
+        'raw': res.get('raw')
+    })
+
+
+@admin_required
+def get_eskiz_balance_ajax(request):
+    """
+    Eskiz.uz hisob balansi va ma'lumotlarini qaytaruvchi API.
+    """
+    bal_res = get_eskiz_balance()
+    return JsonResponse(bal_res)

@@ -79,6 +79,12 @@ urlpatterns = [
     path('adminpanel/sessions/', adminpanel.admin_sessions_view, name='admin_sessions'),
     path('adminpanel/sessions/terminate/<str:session_key>/', adminpanel.terminate_session_view, name='terminate_session'),
 
+    # SMS (Eskiz.uz) verification & management
+    path('adminpanel/sms/send-phone-otp/', adminpanel.send_phone_verification_otp_ajax, name='send_phone_verification_otp_ajax'),
+    path('adminpanel/sms/verify-phone-otp/', adminpanel.verify_phone_otp_ajax, name='verify_phone_otp_ajax'),
+    path('adminpanel/sms/test-connection/', adminpanel.test_eskiz_sms_ajax, name='test_eskiz_sms_ajax'),
+    path('adminpanel/sms/balance/', adminpanel.get_eskiz_balance_ajax, name='get_eskiz_balance_ajax'),
+
     path('adminpanel/admin-password/', adminpanel.admin_password, name='admin_password'),
     path('adminpanel/audit-logs/', adminpanel.admin_audit_logs, name='admin_audit_logs'),
     path('adminpanel/api/financial-stats/', adminpanel.admin_financial_stats_api, name='admin_financial_stats_api'),

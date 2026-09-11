@@ -78,6 +78,49 @@
         color: #00f2fe;
     }
 
+    .btn-otp-action {
+        padding: 0 18px;
+        background: rgba(0, 242, 254, 0.12);
+        border: 1px solid rgba(0, 242, 254, 0.3);
+        color: #00f2fe;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        transition: 0.3s;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-otp-action:hover:not(:disabled) {
+        background: rgba(0, 242, 254, 0.25);
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+    }
+    .btn-otp-action:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .btn-otp-verify {
+        padding: 0 20px;
+        background: linear-gradient(135deg, #00ffaa, #00b09b);
+        color: #070a12;
+        border: none;
+        border-radius: 10px;
+        font-weight: 800;
+        font-size: 13px;
+        cursor: pointer;
+        transition: 0.3s;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-otp-verify:hover {
+        box-shadow: 0 0 15px rgba(0, 255, 170, 0.4);
+    }
+
     .radio-konteyner {
         display: flex;
         gap: 20px;
@@ -175,33 +218,84 @@
     </div>
 </div>
 
+{% if messages %}
+    <div style="margin-bottom: 20px; max-width: 650px; margin-left: auto; margin-right: auto;">
+        {% for message in messages %}
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 12px 18px; color: #ff6b6b; font-size: 13.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 <div class="form-card">
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" id="add-student-form" onsubmit="return validateStudentForm(event)">
         {% csrf_token %}
 
         <div class="section-title">Shaxsiy ma'lumotlar</div>
 
         <div class="form-group">
             <label for="last_name">O'quvchi familiyasi *</label>
-            <input type="text" class="form-control" id="last_name" name="last_name" required>
+            <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Masalan: Karimov" required>
         </div>
 
         <div class="form-group">
             <label for="first_name">O'quvchi ismi *</label>
-            <input type="text" class="form-control" id="first_name" name="first_name" required>
+            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Masalan: Sardor" required>
         </div>
 
         <div class="form-group">
             <label for="phone_number">Telefon raqami *</label>
-            <input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="Namuna: +99894 123 45 67" required>
+            <div style="display: flex; gap: 10px; align-items: stretch;">
+                <input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="+998901234567" required style="flex: 1;">
+                <button type="button" id="btn-send-otp" class="btn-otp-action" onclick="sendPhoneOtp()">
+                    <i class="fas fa-sms"></i> <span id="btn-send-otp-text">SMS kod yuborish</span>
+                </button>
+            </div>
+            <div class="info" id="phone-hint"><i class="fas fa-info-circle"></i> O'quvchi profil ma'lumotlari va paroli shu raqamga SMS orqali yuboriladi.</div>
+
+            <!-- OTP Input Box (initially hidden) -->
+            <div id="otp-verification-box" style="display: none; margin-top: 15px; background: rgba(0, 242, 254, 0.03); border: 1px dashed rgba(0, 242, 254, 0.25); border-radius: 14px; padding: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <label style="font-size: 11.5px; font-weight: 700; color: #00f2fe; margin-bottom: 0;">
+                        <i class="fas fa-shield-alt" style="margin-right: 4px;"></i> 6 XONALI TASDIQLASH KODI:
+                    </label>
+                    <span id="otp-countdown" style="font-size: 11.5px; color: rgba(255,255,255,0.5); font-weight: 600;"></span>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: stretch;">
+                    <input type="text" id="otp-input" maxlength="6" placeholder="______" style="flex: 1; padding: 10px 15px; font-size: 18px; font-weight: 800; letter-spacing: 6px; text-align: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(0,242,254,0.3); border-radius: 10px; color: #00f2fe; outline: none;">
+                    <button type="button" id="btn-verify-otp" class="btn-otp-verify" onclick="verifyPhoneOtp()">
+                        <i class="fas fa-check-circle"></i> Tasdiqlash
+                    </button>
+                </div>
+                <div id="otp-alert-msg" style="margin-top: 10px; font-size: 12px; display: none;"></div>
+            </div>
+
+            <!-- Verified Badge -->
+            <div id="phone-verified-badge" style="display: none; margin-top: 12px; background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.3); border-radius: 10px; padding: 10px 14px; color: #00ffaa; font-size: 12.5px; font-weight: 700; align-items: center; gap: 8px;">
+                <i class="fas fa-check-circle" style="font-size: 16px;"></i> 
+                <span>Telefon raqami muvaffaqiyatli tasdiqlandi!</span>
+            </div>
+            <input type="hidden" name="otp_code" id="hidden_otp_code" value="">
         </div>
 
         <div class="section-title">Hisob ma'lumotlari</div>
 
+        <!-- Parol haqida xabarnoma -->
+        <div style="background: rgba(0, 242, 254, 0.05); border: 1px dashed rgba(0, 242, 254, 0.3); border-radius: 12px; padding: 14px 18px; margin-bottom: 22px; display: flex; align-items: center; gap: 14px;">
+            <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(0, 242, 254, 0.1); display: flex; align-items: center; justify-content: center; color: #00f2fe; font-size: 18px; flex-shrink: 0;">
+                <i class="fas fa-key"></i>
+            </div>
+            <div style="font-size: 12.5px; color: rgba(255, 255, 255, 0.85); line-height: 1.45;">
+                <strong style="color: #00f2fe;">Avtomatik xavfsiz parol:</strong> Endi parolni qo'lda kiritish shart emas. Tizim o'quvchi uchun avtomatik mustahkam parol yaratadi va saqlangach, tasdiqlangan telefon raqamiga login bilan birga SMS orqali yuboradi.
+            </div>
+        </div>
+
         <div class="form-group">
-            <label for="kirit-nomi">O'quvchi logini *</label>
-            <input type="text" class="form-control" id="kirit-nomi" name="username" required>
-            <div class="info"><i class="fas fa-info-circle"></i> Majburiy. 150 yoki undan kam belgi. Faqat harflar, raqamlar va @/./+/-/_.</div>
+            <label for="kirit-nomi">O'quvchi logini (Ixtiyoriy)</label>
+            <input type="text" class="form-control" id="kirit-nomi" name="username" placeholder="Bo'sh qoldirilsa, telefon raqamidan yaratiladi">
+            <div class="info"><i class="fas fa-info-circle"></i> Bo'sh qoldirsangiz, tizim o'zi avtomatik login tayinlaydi.</div>
         </div>
 
         <div class="form-group">
@@ -213,32 +307,21 @@
         </div>
 
         <div class="form-group">
-            <label for="parol-kirit">Parol *</label>
-            <input type="password" class="form-control" id="parol-kirit" name="password" required>
-            <div class="info"><i class="fas fa-info-circle"></i> Kamida 8 ta belgidan iborat va raqamlardangina iborat bo'lmagan parol kiriting.</div>
-        </div>
-
-        <div class="form-group">
-            <label for="parol-tasdiq">Parolni tasdiqlash *</label>
-            <input type="password" class="form-control" id="parol-tasdiq" name="confirm_password" required>
-            <div class="info"><i class="fas fa-info-circle"></i> Tasdiqlash uchun parolni qayta kiriting.</div>
-        </div>
-
-        <div class="form-group">
-            <label for="rol-tanla">Roli *</label>
+            <label for="rol-tanla">Roli</label>
             <select id="rol-tanla" name="role" class="form-control" required>
-                <option value="">--------</option>
-                <option value="student">O'quvchi</option>
+                <option value="student" selected>O'quvchi</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="profil-rasmi">Profil rasmi</label>
+            <label for="profil-rasmi">Profil rasmi (Ixtiyoriy)</label>
             <input type="file" class="form-control" id="profil-rasmi" name="profile_image">
         </div>
 
         <div class="tugmalar">
-            <button type="submit" class="btn-submit"><i class="fas fa-plus" style="margin-right: 6px;"></i> O'quvchini saqlash</button>
+            <button type="submit" class="btn-submit" id="btn-submit-main">
+                <i class="fas fa-user-plus" style="margin-right: 6px;"></i> O'quvchini saqlash & SMS yuborish
+            </button>
             <a href="{% url 'students_list_admin' %}" class="btn-cancel">Bekor qilish</a>
         </div>
     </form>
@@ -246,5 +329,168 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- Maxsus JS logic, agar kerak bo'lsa -->
+<script>
+    let isPhoneVerified = false;
+    let countdownInterval = null;
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    function showOtpAlert(msg, isSuccess) {
+        const box = document.getElementById('otp-alert-msg');
+        box.style.display = 'block';
+        box.style.color = isSuccess ? '#00ffaa' : '#ff6b6b';
+        box.innerHTML = (isSuccess ? '<i class="fas fa-check-circle"></i> ' : '<i class="fas fa-exclamation-triangle"></i> ') + msg;
+    }
+
+    function startCountdown(seconds) {
+        const timerEl = document.getElementById('otp-countdown');
+        const btnSend = document.getElementById('btn-send-otp');
+        const btnText = document.getElementById('btn-send-otp-text');
+        
+        btnSend.disabled = true;
+        let remaining = seconds;
+
+        if (countdownInterval) clearInterval(countdownInterval);
+
+        countdownInterval = setInterval(() => {
+            remaining--;
+            if (remaining <= 0) {
+                clearInterval(countdownInterval);
+                timerEl.textContent = '';
+                btnSend.disabled = false;
+                btnText.textContent = "Qayta kod yuborish";
+            } else {
+                timerEl.textContent = `Qayta yuborish: ${remaining}s`;
+                btnText.textContent = `${remaining}s`;
+            }
+        }, 1000);
+    }
+
+    async function sendPhoneOtp() {
+        const phoneInput = document.getElementById('phone_number');
+        const phone = phoneInput.value.trim();
+
+        if (!phone) {
+            alert("Iltimos, avval telefon raqamini kiriting.");
+            phoneInput.focus();
+            return;
+        }
+
+        const btnSend = document.getElementById('btn-send-otp');
+        const btnText = document.getElementById('btn-send-otp-text');
+        btnSend.disabled = true;
+        btnText.textContent = "Yuborilmoqda...";
+
+        try {
+            const response = await fetch("{% url 'send_phone_verification_otp_ajax' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({ phone_number: phone })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                document.getElementById('otp-verification-box').style.display = 'block';
+                startCountdown(60);
+                showOtpAlert(data.message, true);
+
+                if (data.debug_code) {
+                    showOtpAlert(`${data.message} (Sinov kodi: ${data.debug_code})`, true);
+                    document.getElementById('otp-input').value = data.debug_code;
+                }
+            } else {
+                btnSend.disabled = false;
+                btnText.textContent = "SMS kod yuborish";
+                alert(data.message || "Xatolik yuz berdi. Qayta urinib ko'ring.");
+            }
+        } catch (err) {
+            btnSend.disabled = false;
+            btnText.textContent = "SMS kod yuborish";
+            alert("Serverga ulanishda xatolik: " + err);
+        }
+    }
+
+    async function verifyPhoneOtp() {
+        const phone = document.getElementById('phone_number').value.trim();
+        const otpInput = document.getElementById('otp-input');
+        const otp = otpInput.value.trim();
+
+        if (!otp || otp.length < 4) {
+            showOtpAlert("Iltimos, tasdiqlash kodini to'liq kiriting.", false);
+            otpInput.focus();
+            return;
+        }
+
+        const btnVerify = document.getElementById('btn-verify-otp');
+        btnVerify.disabled = true;
+        btnVerify.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Tekshirilmoqda...';
+
+        try {
+            const response = await fetch("{% url 'verify_phone_otp_ajax' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({ phone_number: phone, otp_code: otp })
+            });
+
+            const data = await response.json();
+            btnVerify.disabled = false;
+            btnVerify.innerHTML = '<i class="fas fa-check-circle"></i> Tasdiqlash';
+
+            if (data.success) {
+                isPhoneVerified = true;
+                document.getElementById('hidden_otp_code').value = otp;
+                document.getElementById('otp-verification-box').style.display = 'none';
+                document.getElementById('phone-verified-badge').style.display = 'flex';
+                document.getElementById('phone_number').readOnly = true;
+                document.getElementById('btn-send-otp').style.display = 'none';
+                if (countdownInterval) clearInterval(countdownInterval);
+            } else {
+                showOtpAlert(data.message || "Kod noto'g'ri.", false);
+            }
+        } catch (err) {
+            btnVerify.disabled = false;
+            btnVerify.innerHTML = '<i class="fas fa-check-circle"></i> Tasdiqlash';
+            showOtpAlert("Serverga ulanishda xatolik: " + err, false);
+        }
+    }
+
+    function validateStudentForm(e) {
+        if (!isPhoneVerified) {
+            const otpBox = document.getElementById('otp-verification-box');
+            if (otpBox.style.display === 'block') {
+                const otpVal = document.getElementById('otp-input').value.trim();
+                if (otpVal.length >= 4) {
+                    document.getElementById('hidden_otp_code').value = otpVal;
+                    return true;
+                }
+            }
+            if (!confirm("Telefon raqami SMS orqali hali tasdiqlanmadi. Baribir saqlashni davom ettirmoqchimisiz?")) {
+                e.preventDefault();
+                return false;
+            }
+        }
+        return true;
+    }
+</script>
 {% endblock %}
