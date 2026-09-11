@@ -1715,6 +1715,9 @@
                 {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_teachers' in request.user.subadmin_permissions %}
                 <li><a href="{% url 'teachers_list_admin' %}"><i class="fas fa-chalkboard-teacher"></i><span> O'qituvchilar</span></a></li>
                 {% endif %}
+                {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff or 'manage_students' in request.user.subadmin_permissions or 'manage_teachers' in request.user.subadmin_permissions %}
+                <li><a href="{% url 'import_students_csv' %}"><i class="fas fa-file-import"></i><span> CSV orqali import</span></a></li>
+                {% endif %}
                 {% if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff %}
                 <li><a href="{% url 'admin_settings' %}#subadmins"><i class="fas fa-user-shield"></i><span> Sub-adminlar</span></a></li>
                 {% endif %}
