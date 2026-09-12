@@ -284,6 +284,13 @@
             margin-bottom: 20px;
         }
 
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
         .form-group {
             margin-bottom: 20px;
         }
@@ -471,7 +478,7 @@
             .onboarding-card {
                 padding: 25px 20px;
             }
-            .form-grid-2 {
+            .form-grid-2, .form-grid-3 {
                 grid-template-columns: 1fr;
                 gap: 0;
             }
@@ -600,14 +607,18 @@
                     </span>
                 </div>
 
-                <div class="form-grid-2">
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label for="id_last_name">Familiyangiz *</label>
+                        <input type="text" class="form-control" id="id_last_name" name="last_name" value="{{ user.last_name }}" placeholder="Masalan: Karimov" required>
+                    </div>
                     <div class="form-group">
                         <label for="id_first_name">Ismingiz *</label>
                         <input type="text" class="form-control" id="id_first_name" name="first_name" value="{{ user.first_name }}" placeholder="Masalan: Sardor" required>
                     </div>
                     <div class="form-group">
-                        <label for="id_last_name">Familiyangiz *</label>
-                        <input type="text" class="form-control" id="id_last_name" name="last_name" value="{{ user.last_name }}" placeholder="Masalan: Karimov" required>
+                        <label for="id_middle_name">Sharifingiz (Otasining ismi) *</label>
+                        <input type="text" class="form-control" id="id_middle_name" name="middle_name" value="{{ user.middle_name }}" placeholder="Masalan: Rustam o'g'li / Rustamovich" required>
                     </div>
                 </div>
 
@@ -750,6 +761,7 @@
         document.getElementById('onboardingForm').addEventListener('submit', function(e) {
             const firstName = document.getElementById('id_first_name').value.trim();
             const lastName = document.getElementById('id_last_name').value.trim();
+            const middleName = document.getElementById('id_middle_name').value.trim();
             const termsChecked = document.getElementById('termsCheckbox').checked;
 
             if (!termsChecked) {
@@ -759,10 +771,10 @@
                 return false;
             }
 
-            if (!firstName || !lastName) {
+            if (!firstName || !lastName || !middleName) {
                 e.preventDefault();
                 goToStep(2);
-                alert("Ism va familiyangizni to'ldirishingiz shart.");
+                alert("Familiya, ism va sharifingizni to'liq to'ldirishingiz shart.");
                 return false;
             }
 

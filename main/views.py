@@ -292,6 +292,7 @@ def onboarding_view(request):
         terms_consent = request.POST.get('terms_accepted') == 'on'
         first_name = request.POST.get('first_name', '').strip()
         last_name = request.POST.get('last_name', '').strip()
+        middle_name = request.POST.get('middle_name', '').strip()
         new_password = request.POST.get('new_password', '').strip()
         confirm_password = request.POST.get('confirm_password', '').strip()
         profile_image = request.FILES.get('profile_image')
@@ -301,9 +302,9 @@ def onboarding_view(request):
             messages.error(request, "Shaxsiy ma'lumotlarni qayta ishlash Nizomi (Ommaviy oferta) shartlariga rozilik bildirishingiz shart.")
             return render(request, 'onboarding.html', {'site_name': site_name, 'user': user})
 
-        # 2. Name validation
-        if not first_name or not last_name:
-            messages.error(request, "Ism va familiyangizni to'liq kiritishingiz shart.")
+        # 2. Name validation (Familiya, Ism va Sharif majburiy)
+        if not first_name or not last_name or not middle_name:
+            messages.error(request, "Familiya, ism va sharifingizni (otasining ismini) to'liq kiritishingiz shart.")
             return render(request, 'onboarding.html', {'site_name': site_name, 'user': user})
 
         # 3. Profile Image validation if provided
@@ -328,6 +329,7 @@ def onboarding_view(request):
         # 5. Save user profile data
         user.first_name = first_name
         user.last_name = last_name
+        user.middle_name = middle_name
         if profile_image:
             user.profile_image = profile_image
         

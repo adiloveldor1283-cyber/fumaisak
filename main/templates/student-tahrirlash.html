@@ -172,7 +172,7 @@
             {% else %}
                 <img src="{{ default_profile_image }}" alt="Student profile picture" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.1); object-fit: cover; display: inline-block;">
             {% endif %}
-            <h3 style="margin-top: 12px; font-weight: 800; font-size: 16px; color: white;">{{ student.last_name }} {{ student.first_name }}</h3>
+            <h3 style="margin-top: 12px; font-weight: 800; font-size: 16px; color: white;">{{ student.last_name }} {{ student.first_name }} {{ student.middle_name }}</h3>
             <span style="font-size: 12px; text-transform: uppercase; color: rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 0.5px;">{{ student.get_role_display }}</span>
         </div>
 
@@ -193,6 +193,11 @@
         <div class="form-group">
             <label for="first_name">O'quvchi ismi *</label>
             <input type="text" class="form-control" id="first_name" name="first_name" value="{{ student.first_name }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="middle_name">O'quvchi sharifi / otasining ismi *</label>
+            <input type="text" class="form-control" id="middle_name" name="middle_name" value="{{ student.middle_name }}" placeholder="Masalan: Rustam o'g'li / Rustamovich" required>
         </div>
 
         <div class="form-group">

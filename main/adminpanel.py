@@ -602,6 +602,10 @@ def edit_student(request, student_id):
         if last_name:
             student.last_name = last_name
 
+        middle_name = request.POST.get('middle_name')
+        if middle_name is not None:
+            student.middle_name = middle_name.strip()
+
         phone_number = request.POST.get('phone_number')
         if phone_number:
             student.phone_number = phone_number
@@ -622,7 +626,7 @@ def edit_student(request, student_id):
             student.profile_image = profile_image
 
         student.save()
-        log_action(request.user, "Talaba Tahrirlandi", f"Talaba ma'lumotlari tahrirlandi: {student.phone_number} ({student.first_name} {student.last_name})", request)
+        log_action(request.user, "Talaba Tahrirlandi", f"Talaba ma'lumotlari tahrirlandi: {student.phone_number} ({student.get_full_name()})", request)
         messages.success(request, "O'quvchi ma'lumotlari saqlandi.", extra_tags='edit_user')
         return redirect('students_list_admin')
 
@@ -679,6 +683,10 @@ def edit_teacher(request, teacher_id):
         if last_name:
             teacher.last_name = last_name
 
+        middle_name = request.POST.get('middle_name')
+        if middle_name is not None:
+            teacher.middle_name = middle_name.strip()
+
         phone_number = request.POST.get('phone_number')
         if phone_number:
             teacher.phone_number = phone_number
@@ -704,7 +712,7 @@ def edit_teacher(request, teacher_id):
         selected_subjects = request.POST.getlist('subjects')
         teacher.subjects.set(selected_subjects)
 
-        log_action(request.user, "O'qituvchi Tahrirlandi", f"O'qituvchi ma'lumotlari tahrirlandi: {teacher.phone_number} ({teacher.first_name} {teacher.last_name})", request)
+        log_action(request.user, "O'qituvchi Tahrirlandi", f"O'qituvchi ma'lumotlari tahrirlandi: {teacher.phone_number} ({teacher.get_full_name()})", request)
         messages.success(request, "O'qituvchi ma'lumotlari saqlandi.", extra_tags='teacher_list')
         return redirect('teachers_list_admin')
 
@@ -1263,7 +1271,7 @@ def export_students_pdf(request):
     ]]
 
     for idx, student in enumerate(students, start=1):
-        full_name = f"{student.last_name} {student.first_name}".strip()
+        full_name = student.get_full_name()
         groups_qs = student.student_groups.all()
         groups_str = ", ".join(g.name for g in groups_qs) if groups_qs else "-"
         status_p = Paragraph("Faol", status_active_style) if student.is_active else Paragraph("Bloklangan", status_blocked_style)
@@ -1354,38 +1362,56 @@ def export_students_pdf(request):
 @subadmin_permission_required('manage_students')
 def export_students_excel(request):
     """
-    O'quvchilar ro'yxatini to'liq formatlangan, rangli sarlavha va katakchalarga ega
-    professional Excel (.xlsx) fayli ko'rinishida yuklab olish.
+    O'quvchilar ro'yxatini to'liq formatlangan zamonaviy Excel (.xlsx) fayl sifatida eksport qilish.
     """
+    import csv
+    from django.utils import timezone
+    from django.http import HttpResponse
+    from main.models import CustomUser, Group, SiteSetting
+
+    # 1. Ma'lumotlarni yig'ish va filtrlash
     group_id = request.GET.get('group_id')
+    search_query = request.GET.get('search', '').strip()
+    status_filter = request.GET.get('status', '').strip()
+
     setting = SiteSetting.objects.first()
     site_name = setting.site_name if setting and setting.site_name else "VLE Tizimi"
+    admin_user = request.user
+    admin_name = f"{admin_user.first_name} {admin_user.last_name}".strip() if admin_user and (admin_user.first_name or admin_user.last_name) else (admin_user.username if admin_user else "Administrator")
 
-    # Administrator ismi
-    admin_user = CustomUser.objects.filter(is_superuser=True).first() or CustomUser.objects.filter(role='admin').first()
-    if admin_user and (admin_user.first_name or admin_user.last_name):
-        admin_name = f"{admin_user.first_name} {admin_user.last_name}".strip()
-    else:
-        admin_name = "Tizim Administratori"
+    group_name = "Barcha o'quvchilar"
+    subject_name = "Barcha fanlar"
+    teachers_names = "-"
+    filename_prefix = "barchasi"
 
-    # 1. O'quvchilarni olish
-    if group_id == "all" or not group_id:
+    if not group_id or group_id == 'all':
         students = CustomUser.objects.filter(role='student').prefetch_related('student_groups').order_by('last_name', 'first_name')
-        group_name = "Barcha o'quvchilar ro'yxati"
-        subject_name = "Barcha fanlar"
-        teachers_names = "Barcha o'qituvchilar"
-        filename_prefix = "barcha_oquvchilar"
     else:
         try:
             group = Group.objects.prefetch_related('teachers', 'subject').get(id=group_id)
-            students = group.students.all().prefetch_related('student_groups').order_by('last_name', 'first_name')
-            group_name = f"{group.name} guruhi"
-            subject_name = group.subject.name if group.subject else "-"
+            group_name = group.name
+            subject_name = group.subject.name if group.subject else "Biriktirilmagan"
             teacher_list = group.teachers.all()
-            teachers_names = ", ".join(f"{t.first_name} {t.last_name}".strip() for t in teacher_list) if teacher_list else "Biriktirilmagan"
+            teachers_names = ", ".join(t.get_full_name() for t in teacher_list) if teacher_list else "Biriktirilmagan"
             filename_prefix = f"guruh_{group.id}"
+            students = group.students.all().prefetch_related('student_groups').order_by('last_name', 'first_name')
         except Group.DoesNotExist:
-            return HttpResponse("Guruh topilmadi", status=404)
+            students = CustomUser.objects.filter(role='student').prefetch_related('student_groups').order_by('last_name', 'first_name')
+
+    if search_query:
+        from django.db.models import Q
+        students = students.filter(
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query) |
+            Q(middle_name__icontains=search_query) |
+            Q(phone_number__icontains=search_query) |
+            Q(username__icontains=search_query)
+        )
+
+    if status_filter == 'active':
+        students = students.filter(is_active=True)
+    elif status_filter == 'blocked':
+        students = students.filter(is_active=False)
 
     total_count = students.count()
     active_count = students.filter(is_active=True).count()
@@ -1409,13 +1435,13 @@ def export_students_excel(request):
         writer.writerow([f"{site_name.upper()} - O'QUVCHILAR RO'YXATI (QAYDNOMASI)"])
         writer.writerow([f"Guruh: {group_name}", f"Fan: {subject_name}", f"O'qituvchi: {teachers_names}", f"Sana: {today_str}"])
         writer.writerow([])
-        writer.writerow(["№", "Familiyasi", "Ismi", "Telefon raqami", "Guruh(lar)i", "Holati", "Qo'shilgan sana"])
+        writer.writerow(["№", "Familiyasi", "Ismi", "Sharifi", "Telefon raqami", "Guruh(lar)i", "Holati", "Qo'shilgan sana"])
         for idx, student in enumerate(students, start=1):
             groups_qs = student.student_groups.all()
             groups_str = ", ".join(g.name for g in groups_qs) if groups_qs else "-"
             status_text = "Faol" if student.is_active else "Bloklangan"
             joined_str = timezone.localtime(student.joined_at).strftime("%d.%m.%Y %H:%M") if student.joined_at else "-"
-            writer.writerow([idx, student.last_name, student.first_name, student.phone_number or "-", groups_str, status_text, joined_str])
+            writer.writerow([idx, student.last_name, student.first_name, student.middle_name, student.phone_number or "-", groups_str, status_text, joined_str])
         return response
 
 
@@ -1442,19 +1468,19 @@ def export_students_excel(request):
     font_summary = Font(name="Arial", size=10.5, bold=True, color="0F172A")
 
     # Sarlavha qatorlari
-    ws.merge_cells("A1:G1")
+    ws.merge_cells("A1:H1")
     ws["A1"] = f"{site_name.upper()} - O'QUVCHILAR RO'YXATI (QAYDNOMASI)"
     ws["A1"].font = font_title
     ws["A1"].alignment = Alignment(horizontal="center", vertical="center")
     ws.row_dimensions[1].height = 26
 
-    ws.merge_cells("A2:G2")
+    ws.merge_cells("A2:H2")
     ws["A2"] = f"Guruh / Kurs: {group_name} | Fan: {subject_name} | O'qituvchi(lar): {teachers_names}"
     ws["A2"].font = font_sub
     ws["A2"].alignment = Alignment(horizontal="center", vertical="center")
     ws.row_dimensions[2].height = 18
 
-    ws.merge_cells("A3:G3")
+    ws.merge_cells("A3:H3")
     ws["A3"] = f"Shakllantirildi: {today_str} | Jami: {total_count} nafar (Faol: {active_count} ta, Bloklangan: {inactive_count} ta) | Mas'ul: {admin_name}"
     ws["A3"].font = font_meta
     ws["A3"].alignment = Alignment(horizontal="center", vertical="center")
@@ -1468,6 +1494,7 @@ def export_students_excel(request):
         "№",
         "Familiyasi",
         "Ismi",
+        "Sharifi",
         "Telefon raqami",
         "Guruh(lar)i",
         "Holati",
@@ -1495,6 +1522,7 @@ def export_students_excel(request):
             idx,
             student.last_name,
             student.first_name,
+            student.middle_name,
             student.phone_number or "-",
             groups_str,
             status_text,
@@ -1849,7 +1877,7 @@ def export_teachers_pdf(request):
     ]]
 
     for idx, teacher in enumerate(teachers, start=1):
-        full_name = f"{teacher.last_name} {teacher.first_name}".strip()
+        full_name = teacher.get_full_name()
         subjects_qs = teacher.subjects.all()
         subjects_str = ", ".join(s.name for s in subjects_qs) if subjects_qs else "-"
         groups_qs = teacher.teachers_groups.all()
@@ -1988,7 +2016,7 @@ def export_teachers_excel(request):
         writer.writerow([f"{site_name.upper()} - O'QITUVCHILAR RO'YXATI (QAYDNOMASI)"])
         writer.writerow([f"Kategoriya: {category_name}", f"Fan: {subject_name}", f"Sana: {today_str}"])
         writer.writerow([])
-        writer.writerow(["№", "Familiyasi", "Ismi", "Telefon raqami", "Fan / Mutaxassisliklari", "Guruh(lar)i", "Holati", "Qo'shilgan sana"])
+        writer.writerow(["№", "Familiyasi", "Ismi", "Sharifi", "Telefon raqami", "Fan / Mutaxassisliklari", "Guruh(lar)i", "Holati", "Qo'shilgan sana"])
         for idx, teacher in enumerate(teachers, start=1):
             subjects_qs = teacher.subjects.all()
             subjects_str = ", ".join(s.name for s in subjects_qs) if subjects_qs else "-"
@@ -1996,7 +2024,7 @@ def export_teachers_excel(request):
             groups_str = ", ".join(g.name for g in groups_qs) if groups_qs else "-"
             status_text = "Faol" if teacher.is_active else "Bloklangan"
             joined_str = timezone.localtime(teacher.joined_at).strftime("%d.%m.%Y %H:%M") if teacher.joined_at else "-"
-            writer.writerow([idx, teacher.last_name, teacher.first_name, teacher.phone_number or "-", subjects_str, groups_str, status_text, joined_str])
+            writer.writerow([idx, teacher.last_name, teacher.first_name, teacher.middle_name, teacher.phone_number or "-", subjects_str, groups_str, status_text, joined_str])
         return response
 
     thin_border = Border(
@@ -2021,19 +2049,19 @@ def export_teachers_excel(request):
     font_summary = Font(name="Arial", size=10.5, bold=True, color="0F172A")
 
     # Sarlavha qatorlari
-    ws.merge_cells("A1:H1")
+    ws.merge_cells("A1:I1")
     ws["A1"] = f"{site_name.upper()} - O'QITUVCHILAR RO'YXATI (QAYDNOMASI)"
     ws["A1"].font = font_title
     ws["A1"].alignment = Alignment(horizontal="center", vertical="center")
     ws.row_dimensions[1].height = 26
 
-    ws.merge_cells("A2:H2")
+    ws.merge_cells("A2:I2")
     ws["A2"] = f"Kategoriya: {category_name} | Fan / Mutaxassislik: {subject_name}"
     ws["A2"].font = font_sub
     ws["A2"].alignment = Alignment(horizontal="center", vertical="center")
     ws.row_dimensions[2].height = 18
 
-    ws.merge_cells("A3:H3")
+    ws.merge_cells("A3:I3")
     ws["A3"] = f"Shakllantirildi: {today_str} | Jami: {total_count} nafar (Faol: {active_count} ta, Bloklangan: {inactive_count} ta) | Mas'ul: {admin_name}"
     ws["A3"].font = font_meta
     ws["A3"].alignment = Alignment(horizontal="center", vertical="center")
@@ -2045,6 +2073,7 @@ def export_teachers_excel(request):
         "№",
         "Familiyasi",
         "Ismi",
+        "Sharifi",
         "Telefon raqami",
         "Fan / Mutaxassisliklari",
         "Guruh(lar)i",
@@ -2074,6 +2103,7 @@ def export_teachers_excel(request):
             idx,
             teacher.last_name,
             teacher.first_name,
+            teacher.middle_name,
             teacher.phone_number or "-",
             subjects_str,
             groups_str,
@@ -2094,19 +2124,19 @@ def export_teachers_excel(request):
             if col_num == 1:
                 cell.alignment = Alignment(horizontal="center", vertical="center")
                 cell.font = font_td
-            elif col_num in (2, 3):
+            elif col_num in (2, 3, 4):
                 cell.alignment = Alignment(horizontal="left", vertical="center")
                 cell.font = font_td_bold
-            elif col_num == 4:
+            elif col_num == 5:
                 cell.alignment = Alignment(horizontal="center", vertical="center")
                 cell.font = font_td
-            elif col_num in (5, 6):
+            elif col_num in (6, 7):
                 cell.alignment = Alignment(horizontal="left", vertical="center")
                 cell.font = font_td
-            elif col_num == 7:
+            elif col_num == 8:
                 cell.alignment = Alignment(horizontal="center", vertical="center")
                 cell.font = font_active if teacher.is_active else font_blocked
-            elif col_num == 8:
+            elif col_num == 9:
                 cell.alignment = Alignment(horizontal="center", vertical="center")
                 cell.font = font_td
 
@@ -2706,14 +2736,14 @@ def import_students_csv(request):
         response.write('\ufeff')  # UTF-8 BOM for Excel compatibility
 
         writer = csv.writer(response)
-        writer.writerow(['first_name', 'last_name', 'phone_number', 'username', 'password'])
+        writer.writerow(['last_name', 'first_name', 'middle_name', 'phone_number', 'username', 'password'])
         if role_type == 'student':
-            writer.writerow(['Ali', 'Karimov', '+998901234567', '', ''])
-            writer.writerow(['Vali', 'Rustamov', '+998931234568', 'vali_student', ''])
-            writer.writerow(['Zuhra', 'Sobirova', '+998941234569', '', 'Parol1234'])
+            writer.writerow(['Karimov', 'Ali', 'Rustamovich', '+998901234567', '', ''])
+            writer.writerow(['Rustamov', 'Vali', 'Anvar o\'g\'li', '+998931234568', 'vali_student', ''])
+            writer.writerow(['Sobirova', 'Zuhra', 'Akram qizi', '+998941234569', '', 'Parol1234'])
         else:
-            writer.writerow(['Jasur', 'Abdullayev', '+998901234567', '', ''])
-            writer.writerow(['Malika', 'Qosimova', '+998931234568', 't_malika', ''])
+            writer.writerow(['Abdullayev', 'Jasur', 'Botir o\'g\'li', '+998901234567', '', ''])
+            writer.writerow(['Qosimova', 'Malika', 'Erkin qizi', '+998931234568', 't_malika', ''])
         return response
 
     imported_summary = request.session.get('last_imported_users', None)
@@ -2750,9 +2780,10 @@ def import_students_csv(request):
 
             # Flexible column mapping
             fn_idx = headers.index('first_name') if 'first_name' in headers else (headers.index('ism') if 'ism' in headers else (1 if len(headers) >= 2 else 0))
-            ln_idx = headers.index('last_name') if 'last_name' in headers else (headers.index('familiya') if 'familiya' in headers else (2 if len(headers) >= 3 else 1))
+            ln_idx = headers.index('last_name') if 'last_name' in headers else (headers.index('familiya') if 'familiya' in headers else (0 if len(headers) >= 3 else 1))
+            mn_idx = headers.index('middle_name') if 'middle_name' in headers else (headers.index('sharif') if 'sharif' in headers else (headers.index('otasining_ismi') if 'otasining_ismi' in headers else None))
             ph_idx = headers.index('phone_number') if 'phone_number' in headers else (headers.index('telefon') if 'telefon' in headers else (headers.index('phone') if 'phone' in headers else (3 if len(headers) >= 4 else 2)))
-            un_idx = headers.index('username') if 'username' in headers else (headers.index('login') if 'login' in headers else (0 if 'username' in headers else None))
+            un_idx = headers.index('username') if 'username' in headers else (headers.index('login') if 'login' in headers else None)
             pw_idx = headers.index('password') if 'password' in headers else (headers.index('parol') if 'parol' in headers else None)
 
             site_name = setting.site_name if setting and setting.site_name else "VLE Tizimi"
@@ -2769,6 +2800,7 @@ def import_students_csv(request):
 
                 first_name = row[fn_idx].strip() if fn_idx < len(row) else ''
                 last_name = row[ln_idx].strip() if ln_idx < len(row) else ''
+                middle_name = row[mn_idx].strip() if (mn_idx is not None and mn_idx < len(row)) else ''
                 phone_raw = row[ph_idx].strip() if ph_idx < len(row) else ''
 
                 if not (first_name or last_name) and not phone_raw:
@@ -2797,6 +2829,7 @@ def import_students_csv(request):
                     username=username,
                     first_name=first_name,
                     last_name=last_name,
+                    middle_name=middle_name,
                     phone_number=phone_raw or (f"+{phone_clean}" if phone_clean else ""),
                     role=role,
                     password=make_password(raw_password),
@@ -2817,7 +2850,7 @@ def import_students_csv(request):
                         sms_status = f"Xato: {sms_res.get('message')}"
 
                 imported_list.append({
-                    'name': f"{first_name} {last_name}".strip() or username,
+                    'name': user.get_full_name() or username,
                     'username': username,
                     'phone': phone_raw,
                     'password': raw_password,
@@ -4221,11 +4254,12 @@ def add_subadmin(request):
         password = request.POST.get('password', '').strip()
         first_name = request.POST.get('first_name', '').strip()
         last_name = request.POST.get('last_name', '').strip()
+        middle_name = request.POST.get('middle_name', '').strip()
         phone_number = request.POST.get('phone_number', '').strip()
         permissions = request.POST.getlist('permissions')
 
-        if not (username and password and first_name and last_name and phone_number):
-            messages.error(request, "Iltimos, barcha maydonlarni to'ldiring.")
+        if not (username and password and first_name and last_name and middle_name and phone_number):
+            messages.error(request, "Iltimos, barcha maydonlarni (Ism, Familiya, Sharif, Telefon) to'ldiring.")
             return redirect('admin_settings')
 
         if CustomUser.objects.filter(username=username).exists():
@@ -4250,11 +4284,12 @@ def add_subadmin(request):
                 password=make_password(password),
                 first_name=first_name,
                 last_name=last_name,
+                middle_name=middle_name,
                 phone_number=phone_number,
                 role='reception',
                 subadmin_permissions=permissions
             )
-            messages.success(request, f"Yangi sub-admin ({first_name} {last_name}) muvaffaqiyatli yaratildi.")
+            messages.success(request, f"Yangi sub-admin ({user.get_full_name()}) muvaffaqiyatli yaratildi.")
         except Exception as e:
             messages.error(request, f"Xatolik yuz berdi: {str(e)}")
 
@@ -4268,16 +4303,18 @@ def edit_subadmin(request, subadmin_id):
         password = request.POST.get('password', '').strip()
         first_name = request.POST.get('first_name', '').strip()
         last_name = request.POST.get('last_name', '').strip()
+        middle_name = request.POST.get('middle_name', '').strip()
         phone_number = request.POST.get('phone_number', '').strip()
         permissions = request.POST.getlist('permissions')
 
-        if not (first_name and last_name and phone_number):
-            messages.error(request, "Ism, Familiya va Telefon raqami majburiy.")
+        if not (first_name and last_name and middle_name and phone_number):
+            messages.error(request, "Familiya, Ism, Sharif va Telefon raqami majburiy.")
             return redirect('admin_settings')
 
         try:
             sub_admin.first_name = first_name
             sub_admin.last_name = last_name
+            sub_admin.middle_name = middle_name
             sub_admin.phone_number = phone_number
             sub_admin.subadmin_permissions = permissions
 
@@ -4285,7 +4322,7 @@ def edit_subadmin(request, subadmin_id):
                 sub_admin.password = make_password(password)
 
             sub_admin.save()
-            messages.success(request, f"Sub-admin ({first_name} {last_name}) ma'lumotlari muvaffaqiyatli yangilandi.")
+            messages.success(request, f"Sub-admin ({sub_admin.get_full_name()}) ma'lumotlari muvaffaqiyatli yangilandi.")
         except Exception as e:
             messages.error(request, f"Xatolik yuz berdi: {str(e)}")
 

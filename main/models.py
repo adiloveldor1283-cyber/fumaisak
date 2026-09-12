@@ -32,14 +32,29 @@ class CustomUser(AbstractUser):
     balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, verbose_name="Hamyon balansi")
 
     # Onboarding & Shaxsiy ma'lumotlar roziligi (O'RQ-547)
+    middle_name = models.CharField(max_length=150, blank=True, verbose_name="Sharifi / Otasining ismi", default='')
     is_profile_completed = models.BooleanField(default=False, verbose_name="Profil to'ldirilganmi", db_index=True)
     terms_accepted = models.BooleanField(default=False, verbose_name="Nizomga rozilik berilganmi", db_index=True)
     terms_accepted_at = models.DateTimeField(blank=True, null=True, verbose_name="Rozilik berilgan sana")
     terms_accepted_ip = models.CharField(max_length=50, blank=True, null=True, verbose_name="Rozilik berilgan IP")
 
+    def get_full_name(self):
+        """
+        Foydalanuvchining to'liq F.I.Sh (Familiya Ism Sharif) ni qaytaradi.
+        """
+        parts = [self.last_name, self.first_name, self.middle_name]
+        full_name = " ".join(part for part in parts if part).strip()
+        return full_name or self.username
+
+    def get_full_name_reverse(self):
+        """
+        Ism Familiya Sharif formatida qaytaradi.
+        """
+        parts = [self.first_name, self.last_name, self.middle_name]
+        return " ".join(part for part in parts if part).strip() or self.username
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.role})"
+        return f"{self.get_full_name()} ({self.role})"
 
 
 class Subject(models.Model):

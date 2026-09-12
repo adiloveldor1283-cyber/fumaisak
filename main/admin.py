@@ -20,13 +20,13 @@ class StudentGroupMembershipInline(TabularInline):
 class CustomUserAdmin(UserAdmin, ModelAdmin):
     model = CustomUser
     inlines = [StudentGroupMembershipInline]
-    list_display = ['username', 'first_name', 'last_name', 'role', 'balance', 'group_count', 'related_teachers_count', 'active_sessions_count']
+    list_display = ['username', 'last_name', 'first_name', 'middle_name', 'role', 'phone_number', 'balance', 'group_count', 'related_teachers_count', 'active_sessions_count']
     list_filter = ['role']
-    search_fields = ['first_name', 'last_name', 'username']
+    search_fields = ['first_name', 'last_name', 'middle_name', 'username', 'phone_number']
     readonly_fields = UserAdmin.readonly_fields + ('group_details',)
 
     fieldsets = UserAdmin.fieldsets + (
-        ('Qo‘shimcha Ma’lumotlar', {'fields': ('role', 'profile_image', 'balance', 'group_details')}),
+        ('Qo‘shimcha Ma’lumotlar', {'fields': ('middle_name', 'role', 'phone_number', 'profile_image', 'balance', 'group_details')}),
     )
 
     def get_queryset(self, request):

@@ -614,7 +614,7 @@
             <tbody>
                 {% for sub in sub_admins %}
                 <tr style="transition: 0.3s;" onmouseover="this.style.background='var(--table-row-hover)'" onmouseout="this.style.background='none'">
-                    <td data-label="F.I.SH." style="padding: 15px; font-weight: 700; color: var(--text-primary);">{{ sub.first_name }} {{ sub.last_name }}</td>
+                    <td data-label="F.I.SH." style="padding: 15px; font-weight: 700; color: var(--text-primary);">{{ sub.get_full_name }}</td>
                     <td data-label="Foydalanuvchi nomi" style="padding: 15px; color: var(--accent-primary);">@{{ sub.username }}</td>
                     <td data-label="Telefon raqami" style="padding: 15px; color: var(--text-secondary);">{{ sub.phone_number }}</td>
                     <td data-label="Biriktirilgan huquqlar" style="padding: 15px; max-width: 300px; word-wrap: break-word;">
@@ -639,7 +639,7 @@
                     </td>
                     <td data-label="Amallar" style="padding: 15px; text-align: right;">
                         <button style="background: none; border: 1px solid var(--border-input); color: var(--accent-primary); padding: 6px 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 12px; font-weight: 700; margin-right: 8px;" 
-                                onclick="openSubadminModal('edit', '{{ sub.id }}', '{{ sub.first_name|escapejs }}', '{{ sub.last_name|escapejs }}', '{{ sub.username|escapejs }}', '{{ sub.phone_number|escapejs }}', '{{ sub.subadmin_permissions|join:',' }}')"
+                                onclick="openSubadminModal('edit', '{{ sub.id }}', '{{ sub.first_name|escapejs }}', '{{ sub.last_name|escapejs }}', '{{ sub.middle_name|escapejs }}', '{{ sub.username|escapejs }}', '{{ sub.phone_number|escapejs }}', '{{ sub.subadmin_permissions|join:',' }}')"
                                 title="Tahrirlash">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -673,13 +673,18 @@
             {% csrf_token %}
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                 <div class="form-group">
-                    <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Ism:</label>
-                    <input type="text" name="first_name" id="modal-first-name" required style="width: 100%; padding: 10px 15px; border-radius: 10px; font-size: 13.5px;">
-                </div>
-                <div class="form-group">
-                    <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Familiya:</label>
+                    <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Familiya *:</label>
                     <input type="text" name="last_name" id="modal-last-name" required style="width: 100%; padding: 10px 15px; border-radius: 10px; font-size: 13.5px;">
                 </div>
+                <div class="form-group">
+                    <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Ism *:</label>
+                    <input type="text" name="first_name" id="modal-first-name" required style="width: 100%; padding: 10px 15px; border-radius: 10px; font-size: 13.5px;">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Sharifi (Otasining ismi) *:</label>
+                <input type="text" name="middle_name" id="modal-middle-name" placeholder="Masalan: Rustam o'g'li / Rustamovich" required style="width: 100%; padding: 10px 15px; border-radius: 10px; font-size: 13.5px;">
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
@@ -688,7 +693,7 @@
                     <input type="text" name="username" id="modal-username" style="width: 100%; padding: 10px 15px; border-radius: 10px; font-size: 13.5px;">
                 </div>
                 <div class="form-group">
-                    <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Telefon raqami:</label>
+                    <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Telefon raqami *:</label>
                     <input type="text" name="phone_number" id="modal-phone" required style="width: 100%; padding: 10px 15px; border-radius: 10px; font-size: 13.5px;">
                 </div>
             </div>
@@ -809,7 +814,7 @@
         }
     }
 
-    function openSubadminModal(mode, id, firstName, lastName, username, phone, permissionsStr) {
+    function openSubadminModal(mode, id, firstName, lastName, middleName, username, phone, permissionsStr) {
         const modal = document.getElementById('subadmin-modal');
         const form = document.getElementById('modal-form');
         const title = document.getElementById('modal-title');
@@ -831,6 +836,7 @@
             // Clear values
             document.getElementById('modal-first-name').value = '';
             document.getElementById('modal-last-name').value = '';
+            document.getElementById('modal-middle-name').value = '';
             document.getElementById('modal-username').value = '';
             document.getElementById('modal-phone').value = '';
             passwordInput.value = '';
@@ -843,9 +849,10 @@
             passwordHint.style.display = 'block';
 
             // Set values
-            document.getElementById('modal-first-name').value = firstName;
-            document.getElementById('modal-last-name').value = lastName;
-            document.getElementById('modal-phone').value = phone;
+            document.getElementById('modal-first-name').value = firstName || '';
+            document.getElementById('modal-last-name').value = lastName || '';
+            document.getElementById('modal-middle-name').value = middleName || '';
+            document.getElementById('modal-phone').value = phone || '';
             passwordInput.value = '';
 
             // Check permissions
