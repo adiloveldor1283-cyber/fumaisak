@@ -249,6 +249,14 @@ class SiteSetting(models.Model):
     sms_on_payment = models.BooleanField(default=True, verbose_name="To'lov qabul qilinganda SMS yuborish")
     sms_on_absence = models.BooleanField(default=True, verbose_name="Darsga kelmaganda SMS yuborish")
 
+    # Telegram Bot sozlamalari
+    telegram_bot_token = models.CharField(max_length=255, blank=True, null=True, verbose_name="Telegram Bot Token")
+    telegram_bot_username = models.CharField(max_length=100, blank=True, null=True, verbose_name="Telegram Bot Username")
+    telegram_enabled = models.BooleanField(default=True, verbose_name="Telegram Bot xizmati faolmi")
+    telegram_on_register = models.BooleanField(default=True, verbose_name="Ro'yxatdan o'tganda Telegram orqali login/parol yuborish")
+    telegram_on_payment = models.BooleanField(default=True, verbose_name="To'lov qabul qilinganda Telegram yuborish")
+    telegram_on_absence = models.BooleanField(default=True, verbose_name="Darsga kelmaganda Telegram yuborish")
+
     def __str__(self):
         return f"Sayt sozlamalari ({self.site_name})"
 

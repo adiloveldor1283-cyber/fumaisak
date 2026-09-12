@@ -78,11 +78,49 @@
         color: #00f2fe;
     }
 
+    .channel-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    .btn-channel-tab {
+        flex: 1;
+        padding: 10px 14px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.7);
+        border-radius: 10px;
+        font-size: 12.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn-channel-tab:hover {
+        background: rgba(255, 255, 255, 0.07);
+        color: white;
+    }
+    .btn-channel-tab.active-tg {
+        background: rgba(0, 136, 204, 0.18);
+        border-color: #0088cc;
+        color: #38bdf8;
+        box-shadow: 0 0 15px rgba(0, 136, 204, 0.25);
+    }
+    .btn-channel-tab.active-sms {
+        background: rgba(0, 242, 254, 0.15);
+        border-color: #00f2fe;
+        color: #00f2fe;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
+    }
+
     .btn-otp-action {
         padding: 0 18px;
-        background: rgba(0, 242, 254, 0.12);
-        border: 1px solid rgba(0, 242, 254, 0.3);
-        color: #00f2fe;
+        background: rgba(0, 136, 204, 0.15);
+        border: 1px solid rgba(0, 136, 204, 0.35);
+        color: #38bdf8;
         border-radius: 12px;
         font-weight: 700;
         font-size: 13px;
@@ -94,8 +132,8 @@
         gap: 6px;
     }
     .btn-otp-action:hover:not(:disabled) {
-        background: rgba(0, 242, 254, 0.25);
-        box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        background: rgba(0, 136, 204, 0.3);
+        box-shadow: 0 0 15px rgba(0, 136, 204, 0.35);
     }
     .btn-otp-action:disabled {
         opacity: 0.5;
@@ -241,17 +279,38 @@
     <form method="POST" enctype="multipart/form-data" id="add-teacher-form" onsubmit="return validateTeacherForm(event)">
         {% csrf_token %}
 
-        <div class="section-title">O'qituvchi ma'lumotlari</div>
+        <div class="section-title">O'qituvchi ma'lumotlari & Tasdiqlash</div>
 
         <div class="form-group">
+            <label style="margin-bottom: 8px;">Tasdiqlash usuli</label>
+            <div class="channel-tabs">
+                <button type="button" class="btn-channel-tab active-tg" id="tab-tg" onclick="setTeacherChannel('telegram')">
+                    <i class="fab fa-telegram-plane" style="font-size: 15px;"></i> Telegram Bot orqali (0 so'm / Bepul)
+                </button>
+                <button type="button" class="btn-channel-tab" id="tab-sms" onclick="setTeacherChannel('sms')">
+                    <i class="fas fa-sms" style="font-size: 15px;"></i> SMS orqali
+                </button>
+            </div>
+
+            <!-- Dynamic Guide Box -->
+            <div id="tg-guide-box" style="background: rgba(0, 136, 204, 0.06); border: 1px solid rgba(0, 136, 204, 0.25); border-radius: 12px; padding: 12px 16px; margin-bottom: 15px; font-size: 12.5px; color: rgba(255,255,255,0.85); line-height: 1.5; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <strong style="color: #38bdf8;"><i class="fab fa-telegram-plane"></i> Telegram orqali ro'yxatdan o'tkazish:</strong><br>
+                    O'qituvchi <strong style="color: white;">@{{ bot_username|default:'FumaIsakBot' }}</strong> botimizga kirib <strong>"📱 Telefon raqamimni ulashish"</strong> tugmasini bosadi va chiqqan 6 xonali kodni aytadi.
+                </div>
+                <a href="https://t.me/{{ bot_username|default:'FumaIsakBot' }}" target="_blank" style="padding: 6px 14px; background: #0088cc; color: white; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fab fa-telegram-plane"></i> Botni ochish
+                </a>
+            </div>
+
             <label for="phone_number">Telefon raqami *</label>
             <div style="display: flex; gap: 10px; align-items: stretch;">
                 <input type="text" class="form-control" id="phone_number" name="teacher_phone_number" placeholder="+998901234567" required style="flex: 1;">
                 <button type="button" id="btn-send-otp" class="btn-otp-action" onclick="sendTeacherPhoneOtp()">
-                    <i class="fas fa-sms"></i> <span id="btn-send-otp-text">SMS kod yuborish</span>
+                    <i class="fab fa-telegram-plane" id="btn-otp-icon"></i> <span id="btn-send-otp-text">Kodni tekshirish / olish</span>
                 </button>
             </div>
-            <div class="info" id="phone-hint"><i class="fas fa-info-circle"></i> O'qituvchiga login va xavfsiz parol SMS orqali yuboriladi.</div>
+            <div class="info" id="phone-hint"><i class="fas fa-info-circle"></i> O'qituvchi botga kontakt yuborganida kod avtomatik shakllanadi.</div>
 
             <!-- OTP Input Box (initially hidden) -->
             <div id="otp-verification-box" style="display: none; margin-top: 15px; background: rgba(0, 242, 254, 0.03); border: 1px dashed rgba(0, 242, 254, 0.25); border-radius: 14px; padding: 16px;">
@@ -273,7 +332,7 @@
             <!-- Verified Badge -->
             <div id="phone-verified-badge" style="display: none; margin-top: 12px; background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.3); border-radius: 10px; padding: 10px 14px; color: #00ffaa; font-size: 12.5px; font-weight: 700; align-items: center; gap: 8px;">
                 <i class="fas fa-check-circle" style="font-size: 16px;"></i> 
-                <span>Telefon raqami muvaffaqiyatli tasdiqlandi!</span>
+                <span id="verified-badge-text">Telefon raqami muvaffaqiyatli tasdiqlandi!</span>
             </div>
             <input type="hidden" name="otp_code" id="hidden_otp_code" value="">
         </div>
@@ -304,7 +363,7 @@
 
         <div class="tugmalar">
             <button type="submit" class="btn-submit" id="btn-submit-main">
-                <i class="fas fa-user-plus" style="margin-right: 6px;"></i> O'qituvchini ro'yxatga olish & SMS yuborish
+                <i class="fas fa-user-plus" style="margin-right: 6px;"></i> O'qituvchini ro'yxatga olish
             </button>
             <a href="{% url 'teachers_list_admin' %}" class="btn-cancel">Bekor qilish</a>
         </div>
@@ -316,6 +375,7 @@
 <script>
     let isTeacherPhoneVerified = false;
     let teacherCountdownInterval = null;
+    let currentTeacherChannel = 'telegram'; // 'telegram' or 'sms'
 
     function getCookie(name) {
         let cookieValue = null;
@@ -332,6 +392,32 @@
         return cookieValue;
     }
     const csrftoken = getCookie('csrftoken');
+
+    function setTeacherChannel(channel) {
+        currentTeacherChannel = channel;
+        const tabTg = document.getElementById('tab-tg');
+        const tabSms = document.getElementById('tab-sms');
+        const guideBox = document.getElementById('tg-guide-box');
+        const btnIcon = document.getElementById('btn-otp-icon');
+        const btnText = document.getElementById('btn-send-otp-text');
+        const phoneHint = document.getElementById('phone-hint');
+
+        if (channel === 'telegram') {
+            tabTg.className = 'btn-channel-tab active-tg';
+            tabSms.className = 'btn-channel-tab';
+            guideBox.style.display = 'flex';
+            btnIcon.className = 'fab fa-telegram-plane';
+            btnText.textContent = "Kodni tekshirish / olish";
+            phoneHint.innerHTML = '<i class="fas fa-info-circle"></i> O\'qituvchi botga kontakt yuborganida kod avtomatik shakllanadi.';
+        } else {
+            tabTg.className = 'btn-channel-tab';
+            tabSms.className = 'btn-channel-tab active-sms';
+            guideBox.style.display = 'none';
+            btnIcon.className = 'fas fa-sms';
+            btnText.textContent = "SMS kod yuborish";
+            phoneHint.innerHTML = '<i class="fas fa-info-circle"></i> O\'qituvchiga 6 xonali tasdiqlash kodi SMS orqali yuboriladi.';
+        }
+    }
 
     function showTeacherOtpAlert(msg, isSuccess) {
         const box = document.getElementById('otp-alert-msg');
@@ -356,9 +442,9 @@
                 clearInterval(teacherCountdownInterval);
                 timerEl.textContent = '';
                 btnSend.disabled = false;
-                btnText.textContent = "Qayta kod yuborish";
+                btnText.textContent = currentTeacherChannel === 'telegram' ? "Kodni qayta tekshirish" : "Qayta kod yuborish";
             } else {
-                timerEl.textContent = `Qayta yuborish: ${remaining}s`;
+                timerEl.textContent = `Qayta so'rash: ${remaining}s`;
                 btnText.textContent = `${remaining}s`;
             }
         }, 1000);
@@ -377,7 +463,7 @@
         const btnSend = document.getElementById('btn-send-otp');
         const btnText = document.getElementById('btn-send-otp-text');
         btnSend.disabled = true;
-        btnText.textContent = "Yuborilmoqda...";
+        btnText.textContent = "Tekshirilmoqda...";
 
         try {
             const response = await fetch("{% url 'send_phone_verification_otp_ajax' %}", {
@@ -386,7 +472,7 @@
                     'Content-Type': 'application/json',
                     'X-CSRFToken': csrftoken
                 },
-                body: JSON.stringify({ phone_number: phone })
+                body: JSON.stringify({ phone_number: phone, channel: currentTeacherChannel })
             });
 
             const data = await response.json();
@@ -402,12 +488,12 @@
                 }
             } else {
                 btnSend.disabled = false;
-                btnText.textContent = "SMS kod yuborish";
+                btnText.textContent = currentTeacherChannel === 'telegram' ? "Kodni tekshirish / olish" : "SMS kod yuborish";
                 alert(data.message || "Xatolik yuz berdi. Qayta urinib ko'ring.");
             }
         } catch (err) {
             btnSend.disabled = false;
-            btnText.textContent = "SMS kod yuborish";
+            btnText.textContent = currentTeacherChannel === 'telegram' ? "Kodni tekshirish / olish" : "SMS kod yuborish";
             alert("Serverga ulanishda xatolik: " + err);
         }
     }
@@ -446,6 +532,7 @@
                 document.getElementById('hidden_otp_code').value = otp;
                 document.getElementById('otp-verification-box').style.display = 'none';
                 document.getElementById('phone-verified-badge').style.display = 'flex';
+                document.getElementById('verified-badge-text').textContent = data.message;
                 document.getElementById('phone_number').readOnly = true;
                 document.getElementById('btn-send-otp').style.display = 'none';
                 if (teacherCountdownInterval) clearInterval(teacherCountdownInterval);
@@ -469,7 +556,7 @@
                     return true;
                 }
             }
-            if (!confirm("Telefon raqami SMS orqali hali tasdiqlanmadi. Baribir saqlashni davom ettirmoqchimisiz?")) {
+            if (!confirm("Telefon raqami hali tasdiqlanmadi. Baribir saqlashni davom ettirmoqchimisiz?")) {
                 e.preventDefault();
                 return false;
             }

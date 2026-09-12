@@ -509,6 +509,16 @@ def add_student(request):
         # Auto-generate secure strong password
         raw_password = generate_random_password(8)
 
+        # Check if telegram_chat_id is available in session or cache
+        from django.core.cache import cache
+        tg_chat_id = request.session.get(f'tg_chat_id_{phone_clean}')
+        if not tg_chat_id:
+            tg_reg = cache.get(f"tg_reg_otp_{phone_clean}")
+            if tg_reg and isinstance(tg_reg, dict):
+                tg_chat_id = tg_reg.get('chat_id')
+        if not tg_chat_id:
+            tg_chat_id = cache.get(f"tg_chat_by_phone_{phone_clean}")
+
         # System creates account with empty names; student fills them during onboarding (O'RQ-547)
         user = CustomUser.objects.create(
             username=username,
@@ -518,6 +528,7 @@ def add_student(request):
             password=make_password(raw_password),
             role=role,
             is_active=is_active,
+            telegram_chat_id=str(tg_chat_id) if tg_chat_id else None,
             is_profile_completed=False,
             terms_accepted=False
         )
@@ -533,29 +544,45 @@ def add_student(request):
             except (Group.DoesNotExist, ValueError):
                 pass
 
-        # Send credentials via SMS
+        # Send credentials via Telegram or SMS
         site_setting = SiteSetting.objects.first()
         site_name = site_setting.site_name if site_setting and site_setting.site_name else "VLE Tizimi"
-        site_url = request.build_absolute_uri('/')
-        greeting = f"Assalomu alaykum, {first_name}!" if first_name else "Assalomu alaykum!"
-        sms_text = f"{greeting} {site_name} tizimidagi profilingiz yaratildi.\nLogin: {username}\nParol: {raw_password}\nKirish: {site_url}"
-        sms_res = send_sms(phone_clean, sms_text, check_enabled=True)
+        login_url = request.build_absolute_uri(reverse('login'))
+        sent_via_tg = False
 
-        # Clear OTP from session
+        if user.telegram_chat_id:
+            from main.telegram_service import send_telegram_registration_credentials
+            sent_via_tg = send_telegram_registration_credentials(
+                chat_id=user.telegram_chat_id,
+                username=username,
+                password=raw_password,
+                login_url=login_url
+            )
+
+        # Clear OTP and TG cache from session
         request.session.pop(f'phone_otp_{phone_clean}', None)
         request.session.pop(f'sms_verified_{phone_clean}', None)
+        request.session.pop(f'tg_chat_id_{phone_clean}', None)
+        cache.delete(f"tg_reg_otp_{phone_clean}")
 
         display_name = f"{user.first_name} {user.last_name}".strip() or user.phone_number
         log_action(request.user, "Talaba Qo'shildi", f"Yangi talaba qo'shildi: {user.phone_number} ({display_name})", request)
         
-        if sms_res.get('success'):
-            messages.success(request, f"O'quvchi muvaffaqiyatli qo'shildi! Kirish ma'lumotlari {phone_clean} raqamiga SMS orqali yuborildi.", extra_tags='edit_user')
+        if sent_via_tg:
+            messages.success(request, f"O'quvchi muvaffaqiyatli qo'shildi! Kirish ma'lumotlari Telegram bot orqali yuborildi.", extra_tags='edit_user')
         else:
-            messages.success(request, f"O'quvchi muvaffaqiyatli qo'shildi! Kirish ma'lumotlari SMS orqali yuborildi.", extra_tags='edit_user')
+            sms_text = f"Assalomu alaykum! {site_name} tizimidagi profilingiz yaratildi.\nLogin: {username}\nParol: {raw_password}\nKirish: {login_url}"
+            sms_res = send_sms(phone_clean, sms_text, check_enabled=True)
+            if sms_res.get('success'):
+                messages.success(request, f"O'quvchi muvaffaqiyatli qo'shildi! Kirish ma'lumotlari {phone_clean} raqamiga SMS orqali yuborildi.", extra_tags='edit_user')
+            else:
+                messages.success(request, f"O'quvchi muvaffaqiyatli qo'shildi! Kirish ma'lumotlari tayyorlandi.", extra_tags='edit_user')
         return redirect('students_list_admin')
 
+    from main.telegram_service import get_bot_username
     return render(request, 'add-student.html', {
-        'groups': groups
+        'groups': groups,
+        'bot_username': get_bot_username()
     })
 
 
@@ -754,6 +781,16 @@ def add_teacher(request):
         # Auto-generate secure strong password
         raw_password = generate_random_password(8)
 
+        # Check if telegram_chat_id is available in session or cache
+        from django.core.cache import cache
+        tg_chat_id = request.session.get(f'tg_chat_id_{phone_clean}')
+        if not tg_chat_id:
+            tg_reg = cache.get(f"tg_reg_otp_{phone_clean}")
+            if tg_reg and isinstance(tg_reg, dict):
+                tg_chat_id = tg_reg.get('chat_id')
+        if not tg_chat_id:
+            tg_chat_id = cache.get(f"tg_chat_by_phone_{phone_clean}")
+
         # System creates teacher account with empty names; teacher fills them during onboarding (O'RQ-547)
         new_teacher = CustomUser.objects.create(
             username=username,
@@ -764,6 +801,7 @@ def add_teacher(request):
             role=role,
             is_active=is_active,
             profile_image=profile_image,
+            telegram_chat_id=str(tg_chat_id) if tg_chat_id else None,
             is_profile_completed=False,
             terms_accepted=False
         )
@@ -773,28 +811,46 @@ def add_teacher(request):
         if selected_subjects:
             new_teacher.subjects.set(selected_subjects)
 
-        # Send credentials via SMS
+        # Send credentials via Telegram or SMS
         site_setting = SiteSetting.objects.first()
         site_name = site_setting.site_name if site_setting and site_setting.site_name else "VLE Tizimi"
-        site_url = request.build_absolute_uri('/')
-        greeting = f"Assalomu alaykum, {first_name}!" if first_name else "Assalomu alaykum!"
-        sms_text = f"{greeting} {site_name} tizimidagi o'qituvchi profilingiz yaratildi.\nLogin: {username}\nParol: {raw_password}\nKirish: {site_url}"
-        sms_res = send_sms(phone_clean, sms_text, check_enabled=True)
+        login_url = request.build_absolute_uri(reverse('login'))
+        sent_via_tg = False
 
-        # Clear OTP from session
+        if new_teacher.telegram_chat_id:
+            from main.telegram_service import send_telegram_registration_credentials
+            sent_via_tg = send_telegram_registration_credentials(
+                chat_id=new_teacher.telegram_chat_id,
+                username=username,
+                password=raw_password,
+                login_url=login_url
+            )
+
+        # Clear OTP and TG cache from session
         request.session.pop(f'phone_otp_{phone_clean}', None)
         request.session.pop(f'sms_verified_{phone_clean}', None)
+        request.session.pop(f'tg_chat_id_{phone_clean}', None)
+        cache.delete(f"tg_reg_otp_{phone_clean}")
 
         display_name = f"{new_teacher.first_name} {new_teacher.last_name}".strip() or new_teacher.phone_number
         log_action(request.user, "O'qituvchi Qo'shildi", f"Yangi o'qituvchi qo'shildi: {new_teacher.phone_number} ({display_name})", request)
         
-        if sms_res.get('success'):
-            messages.success(request, f"O'qituvchi muvaffaqiyatli qo‘shildi! Kirish ma'lumotlari {phone_clean} raqamiga SMS orqali yuborildi.", extra_tags='teacher_list')
+        if sent_via_tg:
+            messages.success(request, f"O'qituvchi muvaffaqiyatli qo‘shildi! Kirish ma'lumotlari Telegram bot orqali yuborildi.", extra_tags='teacher_list')
         else:
-            messages.success(request, f"O'qituvchi muvaffaqiyatli qo‘shildi! Kirish ma'lumotlari SMS orqali yuborildi.", extra_tags='teacher_list')
+            sms_text = f"Assalomu alaykum! {site_name} tizimidagi o'qituvchi profilingiz yaratildi.\nLogin: {username}\nParol: {raw_password}\nKirish: {login_url}"
+            sms_res = send_sms(phone_clean, sms_text, check_enabled=True)
+            if sms_res.get('success'):
+                messages.success(request, f"O'qituvchi muvaffaqiyatli qo‘shildi! Kirish ma'lumotlari {phone_clean} raqamiga SMS orqali yuborildi.", extra_tags='teacher_list')
+            else:
+                messages.success(request, f"O'qituvchi muvaffaqiyatli qo‘shildi! Kirish ma'lumotlari tayyorlandi.", extra_tags='teacher_list')
         return redirect('teachers_list_admin')
 
-    return render(request, 'add-teacher.html', {'all_subjects': all_subjects})
+    from main.telegram_service import get_bot_username
+    return render(request, 'add-teacher.html', {
+        'all_subjects': all_subjects,
+        'bot_username': get_bot_username()
+    })
 
 
 def admin_password(request):
@@ -4126,6 +4182,27 @@ def admin_settings_view(request):
             cache.delete("eskiz_api_bearer_token")
             messages.success(request, "Eskiz.uz SMS sozlamalari muvaffaqiyatli saqlandi.")
 
+        # Telegram Bot Settings Form handling
+        if 'telegram_settings_form' in request.POST or 'telegram_bot_token' in request.POST:
+            if not setting:
+                setting = SiteSetting.objects.create()
+
+            tg_token = request.POST.get('telegram_bot_token')
+            if tg_token is not None:
+                setting.telegram_bot_token = tg_token.strip()
+
+            tg_username = request.POST.get('telegram_bot_username')
+            if tg_username is not None:
+                setting.telegram_bot_username = tg_username.strip().replace('@', '')
+
+            setting.telegram_enabled = request.POST.get('telegram_enabled') == 'on'
+            setting.telegram_on_register = request.POST.get('telegram_on_register') == 'on'
+            setting.telegram_on_payment = request.POST.get('telegram_on_payment') == 'on'
+            setting.telegram_on_absence = request.POST.get('telegram_on_absence') == 'on'
+            setting.save()
+
+            messages.success(request, "Telegram Bot sozlamalari muvaffaqiyatli saqlandi.")
+
         from django.core.cache import cache
         cache.delete('site_global_images')
         return redirect('admin_settings')
@@ -6826,10 +6903,12 @@ def admin_unlock_page(request, page_id):
 @login_required
 def send_phone_verification_otp_ajax(request):
     """
-    Telefon raqamiga 6 xonali tasdiqlash kodini SMS orqali yuboradi va sessiyada saqlaydi.
+    Telefon raqamiga 6 xonali tasdiqlash kodini SMS yoki Telegram orqali yuboradi va sessiyada saqlaydi.
     """
     import json
     import time
+    from django.core.cache import cache
+    from main.telegram_service import get_bot_username, send_telegram_message
 
     if request.method != 'POST':
         return JsonResponse({'success': False, 'message': "Faqat POST so'rov qabul qilinadi."})
@@ -6837,14 +6916,16 @@ def send_phone_verification_otp_ajax(request):
     try:
         data = json.loads(request.body.decode('utf-8')) if request.content_type == 'application/json' else request.POST
         phone = data.get('phone_number', '').strip()
+        channel = data.get('channel', 'sms').strip().lower()
     except Exception:
         phone = request.POST.get('phone_number', '').strip()
+        channel = request.POST.get('channel', 'sms').strip().lower()
 
     phone_clean = clean_phone_number(phone)
     if not phone_clean or len(phone_clean) != 12:
         return JsonResponse({'success': False, 'message': "Iltimos, to'g'ri telefon raqam kiriting (masalan: +998901234567)."})
 
-    # Dublikat tekshiruvi: Agar foydalanuvchi allaqachon mavjud bo'lsa, ortiqcha SMS yuborilmaydi
+    # Dublikat tekshiruvi: Agar foydalanuvchi allaqachon mavjud bo'lsa, ortiqcha kod yuborilmaydi
     existing_user = CustomUser.objects.filter(
         Q(phone_number=phone) |
         Q(phone_number=f"+{phone_clean}") |
@@ -6863,7 +6944,83 @@ def send_phone_verification_otp_ajax(request):
     last_sent_key = f'phone_otp_sent_time_{phone_clean}'
     last_sent_time = request.session.get(last_sent_key, 0)
     current_time = time.time()
+    bot_username = get_bot_username()
+    is_staff = request.user.is_superuser or getattr(request.user, 'role', '') in ['admin', 'reception']
 
+    # --- TELEGRAM KANAL ORQALI TASDIQLASH ---
+    if channel == 'telegram':
+        tg_reg = cache.get(f"tg_reg_otp_{phone_clean}")
+        tg_chat_id = cache.get(f"tg_chat_by_phone_{phone_clean}")
+
+        if tg_reg and isinstance(tg_reg, dict):
+            otp_code = tg_reg.get('otp')
+            chat_id = tg_reg.get('chat_id')
+            request.session[otp_session_key] = {
+                'otp': otp_code,
+                'expires_at': time.time() + 600,
+                'verified': False,
+                'channel': 'telegram',
+                'chat_id': chat_id
+            }
+            if chat_id:
+                request.session[f'tg_chat_id_{phone_clean}'] = str(chat_id)
+            request.session[last_sent_key] = current_time
+            request.session.modified = True
+
+            return JsonResponse({
+                'success': True,
+                'channel': 'telegram',
+                'message': f"O'quvchining Telegram botiga tasdiqlash kodi chiqarilgan ({otp_code}). O'quvchidan kodni so'rab kiriting.",
+                'bot_username': bot_username,
+                'debug_code': otp_code if is_staff else None
+            })
+        elif tg_chat_id:
+            otp_code = generate_otp_code()
+            cache.set(f"tg_reg_otp_{phone_clean}", {
+                'otp': otp_code,
+                'chat_id': str(tg_chat_id),
+                'phone_clean': phone_clean,
+                'created_at': current_time,
+                'expires_at': current_time + 600
+            }, timeout=600)
+
+            request.session[otp_session_key] = {
+                'otp': otp_code,
+                'expires_at': current_time + 600,
+                'verified': False,
+                'channel': 'telegram',
+                'chat_id': str(tg_chat_id)
+            }
+            request.session[f'tg_chat_id_{phone_clean}'] = str(tg_chat_id)
+            request.session[last_sent_key] = current_time
+            request.session.modified = True
+
+            tg_text = (
+                f"✅ <b>Telefon raqamingiz:</b> +{phone_clean}\n\n"
+                f"🔢 <b>Ro'yxatdan o'tish kodingiz:</b> <code>{otp_code}</code>\n"
+                f"⏳ <i>Amal qilish muddati: 10 daqiqa</i>\n\n"
+                f"Ushbu kodni markaz administratoriga ayting."
+            )
+            send_telegram_message(str(tg_chat_id), tg_text)
+
+            return JsonResponse({
+                'success': True,
+                'channel': 'telegram',
+                'message': f"O'quvchining Telegram botiga 6 xonali tasdiqlash kodi yuborildi.",
+                'bot_username': bot_username,
+                'debug_code': otp_code if is_staff else None
+            })
+        else:
+            return JsonResponse({
+                'success': False,
+                'needs_contact': True,
+                'channel': 'telegram',
+                'bot_username': bot_username,
+                'bot_url': f"https://t.me/{bot_username}",
+                'message': f"O'quvchi avval markazimizning Telegram boti (@{bot_username})ga kirib '📱 Telefon raqamni ulashish' tugmasini bosishi kerak."
+            })
+
+    # --- ODATIY SMS KANAL ORQALI TASDIQLASH ---
     if current_time - last_sent_time < 30:
         remaining = int(30 - (current_time - last_sent_time))
         return JsonResponse({'success': False, 'message': f"Iltimos, {remaining} soniya kuting va qayta urinib ko'ring."})
@@ -6872,7 +7029,8 @@ def send_phone_verification_otp_ajax(request):
     request.session[otp_session_key] = {
         'otp': otp_code,
         'expires_at': current_time + 600,
-        'verified': False
+        'verified': False,
+        'channel': 'sms'
     }
     request.session[last_sent_key] = current_time
     request.session.modified = True
@@ -6880,16 +7038,16 @@ def send_phone_verification_otp_ajax(request):
     sms_text = f"VLE Tizimi: Telefon raqamingizni tasdiqlash kodi: {otp_code}. Hech kimga bermang!"
     send_res = send_sms(phone_clean, sms_text, check_enabled=False)
 
-    is_staff = request.user.is_superuser or getattr(request.user, 'role', '') in ['admin', 'reception']
-
     if send_res['success']:
         return JsonResponse({
             'success': True,
-            'message': f"+{phone_clean} raqamiga 6 xonali tasdiqlash kodi yuborildi."
+            'channel': 'sms',
+            'message': f"+{phone_clean} raqamiga 6 xonali tasdiqlash kodi SMS orqali yuborildi."
         })
     else:
         return JsonResponse({
             'success': True if is_staff else False,
+            'channel': 'sms',
             'message': f"Tasdiqlash kodi tayyorlandi. {send_res.get('message')}",
             'debug_code': otp_code if is_staff else None,
             'sms_error': send_res.get('message')
@@ -6899,10 +7057,11 @@ def send_phone_verification_otp_ajax(request):
 @login_required
 def verify_phone_otp_ajax(request):
     """
-    Telefon raqami va kiritilgan 6 xonali OTP kodni tekshiradi.
+    Telefon raqami va kiritilgan 6 xonali OTP kodni tekshiradi (SMS yoki Telegram kesh).
     """
     import json
     import time
+    from django.core.cache import cache
 
     if request.method != 'POST':
         return JsonResponse({'success': False, 'message': "Faqat POST so'rov qabul qilinadi."})
@@ -6924,21 +7083,41 @@ def verify_phone_otp_ajax(request):
 
     otp_session_key = f'phone_otp_{phone_clean}'
     stored_data = request.session.get(otp_session_key)
+    tg_reg = cache.get(f"tg_reg_otp_{phone_clean}")
 
-    if not stored_data or not isinstance(stored_data, dict):
-        return JsonResponse({'success': False, 'message': "Tasdiqlash kodi yuborilmagan yoki muddati tugagan. Qaytadan kod so'rang."})
+    verified = False
+    chat_id = None
 
-    if time.time() > stored_data.get('expires_at', 0):
-        return JsonResponse({'success': False, 'message': "Tasdiqlash kodi muddati o'tgan. Qaytadan kod so'rang."})
+    # Check session OTP
+    if stored_data and isinstance(stored_data, dict):
+        if time.time() <= stored_data.get('expires_at', 0) and str(stored_data.get('otp')) == str(otp):
+            verified = True
+            chat_id = stored_data.get('chat_id')
 
-    if str(stored_data.get('otp')) == str(otp):
-        stored_data['verified'] = True
-        request.session[otp_session_key] = stored_data
+    # Check Telegram cache OTP
+    if not verified and tg_reg and isinstance(tg_reg, dict):
+        if time.time() <= tg_reg.get('expires_at', 0) and str(tg_reg.get('otp')) == str(otp):
+            verified = True
+            chat_id = tg_reg.get('chat_id')
+
+    if verified:
+        request.session[otp_session_key] = {
+            'otp': otp,
+            'verified': True,
+            'expires_at': time.time() + 600,
+            'chat_id': chat_id
+        }
         request.session[f'sms_verified_{phone_clean}'] = True
+        if chat_id:
+            request.session[f'tg_chat_id_{phone_clean}'] = str(chat_id)
         request.session.modified = True
-        return JsonResponse({'success': True, 'message': "Telefon raqami muvaffaqiyatli tasdiqlandi!"})
+        return JsonResponse({
+            'success': True,
+            'message': "Telefon raqami muvaffaqiyatli tasdiqlandi!" + (" (Telegram bot bog'landi ✅)" if chat_id else ""),
+            'telegram_linked': bool(chat_id)
+        })
     else:
-        return JsonResponse({'success': False, 'message': "Noto'g'ri tasdiqlash kodi kiritildi. Qaytadan tekshiring."})
+        return JsonResponse({'success': False, 'message': "Noto'g'ri yoki muddati o'tgan tasdiqlash kodi kiritildi. Qaytadan tekshiring."})
 
 
 @admin_required
