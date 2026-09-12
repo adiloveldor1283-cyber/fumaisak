@@ -610,13 +610,10 @@
 
             if (data.success) {
                 document.getElementById('otp-verification-box').style.display = 'block';
+                document.getElementById('otp-input').value = '';
+                document.getElementById('otp-input').focus();
                 startTeacherCountdown(60);
                 showTeacherOtpAlert(data.message, true);
-
-                if (data.debug_code) {
-                    showTeacherOtpAlert(`${data.message} (Sinov kodi: ${data.debug_code})`, true);
-                    document.getElementById('otp-input').value = data.debug_code;
-                }
             } else {
                 btnSend.disabled = false;
                 btnText.textContent = currentTeacherChannel === 'telegram' ? "Kodni yuborish" : "SMS kod yuborish";
@@ -655,8 +652,6 @@
             });
 
             const data = await response.json();
-            btnVerify.disabled = false;
-            btnVerify.innerHTML = '<i class="fas fa-check-circle"></i> Tasdiqlash';
 
             if (data.success) {
                 isTeacherPhoneVerified = true;
@@ -668,7 +663,10 @@
                 document.getElementById('btn-send-otp').style.display = 'none';
                 if (teacherCountdownInterval) clearInterval(teacherCountdownInterval);
             } else {
-                showTeacherOtpAlert(data.message || "Kod noto'g'ri.", false);
+                btnVerify.disabled = false;
+                btnVerify.innerHTML = '<i class="fas fa-check-circle"></i> Tasdiqlash';
+                showTeacherOtpAlert(data.message || "Kod noto'g'ri yoki muddati o'tgan.", false);
+                otpInput.focus();
             }
         } catch (err) {
             btnVerify.disabled = false;
@@ -679,18 +677,9 @@
 
     function validateTeacherForm(e) {
         if (!isTeacherPhoneVerified) {
-            const otpBox = document.getElementById('otp-verification-box');
-            if (otpBox.style.display === 'block') {
-                const otpVal = document.getElementById('otp-input').value.trim();
-                if (otpVal.length >= 4) {
-                    document.getElementById('hidden_otp_code').value = otpVal;
-                    return true;
-                }
-            }
-            if (!confirm("Telefon raqami hali tasdiqlanmadi. Baribir saqlashni davom ettirmoqchimisiz?")) {
-                e.preventDefault();
-                return false;
-            }
+            alert("Iltimos, avval telefon raqamiga yuborilgan tasdiqlash kodini kiriting va 'Tasdiqlash' tugmasini bosing.");
+            e.preventDefault();
+            return false;
         }
         return true;
     }

@@ -295,7 +295,13 @@
                             <span style="color: rgba(255,255,255,0.25); font-size: 12px; font-weight: 500;">Bog'lanmagan</span>
                         {% endif %}
                     </td>
-                    <td data-label="AMALLAR" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><a href="{% url 'edit_student' student.id %}" class="btn-otish" style="display: inline-block; padding: 10px 20px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 700; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-edit" style="margin-right: 5px;"></i> Tahrirlash</a></td>
+                    <td data-label="AMALLAR" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                        {% if student.is_profile_completed %}
+                            <a href="{% url 'edit_student' student.id %}" class="btn-otish" style="display: inline-block; padding: 10px 20px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 700; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-edit" style="margin-right: 5px;"></i> Tahrirlash</a>
+                        {% else %}
+                            <span class="btn-otish" style="display: inline-block; padding: 10px 16px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.4); border-radius: 10px; font-size: 12px; font-weight: 600; text-align: center; cursor: not-allowed;" title="Foydalanuvchi hali tizimga kirmagan va profilini to'ldirmagan (Onboarding kutilmoqda)"><i class="fas fa-lock" style="margin-right: 5px; color: #ffaa00;"></i> Kutilmoqda</span>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

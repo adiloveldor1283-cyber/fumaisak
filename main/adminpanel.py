@@ -589,6 +589,10 @@ def add_student(request):
 def edit_student(request, student_id):
 
     student = get_object_or_404(CustomUser, id=student_id)
+    if not student.is_profile_completed:
+        messages.warning(request, "Ushbu o'quvchi hali tizimga kirib o'z shaxsiy ma'lumotlarini to'ldirmagan (Onboarding kutilmoqda). Uni hozircha tahrirlab bo'lmaydi.", extra_tags='edit_user')
+        return redirect('students_list_admin')
+
     if request.method == 'POST':
         username = request.POST.get('username')
         if username:
@@ -668,6 +672,10 @@ def teachers_list_admin(request):
 def edit_teacher(request, teacher_id):
 
     teacher = get_object_or_404(CustomUser, id=teacher_id)
+    if not teacher.is_profile_completed:
+        messages.warning(request, "Ushbu o'qituvchi hali tizimga kirib o'z shaxsiy ma'lumotlarini to'ldirmagan (Onboarding kutilmoqda). Uni hozircha tahrirlab bo'lmaydi.", extra_tags='teacher_list')
+        return redirect('teachers_list_admin')
+
     all_subjects = Subject.objects.all().order_by('name')
 
     if request.method == 'POST':
@@ -6984,6 +6992,13 @@ def send_phone_verification_otp_ajax(request):
     bot_username = get_bot_username()
     is_staff = request.user.is_superuser or getattr(request.user, 'role', '') in ['admin', 'reception']
 
+    # Har yangi kod so'ralganda oldingi tasdiqlangan holat va sessiyalarni tozalash (qayta-qayta tasdiqlanib ketishni oldini olish)
+    request.session.pop(f'sms_verified_{phone_clean}', None)
+    request.session.pop(f'tg_chat_id_{phone_clean}', None)
+    request.session.pop(otp_session_key, None)
+    cache.delete(f"tg_reg_otp_{phone_clean}")
+    request.session.modified = True
+
     # --- TELEGRAM KANAL ORQALI TASDIQLASH ---
     if channel == 'telegram':
         tg_chat_id = cache.get(f"tg_chat_by_phone_{phone_clean}")
@@ -7030,8 +7045,7 @@ def send_phone_verification_otp_ajax(request):
             'success': True,
             'channel': 'telegram',
             'message': f"Foydalanuvchining Telegram botiga 6 xonali tasdiqlash kodi yuborildi.",
-            'bot_username': bot_username,
-            'debug_code': otp_code if is_staff else None
+            'bot_username': bot_username
         })
 
     # --- ODATIY SMS KANAL ORQALI TASDIQLASH ---
@@ -7063,7 +7077,6 @@ def send_phone_verification_otp_ajax(request):
             'success': True if is_staff else False,
             'channel': 'sms',
             'message': f"Tasdiqlash kodi tayyorlandi. {send_res.get('message')}",
-            'debug_code': otp_code if is_staff else None,
             'sms_error': send_res.get('message')
         })
 
@@ -7092,8 +7105,8 @@ def verify_phone_otp_ajax(request):
     if not phone_clean:
         return JsonResponse({'success': False, 'message': "Telefon raqami kiritilmagan."})
 
-    if not otp:
-        return JsonResponse({'success': False, 'message': "Tasdiqlash kodi kiritilmagan."})
+    if not otp or len(otp) < 4:
+        return JsonResponse({'success': False, 'message': "Tasdiqlash kodi to'liq kiritilmagan."})
 
     otp_session_key = f'phone_otp_{phone_clean}'
     stored_data = request.session.get(otp_session_key)
@@ -7128,12 +7141,16 @@ def verify_phone_otp_ajax(request):
         if chat_id:
             request.session[f'tg_chat_id_{phone_clean}'] = str(chat_id)
         request.session.modified = True
+        # Bir marta tasdiqlangan kod keshdan o'chiriladi, qayta ishlatilmasligi uchun
+        cache.delete(f"tg_reg_otp_{phone_clean}")
         return JsonResponse({
             'success': True,
             'message': "Telefon raqami muvaffaqiyatli tasdiqlandi!" + (" (Telegram bot bog'landi ✅)" if chat_id else ""),
             'telegram_linked': bool(chat_id)
         })
     else:
+        request.session.pop(f'sms_verified_{phone_clean}', None)
+        request.session.modified = True
         return JsonResponse({'success': False, 'message': "Noto'g'ri yoki muddati o'tgan tasdiqlash kodi kiritildi. Qaytadan tekshiring."})
 
 

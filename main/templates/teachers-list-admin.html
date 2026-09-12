@@ -309,7 +309,13 @@
                             <span style="color: rgba(255,255,255,0.25); font-size: 12px; font-weight: 500;">Bog'lanmagan</span>
                         {% endif %}
                     </td>
-                    <td data-label="AMALLAR" style="padding: 12px 10px; font-size: 13px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); text-align: center; white-space: nowrap;"><a href="{% url 'edit_teacher' teacher.id %}" class="btn-otish" style="display: inline-block; padding: 6px 14px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 12px; font-weight: 700; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-edit" style="margin-right: 4px;"></i> Tahrirlash</a></td>
+                    <td data-label="AMALLAR" style="padding: 12px 10px; font-size: 13px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); text-align: center; white-space: nowrap;">
+                        {% if teacher.is_profile_completed %}
+                            <a href="{% url 'edit_teacher' teacher.id %}" class="btn-otish" style="display: inline-block; padding: 6px 14px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 12px; font-weight: 700; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-edit" style="margin-right: 4px;"></i> Tahrirlash</a>
+                        {% else %}
+                            <span class="btn-otish" style="display: inline-block; padding: 6px 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.4); border-radius: 8px; font-size: 11.5px; font-weight: 600; text-align: center; cursor: not-allowed;" title="Foydalanuvchi hali tizimga kirmagan va profilini to'ldirmagan (Onboarding kutilmoqda)"><i class="fas fa-lock" style="margin-right: 4px; color: #ffaa00;"></i> Kutilmoqda</span>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
