@@ -617,38 +617,66 @@
     let scrollRenderedPages = new Set();
     let scrollObserver = null;
 
-    const readerModal = document.getElementById('book-reader-modal');
-    const modalTitle = document.getElementById('reader-modal-title');
-    const modalSubject = document.getElementById('reader-modal-subject');
-    const modalDownloadBtn = document.getElementById('btn-reader-download');
-    const flipbookViewport = document.getElementById('flipbook-viewport');
-    const flipbookContainer = document.getElementById('flipbook-container');
-    const stage3D = document.getElementById('stage-3d');
-    const stageScroll = document.getElementById('stage-scroll');
-    const modalPrevBtn = document.getElementById('modal-prev-btn');
-    const modalNextBtn = document.getElementById('modal-next-btn');
-    const modalPageInput = document.getElementById('modal-page-input');
-    const modalTotalPagesSpan = document.getElementById('modal-total-pages');
-    const btnMode3D = document.getElementById('btn-mode-3d');
-    const btnModeScroll = document.getElementById('btn-mode-scroll');
-    const btnZoomIn = document.getElementById('btn-reader-zoom-in');
-    const btnZoomOut = document.getElementById('btn-reader-zoom-out');
-    const btnTheme = document.getElementById('btn-reader-theme');
-    const btnFullscreen = document.getElementById('btn-reader-fullscreen');
-    const readerFooter = document.getElementById('reader-footer');
+    let readerModal = document.getElementById('book-reader-modal');
+    let modalTitle = document.getElementById('reader-modal-title');
+    let modalSubject = document.getElementById('reader-modal-subject');
+    let modalDownloadBtn = document.getElementById('btn-reader-download');
+    let flipbookViewport = document.getElementById('flipbook-viewport');
+    let flipbookContainer = document.getElementById('flipbook-container');
+    let stage3D = document.getElementById('stage-3d');
+    let stageScroll = document.getElementById('stage-scroll');
+    let modalPrevBtn = document.getElementById('modal-prev-btn');
+    let modalNextBtn = document.getElementById('modal-next-btn');
+    let modalPageInput = document.getElementById('modal-page-input');
+    let modalTotalPagesSpan = document.getElementById('modal-total-pages');
+    let btnMode3D = document.getElementById('btn-mode-3d');
+    let btnModeScroll = document.getElementById('btn-mode-scroll');
+    let btnZoomIn = document.getElementById('btn-reader-zoom-in');
+    let btnZoomOut = document.getElementById('btn-reader-zoom-out');
+    let btnTheme = document.getElementById('btn-reader-theme');
+    let btnFullscreen = document.getElementById('btn-reader-fullscreen');
+    let readerFooter = document.getElementById('reader-footer');
+
+    function initReaderDom() {
+        if (!readerModal) readerModal = document.getElementById('book-reader-modal');
+        if (!modalTitle) modalTitle = document.getElementById('reader-modal-title');
+        if (!modalSubject) modalSubject = document.getElementById('reader-modal-subject');
+        if (!modalDownloadBtn) modalDownloadBtn = document.getElementById('btn-reader-download');
+        if (!flipbookViewport) flipbookViewport = document.getElementById('flipbook-viewport');
+        if (!flipbookContainer) flipbookContainer = document.getElementById('flipbook-container');
+        if (!stage3D) stage3D = document.getElementById('stage-3d');
+        if (!stageScroll) stageScroll = document.getElementById('stage-scroll');
+        if (!modalPrevBtn) modalPrevBtn = document.getElementById('modal-prev-btn');
+        if (!modalNextBtn) modalNextBtn = document.getElementById('modal-next-btn');
+        if (!modalPageInput) modalPageInput = document.getElementById('modal-page-input');
+        if (!modalTotalPagesSpan) modalTotalPagesSpan = document.getElementById('modal-total-pages');
+        if (!btnMode3D) btnMode3D = document.getElementById('btn-mode-3d');
+        if (!btnModeScroll) btnModeScroll = document.getElementById('btn-mode-scroll');
+        if (!btnZoomIn) btnZoomIn = document.getElementById('btn-reader-zoom-in');
+        if (!btnZoomOut) btnZoomOut = document.getElementById('btn-reader-zoom-out');
+        if (!btnTheme) btnTheme = document.getElementById('btn-reader-theme');
+        if (!btnFullscreen) btnFullscreen = document.getElementById('btn-reader-fullscreen');
+        if (!readerFooter) readerFooter = document.getElementById('reader-footer');
+    }
 
     // OPEN MODAL
     function openBookReaderModal(title, subject, pdfUrl) {
-        if (!readerModal) return;
+        initReaderDom();
+        if (!readerModal) {
+            console.error("Reader modal element #book-reader-modal not found.");
+            window.open(pdfUrl, '_blank');
+            return;
+        }
 
         // CRITICAL: Ensure readerModal is attached directly to <body> so sidebars/containers can NEVER clip or overlay it!
         if (readerModal.parentElement !== document.body) {
             document.body.appendChild(readerModal);
+            initReaderDom();
         }
 
-        modalTitle.textContent = title || "Elektron Kitob";
-        modalSubject.textContent = (subject || "Fan") + " • Elektron darslik";
-        modalDownloadBtn.href = pdfUrl;
+        if (modalTitle) modalTitle.textContent = title || "Elektron Kitob";
+        if (modalSubject) modalSubject.textContent = (subject || "Fan") + " • Elektron darslik";
+        if (modalDownloadBtn) modalDownloadBtn.href = pdfUrl;
 
         // DEFAULT: Light / Kun rejimi
         readerModal.classList.remove('dark-reader');
@@ -659,8 +687,8 @@
         modalCurrentSheet = 0;
         modalSheets = [];
         scrollRenderedPages.clear();
-        flipbookViewport.innerHTML = '<div style="color: #0284c7; font-weight: 700; text-align: center; padding: 40px;"><div class="sheet-spinner" style="margin: 0 auto 15px auto;"></div>Kitob ochilmoqda...</div>';
-        stageScroll.innerHTML = '';
+        if (flipbookViewport) flipbookViewport.innerHTML = '<div style="color: #0284c7; font-weight: 700; text-align: center; padding: 40px;"><div class="sheet-spinner" style="margin: 0 auto 15px auto;"></div>Kitob ochilmoqda...</div>';
+        if (stageScroll) stageScroll.innerHTML = '';
         applyZoom();
 
         // Lock body scrolling
@@ -669,35 +697,74 @@
 
         switchReaderMode('3d');
 
-        // Load PDF document
-        pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
+        // Check PDF.js library
+        const pLib = window.pdfjsLib || (typeof pdfjsLib !== 'undefined' ? pdfjsLib : null);
+        if (!pLib) {
+            console.warn("PDF.js library still loading, retrying in 300ms...");
+            setTimeout(() => {
+                const retryLib = window.pdfjsLib || (typeof pdfjsLib !== 'undefined' ? pdfjsLib : null);
+                if (retryLib) {
+                    loadPdfDoc(retryLib, pdfUrl);
+                } else {
+                    if (flipbookViewport) {
+                        flipbookViewport.innerHTML = `<div style="color: #ef4444; padding: 25px; text-align: center; font-weight: 700;">
+                            PDF ko'rish dasturi yuklanmadi.
+                            <br><br>
+                            <a href="${pdfUrl}" target="_blank" class="reader-nav-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                                <i class="fas fa-external-link-alt"></i> Yangi oynada ochish
+                            </a>
+                        </div>`;
+                    }
+                }
+            }, 300);
+            return;
+        }
+
+        loadPdfDoc(pLib, pdfUrl);
+    }
+
+    function loadPdfDoc(pLib, pdfUrl) {
+        if (!pLib.GlobalWorkerOptions.workerSrc) {
+            pLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        }
+
+        pLib.getDocument(pdfUrl).promise.then(function(pdf) {
             currentPdfDoc = pdf;
             modalTotalPages = pdf.numPages;
-            // Sheet 0 contains Page 1 (Front cover) and Page 2 (Back).
-            // Sheet 1 contains Page 3 (Front) and Page 4 (Back), etc.
             modalTotalSheets = Math.ceil(modalTotalPages / 2);
 
-            modalTotalPagesSpan.textContent = modalTotalPages;
-            modalPageInput.max = modalTotalPages;
-            modalPageInput.value = 1;
+            if (modalTotalPagesSpan) modalTotalPagesSpan.textContent = modalTotalPages;
+            if (modalPageInput) {
+                modalPageInput.max = modalTotalPages;
+                modalPageInput.value = 1;
+            }
 
             buildModalFlipbook();
             buildScrollPages();
             goToModalSheet(0);
         }).catch(function(err) {
             console.error("Error loading PDF in modal: ", err);
-            flipbookViewport.innerHTML = `<div style="color: #ef4444; padding: 25px; text-align: center; font-weight: 700;">Kitobni yuklab bo'lmadi: ${err.message}</div>`;
+            if (flipbookViewport) {
+                flipbookViewport.innerHTML = `<div style="color: #ef4444; padding: 25px; text-align: center; font-weight: 700;">
+                    Kitobni ochib bo'lmadi (${err.message || 'Xatolik'}).
+                    <br><br>
+                    <a href="${pdfUrl}" target="_blank" class="reader-nav-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                        <i class="fas fa-external-link-alt"></i> Yangi oynada ochish
+                    </a>
+                </div>`;
+            }
         });
     }
 
     // CLOSE MODAL
     function closeBookReaderModal() {
+        initReaderDom();
         if (!readerModal) return;
         readerModal.classList.remove('active');
         document.body.style.overflow = '';
         currentPdfDoc = null;
-        flipbookViewport.innerHTML = '';
-        stageScroll.innerHTML = '';
+        if (flipbookViewport) flipbookViewport.innerHTML = '';
+        if (stageScroll) stageScroll.innerHTML = '';
         if (document.fullscreenElement) {
             document.exitFullscreen().catch(()=>{});
         }
@@ -1039,4 +1106,9 @@
             if (currentViewMode === '3d') goToModalSheet(modalCurrentSheet + 1);
         }
     });
+
+    // Expose functions globally on window
+    window.openBookReaderModal = openBookReaderModal;
+    window.closeBookReaderModal = closeBookReaderModal;
+    window.switchReaderMode = switchReaderMode;
 </script>

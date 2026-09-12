@@ -1,8 +1,7 @@
 {% extends 'baseteacher.html' %}
 {% load static %}
 
-{% block title %}Mening fanlarim{% include 'book_reader_modal.html' %}
-{% endblock %}
+{% block title %}Mening fanlarim{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -743,6 +742,8 @@
     <p style="color: rgba(255,255,255,0.4); font-size: 13.5px; line-height: 1.5;">Sizga hali dars o'tadigan fanlar (mutaxassislik) biriktirilmagan. Iltimos, administrator bilan bog'laning.</p>
 </div>
 {% endif %}
+<!-- 📖 3D & Scrollable Reusable Book Reader Modal -->
+{% include 'book_reader_modal.html' %}
 {% endblock %}
 
 {% block extra_js %}

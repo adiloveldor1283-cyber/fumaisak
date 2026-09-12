@@ -1,8 +1,7 @@
 {% extends 'baseadmin.html' %}
 {% load static %}
 
-{% block title %}Fanni tahrirlash: {{ subject.name }} | VLE Tizimi{% include 'book_reader_modal.html' %}
-{% endblock %}
+{% block title %}Fanni tahrirlash: {{ subject.name }} | VLE Tizimi{% endblock %}
 
 {% block content %}
 <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
@@ -180,4 +179,7 @@
         }
     }
 </script>
+
+<!-- 📖 3D & Scrollable Reusable Book Reader Modal -->
+{% include 'book_reader_modal.html' %}
 {% endblock %}

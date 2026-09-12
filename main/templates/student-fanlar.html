@@ -1,8 +1,7 @@
 {% extends 'basestudent.html' %}
 {% load static %}
 
-{% block title %}Mening fanlarim{% include 'book_reader_modal.html' %}
-{% endblock %}
+{% block title %}Mening fanlarim{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -686,6 +685,9 @@
         </div>
     </div>
 </div>
+
+<!-- 📖 3D & Scrollable Reusable Book Reader Modal -->
+{% include 'book_reader_modal.html' %}
 {% endblock %}
 
 {% block extra_js %}
