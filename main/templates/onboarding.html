@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Profilni faollashtirish va Nizom | {{ site_name|default:"VLE Tizimi" }}</title>
+    <title>Shaxsiy ma'lumotlar Nizomi va Profilni faollashtirish | {{ site_name|default:"VLE Tizimi" }}</title>
     <link rel="icon" type="image/png" href="{% url 'circular_favicon' %}">
     <link rel="shortcut icon" type="image/png" href="{% url 'circular_favicon' %}">
 
@@ -56,9 +56,9 @@
             position: relative;
             z-index: 1;
             width: 100%;
-            max-width: 780px;
-            background: rgba(14, 21, 37, 0.75);
-            border: 1px solid rgba(0, 242, 254, 0.2);
+            max-width: 840px;
+            background: rgba(14, 21, 37, 0.85);
+            border: 1px solid rgba(0, 242, 254, 0.22);
             border-radius: 24px;
             padding: 40px;
             box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 242, 254, 0.08);
@@ -166,7 +166,7 @@
             font-size: 22px;
             font-weight: 800;
             color: #ffffff;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -174,37 +174,54 @@
 
         .header-subtitle {
             font-size: 13.5px;
-            color: rgba(255, 255, 255, 0.65);
-            margin-bottom: 25px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 22px;
             line-height: 1.5;
         }
 
         /* Legal box */
         .legal-box {
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(0, 242, 254, 0.15);
             border-radius: 16px;
-            padding: 22px;
-            max-height: 280px;
+            padding: 24px;
+            max-height: 340px;
             overflow-y: auto;
-            font-size: 13.5px;
-            line-height: 1.65;
-            color: rgba(255, 255, 255, 0.85);
+            font-size: 13px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.88);
             margin-bottom: 22px;
         }
 
         .legal-box::-webkit-scrollbar {
-            width: 6px;
+            width: 7px;
+        }
+        .legal-box::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
         }
         .legal-box::-webkit-scrollbar-thumb {
-            background: rgba(0, 242, 254, 0.3);
+            background: rgba(0, 242, 254, 0.35);
             border-radius: 10px;
+        }
+
+        .legal-article-badge {
+            display: inline-block;
+            background: rgba(0, 242, 254, 0.12);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            color: #00f2fe;
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
         }
 
         .legal-box h4 {
             color: #00f2fe;
             font-size: 14px;
-            margin-top: 14px;
+            margin-top: 18px;
             margin-bottom: 6px;
             font-weight: 700;
         }
@@ -212,12 +229,16 @@
             margin-top: 0;
         }
 
-        .legal-box ul {
-            padding-left: 20px;
+        .legal-box p {
             margin-bottom: 10px;
         }
+
+        .legal-box ul {
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
         .legal-box li {
-            margin-bottom: 4px;
+            margin-bottom: 5px;
         }
 
         /* Consent checkbox */
@@ -230,7 +251,7 @@
             align-items: flex-start;
             gap: 14px;
             cursor: pointer;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             transition: 0.3s;
         }
         .consent-checkbox-wrap:hover {
@@ -501,43 +522,56 @@
             <div class="step-section active" id="stepSection1">
                 <div class="header-title">
                     <i class="fas fa-file-contract" style="color: #00f2fe;"></i>
-                    <span>Shaxsiy ma'lumotlarni qayta ishlash Nizomi</span>
+                    <span>Shaxsiy ma'lumotlarni qayta ishlash Nizomi (Ommaviy oferta)</span>
                 </div>
                 <p class="header-subtitle">
-                    O'zbekiston Respublikasining 2019-yil 2-iyuldagi <strong>O'RQ-547-sonli "Shaxsiy ma'lumotlar to'g'risida"</strong>gi Qonuni talablariga muvofiq, tizimdan foydalanishdan oldin quyidagi ommaviy oferta va maxfiylik qoidalari bilan tanishib chiqing:
+                    O'zbekiston Respublikasining 2019-yil 2-iyuldagi <strong>O'RQ-547-sonli "Shaxsiy ma'lumotlar to'g'risida"gi Qonuni</strong> hamda Fuqarolik Kodeksining 367-370-moddalari talablari asosida platformadan foydalanish shartlari:
                 </p>
 
                 <div class="legal-box" id="legalTextBox">
-                    <h4>1. Umumiy qoidalar va Maqsad</h4>
+                    <span class="legal-article-badge">1-modda. Qonuniy asos va Maqsad</span>
                     <p>
-                        Mazkur Nizom <strong>"{{ site_name }}"</strong> axborot-ta'lim platformasida ta'lim oluvchilar va pedagogik xodimlarning shaxsiy ma'lumotlarini qonuniy, shaffof va xavfsiz qayta ishlash tartibini belgilaydi. 
-                        Ma'lumotlarni yig'ishning yagona maqsadi — ta'lim jarayonini tashkil etish, dars jadvallari, davomat va o'zlashtirishni hisobga olish, to'lovlar va hisob-kitob shaffofligini ta'minlash hamda xabarnomalar yuborishdan iborat.
+                        Mazkur Nizom <strong>"{{ site_name }}"</strong> axborot-ta'lim platformasida ta'lim oluvchilar, o'qituvchilar va xodimlarning shaxsiy ma'lumotlarini qonuniy, shaffof va xavfsiz qayta ishlash tartibini belgilaydi.
+                    </p>
+                    <p>
+                        <strong>Qayta ishlash maqsadi:</strong> O'quv jarayonini tashkil etish, elektron guruhlar va dars jadvallarini yuritish, davomatni hisobga olish, o'zlashtirish va test sinovlari natijalarini monitoring qilish, ta'lim to'lovlari va elektron hamyon hisob-kitoblarining shaffofligini ta'minlash hamda SMS va tizim xabarnomalarini yuborish.
                     </p>
 
-                    <h4>2. Qayta ishlanadigan ma'lumotlar ro'yxati</h4>
+                    <span class="legal-article-badge">2-modda. Qayta ishlanadigan ma'lumotlar tarkibi</span>
                     <ul>
-                        <li>Foydalanuvchining Familiyasi va Ismi;</li>
-                        <li>Identifikatsiya uchun 3x4 o'lchamdagi fotosurati;</li>
-                        <li>Aloqa va xabarnomalar uchun tasdiqlangan telefon raqami;</li>
-                        <li>O'quv jarayonidagi faollik, dars davomati, baholar va to'lovlar tarixi.</li>
+                        <li>Foydalanuvchining Familiyasi va Ismi (F.I.SH);</li>
+                        <li>Shaxsni vizual identifikatsiya qilish uchun 3x4 o'lchamdagi fotosurati;</li>
+                        <li>Xabarnomalar va login ma'lumotlari uchun tasdiqlangan telefon raqami;</li>
+                        <li>O'quv faoliyati: darslardagi davomat, test va uy vazifalari natijalari, guruhlar tarixi hamda to'lov ma'lumotlari.</li>
                     </ul>
 
-                    <h4>3. Ma'lumotlar xavfsizligi va Kafolatlar</h4>
+                    <span class="legal-article-badge">3-modda. Ma'lumotlarni tahrirlash va yangilash (Foydalanuvchi huquqlari)</span>
                     <p>
-                        Foydalanuvchining shaxsiy ma'lumotlari O'zbekiston Respublikasi hududida joylashgan serverlarda shifrlangan holda saqlanadi. 
-                        Tizim ma'muriyati shaxsiy ma'lumotlarni uchinchi shaxslarga tijorat yoki reklama maqsadlarida sotmaslik, bermaslik va qat'iy maxfiylikni saqlash majburiyatini oladi (qonunchilikda belgilangan vakolatli davlat organlari so'rovi bundan mustasno).
+                        O'zbekiston Respublikasi O'RQ-547 Qonuniga muvofiq, foydalanuvchi quyidagi so'zsiz huquqlarga ega:
+                    </p>
+                    <ul>
+                        <li>O'z shaxsiy ma'lumotlarini profilda erkin ko'rish;</li>
+                        <li>Istalgan vaqtda shaxsiy profil sozlamalari orqali o'zining <strong>Ismi, Familiyasi, 3x4 fotosurati, telefon raqami va parolini mustaqil ravishda qayta ishlash (tahrirlash, o'zgartirish va yangilash)</strong>;</li>
+                        <li>Noaniq, eskirgan yoki xato kiritilgan ma'lumotlarni to'g'rilash;</li>
+                        <li>Ta'lim yakunlangach ma'lumotlarni arxivlash yoki hisobni o'chirishni talab qilish.</li>
+                    </ul>
+
+                    <span class="legal-article-badge">4-modda. Xavfsizlik va Maxfiylik kafolatlari</span>
+                    <p>
+                        Barcha shaxsiy ma'lumotlar O'zbekiston Respublikasi hududidagi himoyalangan serverlarda shifrlangan holatda saqlanadi (O'RQ-547 Qonuni 27-1-moddasi). 
+                        Tizim ma'muriyati shaxsiy ma'lumotlarni uchinchi shaxslarga tijorat, reklama yoki begona maqsadlarda berilmasligini qat'iy kafolatlaydi (qonunchilikda belgilangan vakolatli davlat organlari so'rovi bundan mustasno).
                     </p>
 
-                    <h4>4. Foydalanuvchining huquqlari</h4>
+                    <span class="legal-article-badge">5-modda. Rozilikning yuridik kuchi</span>
                     <p>
-                        Foydalanuvchi o'z ma'lumotlarini profil sahifasida ko'rish, xatolarni tuzatish, parolini yangilash hamda ta'lim yakunlangach ma'lumotlarni arxivlash/o'chirishni talab qilish huquqiga ega.
+                        Foydalanuvchi tomonidan quyidagi tasdiq katakchasini belgilash orqali berilgan elektron rozilik O'zbekiston Respublikasi qonunchiligiga ko'ra qog'ozda o'z qo'li bilan imzolangan yozma rozilik bilan teng yuridik kuchga ega hisoblanadi.
                     </p>
                 </div>
 
                 <label class="consent-checkbox-wrap" for="termsCheckbox">
                     <input type="checkbox" name="terms_accepted" id="termsCheckbox" required onchange="handleConsentChange()">
                     <span class="consent-text">
-                        Men "{{ site_name }}" tizimida shaxsiy ma'lumotlarni qayta ishlash to'g'risidagi Nizom shartlari bilan to'liq tanishdim va shaxsiy ma'lumotlarim (F.I.SH, rasm, telefon) ta'lim jarayonida qayta ishlanishiga o'z ixtiyorim bilan rozilik bildiraman.
+                        Men "{{ site_name }}" platformasida shaxsiy ma'lumotlarni qayta ishlash, saqlash va erkin tahrirlash bo'yicha yuqoridagi Nizom shartlari bilan to'liq tanishdim va shaxsiy ma'lumotlarim ta'lim jarayonida qayta ishlanishiga o'z ixtiyorim bilan to'liq rozilik bildiraman.
                     </span>
                 </label>
 
@@ -555,8 +589,16 @@
                     <span>Shaxsiy ma'lumotlarni to'ldirish</span>
                 </div>
                 <p class="header-subtitle">
-                    Tizimda o'qituvchilar va guruh a'zolari sizni taniydi. Iltimos, ism-familiyangizni to'g'ri kiriting va sifatli 3x4 fotosurat yuklang:
+                    Tizimda o'qituvchilar va guruhdoshlaringiz sizni aniq tanishi uchun ism-familiyangizni to'liq kiriting hamda 3x4 fotosurat yuklang:
                 </p>
+
+                <!-- Tahrirlash huquqi haqida qulay eslatma -->
+                <div style="background: rgba(0, 242, 254, 0.05); border: 1px dashed rgba(0, 242, 254, 0.3); border-radius: 12px; padding: 12px 16px; margin-bottom: 22px; display: flex; align-items: center; gap: 12px;">
+                    <i class="fas fa-info-circle" style="color: #00f2fe; font-size: 16px; flex-shrink: 0;"></i>
+                    <span style="font-size: 12.5px; color: rgba(255,255,255,0.85); line-height: 1.45;">
+                        <strong>Eslatma:</strong> Kiritilgan barcha ma'lumotlarni (F.I.SH, rasm, telefon, parol) keyinchalik ham o'z profilingiz sahifasidan istalgan vaqtda qayta tahrirlashingiz va yangilashingiz mumkin.
+                    </span>
+                </div>
 
                 <div class="form-grid-2">
                     <div class="form-group">

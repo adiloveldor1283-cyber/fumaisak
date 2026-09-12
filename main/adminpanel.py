@@ -495,19 +495,17 @@ def add_student(request):
         # Auto-generate secure strong password
         raw_password = generate_random_password(8)
 
-        # If first_name and last_name are provided, profile is marked completed; otherwise user completes on first login
-        is_completed = bool(first_name and last_name)
-
+        # System creates account with empty names; student fills them during onboarding (O'RQ-547)
         user = CustomUser.objects.create(
             username=username,
-            first_name=first_name,
-            last_name=last_name,
+            first_name="",
+            last_name="",
             phone_number=phone_number,
             password=make_password(raw_password),
             role=role,
             is_active=is_active,
-            is_profile_completed=is_completed,
-            terms_accepted=is_completed
+            is_profile_completed=False,
+            terms_accepted=False
         )
         if profile_image:
             user.profile_image = profile_image
@@ -729,20 +727,18 @@ def add_teacher(request):
         # Auto-generate secure strong password
         raw_password = generate_random_password(8)
 
-        # If first_name and last_name are provided, profile is marked completed; otherwise user completes on first login
-        is_completed = bool(first_name and last_name)
-
+        # System creates teacher account with empty names; teacher fills them during onboarding (O'RQ-547)
         new_teacher = CustomUser.objects.create(
             username=username,
-            first_name=first_name,
-            last_name=last_name,
+            first_name="",
+            last_name="",
             phone_number=phone_number,
             password=make_password(raw_password),
             role=role,
             is_active=is_active,
             profile_image=profile_image,
-            is_profile_completed=is_completed,
-            terms_accepted=is_completed
+            is_profile_completed=False,
+            terms_accepted=False
         )
         
         # Save subjects M2M

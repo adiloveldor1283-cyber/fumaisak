@@ -213,7 +213,6 @@
 <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
     <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Yangi o'quvchi qo'shish</h2>
     <div style="display: flex; gap: 10px;">
-        <a href="{% url 'import_students_csv' %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-file-import"></i> CSV orqali import qilish</a>
         <a href="{% url 'students_list_admin' %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-arrow-left"></i> Orqaga</a>
     </div>
 </div>
@@ -236,15 +235,15 @@
             <i class="fas fa-user-shield"></i>
         </div>
         <div style="font-size: 12.5px; color: rgba(255, 255, 255, 0.85); line-height: 1.5;">
-            <strong style="color: #00f2fe;">Qonuniy va xavfsiz ro'yxatga olish (O'RQ-547):</strong><br>
-            Admin faqat <strong>Telefon raqami</strong> va <strong>Guruh</strong>ni kiritadi. Yangi o'quvchi tizimga birinchi marta kirganida o'zining <strong>Ismi, Familiyasi, 3x4 fotosurati</strong>ni mustaqil to'ldiradi hamda shaxsiy ma'lumotlarni qayta ishlash Nizomiga rozilik beradi.
+            <strong style="color: #00f2fe;">Qonuniy va tezkor ro'yxatga olish (O'RQ-547):</strong><br>
+            Admin faqat <strong>Telefon raqami</strong> va <strong>Guruh</strong>ni kiritadi. O'quvchi tizimga birinchi marta kirganida o'zining <strong>Ismi, Familiyasi va 3x4 fotosurati</strong>ni mustaqil to'ldiradi hamda shaxsiy ma'lumotlarni qayta ishlash Nizomiga rozilik beradi.
         </div>
     </div>
 
     <form method="POST" enctype="multipart/form-data" id="add-student-form" onsubmit="return validateStudentForm(event)">
         {% csrf_token %}
 
-        <div class="section-title">Asosiy ma'lumotlar (Majburiy)</div>
+        <div class="section-title">O'quvchi ma'lumotlari</div>
 
         <div class="form-group">
             <label for="phone_number">Telefon raqami *</label>
@@ -290,24 +289,6 @@
                 {% endfor %}
             </select>
             <div class="info"><i class="fas fa-info-circle"></i> O'quvchini keyinroq ham guruhga qo'shishingiz mumkin.</div>
-        </div>
-
-        <div class="section-title">Qo'shimcha ma'lumotlar (Ixtiyoriy)</div>
-
-        <div class="form-group">
-            <label for="last_name">Familiyasi (Ixtiyoriy)</label>
-            <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Foydalanuvchi tizimga kirganda o'zi to'ldiradi">
-        </div>
-
-        <div class="form-group">
-            <label for="first_name">Ismi (Ixtiyoriy)</label>
-            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Foydalanuvchi tizimga kirganda o'zi to'ldiradi">
-        </div>
-
-        <div class="form-group">
-            <label for="kirit-nomi">Login (Ixtiyoriy)</label>
-            <input type="text" class="form-control" id="kirit-nomi" name="username" placeholder="Bo'sh qolsa, telefon raqamidan avtomatik yaratiladi">
-            <div class="info"><i class="fas fa-info-circle"></i> Bo'sh qoldirilsa tizim o'zi avtomatik tayinlaydi.</div>
         </div>
 
         <div class="form-group">

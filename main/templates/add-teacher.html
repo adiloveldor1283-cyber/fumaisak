@@ -241,7 +241,7 @@
     <form method="POST" enctype="multipart/form-data" id="add-teacher-form" onsubmit="return validateTeacherForm(event)">
         {% csrf_token %}
 
-        <div class="section-title">Asosiy ma'lumotlar (Majburiy)</div>
+        <div class="section-title">O'qituvchi ma'lumotlari</div>
 
         <div class="form-group">
             <label for="phone_number">Telefon raqami *</label>
@@ -290,24 +290,6 @@
                     <span style="color: rgba(255,255,255,0.4); font-style: italic; font-size: 13px;">Tizimda fanlar mavjud emas.</span>
                 {% endfor %}
             </div>
-        </div>
-
-        <div class="section-title">Qo'shimcha ma'lumotlar (Ixtiyoriy)</div>
-
-        <div class="form-group">
-            <label for="last_name">Familiyasi (Ixtiyoriy)</label>
-            <input type="text" class="form-control" id="last_name" name="teacher_last_name" placeholder="O'qituvchi birinchi kirganda to'ldiradi">
-        </div>
-
-        <div class="form-group">
-            <label for="first_name">Ismi (Ixtiyoriy)</label>
-            <input type="text" class="form-control" id="first_name" name="teacher_first_name" placeholder="O'qituvchi birinchi kirganda to'ldiradi">
-        </div>
-
-        <div class="form-group">
-            <label for="kirit-nomi">Login (Ixtiyoriy)</label>
-            <input type="text" class="form-control" id="kirit-nomi" name="teacher_username" placeholder="Bo'sh qolsa, telefon raqamidan avtomatik yaratiladi">
-            <div class="info"><i class="fas fa-info-circle"></i> Bo'sh qoldirilsa tizim o'zi avtomatik tayinlaydi.</div>
         </div>
 
         <div class="form-group">
