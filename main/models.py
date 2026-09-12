@@ -31,6 +31,12 @@ class CustomUser(AbstractUser):
     # Hamyon
     balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, verbose_name="Hamyon balansi")
 
+    # Onboarding & Shaxsiy ma'lumotlar roziligi (O'RQ-547)
+    is_profile_completed = models.BooleanField(default=False, verbose_name="Profil to'ldirilganmi", db_index=True)
+    terms_accepted = models.BooleanField(default=False, verbose_name="Nizomga rozilik berilganmi", db_index=True)
+    terms_accepted_at = models.DateTimeField(blank=True, null=True, verbose_name="Rozilik berilgan sana")
+    terms_accepted_ip = models.CharField(max_length=50, blank=True, null=True, verbose_name="Rozilik berilgan IP")
+
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.role})"

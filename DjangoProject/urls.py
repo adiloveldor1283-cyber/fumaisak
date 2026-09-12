@@ -27,6 +27,7 @@ urlpatterns = [
     path('favicon.png', views.circular_favicon_view, name='circular_favicon'),
     path('', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('onboarding/', views.onboarding_view, name='onboarding'),
     path('telegram/webhook/', views.telegram_webhook, name='telegram_webhook'),
 
     # 💳 Online Payments (Payme & Click)

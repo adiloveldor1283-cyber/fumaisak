@@ -230,20 +230,21 @@
 {% endif %}
 
 <div class="form-card">
+    <!-- Yuridik Nizom va O'RQ-547 bo'yicha ma'lumotnoma -->
+    <div style="background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 14px; padding: 16px 20px; margin-bottom: 25px; display: flex; align-items: flex-start; gap: 14px;">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(0, 242, 254, 0.12); display: flex; align-items: center; justify-content: center; color: #00f2fe; font-size: 18px; flex-shrink: 0; margin-top: 2px;">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <div style="font-size: 12.5px; color: rgba(255, 255, 255, 0.85); line-height: 1.5;">
+            <strong style="color: #00f2fe;">Qonuniy va xavfsiz ro'yxatga olish (O'RQ-547):</strong><br>
+            Admin faqat <strong>Telefon raqami</strong> va <strong>Guruh</strong>ni kiritadi. Yangi o'quvchi tizimga birinchi marta kirganida o'zining <strong>Ismi, Familiyasi, 3x4 fotosurati</strong>ni mustaqil to'ldiradi hamda shaxsiy ma'lumotlarni qayta ishlash Nizomiga rozilik beradi.
+        </div>
+    </div>
+
     <form method="POST" enctype="multipart/form-data" id="add-student-form" onsubmit="return validateStudentForm(event)">
         {% csrf_token %}
 
-        <div class="section-title">Shaxsiy ma'lumotlar</div>
-
-        <div class="form-group">
-            <label for="last_name">O'quvchi familiyasi *</label>
-            <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Masalan: Karimov" required>
-        </div>
-
-        <div class="form-group">
-            <label for="first_name">O'quvchi ismi *</label>
-            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Masalan: Sardor" required>
-        </div>
+        <div class="section-title">Asosiy ma'lumotlar (Majburiy)</div>
 
         <div class="form-group">
             <label for="phone_number">Telefon raqami *</label>
@@ -253,7 +254,7 @@
                     <i class="fas fa-sms"></i> <span id="btn-send-otp-text">SMS kod yuborish</span>
                 </button>
             </div>
-            <div class="info" id="phone-hint"><i class="fas fa-info-circle"></i> O'quvchi profil ma'lumotlari va paroli shu raqamga SMS orqali yuboriladi.</div>
+            <div class="info" id="phone-hint"><i class="fas fa-info-circle"></i> O'quvchiga login va xavfsiz parol SMS orqali yuboriladi.</div>
 
             <!-- OTP Input Box (initially hidden) -->
             <div id="otp-verification-box" style="display: none; margin-top: 15px; background: rgba(0, 242, 254, 0.03); border: 1px dashed rgba(0, 242, 254, 0.25); border-radius: 14px; padding: 16px;">
@@ -280,22 +281,33 @@
             <input type="hidden" name="otp_code" id="hidden_otp_code" value="">
         </div>
 
-        <div class="section-title">Hisob ma'lumotlari</div>
+        <div class="form-group">
+            <label for="group_id">Guruhga biriktirish (Ixtiyoriy)</label>
+            <select id="group_id" name="group_id" class="form-control">
+                <option value="">-- Guruhni tanlang (Ixtiyoriy) --</option>
+                {% for group in groups %}
+                    <option value="{{ group.id }}">{{ group.name }}{% if group.subject %} ({{ group.subject.name }}){% endif %}</option>
+                {% endfor %}
+            </select>
+            <div class="info"><i class="fas fa-info-circle"></i> O'quvchini keyinroq ham guruhga qo'shishingiz mumkin.</div>
+        </div>
 
-        <!-- Parol haqida xabarnoma -->
-        <div style="background: rgba(0, 242, 254, 0.05); border: 1px dashed rgba(0, 242, 254, 0.3); border-radius: 12px; padding: 14px 18px; margin-bottom: 22px; display: flex; align-items: center; gap: 14px;">
-            <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(0, 242, 254, 0.1); display: flex; align-items: center; justify-content: center; color: #00f2fe; font-size: 18px; flex-shrink: 0;">
-                <i class="fas fa-key"></i>
-            </div>
-            <div style="font-size: 12.5px; color: rgba(255, 255, 255, 0.85); line-height: 1.45;">
-                <strong style="color: #00f2fe;">Avtomatik xavfsiz parol:</strong> Endi parolni qo'lda kiritish shart emas. Tizim o'quvchi uchun avtomatik mustahkam parol yaratadi va saqlangach, tasdiqlangan telefon raqamiga login bilan birga SMS orqali yuboradi.
-            </div>
+        <div class="section-title">Qo'shimcha ma'lumotlar (Ixtiyoriy)</div>
+
+        <div class="form-group">
+            <label for="last_name">Familiyasi (Ixtiyoriy)</label>
+            <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Foydalanuvchi tizimga kirganda o'zi to'ldiradi">
         </div>
 
         <div class="form-group">
-            <label for="kirit-nomi">O'quvchi logini (Ixtiyoriy)</label>
-            <input type="text" class="form-control" id="kirit-nomi" name="username" placeholder="Bo'sh qoldirilsa, telefon raqamidan yaratiladi">
-            <div class="info"><i class="fas fa-info-circle"></i> Bo'sh qoldirsangiz, tizim o'zi avtomatik login tayinlaydi.</div>
+            <label for="first_name">Ismi (Ixtiyoriy)</label>
+            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Foydalanuvchi tizimga kirganda o'zi to'ldiradi">
+        </div>
+
+        <div class="form-group">
+            <label for="kirit-nomi">Login (Ixtiyoriy)</label>
+            <input type="text" class="form-control" id="kirit-nomi" name="username" placeholder="Bo'sh qolsa, telefon raqamidan avtomatik yaratiladi">
+            <div class="info"><i class="fas fa-info-circle"></i> Bo'sh qoldirilsa tizim o'zi avtomatik tayinlaydi.</div>
         </div>
 
         <div class="form-group">
@@ -306,21 +318,11 @@
             </div>
         </div>
 
-        <div class="form-group">
-            <label for="rol-tanla">Roli</label>
-            <select id="rol-tanla" name="role" class="form-control" required>
-                <option value="student" selected>O'quvchi</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="profil-rasmi">Profil rasmi (Ixtiyoriy)</label>
-            <input type="file" class="form-control" id="profil-rasmi" name="profile_image">
-        </div>
+        <input type="hidden" name="role" value="student">
 
         <div class="tugmalar">
             <button type="submit" class="btn-submit" id="btn-submit-main">
-                <i class="fas fa-user-plus" style="margin-right: 6px;"></i> O'quvchini saqlash & SMS yuborish
+                <i class="fas fa-user-plus" style="margin-right: 6px;"></i> O'quvchini ro'yxatga olish & SMS yuborish
             </button>
             <a href="{% url 'students_list_admin' %}" class="btn-cancel">Bekor qilish</a>
         </div>

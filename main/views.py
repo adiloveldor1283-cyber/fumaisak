@@ -15,6 +15,10 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            # Check if student or teacher has completed onboarding & accepted legal terms (O'RQ-547)
+            if hasattr(user, 'role') and user.role in ('student', 'teacher') and not getattr(user, 'is_profile_completed', True):
+                return redirect('onboarding')
+
             if user.is_superuser or user.is_staff or (hasattr(user, 'role') and user.role in ('admin', 'reception')):
                 return redirect('admin_dashboard')
             elif hasattr(user, 'role') and user.role == 'teacher':
@@ -216,6 +220,99 @@ def circular_favicon_view(request):
         return HttpResponse(png_data, content_type="image/png")
     except Exception:
         raise Http404("Favicon topilmadi")
+
+
+from django.utils import timezone
+from main.validators import validate_image_file
+from django.core.exceptions import ValidationError
+from main.utils import get_client_ip, log_action
+from main.models import SiteSetting
+
+@login_required
+def onboarding_view(request):
+    user = request.user
+
+    # If admin or staff, go to dashboard
+    if user.is_superuser or user.is_staff or (hasattr(user, 'role') and user.role in ('admin', 'reception')):
+        return redirect('admin_dashboard')
+
+    # If already completed onboarding, redirect to role home
+    if getattr(user, 'is_profile_completed', False) and getattr(user, 'terms_accepted', False):
+        if user.role == 'teacher':
+            return redirect('teacher_home')
+        return redirect('student_home')
+
+    site_setting = SiteSetting.objects.first()
+    site_name = site_setting.site_name if site_setting and site_setting.site_name else "VLE Ta'lim Tizimi"
+
+    if request.method == 'POST':
+        terms_consent = request.POST.get('terms_accepted') == 'on'
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        new_password = request.POST.get('new_password', '').strip()
+        confirm_password = request.POST.get('confirm_password', '').strip()
+        profile_image = request.FILES.get('profile_image')
+
+        # 1. Terms verification
+        if not terms_consent:
+            messages.error(request, "Shaxsiy ma'lumotlarni qayta ishlash Nizomi (Ommaviy oferta) shartlariga rozilik bildirishingiz shart.")
+            return render(request, 'onboarding.html', {'site_name': site_name, 'user': user})
+
+        # 2. Name validation
+        if not first_name or not last_name:
+            messages.error(request, "Ism va familiyangizni to'liq kiritishingiz shart.")
+            return render(request, 'onboarding.html', {'site_name': site_name, 'user': user})
+
+        # 3. Profile Image validation if provided
+        if profile_image:
+            try:
+                validate_image_file(profile_image)
+            except ValidationError as ve:
+                messages.error(request, ve.message)
+                return render(request, 'onboarding.html', {'site_name': site_name, 'user': user})
+
+        # 4. Optional password change validation
+        if new_password or confirm_password:
+            if len(new_password) < 6:
+                messages.error(request, "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak.")
+                return render(request, 'onboarding.html', {'site_name': site_name, 'user': user})
+            if new_password != confirm_password:
+                messages.error(request, "Kiritilgan yangi parollar bir-biriga mos kelmadi.")
+                return render(request, 'onboarding.html', {'site_name': site_name, 'user': user})
+            user.set_password(new_password)
+            update_session_auth_hash(request, user)
+
+        # 5. Save user profile data
+        user.first_name = first_name
+        user.last_name = last_name
+        if profile_image:
+            user.profile_image = profile_image
+        
+        client_ip = get_client_ip(request)
+        user.terms_accepted = True
+        user.terms_accepted_at = timezone.now()
+        user.terms_accepted_ip = client_ip
+        user.is_profile_completed = True
+        user.save()
+
+        log_action(
+            user,
+            "Onboarding Yakunlandi",
+            f"Foydalanuvchi ({user.username}) profilini to'ldirdi va shaxsiy ma'lumotlar nizomiga rozilik bildirdi (IP: {client_ip})",
+            request
+        )
+
+        messages.success(request, f"Xush kelibsiz, {first_name}! Profilingiz muvaffaqiyatli to'ldirildi.")
+        
+        if user.role == 'teacher':
+            return redirect('teacher_home')
+        return redirect('student_home')
+
+    return render(request, 'onboarding.html', {
+        'site_name': site_name,
+        'user': user
+    })
+
 
 
 

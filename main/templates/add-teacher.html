@@ -227,20 +227,21 @@
 {% endif %}
 
 <div class="form-card">
+    <!-- Yuridik Nizom va O'RQ-547 bo'yicha ma'lumotnoma -->
+    <div style="background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 14px; padding: 16px 20px; margin-bottom: 25px; display: flex; align-items: flex-start; gap: 14px;">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(0, 242, 254, 0.12); display: flex; align-items: center; justify-content: center; color: #00f2fe; font-size: 18px; flex-shrink: 0; margin-top: 2px;">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <div style="font-size: 12.5px; color: rgba(255, 255, 255, 0.85); line-height: 1.5;">
+            <strong style="color: #00f2fe;">Qonuniy va xavfsiz ro'yxatga olish (O'RQ-547):</strong><br>
+            Admin faqat <strong>Telefon raqami</strong> va <strong>Fanlar</strong>ni kiritadi. O'qituvchi tizimga birinchi marta kirganida o'zining <strong>Ismi, Familiyasi, 3x4 fotosurati</strong>ni mustaqil to'ldiradi hamda shaxsiy ma'lumotlarni qayta ishlash Nizomiga rozilik beradi.
+        </div>
+    </div>
+
     <form method="POST" enctype="multipart/form-data" id="add-teacher-form" onsubmit="return validateTeacherForm(event)">
         {% csrf_token %}
 
-        <div class="section-title">Shaxsiy ma'lumotlar</div>
-
-        <div class="form-group">
-            <label for="last_name">O'qituvchi familiyasi *</label>
-            <input type="text" class="form-control" id="last_name" name="teacher_last_name" placeholder="Masalan: Rustamov" required>
-        </div>
-
-        <div class="form-group">
-            <label for="first_name">O'qituvchi ismi *</label>
-            <input type="text" class="form-control" id="first_name" name="teacher_first_name" placeholder="Masalan: Jasur" required>
-        </div>
+        <div class="section-title">Asosiy ma'lumotlar (Majburiy)</div>
 
         <div class="form-group">
             <label for="phone_number">Telefon raqami *</label>
@@ -250,7 +251,7 @@
                     <i class="fas fa-sms"></i> <span id="btn-send-otp-text">SMS kod yuborish</span>
                 </button>
             </div>
-            <div class="info" id="phone-hint"><i class="fas fa-info-circle"></i> O'qituvchi profil ma'lumotlari va paroli shu raqamga SMS orqali yuboriladi.</div>
+            <div class="info" id="phone-hint"><i class="fas fa-info-circle"></i> O'qituvchiga login va xavfsiz parol SMS orqali yuboriladi.</div>
 
             <!-- OTP Input Box (initially hidden) -->
             <div id="otp-verification-box" style="display: none; margin-top: 15px; background: rgba(0, 242, 254, 0.03); border: 1px dashed rgba(0, 242, 254, 0.25); border-radius: 14px; padding: 16px;">
@@ -277,39 +278,6 @@
             <input type="hidden" name="otp_code" id="hidden_otp_code" value="">
         </div>
 
-        <div class="section-title">Hisob ma'lumotlari</div>
-
-        <!-- Parol haqida xabarnoma -->
-        <div style="background: rgba(0, 242, 254, 0.05); border: 1px dashed rgba(0, 242, 254, 0.3); border-radius: 12px; padding: 14px 18px; margin-bottom: 22px; display: flex; align-items: center; gap: 14px;">
-            <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(0, 242, 254, 0.1); display: flex; align-items: center; justify-content: center; color: #00f2fe; font-size: 18px; flex-shrink: 0;">
-                <i class="fas fa-key"></i>
-            </div>
-            <div style="font-size: 12.5px; color: rgba(255, 255, 255, 0.85); line-height: 1.45;">
-                <strong style="color: #00f2fe;">Avtomatik xavfsiz parol:</strong> O'qituvchi uchun parol tizim tomonidan avtomatik yaratiladi va saqlangach, tasdiqlangan telefon raqamiga login bilan birga SMS tarzida yuboriladi.
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label for="kirit-nomi">O'qituvchi logini (Ixtiyoriy)</label>
-            <input type="text" class="form-control" id="kirit-nomi" name="teacher_username" placeholder="Bo'sh qoldirilsa, telefon raqamidan yaratiladi">
-            <div class="info"><i class="fas fa-info-circle"></i> Bo'sh qoldirsangiz, tizim o'zi avtomatik login tayinlaydi.</div>
-        </div>
-
-        <div class="form-group">
-            <label>Hisob holati</label>
-            <div class="radio-konteyner">
-                <label><input type="radio" name="is_active" value="on" checked> Faol</label>
-                <label><input type="radio" name="is_active" value=""> Faol emas</label>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label for="rol-tanla">Roli</label>
-            <select id="rol-tanla" name="role" class="form-control" required>
-                <option value="teacher" selected>O'qituvchi</option>
-            </select>
-        </div>
-
         <div class="form-group">
             <label>Dars beradigan fanlari</label>
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 15px 18px;">
@@ -324,14 +292,37 @@
             </div>
         </div>
 
+        <div class="section-title">Qo'shimcha ma'lumotlar (Ixtiyoriy)</div>
+
         <div class="form-group">
-            <label for="profil-rasmi">Profil rasmi (Ixtiyoriy)</label>
-            <input type="file" class="form-control" id="profil-rasmi" name="profile_image">
+            <label for="last_name">Familiyasi (Ixtiyoriy)</label>
+            <input type="text" class="form-control" id="last_name" name="teacher_last_name" placeholder="O'qituvchi birinchi kirganda to'ldiradi">
         </div>
+
+        <div class="form-group">
+            <label for="first_name">Ismi (Ixtiyoriy)</label>
+            <input type="text" class="form-control" id="first_name" name="teacher_first_name" placeholder="O'qituvchi birinchi kirganda to'ldiradi">
+        </div>
+
+        <div class="form-group">
+            <label for="kirit-nomi">Login (Ixtiyoriy)</label>
+            <input type="text" class="form-control" id="kirit-nomi" name="teacher_username" placeholder="Bo'sh qolsa, telefon raqamidan avtomatik yaratiladi">
+            <div class="info"><i class="fas fa-info-circle"></i> Bo'sh qoldirilsa tizim o'zi avtomatik tayinlaydi.</div>
+        </div>
+
+        <div class="form-group">
+            <label>Hisob holati</label>
+            <div class="radio-konteyner">
+                <label><input type="radio" name="is_active" value="on" checked> Faol</label>
+                <label><input type="radio" name="is_active" value=""> Faol emas</label>
+            </div>
+        </div>
+
+        <input type="hidden" name="role" value="teacher">
 
         <div class="tugmalar">
             <button type="submit" class="btn-submit" id="btn-submit-main">
-                <i class="fas fa-user-plus" style="margin-right: 6px;"></i> O'qituvchini saqlash & SMS yuborish
+                <i class="fas fa-user-plus" style="margin-right: 6px;"></i> O'qituvchini ro'yxatga olish & SMS yuborish
             </button>
             <a href="{% url 'teachers_list_admin' %}" class="btn-cancel">Bekor qilish</a>
         </div>

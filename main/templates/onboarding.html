@@ -1,0 +1,751 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profilni faollashtirish va Nizom | {{ site_name|default:"VLE Tizimi" }}</title>
+    <link rel="icon" type="image/png" href="{% url 'circular_favicon' %}">
+    <link rel="shortcut icon" type="image/png" href="{% url 'circular_favicon' %}">
+
+    <!-- Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: #070a12;
+            background-image: 
+                radial-gradient(at 10% 15%, rgba(0, 242, 254, 0.08) 0px, transparent 50%),
+                radial-gradient(at 90% 85%, rgba(79, 172, 254, 0.08) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(13, 21, 39, 0.95) 0px, transparent 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 15px;
+            position: relative;
+        }
+
+        .cyber-grid-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.05;
+            background-size: 36px 36px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 242, 254, 0.4) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 242, 254, 0.4) 1px, transparent 1px);
+        }
+
+        .onboarding-card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 780px;
+            background: rgba(14, 21, 37, 0.75);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 242, 254, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            animation: fadeInCard 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeInCard {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Stepper header */
+        .stepper-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 35px;
+            position: relative;
+        }
+
+        .stepper-progress-bar {
+            position: absolute;
+            top: 20px;
+            left: 50px;
+            right: 50px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 0;
+        }
+
+        .stepper-progress-fill {
+            height: 100%;
+            width: 50%;
+            background: linear-gradient(90deg, #00f2fe, #4facfe);
+            transition: width 0.4s ease;
+        }
+
+        .step-node {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .step-circle {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #0d1526;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        .step-node.active .step-circle {
+            border-color: #00f2fe;
+            background: rgba(0, 242, 254, 0.15);
+            color: #00f2fe;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+
+        .step-node.completed .step-circle {
+            border-color: #00ffaa;
+            background: rgba(0, 255, 170, 0.15);
+            color: #00ffaa;
+        }
+
+        .step-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step-node.active .step-label {
+            color: #00f2fe;
+        }
+
+        /* Content steps */
+        .step-section {
+            display: none;
+        }
+        .step-section.active {
+            display: block;
+            animation: fadeInSection 0.4s ease;
+        }
+
+        @keyframes fadeInSection {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-subtitle {
+            font-size: 13.5px;
+            color: rgba(255, 255, 255, 0.65);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        /* Legal box */
+        .legal-box {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 22px;
+            max-height: 280px;
+            overflow-y: auto;
+            font-size: 13.5px;
+            line-height: 1.65;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 22px;
+        }
+
+        .legal-box::-webkit-scrollbar {
+            width: 6px;
+        }
+        .legal-box::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.3);
+            border-radius: 10px;
+        }
+
+        .legal-box h4 {
+            color: #00f2fe;
+            font-size: 14px;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+        .legal-box h4:first-child {
+            margin-top: 0;
+        }
+
+        .legal-box ul {
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+        .legal-box li {
+            margin-bottom: 4px;
+        }
+
+        /* Consent checkbox */
+        .consent-checkbox-wrap {
+            background: rgba(0, 242, 254, 0.06);
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            border-radius: 14px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: 0.3s;
+        }
+        .consent-checkbox-wrap:hover {
+            background: rgba(0, 242, 254, 0.1);
+            border-color: rgba(0, 242, 254, 0.4);
+        }
+
+        .consent-checkbox-wrap input[type="checkbox"] {
+            accent-color: #00f2fe;
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .consent-text {
+            font-size: 13px;
+            color: #ffffff;
+            line-height: 1.5;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        /* Form elements */
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 13px 18px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+        .form-control:focus {
+            border-color: #00f2fe;
+            background: rgba(0, 242, 254, 0.04);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+        }
+
+        /* Photo upload preview */
+        .photo-upload-container {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(0, 242, 254, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 22px;
+        }
+
+        .avatar-preview-box {
+            width: 90px;
+            height: 110px;
+            border-radius: 12px;
+            background: #080d1a;
+            border: 2px solid rgba(0, 242, 254, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .avatar-preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .avatar-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 11px;
+            text-align: center;
+        }
+        .avatar-placeholder i {
+            font-size: 28px;
+            color: #00f2fe;
+            opacity: 0.7;
+        }
+
+        .photo-upload-info {
+            flex: 1;
+        }
+
+        .btn-choose-file {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: rgba(0, 242, 254, 0.12);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            color: #00f2fe;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 8px;
+        }
+        .btn-choose-file:hover {
+            background: rgba(0, 242, 254, 0.22);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        }
+
+        /* Password relative wrapper */
+        .password-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .toggle-pwd-btn {
+            position: absolute;
+            right: 14px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+        .toggle-pwd-btn:hover {
+            color: #00f2fe;
+        }
+
+        /* Buttons */
+        .btn-primary-action {
+            width: 100%;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #070a12;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-primary-action:hover:not(:disabled) {
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.5);
+            transform: translateY(-2px);
+        }
+        .btn-primary-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-back-action {
+            padding: 14px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-back-action:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .alert-box {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 12px 18px;
+            color: #ff6b6b;
+            font-size: 13.5px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 650px) {
+            .onboarding-card {
+                padding: 25px 20px;
+            }
+            .form-grid-2 {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .stepper-progress-bar {
+                left: 30px;
+                right: 30px;
+            }
+            .photo-upload-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cyber-grid-layer"></div>
+
+    <div class="onboarding-card">
+        <!-- Stepper Indicator -->
+        <div class="stepper-container">
+            <div class="stepper-progress-bar">
+                <div class="stepper-progress-fill" id="progressFill"></div>
+            </div>
+            <div class="step-node active" id="nodeStep1" onclick="goToStep(1)">
+                <div class="step-circle" id="circleStep1">1</div>
+                <div class="step-label">1. Yuridik Nizom</div>
+            </div>
+            <div class="step-node" id="nodeStep2" onclick="goToStep(2)">
+                <div class="step-circle" id="circleStep2">2</div>
+                <div class="step-label">2. Shaxsiy ma'lumotlar</div>
+            </div>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-box">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" id="onboardingForm">
+            {% csrf_token %}
+
+            <!-- ===================== STEP 1: LEGAL TERMS & PRIVACY ===================== -->
+            <div class="step-section active" id="stepSection1">
+                <div class="header-title">
+                    <i class="fas fa-file-contract" style="color: #00f2fe;"></i>
+                    <span>Shaxsiy ma'lumotlarni qayta ishlash Nizomi</span>
+                </div>
+                <p class="header-subtitle">
+                    O'zbekiston Respublikasining 2019-yil 2-iyuldagi <strong>O'RQ-547-sonli "Shaxsiy ma'lumotlar to'g'risida"</strong>gi Qonuni talablariga muvofiq, tizimdan foydalanishdan oldin quyidagi ommaviy oferta va maxfiylik qoidalari bilan tanishib chiqing:
+                </p>
+
+                <div class="legal-box" id="legalTextBox">
+                    <h4>1. Umumiy qoidalar va Maqsad</h4>
+                    <p>
+                        Mazkur Nizom <strong>"{{ site_name }}"</strong> axborot-ta'lim platformasida ta'lim oluvchilar va pedagogik xodimlarning shaxsiy ma'lumotlarini qonuniy, shaffof va xavfsiz qayta ishlash tartibini belgilaydi. 
+                        Ma'lumotlarni yig'ishning yagona maqsadi — ta'lim jarayonini tashkil etish, dars jadvallari, davomat va o'zlashtirishni hisobga olish, to'lovlar va hisob-kitob shaffofligini ta'minlash hamda xabarnomalar yuborishdan iborat.
+                    </p>
+
+                    <h4>2. Qayta ishlanadigan ma'lumotlar ro'yxati</h4>
+                    <ul>
+                        <li>Foydalanuvchining Familiyasi va Ismi;</li>
+                        <li>Identifikatsiya uchun 3x4 o'lchamdagi fotosurati;</li>
+                        <li>Aloqa va xabarnomalar uchun tasdiqlangan telefon raqami;</li>
+                        <li>O'quv jarayonidagi faollik, dars davomati, baholar va to'lovlar tarixi.</li>
+                    </ul>
+
+                    <h4>3. Ma'lumotlar xavfsizligi va Kafolatlar</h4>
+                    <p>
+                        Foydalanuvchining shaxsiy ma'lumotlari O'zbekiston Respublikasi hududida joylashgan serverlarda shifrlangan holda saqlanadi. 
+                        Tizim ma'muriyati shaxsiy ma'lumotlarni uchinchi shaxslarga tijorat yoki reklama maqsadlarida sotmaslik, bermaslik va qat'iy maxfiylikni saqlash majburiyatini oladi (qonunchilikda belgilangan vakolatli davlat organlari so'rovi bundan mustasno).
+                    </p>
+
+                    <h4>4. Foydalanuvchining huquqlari</h4>
+                    <p>
+                        Foydalanuvchi o'z ma'lumotlarini profil sahifasida ko'rish, xatolarni tuzatish, parolini yangilash hamda ta'lim yakunlangach ma'lumotlarni arxivlash/o'chirishni talab qilish huquqiga ega.
+                    </p>
+                </div>
+
+                <label class="consent-checkbox-wrap" for="termsCheckbox">
+                    <input type="checkbox" name="terms_accepted" id="termsCheckbox" required onchange="handleConsentChange()">
+                    <span class="consent-text">
+                        Men "{{ site_name }}" tizimida shaxsiy ma'lumotlarni qayta ishlash to'g'risidagi Nizom shartlari bilan to'liq tanishdim va shaxsiy ma'lumotlarim (F.I.SH, rasm, telefon) ta'lim jarayonida qayta ishlanishiga o'z ixtiyorim bilan rozilik bildiraman.
+                    </span>
+                </label>
+
+                <button type="button" class="btn-primary-action" id="btnNextToStep2" onclick="goToStep(2)" disabled>
+                    <span>Roziman, 2-bosqichga o'tish</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+
+            <!-- ===================== STEP 2: PROFILE DATA COMPLETION ===================== -->
+            <div class="step-section" id="stepSection2">
+                <div class="header-title">
+                    <i class="fas fa-user-edit" style="color: #00f2fe;"></i>
+                    <span>Shaxsiy ma'lumotlarni to'ldirish</span>
+                </div>
+                <p class="header-subtitle">
+                    Tizimda o'qituvchilar va guruh a'zolari sizni taniydi. Iltimos, ism-familiyangizni to'g'ri kiriting va sifatli 3x4 fotosurat yuklang:
+                </p>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="id_first_name">Ismingiz *</label>
+                        <input type="text" class="form-control" id="id_first_name" name="first_name" value="{{ user.first_name }}" placeholder="Masalan: Sardor" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_last_name">Familiyangiz *</label>
+                        <input type="text" class="form-control" id="id_last_name" name="last_name" value="{{ user.last_name }}" placeholder="Masalan: Karimov" required>
+                    </div>
+                </div>
+
+                <!-- 3x4 Photo Upload -->
+                <div class="form-group">
+                    <label>3x4 Fotosurat (Profil rasmi)</label>
+                    <div class="photo-upload-container">
+                        <div class="avatar-preview-box" id="avatarPreviewContainer">
+                            {% if user.profile_image %}
+                                <img src="{{ user.profile_image.url }}" id="avatarPreviewImg" style="display: block;" alt="Rasm">
+                                <div class="avatar-placeholder" id="avatarPlaceholder" style="display: none;">
+                                    <i class="fas fa-camera"></i>
+                                    <span>3x4 Rasm</span>
+                                </div>
+                            {% else %}
+                                <img src="" id="avatarPreviewImg" alt="Rasm">
+                                <div class="avatar-placeholder" id="avatarPlaceholder">
+                                    <i class="fas fa-camera"></i>
+                                    <span>3x4 Rasm</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="photo-upload-info">
+                            <label for="id_profile_image" class="btn-choose-file">
+                                <i class="fas fa-upload"></i> Rasmni tanlash (3x4)
+                            </label>
+                            <input type="file" id="id_profile_image" name="profile_image" accept="image/*" style="display: none;" onchange="previewAvatar(event)">
+                            <div style="font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.4;">
+                                Tiniq, yuz qismi aniq ko'ringan fotosurat yuklang (JPG, PNG, WebP). Maksimal hajm: 5MB.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Optional Password Change -->
+                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 16px; padding: 18px 20px; margin-bottom: 25px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                        <i class="fas fa-key" style="color: #00f2fe;"></i>
+                        <span style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: #ffffff;">Yangi parol o'rnatish (Ixtiyoriy)</span>
+                    </div>
+                    <p style="font-size: 12px; color: rgba(255, 255, 255, 0.5); margin-bottom: 15px;">
+                        SMS orqali kelgan vaqtinchalik parolni o'zingiz istagan yangi parolga almashtirishingiz mumkin. O'zgartirishni istamasangiz, bo'sh qoldiring.
+                    </p>
+                    <div class="form-grid-2" style="margin-bottom: 0;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="id_new_password">Yangi parol</label>
+                            <div class="password-input-wrap">
+                                <input type="password" class="form-control" id="id_new_password" name="new_password" placeholder="Kamida 6 belgi">
+                                <button type="button" class="toggle-pwd-btn" onclick="togglePasswordVisibility('id_new_password', this)"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="id_confirm_password">Yangi parolni takrorlang</label>
+                            <div class="password-input-wrap">
+                                <input type="password" class="form-control" id="id_confirm_password" name="confirm_password" placeholder="Parolni takrorlang">
+                                <button type="button" class="toggle-pwd-btn" onclick="togglePasswordVisibility('id_confirm_password', this)"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <button type="button" class="btn-back-action" onclick="goToStep(1)">
+                        <i class="fas fa-arrow-left"></i> Orqaga
+                    </button>
+                    <button type="submit" class="btn-primary-action" id="btnSubmitOnboarding">
+                        <i class="fas fa-check-circle"></i> Profilni tasdiqlash va Kirish
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function handleConsentChange() {
+            const isChecked = document.getElementById('termsCheckbox').checked;
+            const btnNext = document.getElementById('btnNextToStep2');
+            btnNext.disabled = !isChecked;
+        }
+
+        function goToStep(stepNumber) {
+            const isTermsChecked = document.getElementById('termsCheckbox').checked;
+            
+            if (stepNumber === 2 && !isTermsChecked) {
+                alert("Iltimos, avval Shaxsiy ma'lumotlarni qayta ishlash Nizomiga rozilik bildiring.");
+                return;
+            }
+
+            // Update Stepper Visuals
+            const node1 = document.getElementById('nodeStep1');
+            const node2 = document.getElementById('nodeStep2');
+            const progressFill = document.getElementById('progressFill');
+
+            const section1 = document.getElementById('stepSection1');
+            const section2 = document.getElementById('stepSection2');
+
+            if (stepNumber === 1) {
+                node1.className = "step-node active";
+                node2.className = "step-node";
+                progressFill.style.width = "50%";
+                section1.className = "step-section active";
+                section2.className = "step-section";
+            } else {
+                node1.className = "step-node completed";
+                node2.className = "step-node active";
+                progressFill.style.width = "100%";
+                section1.className = "step-section";
+                section2.className = "step-section active";
+            }
+        }
+
+        function previewAvatar(event) {
+            const input = event.target;
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('avatarPreviewImg');
+                    const placeholder = document.getElementById('avatarPlaceholder');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        // Form submission validation
+        document.getElementById('onboardingForm').addEventListener('submit', function(e) {
+            const firstName = document.getElementById('id_first_name').value.trim();
+            const lastName = document.getElementById('id_last_name').value.trim();
+            const termsChecked = document.getElementById('termsCheckbox').checked;
+
+            if (!termsChecked) {
+                e.preventDefault();
+                goToStep(1);
+                alert("Nizomga rozilik berilishi shart.");
+                return false;
+            }
+
+            if (!firstName || !lastName) {
+                e.preventDefault();
+                goToStep(2);
+                alert("Ism va familiyangizni to'ldirishingiz shart.");
+                return false;
+            }
+
+            const newPwd = document.getElementById('id_new_password').value.trim();
+            const confirmPwd = document.getElementById('id_confirm_password').value.trim();
+            if (newPwd || confirmPwd) {
+                if (newPwd.length < 6) {
+                    e.preventDefault();
+                    goToStep(2);
+                    alert("Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak.");
+                    return false;
+                }
+                if (newPwd !== confirmPwd) {
+                    e.preventDefault();
+                    goToStep(2);
+                    alert("Kiritilgan yangi parollar bir-biriga mos kelmadi.");
+                    return false;
+                }
+            }
+
+            const btn = document.getElementById('btnSubmitOnboarding');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saqlanmoqda...';
+            return true;
+        });
+    </script>
+</body>
+</html>

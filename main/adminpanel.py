@@ -442,19 +442,21 @@ def students_list_admin(request):
 
 @subadmin_permission_required('manage_students')
 def add_student(request):
+    groups = Group.objects.all().order_by('name')
 
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         first_name = request.POST.get('first_name', '').strip()
         last_name = request.POST.get('last_name', '').strip()
         phone_number = request.POST.get('phone_number', '').strip()
+        group_id = request.POST.get('group_id', '').strip()
         role = request.POST.get('role', 'student').strip() or 'student'
         is_active = request.POST.get('is_active') == 'on'
         profile_image = request.FILES.get('profile_image')
         otp_code = request.POST.get('otp_code', '').strip()
 
-        if not all([first_name, last_name, phone_number]):
-            messages.error(request, "Ism, familiya va telefon raqami to‘ldirilishi majburiy.", extra_tags='password_creat')
+        if not phone_number:
+            messages.error(request, "Telefon raqami to‘ldirilishi majburiy.", extra_tags='password_creat')
             return redirect('add_student')
 
         phone_clean = clean_phone_number(phone_number)
@@ -493,6 +495,9 @@ def add_student(request):
         # Auto-generate secure strong password
         raw_password = generate_random_password(8)
 
+        # If first_name and last_name are provided, profile is marked completed; otherwise user completes on first login
+        is_completed = bool(first_name and last_name)
+
         user = CustomUser.objects.create(
             username=username,
             first_name=first_name,
@@ -501,23 +506,35 @@ def add_student(request):
             password=make_password(raw_password),
             role=role,
             is_active=is_active,
+            is_profile_completed=is_completed,
+            terms_accepted=is_completed
         )
         if profile_image:
             user.profile_image = profile_image
             user.save()
 
+        # Link student to group if selected
+        if group_id:
+            try:
+                group_obj = Group.objects.get(id=group_id)
+                GroupStudentMembership.objects.get_or_create(student=user, group=group_obj)
+            except (Group.DoesNotExist, ValueError):
+                pass
+
         # Send credentials via SMS
         site_setting = SiteSetting.objects.first()
         site_name = site_setting.site_name if site_setting and site_setting.site_name else "VLE Tizimi"
         site_url = request.build_absolute_uri('/')
-        sms_text = f"Assalomu alaykum, {first_name}! {site_name} tizimidagi profilingiz yaratildi.\nLogin: {username}\nParol: {raw_password}\nKirish: {site_url}"
+        greeting = f"Assalomu alaykum, {first_name}!" if first_name else "Assalomu alaykum!"
+        sms_text = f"{greeting} {site_name} tizimidagi profilingiz yaratildi.\nLogin: {username}\nParol: {raw_password}\nKirish: {site_url}"
         sms_res = send_sms(phone_clean, sms_text, check_enabled=True)
 
         # Clear OTP from session
         request.session.pop(f'phone_otp_{phone_clean}', None)
         request.session.pop(f'sms_verified_{phone_clean}', None)
 
-        log_action(request.user, "Talaba Qo'shildi", f"Yangi talaba qo'shildi: {user.username} ({user.first_name} {user.last_name})", request)
+        display_name = f"{user.first_name} {user.last_name}".strip() or user.username
+        log_action(request.user, "Talaba Qo'shildi", f"Yangi talaba qo'shildi: {user.username} ({display_name})", request)
         
         if sms_res.get('success'):
             messages.success(request, f"O'quvchi muvaffaqiyatli qo'shildi! Login: {username}, Parol: {raw_password} (SMS orqali yuborildi).", extra_tags='edit_user')
@@ -525,7 +542,9 @@ def add_student(request):
             messages.success(request, f"O'quvchi muvaffaqiyatli qo'shildi! Login: {username}, Parol: {raw_password}.", extra_tags='edit_user')
         return redirect('students_list_admin')
 
-    return render(request, 'add-student.html')
+    return render(request, 'add-student.html', {
+        'groups': groups
+    })
 
 
 def edit_student(request, student_id):
@@ -670,8 +689,8 @@ def add_teacher(request):
         profile_image = request.FILES.get('profile_image')
         otp_code = request.POST.get('otp_code', '').strip()
 
-        if not all([first_name, last_name, phone_number]):
-            messages.error(request, "Ism, familiya va telefon raqami to‘ldirilishi majburiy.", extra_tags='password_creat_teacher')
+        if not phone_number:
+            messages.error(request, "Telefon raqami to‘ldirilishi majburiy.", extra_tags='password_creat_teacher')
             return redirect('add_teacher')
 
         phone_clean = clean_phone_number(phone_number)
@@ -710,6 +729,9 @@ def add_teacher(request):
         # Auto-generate secure strong password
         raw_password = generate_random_password(8)
 
+        # If first_name and last_name are provided, profile is marked completed; otherwise user completes on first login
+        is_completed = bool(first_name and last_name)
+
         new_teacher = CustomUser.objects.create(
             username=username,
             first_name=first_name,
@@ -718,25 +740,30 @@ def add_teacher(request):
             password=make_password(raw_password),
             role=role,
             is_active=is_active,
-            profile_image=profile_image
+            profile_image=profile_image,
+            is_profile_completed=is_completed,
+            terms_accepted=is_completed
         )
         
         # Save subjects M2M
         selected_subjects = request.POST.getlist('subjects')
-        new_teacher.subjects.set(selected_subjects)
+        if selected_subjects:
+            new_teacher.subjects.set(selected_subjects)
 
         # Send credentials via SMS
         site_setting = SiteSetting.objects.first()
         site_name = site_setting.site_name if site_setting and site_setting.site_name else "VLE Tizimi"
         site_url = request.build_absolute_uri('/')
-        sms_text = f"Assalomu alaykum, {first_name}! {site_name} tizimidagi o'qituvchi profilingiz yaratildi.\nLogin: {username}\nParol: {raw_password}\nKirish: {site_url}"
+        greeting = f"Assalomu alaykum, {first_name}!" if first_name else "Assalomu alaykum!"
+        sms_text = f"{greeting} {site_name} tizimidagi o'qituvchi profilingiz yaratildi.\nLogin: {username}\nParol: {raw_password}\nKirish: {site_url}"
         sms_res = send_sms(phone_clean, sms_text, check_enabled=True)
 
         # Clear OTP from session
         request.session.pop(f'phone_otp_{phone_clean}', None)
         request.session.pop(f'sms_verified_{phone_clean}', None)
 
-        log_action(request.user, "O'qituvchi Qo'shildi", f"Yangi o'qituvchi qo'shildi: {new_teacher.username} ({new_teacher.first_name} {new_teacher.last_name})", request)
+        display_name = f"{new_teacher.first_name} {new_teacher.last_name}".strip() or new_teacher.username
+        log_action(request.user, "O'qituvchi Qo'shildi", f"Yangi o'qituvchi qo'shildi: {new_teacher.username} ({display_name})", request)
         
         if sms_res.get('success'):
             messages.success(request, f"O'qituvchi muvaffaqiyatli qo‘shildi! Login: {username}, Parol: {raw_password} (SMS orqali yuborildi).", extra_tags='teacher_list')

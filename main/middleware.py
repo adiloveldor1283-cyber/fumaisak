@@ -259,3 +259,43 @@ class ErrorTrackingMiddleware:
             if path.startswith(w):
                 return True
         return False
+
+
+class OnboardingRequiredMiddleware:
+    """
+    Ensures students and teachers complete their legal consent & personal details (O'RQ-547)
+    before accessing any protected features.
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        user = request.user
+        path = request.path
+
+        if user.is_authenticated and hasattr(user, 'role') and user.role in ('student', 'teacher'):
+            is_completed = getattr(user, 'is_profile_completed', False) and getattr(user, 'terms_accepted', False)
+            
+            whitelisted_prefixes = (
+                '/onboarding',
+                '/logout',
+                '/static',
+                '/media',
+                '/api',
+                '/favicon',
+            )
+            is_whitelisted = any(path.startswith(prefix) for prefix in whitelisted_prefixes)
+
+            if not is_completed:
+                if not is_whitelisted:
+                    from django.shortcuts import redirect
+                    return redirect('onboarding')
+            else:
+                if path.startswith('/onboarding'):
+                    from django.shortcuts import redirect
+                    if user.role == 'teacher':
+                        return redirect('teacher_home')
+                    return redirect('student_home')
+
+        return self.get_response(request)
+

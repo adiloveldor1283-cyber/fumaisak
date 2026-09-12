@@ -71,6 +71,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'main.middleware.NoCacheMiddleware',
     'main.middleware.SessionDeviceTrackerMiddleware',
+    'main.middleware.OnboardingRequiredMiddleware',
     'main.middleware.ErrorTrackingMiddleware',
 ]
 
