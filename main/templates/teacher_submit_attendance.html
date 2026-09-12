@@ -336,6 +336,7 @@
                         <th style="width: 60px; color: #4facfe;">№</th>
                         <th>Familiya</th>
                         <th>Ism</th>
+                        <th>Sharif</th>
                         <th style="width: 200px; text-align: center;">Davomati</th>
                     </tr>
                 </thead>
@@ -345,6 +346,7 @@
                             <td data-label="№" style="font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
                             <td data-label="Familiya" style="font-weight: 700; color: #ffffff;">{{ student.last_name }}</td>
                             <td data-label="Ism">{{ student.first_name }}</td>
+                            <td data-label="Sharif" style="color: rgba(255, 255, 255, 0.85);">{{ student.middle_name|default:"-" }}</td>
                             <td data-label="Davomati" style="text-align: center;">
                                 <select name="status_{{ student.id }}">
                                     <option value="present">Kelgan</option>

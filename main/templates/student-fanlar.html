@@ -583,7 +583,7 @@
                                         <div class="teacher-avatar-placeholder">{{ teacher.first_name|first }}</div>
                                     {% endif %}
                                     <div>
-                                        <div class="teacher-name">{{ teacher.first_name }} {{ teacher.last_name }}</div>
+                                        <div class="teacher-name">{{ teacher.get_full_name }}</div>
                                         <a href="tel:{{ teacher.phone_number }}" class="teacher-phone"><i class="fas fa-phone-alt" style="font-size: 9px;"></i> {{ teacher.phone_number }}</a>
                                     </div>
                                 </div>

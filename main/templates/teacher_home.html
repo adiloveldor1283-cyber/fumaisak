@@ -951,6 +951,7 @@
                         <tr>
                             <th>Familiya</th>
                             <th>Ism</th>
+                            <th>Sharif</th>
                             <th style="text-align: right;">Daraja</th>
                         </tr>
                     </thead>
@@ -959,13 +960,14 @@
                             <tr data-daraja="{{ student_levels|get_item:student.id }}">
                                 <td class="student-last-name" style="font-weight: 600; color: #ffffff;">{{ student.last_name }}</td>
                                 <td class="student-first-name">{{ student.first_name }}</td>
+                                <td class="student-middle-name" style="color: rgba(255, 255, 255, 0.85);">{{ student.middle_name|default:"-" }}</td>
                                 <td class="student-level-col" style="text-align: right; font-weight: 700; color: #00ffaa;">{{ student_levels|get_item:student.id }}</td>
                             </tr>
                         {% empty %}
-                            <tr id="emptyInitialRow"><td colspan="3" style="text-align: center; color: rgba(255,255,255,0.3); padding: 20px 10px; font-style: italic;">O'quvchilar topilmadi.</td></tr>
+                            <tr id="emptyInitialRow"><td colspan="4" style="text-align: center; color: rgba(255,255,255,0.3); padding: 20px 10px; font-style: italic;">O'quvchilar topilmadi.</td></tr>
                         {% endfor %}
                         <tr id="noResultsRow" class="hidden-row" style="display: none;">
-                            <td colspan="3" style="text-align: center; color: rgba(255,255,255,0.3); padding: 20px 10px; font-style: italic;">Qidiruv yoki filtr bo'yicha o'quvchilar topilmadi.</td>
+                            <td colspan="4" style="text-align: center; color: rgba(255,255,255,0.3); padding: 20px 10px; font-style: italic;">Qidiruv yoki filtr bo'yicha o'quvchilar topilmadi.</td>
                         </tr>
                     </tbody>
                 </table>

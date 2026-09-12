@@ -1006,7 +1006,7 @@
             </div>
             <div class="profile-info-wrap">
                 <div class="profile-name-row">
-                    <h2 class="profile-name">{{ teacher.first_name }} {{ teacher.last_name }}</h2>
+                    <h2 class="profile-name">{{ teacher.get_full_name }}</h2>
                     <span class="role-badge"><i class="fas fa-chalkboard-teacher"></i> O'qituvchi</span>
                 </div>
                 <div class="profile-sub-row">
@@ -1071,8 +1071,12 @@
             
             <div class="info-grid">
                 <div class="info-card">
-                    <span class="info-card-label"><i class="fas fa-user"></i> Ism va Familiya</span>
-                    <span class="info-card-value">{{ teacher.first_name }} {{ teacher.last_name }}</span>
+                    <span class="info-card-label"><i class="fas fa-user"></i> To'liq F.I.Sh</span>
+                    <span class="info-card-value">{{ teacher.get_full_name }}</span>
+                </div>
+                <div class="info-card">
+                    <span class="info-card-label"><i class="fas fa-id-badge"></i> Sharifi (Otasining ismi)</span>
+                    <span class="info-card-value">{{ teacher.middle_name|default:"Kiritilmagan" }}</span>
                 </div>
                 <div class="info-card">
                     <span class="info-card-label"><i class="fas fa-user-tag"></i> Login (Foydalanuvchi nomi)</span>

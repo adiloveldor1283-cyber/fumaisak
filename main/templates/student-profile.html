@@ -1006,7 +1006,7 @@
             </div>
             <div class="profile-info-wrap">
                 <div class="profile-name-row">
-                    <h2 class="profile-name">{{ student.first_name }} {{ student.last_name }}</h2>
+                    <h2 class="profile-name">{{ student.get_full_name }}</h2>
                     <span class="role-badge"><i class="fas fa-user-graduate"></i> O'quvchi</span>
                 </div>
                 <div class="profile-sub-row">
@@ -1071,8 +1071,12 @@
             
             <div class="info-grid">
                 <div class="info-card">
-                    <span class="info-card-label"><i class="fas fa-user"></i> Ism va Familiya</span>
-                    <span class="info-card-value">{{ student.first_name }} {{ student.last_name }}</span>
+                    <span class="info-card-label"><i class="fas fa-user"></i> To'liq F.I.Sh</span>
+                    <span class="info-card-value">{{ student.get_full_name }}</span>
+                </div>
+                <div class="info-card">
+                    <span class="info-card-label"><i class="fas fa-id-badge"></i> Sharifi (Otasining ismi)</span>
+                    <span class="info-card-value">{{ student.middle_name|default:"Kiritilmagan" }}</span>
                 </div>
                 <div class="info-card">
                     <span class="info-card-label"><i class="fas fa-user-tag"></i> Login (Foydalanuvchi nomi)</span>
@@ -1124,7 +1128,7 @@
                                     <div class="group-teachers-row">
                                         <span style="color: rgba(255,255,255,0.5); font-size: 11.5px;">Ustoz:</span>
                                         {% for t in g.teachers.all %}
-                                            <span class="teacher-name-tag"><i class="fas fa-chalkboard-teacher"></i> {{ t.first_name }} {{ t.last_name }}</span>
+                                            <span class="teacher-name-tag"><i class="fas fa-chalkboard-teacher"></i> {{ t.get_full_name }}</span>
                                         {% endfor %}
                                     </div>
                                 {% endif %}

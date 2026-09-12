@@ -1,7 +1,7 @@
 {% extends 'baseadmin.html' %}
 {% load static %}
 
-{% block title %}{{ student.first_name }} {{ student.last_name }} to'lov tarixi | VLE Tizimi{% endblock %}
+{% block title %}{{ student.get_full_name }} to'lov tarixi | VLE Tizimi{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -62,7 +62,7 @@
         <a href="{% url 'student_list' %}" class="back-arrow-btn" title="Orqaga">
             <i class="fas fa-chevron-left" style="font-size: 16px;"></i>
         </a>
-        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">{{ student.first_name }} {{ student.last_name }} - to'lov tarixi</h2>
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">{{ student.get_full_name }} - to'lov tarixi</h2>
     </div>
 
     <!-- QIDIRUV FORMASI -->

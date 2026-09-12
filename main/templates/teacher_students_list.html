@@ -512,6 +512,7 @@
                     <th class="th-num">№</th>
                     <th>Familiya</th>
                     <th>Ism</th>
+                    <th>Sharif</th>
                     <th>Telefon raqam</th>
                     <th style="width: 80px; text-align: center;">Rasm</th>
                 </tr>
@@ -534,11 +535,17 @@
                             <span class="student-firstname">{{ student.first_name }}</span>
                         </td>
 
-                        <!-- 4. Mobildagi Birlashgan Ma'lumot Bloki -->
+                        <!-- 4. Desktop Sharif -->
+                        <td class="td-middlename-desktop">
+                            <span class="student-middlename" style="color: rgba(255,255,255,0.85);">{{ student.middle_name|default:"-" }}</span>
+                        </td>
+
+                        <!-- 5. Mobildagi Birlashgan Ma'lumot Bloki -->
                         <td class="td-mobile-info" style="display: none;">
                             <div class="mobile-name-line">
                                 <span class="student-lastname">{{ student.last_name }}</span>
                                 <span class="student-firstname">{{ student.first_name }}</span>
+                                <span class="student-middlename">{{ student.middle_name }}</span>
                             </div>
                             <div class="mobile-phone-line">
                                 {% if student.phone_number %}
@@ -549,7 +556,7 @@
                             </div>
                         </td>
 
-                        <!-- 5. Desktop Telefon -->
+                        <!-- 6. Desktop Telefon -->
                         <td class="td-phone-desktop">
                             {% if student.phone_number %}
                                 <a href="tel:{{ student.phone_number }}" class="phone-link"><i class="fas fa-phone-alt"></i> {{ student.phone_number }}</a>
@@ -558,7 +565,7 @@
                             {% endif %}
                         </td>
 
-                        <!-- 6. Rasm -->
+                        <!-- 7. Rasm -->
                         <td class="td-avatar" style="text-align: center;">
                           {% if student.profile_image %}
                             <img src="{{ student.profile_image.url }}" alt="Rasm" class="profil-rasm-rasm">
@@ -569,14 +576,14 @@
                     </tr>
                 {% empty %}
                     <tr id="emptyInitialRow">
-                        <td colspan="5" class="empty-state-cell">
+                        <td colspan="6" class="empty-state-cell">
                             <i class="fas fa-user-slash"></i>
                             <span>O'quvchilar topilmadi.</span>
                         </td>
                     </tr>
                 {% endfor %}
                 <tr id="noResultsRow" class="d-row-hidden" style="display: none;">
-                    <td colspan="5" class="empty-state-cell">
+                    <td colspan="6" class="empty-state-cell">
                         <i class="fas fa-search-minus"></i>
                         <span>Qidiruv bo'yicha o'quvchilar topilmadi.</span>
                     </td>

@@ -92,7 +92,7 @@
                                 <span><i class="fas fa-chalkboard-teacher" style="color: #4facfe; margin-right: 4px;"></i> O'qituvchi: 
                                     {% if group.teachers.all %}
                                         {% for t in group.teachers.all %}
-                                            <strong style="color: rgba(255,255,255,0.85);">{{ t.first_name }} {{ t.last_name }}</strong>{% if not forloop.last %}, {% endif %}
+                                            <strong style="color: rgba(255,255,255,0.85);">{{ t.get_full_name }}</strong>{% if not forloop.last %}, {% endif %}
                                         {% endfor %}
                                     {% else %}
                                         <em style="color: rgba(255,255,255,0.4);">Biriktirilmagan</em>
@@ -167,7 +167,7 @@
                                                 {% if sched.teacher %}
                                                     <span style="display: inline-flex; align-items: center; gap: 6px;">
                                                         <i class="fas fa-user-tie" style="color: rgba(255,255,255,0.4);"></i>
-                                                        <strong>{{ sched.teacher.first_name }} {{ sched.teacher.last_name }}</strong>
+                                                        <strong>{{ sched.teacher.get_full_name }}</strong>
                                                     </span>
                                                 {% else %}
                                                     <span style="color: rgba(255,255,255,0.4); font-style: italic;">Ko'rsatilmagan</span>

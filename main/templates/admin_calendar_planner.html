@@ -284,7 +284,7 @@
                 <select id="teacherFilter" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(0, 242, 254, 0.2); color: white; outline: none; font-size: 0.85rem; cursor: pointer; font-weight: 600;">
                     <option value="all">Barcha o'qituvchilar</option>
                     {% for teacher in teachers %}
-                        <option value="{{ teacher.id }}">{{ teacher.first_name }} {{ teacher.last_name }}</option>
+                        <option value="{{ teacher.id }}">{{ teacher.get_full_name }}</option>
                     {% endfor %}
                 </select>
             </div>

@@ -406,8 +406,7 @@
                     {% else %}
                         {{ teacher.role }}
                     {% endif %}
-                </span>
-                <span>{{ teacher.first_name }} {{ teacher.last_name }}</span>
+                <span>{{ teacher.get_full_name }}</span>
             </div>
         </div>
 

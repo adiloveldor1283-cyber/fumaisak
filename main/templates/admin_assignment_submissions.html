@@ -384,6 +384,7 @@
                     <th style="width: 60px; color: #4facfe;">№</th>
                     <th>FAMILIYA</th>
                     <th>ISM</th>
+                    <th>SHARIF</th>
                     <th>TELEFON RAQAMI</th>
                     <th>HOLATI</th>
                     <th style="width: 100px; text-align: center;">FAYL</th>
@@ -397,6 +398,7 @@
                     <td data-label="№" style="font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
                     <td data-label="Familiya" style="font-weight: 700; color: #ffffff;">{{ item.student.last_name }}</td>
                     <td data-label="Ism">{{ item.student.first_name }}</td>
+                    <td data-label="Sharif" style="color: rgba(255, 255, 255, 0.85);">{{ item.student.middle_name|default:"-" }}</td>
                     <td data-label="Telefon raqami" style="font-family: monospace; color: rgba(255,255,255,0.6);">{{ item.student.phone_number }}</td>
                     <td data-label="Holati">
                         {% if item.submission %}

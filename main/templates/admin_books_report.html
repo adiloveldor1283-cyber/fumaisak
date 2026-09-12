@@ -131,7 +131,7 @@
                                 {{ item.book.uploaded_by.first_name|first|default:item.book.uploaded_by.phone_number|first }}
                             </div>
                             <div>
-                                <span style="font-weight: 700;">{{ item.book.uploaded_by.first_name }} {{ item.book.uploaded_by.last_name }}</span>
+                                <span style="font-weight: 700;">{{ item.book.uploaded_by.get_full_name }}</span>
                                 <span style="font-size: 10px; color: rgba(255,255,255,0.4); display: block;">{{ item.book.uploaded_by.get_role_display|default:item.book.uploaded_by.role }}</span>
                             </div>
                         </div>

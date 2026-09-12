@@ -1855,7 +1855,7 @@
                         {{ user.role }}
                     {% endif %}
                 </span>
-                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">{{ student.first_name }} {{ student.last_name }}</span>
+                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">{{ request.user.get_full_name }}</span>
             </div>
         </div>
 

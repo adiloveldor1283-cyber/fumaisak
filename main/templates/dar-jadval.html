@@ -531,11 +531,7 @@
             <div style="display: flex; flex-direction: column;">
                 <span class="span">Admin</span>
                 <span style="color: #ffffff; font-weight: 600; font-size: 13px;">
-                    {% if user.first_name or user.last_name %}
-                        {{ user.first_name }} {{ user.last_name }}
-                    {% else %}
-                        {{ user.username }}
-                    {% endif %}
+                    {{ user.get_full_name }}
                 </span>
             </div>
         </div>
@@ -596,7 +592,7 @@
                         <tbody>
                             {% for teacher in teachers %}
                                 <tr>
-                                    <td style="text-align: left; font-weight: 800; color: #00f2fe; white-space: nowrap;"><i class="fas fa-chalkboard-teacher" style="margin-right: 8px;"></i>{{ teacher.first_name }} {{ teacher.last_name }}</td>
+                                    <td style="text-align: left; font-weight: 800; color: #00f2fe; white-space: nowrap;"><i class="fas fa-chalkboard-teacher" style="margin-right: 8px;"></i>{{ teacher.get_full_name }}</td>
                                     {% for day_value, _ in days %}
                                         <td>
                                             <div id="cell-{{ teacher.id }}-{{ day_value }}">

@@ -168,7 +168,7 @@
                     <tr>
                         <td style="text-align: left; vertical-align: middle; font-weight: 700; color: #ffffff;">
                             <i class="fas fa-chalkboard-teacher" style="color: #00f2fe; margin-right: 8px;"></i>
-                            {{ teacher.first_name }} {{ teacher.last_name }}
+                            {{ teacher.get_full_name }}
                         </td>
                         {% for day_value, _ in days %}
                             <td>

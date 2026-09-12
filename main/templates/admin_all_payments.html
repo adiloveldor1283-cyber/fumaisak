@@ -109,7 +109,7 @@
             {% for payment in payments %}
             <tr>
                 <td data-label="№" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #4facfe;">{{ forloop.counter0|add:payments.start_index }}</td>
-                <td data-label="O'quvchi" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ payment.student.first_name }} {{ payment.student.last_name }}</td>
+                <td data-label="O'quvchi" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ payment.student.get_full_name }}</td>
                 <td data-label="Guruh" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: rgba(255,255,255,0.7);">{{ payment.group.name }}</td>
                 <td data-label="Oy" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #00f2fe; font-weight: 600;">{{ payment.month }}</td>
                 <td data-label="To'langan summa" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #00ffaa; font-weight: 700;">{{ payment.amount_paid }} so'm</td>

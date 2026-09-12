@@ -36,7 +36,7 @@
                 <td data-label="№" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
                 <td data-label="TEST NOMI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ quiz.title }}</td>
                 <td data-label="GURUH" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">{{ quiz.group.name }}</td>
-                <td data-label="O'QITUVCHI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">{{ quiz.teacher.first_name }} {{ quiz.teacher.last_name }}</td>
+                <td data-label="O'QITUVCHI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">{{ quiz.teacher.get_full_name }}</td>
                 <td data-label="YARATILGAN VAQTI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ quiz.created_at|date:"d.m.Y H:i" }}</td>
                 <td data-label="TAHRIRLASH" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
                     <a href="{% url 'edit_quiz' quiz.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">Tahrirlash</a>

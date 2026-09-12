@@ -1219,7 +1219,7 @@
                     <tr class="submission-item-row {% if item.submission %}submitted{% else %}not-submitted{% endif %}"
                         data-submitted="{% if item.submission %}submitted{% else %}not-submitted{% endif %}"
                         data-graded="{% if item.submission and item.submission.grade is not None %}graded{% elif item.submission %}ungraded{% else %}not-submitted{% endif %}"
-                        data-name="{{ item.student.last_name|lower }} {{ item.student.first_name|lower }}"
+                        data-name="{{ item.student.get_full_name|lower }}"
                         data-phone="{{ item.student.phone_number|default:'' }}">
 
                         <!-- 📱 MOBIL REJIM KARTASI -->
@@ -1231,7 +1231,7 @@
                                         {{ item.student.first_name|slice:":1"|upper }}{{ item.student.last_name|slice:":1"|upper }}
                                     </div>
                                     <div class="student-names-col">
-                                        <div class="student-full-name">{{ item.student.last_name }} {{ item.student.first_name }}</div>
+                                        <div class="student-full-name">{{ item.student.get_full_name }}</div>
                                         <div class="phone-chip {% if not item.student.phone_number %}empty{% endif %}">
                                             {{ item.student.phone_number|default:"Telefon ko'rsatilmagan" }}
                                         </div>
@@ -1298,7 +1298,7 @@
                                     {{ item.student.first_name|slice:":1"|upper }}{{ item.student.last_name|slice:":1"|upper }}
                                 </div>
                                 <div class="student-names-col">
-                                    <span class="student-full-name">{{ item.student.last_name }} {{ item.student.first_name }}</span>
+                                    <span class="student-full-name">{{ item.student.get_full_name }}</span>
                                 </div>
                             </div>
                         </td>

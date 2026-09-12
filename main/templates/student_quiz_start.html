@@ -192,7 +192,7 @@
             <i class="fas fa-exclamation-triangle warn-icon"></i>
             <h4>Kiber Imtihon Qoidalari</h4>
             <p>
-                <strong>DIQQAT!</strong> Tizim identifikatsiyani tasdiqladi: <span style="color: #00f2fe; font-weight: 700;">{{ student.first_name }} {{ student.last_name }}</span>. <br><br>
+                <strong>DIQQAT!</strong> Tizim identifikatsiyani tasdiqladi: <span style="color: #00f2fe; font-weight: 700;">{{ student.get_full_name }}</span>. <br><br>
                 1. "Boshlash" tugmasini bosganingizda brauzer **To'liq ekran** rejimiga o'tadi va taymer ishga tushadi. <br>
                 2. Imtihon davomida chap menyularni bosish, sahifani yangilash yoki har qanday tarzda imtihon maydonidan chiqish **MUTLAQ TAQIQLANADI**.<br>
                 3. Agar test javoblaridan yoki "Imtihonni yakunlash" tugmasidan boshqa istalgan tugma bosilsa, imtihon o'sha soniyadayoq **avtomatik yakunlanadi** va belgilangan javoblaringiz saqlanib, ro'yxatga qaytarilasiz!
@@ -208,7 +208,7 @@
             <div class="kiber-karta" style="border-color: rgba(0, 242, 254, 0.15);">
                 <div class="matn-qismi">
                     <span class="kichik-tizim">Imtihon topshiruvchi</span>
-                    <span class="katta-qiymat" style="color: #00f2fe;">{{ student.first_name }} {{ student.last_name }}</span>
+                    <span class="katta-qiymat" style="color: #00f2fe;">{{ student.get_full_name }}</span>
                 </div>
                 <div class="ikonka-qutisi" style="color: #00f2fe; border-color: rgba(0,242,254,0.2);"><i class="fas fa-user-graduate"></i></div>
             </div>

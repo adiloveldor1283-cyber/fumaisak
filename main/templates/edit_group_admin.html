@@ -206,7 +206,7 @@
                 <input type="text" class="search-box" data-target="available-teachers" placeholder="Familiya bo'yicha qidirish...">
                 <select id="available-teachers" multiple>
                     {% for teacher in all_teachers %}
-                        <option value="{{ teacher.id }}">{{ teacher.last_name }} {{ teacher.first_name }} ({% for s in teacher.subjects.all %}{{ s.name }}{% if not forloop.last %}, {% endif %}{% empty %}Fan yo'q{% endfor %})</option>
+                        <option value="{{ teacher.id }}">{{ teacher.get_full_name }} ({% for s in teacher.subjects.all %}{{ s.name }}{% if not forloop.last %}, {% endif %}{% empty %}Fan yo'q{% endfor %})</option>
                     {% endfor %}
                 </select>
             </div>
@@ -221,7 +221,7 @@
                 <input type="text" class="search-box" data-target="selected-teachers" placeholder="Familiya bo'yicha qidirish...">
                 <select id="selected-teachers" name="selected_teachers" multiple>
                     {% for teacher in group_teachers %}
-                        <option value="{{ teacher.id }}">{{ teacher.last_name }} {{ teacher.first_name }} ({% for s in teacher.subjects.all %}{{ s.name }}{% if not forloop.last %}, {% endif %}{% empty %}Fan yo'q{% endfor %})</option>
+                        <option value="{{ teacher.id }}">{{ teacher.get_full_name }} ({% for s in teacher.subjects.all %}{{ s.name }}{% if not forloop.last %}, {% endif %}{% empty %}Fan yo'q{% endfor %})</option>
                     {% endfor %}
                 </select>
             </div>
@@ -234,7 +234,7 @@
                 <input type="text" class="search-box" data-target="available-students" placeholder="Familiya bo'yicha qidirish...">
                 <select id="available-students" multiple>
                     {% for student in all_students %}
-                        <option value="{{ student.id }}">{{ student.last_name }} {{ student.first_name }} (O'quvchi)</option>
+                        <option value="{{ student.id }}">{{ student.get_full_name }} (O'quvchi)</option>
                     {% endfor %}
                 </select>
             </div>
@@ -249,7 +249,7 @@
                 <input type="text" class="search-box" data-target="selected-students" placeholder="Familiya bo'yicha qidirish...">
                 <select id="selected-students" name="selected_students" multiple>
                     {% for student in group.students.all %}
-                        <option value="{{ student.id }}">{{ student.last_name }} {{ student.first_name }} (O'quvchi)</option>
+                        <option value="{{ student.id }}">{{ student.get_full_name }} (O'quvchi)</option>
                     {% endfor %}
                 </select>
             </div>

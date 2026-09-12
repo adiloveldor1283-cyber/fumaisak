@@ -306,6 +306,7 @@
                     <th style="width: 60px; color: #4facfe;">№</th>
                     <th>FAMILIYA</th>
                     <th>ISM</th>
+                    <th>SHARIF</th>
                     <th>TELEFON RAQAMI</th>
                     <th style="text-align: center;">SAVOLLAR SONI</th>
                     <th style="text-align: center;">TO'G'RI JAVOBLAR</th>
@@ -319,6 +320,7 @@
                         <td data-label="№" style="font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
                         <td data-label="FAMILIYA" style="font-weight: 700; color: #ffffff;">{{ item.student.last_name }}</td>
                         <td data-label="ISM">{{ item.student.first_name }}</td>
+                        <td data-label="SHARIF" style="color: rgba(255, 255, 255, 0.85);">{{ item.student.middle_name|default:"-" }}</td>
                         <td data-label="TELEFON RAQAMI" style="font-family: monospace; color: rgba(255,255,255,0.6);">{{ item.student.phone_number }}</td>
                         <td data-label="SAVOLLAR SONI" style="text-align: center; font-weight: 700;">{{ item.total_questions }}</td>
 
@@ -332,7 +334,7 @@
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="8" style="text-align: center; color: rgba(255,255,255,0.3); padding: 40px 20px;">
+                        <td colspan="9" style="text-align: center; color: rgba(255,255,255,0.3); padding: 40px 20px;">
                             <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 40px 20px; text-align: center;">
                                 <i class="fas fa-poll" style="font-size: 36px; color: rgba(255,255,255,0.2); margin-bottom: 15px; display: inline-block;"></i>
                                 <h4 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Natijalar mavjud emas</h4>

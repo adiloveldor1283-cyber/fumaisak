@@ -528,11 +528,7 @@
             <div style="display: flex; flex-direction: column;">
                 <span class="span">Admin</span>
                 <span style="color: #ffffff; font-weight: 600; font-size: 13px;">
-                    {% if user.first_name or user.last_name %}
-                        {{ user.first_name }} {{ user.last_name }}
-                    {% else %}
-                        {{ user.username }}
-                    {% endif %}
+                    {{ user.get_full_name }}
                 </span>
             </div>
         </div>
@@ -584,10 +580,10 @@
 
             <div class="users-grid" id="usersContainer">
                 {% for u in users %}
-                    <div class="user-card" data-name="{{ u.first_name|lower }} {{ u.last_name|lower }}" data-role="{{ u.role }}">
+                    <div class="user-card" data-name="{{ u.get_full_name|lower }}" data-role="{{ u.role }}">
                         <h2>
                             <i class="fas {% if u.role == 'teacher' %}fa-chalkboard-teacher{% else %}fa-user-graduate{% endif %}"></i>
-                            {{ u.first_name }} {{ u.last_name }}
+                            {{ u.get_full_name }}
                         </h2>
                         
                         <div class="user-info-row">

@@ -907,8 +907,7 @@
                 <thead>
                     <tr>
                         <th style="width: 50px; color: #4facfe;">№</th>
-                        <th>Familiya</th>
-                        <th>Ism</th>
+                        <th>Familiya, Ism va Sharif</th>
                         <th>Telefon raqam</th>
                         <th style="width: 70px; text-align: center;">Rasm</th>
                     </tr>
@@ -921,6 +920,7 @@
                                 <div class="student-fullname">
                                     <span class="student-lastname">{{ student.last_name }}</span> 
                                     <span class="student-firstname">{{ student.first_name }}</span>
+                                    <span class="student-middlename" style="color: rgba(255,255,255,0.85);">{{ student.middle_name }}</span>
                                 </div>
                                 <div class="mobile-phone-sub">
                                     {% if student.phone_number %}
