@@ -82,8 +82,8 @@
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.01)';" onmouseout="this.style.background='none';">
                             <td data-label="FOYDALANUVCHI" style="padding: 18px 20px; font-weight: 700; color: #ffffff; font-size: 13.5px;">
                                 {% if log.user %}
-                                    {{ log.user.get_full_name }}
-                                    <small style="display: block; color: rgba(255,255,255,0.4); font-weight: 500;">@{{ log.user.username }} ({{ log.user.get_role_display }})</small>
+                                    {{ log.user.get_full_name|default:log.user.phone_number }}
+                                    <small style="display: block; color: rgba(255,255,255,0.4); font-weight: 500;">{% if log.user.role == 'admin' %}@{{ log.user.username }}{% else %}{{ log.user.phone_number }}{% endif %} ({{ log.user.get_role_display }})</small>
                                 {% else %}
                                     <span style="color: rgba(255,255,255,0.4); font-style: italic;">Anonim</span>
                                 {% endif %}

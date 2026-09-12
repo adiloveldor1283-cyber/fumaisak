@@ -220,7 +220,6 @@
             <thead>
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); background: #080d1a; position: sticky; top: 0; z-index: 10;">
                     <th style="padding: 14px 10px; width: 40px; text-align: center; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;"><input type="checkbox" id="check-all" style="accent-color: #00f2fe; width: 16px; height: 16px; cursor: pointer;"></th>
-                    <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a; white-space: nowrap;">LOGINI</th>
                     <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">FAMILIYASI</th>
                     <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">ISMI</th>
                     <th style="padding: 14px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a; white-space: nowrap;">TELEFON RAQAMI</th>
@@ -236,7 +235,6 @@
                 {% for teacher in teachers %}
                 <tr>
                     <td style="padding: 12px 10px; width: 40px; text-align: center; font-size: 13px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);"><input type="checkbox" class="row-check" name="selected_users" value="{{ teacher.id }}" style="accent-color: #00f2fe; width: 16px; height: 16px; cursor: pointer;"></td>
-                    <td data-label="LOGINI" style="padding: 12px 10px; font-size: 13px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: #4facfe; white-space: nowrap;">{{ teacher.username }}</td>
                     <td data-label="FAMILIYASI" style="padding: 12px 10px; font-size: 13.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">
                         {% if teacher.last_name %}
                             {{ teacher.last_name }}

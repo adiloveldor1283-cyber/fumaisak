@@ -160,8 +160,10 @@
                             </div>
                         {% endif %}
                         <div>
-                            <span>{{ s.user.get_full_name|default:s.user.username }}</span>
-                            <span style="display: block; font-size: 11px; font-family: monospace; color: rgba(255,255,255,0.4); margin-top: 2px;">@{{ s.user.username }}</span>
+                            <span>{% if s.user.first_name or s.user.last_name %}{{ s.user.get_full_name }}{% elif s.user.role == 'admin' %}{{ s.user.username }}{% else %}{{ s.user.phone_number }}{% endif %}</span>
+                            <span style="display: block; font-size: 11px; font-family: monospace; color: rgba(255,255,255,0.4); margin-top: 2px;">
+                                {% if s.user.role == 'admin' %}@{{ s.user.username }}{% else %}{{ s.user.phone_number }}{% endif %}
+                            </span>
                         </div>
                     </div>
                 </td>

@@ -531,13 +531,13 @@ def add_student(request):
         request.session.pop(f'phone_otp_{phone_clean}', None)
         request.session.pop(f'sms_verified_{phone_clean}', None)
 
-        display_name = f"{user.first_name} {user.last_name}".strip() or user.username
-        log_action(request.user, "Talaba Qo'shildi", f"Yangi talaba qo'shildi: {user.username} ({display_name})", request)
+        display_name = f"{user.first_name} {user.last_name}".strip() or user.phone_number
+        log_action(request.user, "Talaba Qo'shildi", f"Yangi talaba qo'shildi: {user.phone_number} ({display_name})", request)
         
         if sms_res.get('success'):
-            messages.success(request, f"O'quvchi muvaffaqiyatli qo'shildi! Login: {username}, Parol: {raw_password} (SMS orqali yuborildi).", extra_tags='edit_user')
+            messages.success(request, f"O'quvchi muvaffaqiyatli qo'shildi! Kirish ma'lumotlari {phone_clean} raqamiga SMS orqali yuborildi.", extra_tags='edit_user')
         else:
-            messages.success(request, f"O'quvchi muvaffaqiyatli qo'shildi! Login: {username}, Parol: {raw_password}.", extra_tags='edit_user')
+            messages.success(request, f"O'quvchi muvaffaqiyatli qo'shildi! Kirish ma'lumotlari SMS orqali yuborildi.", extra_tags='edit_user')
         return redirect('students_list_admin')
 
     return render(request, 'add-student.html', {
@@ -581,7 +581,7 @@ def edit_student(request, student_id):
             student.profile_image = profile_image
 
         student.save()
-        log_action(request.user, "Talaba Tahrirlandi", f"Talaba ma'lumotlari tahrirlandi: {student.username} ({student.first_name} {student.last_name})", request)
+        log_action(request.user, "Talaba Tahrirlandi", f"Talaba ma'lumotlari tahrirlandi: {student.phone_number} ({student.first_name} {student.last_name})", request)
         messages.success(request, "O'quvchi ma'lumotlari saqlandi.", extra_tags='edit_user')
         return redirect('students_list_admin')
 
@@ -663,7 +663,7 @@ def edit_teacher(request, teacher_id):
         selected_subjects = request.POST.getlist('subjects')
         teacher.subjects.set(selected_subjects)
 
-        log_action(request.user, "O'qituvchi Tahrirlandi", f"O'qituvchi ma'lumotlari tahrirlandi: {teacher.username} ({teacher.first_name} {teacher.last_name})", request)
+        log_action(request.user, "O'qituvchi Tahrirlandi", f"O'qituvchi ma'lumotlari tahrirlandi: {teacher.phone_number} ({teacher.first_name} {teacher.last_name})", request)
         messages.success(request, "O'qituvchi ma'lumotlari saqlandi.", extra_tags='teacher_list')
         return redirect('teachers_list_admin')
 
@@ -758,13 +758,13 @@ def add_teacher(request):
         request.session.pop(f'phone_otp_{phone_clean}', None)
         request.session.pop(f'sms_verified_{phone_clean}', None)
 
-        display_name = f"{new_teacher.first_name} {new_teacher.last_name}".strip() or new_teacher.username
-        log_action(request.user, "O'qituvchi Qo'shildi", f"Yangi o'qituvchi qo'shildi: {new_teacher.username} ({display_name})", request)
+        display_name = f"{new_teacher.first_name} {new_teacher.last_name}".strip() or new_teacher.phone_number
+        log_action(request.user, "O'qituvchi Qo'shildi", f"Yangi o'qituvchi qo'shildi: {new_teacher.phone_number} ({display_name})", request)
         
         if sms_res.get('success'):
-            messages.success(request, f"O'qituvchi muvaffaqiyatli qo‘shildi! Login: {username}, Parol: {raw_password} (SMS orqali yuborildi).", extra_tags='teacher_list')
+            messages.success(request, f"O'qituvchi muvaffaqiyatli qo‘shildi! Kirish ma'lumotlari {phone_clean} raqamiga SMS orqali yuborildi.", extra_tags='teacher_list')
         else:
-            messages.success(request, f"O'qituvchi muvaffaqiyatli qo‘shildi! Login: {username}, Parol: {raw_password}.", extra_tags='teacher_list')
+            messages.success(request, f"O'qituvchi muvaffaqiyatli qo‘shildi! Kirish ma'lumotlari SMS orqali yuborildi.", extra_tags='teacher_list')
         return redirect('teachers_list_admin')
 
     return render(request, 'add-teacher.html', {'all_subjects': all_subjects})
@@ -1326,13 +1326,13 @@ def export_students_excel(request):
         writer.writerow([f"{site_name.upper()} - O'QUVCHILAR RO'YXATI (QAYDNOMASI)"])
         writer.writerow([f"Guruh: {group_name}", f"Fan: {subject_name}", f"O'qituvchi: {teachers_names}", f"Sana: {today_str}"])
         writer.writerow([])
-        writer.writerow(["№", "Familiyasi", "Ismi", "Telefon raqami", "Logini (Username)", "Guruh(lar)i", "Holati", "Qo'shilgan sana"])
+        writer.writerow(["№", "Familiyasi", "Ismi", "Telefon raqami", "Guruh(lar)i", "Holati", "Qo'shilgan sana"])
         for idx, student in enumerate(students, start=1):
             groups_qs = student.student_groups.all()
             groups_str = ", ".join(g.name for g in groups_qs) if groups_qs else "-"
             status_text = "Faol" if student.is_active else "Bloklangan"
             joined_str = timezone.localtime(student.joined_at).strftime("%d.%m.%Y %H:%M") if student.joined_at else "-"
-            writer.writerow([idx, student.last_name, student.first_name, student.phone_number or "-", student.username, groups_str, status_text, joined_str])
+            writer.writerow([idx, student.last_name, student.first_name, student.phone_number or "-", groups_str, status_text, joined_str])
         return response
 
 
@@ -1359,19 +1359,19 @@ def export_students_excel(request):
     font_summary = Font(name="Arial", size=10.5, bold=True, color="0F172A")
 
     # Sarlavha qatorlari
-    ws.merge_cells("A1:H1")
+    ws.merge_cells("A1:G1")
     ws["A1"] = f"{site_name.upper()} - O'QUVCHILAR RO'YXATI (QAYDNOMASI)"
     ws["A1"].font = font_title
     ws["A1"].alignment = Alignment(horizontal="center", vertical="center")
     ws.row_dimensions[1].height = 26
 
-    ws.merge_cells("A2:H2")
+    ws.merge_cells("A2:G2")
     ws["A2"] = f"Guruh / Kurs: {group_name} | Fan: {subject_name} | O'qituvchi(lar): {teachers_names}"
     ws["A2"].font = font_sub
     ws["A2"].alignment = Alignment(horizontal="center", vertical="center")
     ws.row_dimensions[2].height = 18
 
-    ws.merge_cells("A3:H3")
+    ws.merge_cells("A3:G3")
     ws["A3"] = f"Shakllantirildi: {today_str} | Jami: {total_count} nafar (Faol: {active_count} ta, Bloklangan: {inactive_count} ta) | Mas'ul: {admin_name}"
     ws["A3"].font = font_meta
     ws["A3"].alignment = Alignment(horizontal="center", vertical="center")
@@ -1386,7 +1386,6 @@ def export_students_excel(request):
         "Familiyasi",
         "Ismi",
         "Telefon raqami",
-        "Logini (Username)",
         "Guruh(lar)i",
         "Holati",
         "Qo'shilgan sana"
@@ -1414,7 +1413,6 @@ def export_students_excel(request):
             student.last_name,
             student.first_name,
             student.phone_number or "-",
-            student.username,
             groups_str,
             status_text,
             joined_str
@@ -1441,15 +1439,12 @@ def export_students_excel(request):
                 cell.alignment = Alignment(horizontal="center", vertical="center")
                 cell.font = font_td
             elif col_num == 5:
-                cell.alignment = Alignment(horizontal="center", vertical="center")
-                cell.font = font_td
-            elif col_num == 6:
                 cell.alignment = Alignment(horizontal="left", vertical="center")
                 cell.font = font_td
-            elif col_num == 7:
+            elif col_num == 6:
                 cell.alignment = Alignment(horizontal="center", vertical="center")
                 cell.font = font_active if student.is_active else font_blocked
-            elif col_num == 8:
+            elif col_num == 7:
                 cell.alignment = Alignment(horizontal="center", vertical="center")
                 cell.font = font_td
 
@@ -1457,35 +1452,34 @@ def export_students_excel(request):
         current_row += 1
 
     # Jamlama qator (Summary row)
-    ws.merge_cells(start_row=current_row, start_column=1, end_row=current_row, end_column=8)
+    ws.merge_cells(start_row=current_row, start_column=1, end_row=current_row, end_column=7)
     summary_cell = ws.cell(row=current_row, column=1)
     summary_cell.value = f"JAMI O'QUVCHILAR: {total_count} nafar  (Faol: {active_count} ta, Bloklangan: {inactive_count} ta)"
     summary_cell.font = font_summary
     summary_cell.fill = summary_fill
     summary_cell.alignment = Alignment(horizontal="center", vertical="center")
-    for c in range(1, 9):
+    for c in range(1, 8):
         ws.cell(row=current_row, column=c).border = thin_border
     ws.row_dimensions[current_row].height = 22
     current_row += 2
 
     # Imzolar bloki
     ws.cell(row=current_row, column=2, value=f"O'quv markaz rahbari: {admin_name}").font = font_td_bold
-    ws.cell(row=current_row, column=5, value=f"Mas'ul o'qituvchi: {teachers_names}").font = font_td_bold
-    ws.cell(row=current_row, column=8, value="M.O'.").font = font_td_bold
+    ws.cell(row=current_row, column=4, value=f"Mas'ul o'qituvchi: {teachers_names}").font = font_td_bold
+    ws.cell(row=current_row, column=7, value="M.O'.").font = font_td_bold
 
     current_row += 1
     ws.cell(row=current_row, column=2, value="Imzo: ___________________").font = font_meta
-    ws.cell(row=current_row, column=5, value="Imzo: ___________________").font = font_meta
+    ws.cell(row=current_row, column=4, value="Imzo: ___________________").font = font_meta
 
     # Ustunlar kengligini o'rnatish
     ws.column_dimensions['A'].width = 8   # №
     ws.column_dimensions['B'].width = 18  # Familiya
     ws.column_dimensions['C'].width = 18  # Ism
     ws.column_dimensions['D'].width = 18  # Telefon
-    ws.column_dimensions['E'].width = 18  # Login
-    ws.column_dimensions['F'].width = 24  # Guruhlari
-    ws.column_dimensions['G'].width = 14  # Holati
-    ws.column_dimensions['H'].width = 20  # Qo'shilgan sana
+    ws.column_dimensions['E'].width = 24  # Guruhlari
+    ws.column_dimensions['F'].width = 14  # Holati
+    ws.column_dimensions['G'].width = 20  # Qo'shilgan sana
 
     # Gridlines yoqish
     ws.views.sheetView[0].showGridLines = True
@@ -1911,7 +1905,7 @@ def export_teachers_excel(request):
         writer.writerow([f"{site_name.upper()} - O'QITUVCHILAR RO'YXATI (QAYDNOMASI)"])
         writer.writerow([f"Kategoriya: {category_name}", f"Fan: {subject_name}", f"Sana: {today_str}"])
         writer.writerow([])
-        writer.writerow(["№", "Familiyasi", "Ismi", "Telefon raqami", "Logini (Username)", "Fan / Mutaxassisliklari", "Guruh(lar)i", "Holati", "Qo'shilgan sana"])
+        writer.writerow(["№", "Familiyasi", "Ismi", "Telefon raqami", "Fan / Mutaxassisliklari", "Guruh(lar)i", "Holati", "Qo'shilgan sana"])
         for idx, teacher in enumerate(teachers, start=1):
             subjects_qs = teacher.subjects.all()
             subjects_str = ", ".join(s.name for s in subjects_qs) if subjects_qs else "-"
@@ -1919,7 +1913,7 @@ def export_teachers_excel(request):
             groups_str = ", ".join(g.name for g in groups_qs) if groups_qs else "-"
             status_text = "Faol" if teacher.is_active else "Bloklangan"
             joined_str = timezone.localtime(teacher.joined_at).strftime("%d.%m.%Y %H:%M") if teacher.joined_at else "-"
-            writer.writerow([idx, teacher.last_name, teacher.first_name, teacher.phone_number or "-", teacher.username, subjects_str, groups_str, status_text, joined_str])
+            writer.writerow([idx, teacher.last_name, teacher.first_name, teacher.phone_number or "-", subjects_str, groups_str, status_text, joined_str])
         return response
 
     thin_border = Border(
@@ -1944,19 +1938,19 @@ def export_teachers_excel(request):
     font_summary = Font(name="Arial", size=10.5, bold=True, color="0F172A")
 
     # Sarlavha qatorlari
-    ws.merge_cells("A1:I1")
+    ws.merge_cells("A1:H1")
     ws["A1"] = f"{site_name.upper()} - O'QITUVCHILAR RO'YXATI (QAYDNOMASI)"
     ws["A1"].font = font_title
     ws["A1"].alignment = Alignment(horizontal="center", vertical="center")
     ws.row_dimensions[1].height = 26
 
-    ws.merge_cells("A2:I2")
+    ws.merge_cells("A2:H2")
     ws["A2"] = f"Kategoriya: {category_name} | Fan / Mutaxassislik: {subject_name}"
     ws["A2"].font = font_sub
     ws["A2"].alignment = Alignment(horizontal="center", vertical="center")
     ws.row_dimensions[2].height = 18
 
-    ws.merge_cells("A3:I3")
+    ws.merge_cells("A3:H3")
     ws["A3"] = f"Shakllantirildi: {today_str} | Jami: {total_count} nafar (Faol: {active_count} ta, Bloklangan: {inactive_count} ta) | Mas'ul: {admin_name}"
     ws["A3"].font = font_meta
     ws["A3"].alignment = Alignment(horizontal="center", vertical="center")
@@ -1969,7 +1963,6 @@ def export_teachers_excel(request):
         "Familiyasi",
         "Ismi",
         "Telefon raqami",
-        "Logini (Username)",
         "Fan / Mutaxassisliklari",
         "Guruh(lar)i",
         "Holati",
@@ -1999,7 +1992,6 @@ def export_teachers_excel(request):
             teacher.last_name,
             teacher.first_name,
             teacher.phone_number or "-",
-            teacher.username,
             subjects_str,
             groups_str,
             status_text,
@@ -2022,50 +2014,49 @@ def export_teachers_excel(request):
             elif col_num in (2, 3):
                 cell.alignment = Alignment(horizontal="left", vertical="center")
                 cell.font = font_td_bold
-            elif col_num in (4, 5):
+            elif col_num == 4:
                 cell.alignment = Alignment(horizontal="center", vertical="center")
                 cell.font = font_td
-            elif col_num in (6, 7):
+            elif col_num in (5, 6):
                 cell.alignment = Alignment(horizontal="left", vertical="center")
                 cell.font = font_td
-            elif col_num == 8:
+            elif col_num == 7:
                 cell.alignment = Alignment(horizontal="center", vertical="center")
                 cell.font = font_active if teacher.is_active else font_blocked
-            elif col_num == 9:
+            elif col_num == 8:
                 cell.alignment = Alignment(horizontal="center", vertical="center")
                 cell.font = font_td
 
         ws.row_dimensions[current_row].height = 20
         current_row += 1
 
-    ws.merge_cells(start_row=current_row, start_column=1, end_row=current_row, end_column=9)
+    ws.merge_cells(start_row=current_row, start_column=1, end_row=current_row, end_column=8)
     summary_cell = ws.cell(row=current_row, column=1)
     summary_cell.value = f"JAMI O'QITUVCHILAR: {total_count} nafar  (Faol: {active_count} ta, Bloklangan: {inactive_count} ta)"
     summary_cell.font = font_summary
     summary_cell.fill = summary_fill
     summary_cell.alignment = Alignment(horizontal="center", vertical="center")
-    for c in range(1, 10):
+    for c in range(1, 9):
         ws.cell(row=current_row, column=c).border = thin_border
     ws.row_dimensions[current_row].height = 22
     current_row += 2
 
     ws.cell(row=current_row, column=2, value=f"O'quv markaz rahbari: {admin_name}").font = font_td_bold
-    ws.cell(row=current_row, column=6, value=f"O'quv-metodik bo'lim boshlig'i: {admin_name}").font = font_td_bold
-    ws.cell(row=current_row, column=9, value="M.O'.").font = font_td_bold
+    ws.cell(row=current_row, column=5, value=f"O'quv-metodik bo'lim boshlig'i: {admin_name}").font = font_td_bold
+    ws.cell(row=current_row, column=8, value="M.O'.").font = font_td_bold
 
     current_row += 1
     ws.cell(row=current_row, column=2, value="Imzo: ___________________").font = font_meta
-    ws.cell(row=current_row, column=6, value="Imzo: ___________________").font = font_meta
+    ws.cell(row=current_row, column=5, value="Imzo: ___________________").font = font_meta
 
     ws.column_dimensions['A'].width = 8
     ws.column_dimensions['B'].width = 18
     ws.column_dimensions['C'].width = 18
     ws.column_dimensions['D'].width = 18
-    ws.column_dimensions['E'].width = 18
+    ws.column_dimensions['E'].width = 24
     ws.column_dimensions['F'].width = 24
-    ws.column_dimensions['G'].width = 24
-    ws.column_dimensions['H'].width = 14
-    ws.column_dimensions['I'].width = 20
+    ws.column_dimensions['G'].width = 14
+    ws.column_dimensions['H'].width = 20
 
     ws.views.sheetView[0].showGridLines = True
 
