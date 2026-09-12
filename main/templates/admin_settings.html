@@ -160,6 +160,101 @@
     .btn-save-settings:hover {
         box-shadow: var(--shadow-card-hover);
     }
+
+    /* Form Controls & Inputs Styling (Dark Mode by default, Light Mode adaptive) */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control,
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 14px;
+        background: rgba(255, 255, 255, 0.02) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 12px;
+        color: #ffffff !important;
+        outline: none;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus,
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="number"]:focus,
+    input[type="tel"]:focus,
+    textarea:focus,
+    select:focus {
+        border-color: #00f2fe !important;
+        box-shadow: 0 0 12px rgba(0, 242, 254, 0.25) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    html.light-theme .form-control,
+    html.light-theme input[type="text"],
+    html.light-theme input[type="email"],
+    html.light-theme input[type="password"],
+    html.light-theme input[type="number"],
+    html.light-theme input[type="tel"],
+    html.light-theme textarea,
+    html.light-theme select {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+
+    html.light-theme .form-control:focus,
+    html.light-theme input[type="text"]:focus,
+    html.light-theme input[type="email"]:focus,
+    html.light-theme input[type="password"]:focus,
+    html.light-theme input[type="number"]:focus,
+    html.light-theme input[type="tel"]:focus,
+    html.light-theme textarea:focus,
+    html.light-theme select:focus {
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+        background: #ffffff !important;
+    }
+
+    .info {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.4);
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    html.light-theme .info {
+        color: #64748b;
+    }
+
+    .info i {
+        color: #00f2fe;
+    }
+
+    html.light-theme .info i {
+        color: #0284c7;
+    }
 </style>
 {% endblock %}
 

@@ -207,12 +207,26 @@
         }
 
         /* Global Form Controls & Select Options */
+        input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="image"]),
+        textarea,
         select {
             color-scheme: dark;
         }
+
+        html.light-theme input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="image"]),
+        html.light-theme textarea,
+        html.light-theme select {
+            color-scheme: light;
+        }
+
         select option {
             background-color: #0c101d !important;
             color: #ffffff !important;
+        }
+
+        html.light-theme select option {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
         }
 
         /* Global premium, barely visible scrollbar styling */
