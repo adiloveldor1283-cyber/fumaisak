@@ -1044,9 +1044,9 @@ class StudentPlanSchema(BaseModel):
 
 # --- 🤖 2. UNIVERSAL GEMINI SDK CHAQIRUV FUNKSIYASI ---
 
-def call_gemini_sdk(prompt, response_schema=None):
+def call_gemini_sdk(prompt, response_schema=None, temperature=0.4):
     """
-    Yangi rasmiy google-genai SDK orqali Gemini modeliga xavfsiz murojaat qilish.
+    Yangi rasmiy google-genai SDK orqali Gemini modeliga xavfsiz va tezkor murojaat qilish.
     Agar response_schema berilsa, qat'iy JSON qaytaradi, aks holda Plain Text/Markdown.
     """
     import time
@@ -1057,12 +1057,13 @@ def call_gemini_sdk(prompt, response_schema=None):
     # SDK Client tashkil qilish
     client = genai.Client(api_key=api_key)
 
-    # Eng barqaror va aqlli model
-    model_name = 'gemini-3-flash-preview'
+    # Eng tezkor, barqaror va aqlli rasmiy model
+    model_name = 'gemini-2.5-flash'
 
     config_args = {
-        'temperature': 1.0,
+        'temperature': temperature,
         'top_p': 0.95,
+        'max_output_tokens': 8192,
     }
 
     # Agar Pydantic sxemasi uzatilgan bo'lsa, qat'iy formatlashni yoqamiz
@@ -1082,9 +1083,9 @@ def call_gemini_sdk(prompt, response_schema=None):
                     config=config
                 )
             except Exception as m_err:
-                print(f"gemini-3-flash-preview failed, attempting gemini-2.5-flash: {m_err}")
+                print(f"gemini-2.5-flash failed, attempting fallback to gemini-2.0-flash: {m_err}")
                 response = client.models.generate_content(
-                    model='gemini-2.5-flash',
+                    model='gemini-2.0-flash',
                     contents=prompt,
                     config=config
                 )
@@ -1147,7 +1148,7 @@ def generate_mock_plan(student, quizzes_count, average_score):
 
 
 import threading
-ai_api_lock = threading.Lock()
+ai_api_lock = threading.BoundedSemaphore(5)
 
 
 @login_required
@@ -1197,27 +1198,55 @@ def ai_quiz_dashboard(request):
         categories_str = custom_category
 
         if level == 'beginner':
+            level_code = "A1-A2"
             level_display = "Boshlang'ich (A1-A2 darajasi)"
+            level_instructions = (
+                "DARAJA TALABLARI: A1-A2 (Boshlang'ich / Elementary).\n"
+                "- Savollar asosiy tushunchalar, kundalik iboralar va fundamental qoidalarga asoslansin.\n"
+                "- So'z boyligi va jumlalar sodda va to'g'ridan-to'g'ri bo'lsin."
+            )
         elif level == 'intermediate':
-            level_display = "O'rta (B1-B2 darajasi)"
+            level_code = "B1-B2"
+            level_display = "O'rta / O'rtadan yuqori (B1-B2 darajasi)"
+            level_instructions = (
+                "DARAJA TALABLARI: B1-B2 (O'rta va O'rtadan yuqori / Intermediate & Upper-Intermediate - CEFR B2 STANDARTI).\n"
+                "- Savollar murakkab qoidalar (Mixed Conditionals, Passives, Modal verbs, Phrasal verbs, Dependent prepositions) va sabab-oqibatli mantiqqa asoslansin.\n"
+                "- Barcha 4 ta variant ham mantiqan juda yaqin, chuqur o'ylantiradigan va asosli (plausible distractors) bo'lsin.\n"
+                "- Kontekstual vaziyatlar va real hayotiy misollardan foydalanilsin."
+            )
         else:
             level = 'advanced'
+            level_code = "C1-C2"
             level_display = "Yuqori / Murakkab (C1-C2 darajasi)"
+            level_instructions = (
+                "DARAJA TALABLARI: C1-C2 (Yuqori, Professional va Ilmiy / Advanced & Mastery - CEFR C1-C2 STANDARTI).\n"
+                "- Savollar nozik farqlar (subtle distinctions), Inversion, Cleft sentences, Subjunctive mood, akademik darajadagi leksika va qoidalarning istisnolariga asoslansin.\n"
+                "- Savollar o'quvchining chuqur analitik va mantiqiy tafakkurini sinovdan o'tkazsin.\n"
+                "- Noto'g'ri variantlar oddiy xato emas, balki yuqori darajada kuchli va nozik chalg'ituvchi (high-level distractors) bo'lsin."
+            )
 
         prompt = f"""
-        Tizim o'quvchi uchun mustaqil test savollarini tuzib berishi kerak.
-        O'quvchining darajasi: {level_display}
-        Test mavzusi: {categories_str}
-        Savollar soni: {num_questions} ta.
+        Siz professional xalqaro imtihonlar (CEFR, IELTS, DTM, SAT) tuzuvchi tajribali ekspert va metodistsiz.
+        O'quvchi uchun mustaqil test topshiriqlarini tuzib bering.
 
-        Har bir savol uchun o'rtacha 2 daqiqa hisobida 'time_limit' qiymatini belgilang.
-        Savollar va variantlarni tushunarli tilda tuzing. Agar mavzu chet tili (masalan, ingliz tili grammatikasi) bo'lsa, savol matni va uning variantlari o'sha tilda bo'lsin, lekin to'g'ri javob izohi (correct_explanation) HAR DOIM mukammal va batafsil O'ZBEK tilida yozilishi shart.
+        Mavzu: "{categories_str}"
+        Talab qilinadigan savollar soni: ANIQ {num_questions} TA SAVOL TUZING (aynan {num_questions} ta savol bo'lishi shart).
+        
+        {level_instructions}
+
+        MUHIM QOIDALAR:
+        1. Har bir savolda aniq 4 ta variant (options) bo'lsin, ulardan faqat 1 tasi to'g'ri (is_correct: true), qolgan 3 tasi noto'g'ri (is_correct: false) bo'lsin.
+        2. Agar mavzu chet tili (masalan, Ingliz tili) bo'lsa, savol matni va 4 ta varianti o'sha tilda bo'lsin. Ammo 'correct_explanation' (to'g'ri javob izohi) HAR DOIM mukammal, ravon va ilmiy O'ZBEK tilida bo'lishi shart.
+        3. Agar mavzu aniq yoki tabiiy fanlar (Matematika, Fizika, Kimyo) bo'lsa, formulalarni standart LaTeX ($...$) ko'rinishida yozing.
+        4. 'correct_explanation'da nima uchun aynan shu javob to'g'riligi va boshqa variantlar nima sababdan xatoligi ixcham va tushunarli tahlil qilinsin.
+        5. 'time_limit' qiymatini har bir savol uchun 2 daqiqa hisobida butun son (daqiqa) sifatida belgilang ({num_questions * 2} daqiqa).
+        6. 'title' qiymatiga mavzuning to'liq nomini bering ("{categories_str}").
         """
 
-        # Thread-safe API Queue Mutex Lock so hundreds of parallel student requests process orderly
-        acquired = ai_api_lock.acquire(timeout=20)
+        # Concurrency control with generous timeout for large 20-question quizzes
+        acquired = ai_api_lock.acquire(timeout=60)
         try:
-            api_response = call_gemini_sdk(prompt, response_schema=QuizStructureSchema)
+            api_response = call_gemini_sdk(prompt, response_schema=QuizStructureSchema, temperature=0.4)
             quiz_data = json.loads(api_response)
         except Exception as e:
             print(f"--- Gemini SDK Quiz Error: {str(e)} ---")
