@@ -108,7 +108,8 @@ def telegram_webhook(request):
             raw_phone = contact.get('phone_number', '')
             phone_clean = clean_phone_number(raw_phone)
             if phone_clean:
-                cache.set(f"tg_chat_by_phone_{phone_clean}", chat_id, timeout=7200)
+                # Save chat_id mapped to phone for 24 hours
+                cache.set(f"tg_chat_by_phone_{phone_clean}", chat_id, timeout=86400)
 
                 existing_user = CustomUser.objects.filter(
                     Q(phone_number=raw_phone) |
@@ -133,25 +134,12 @@ def telegram_webhook(request):
                     )
                     send_telegram_message(chat_id, welcome_msg, reply_markup=remove_kb)
                 else:
-                    otp_code = generate_otp_code()
-                    cache_payload = {
-                        'otp': otp_code,
-                        'chat_id': chat_id,
-                        'phone_clean': phone_clean,
-                        'created_at': time.time(),
-                        'expires_at': time.time() + 600
-                    }
-                    cache.set(f"tg_reg_otp_{phone_clean}", cache_payload, timeout=600)
-
                     remove_kb = {"remove_keyboard": True}
-                    otp_msg = (
-                        f"✅ <b>Telefon raqamingiz qabul qilindi:</b> +{phone_clean}\n\n"
-                        f"🔢 <b>Sizning ro'yxatdan o'tish kodingiz:</b> <code>{otp_code}</code>\n"
-                        f"⏳ <i>Amal qilish muddati: 10 daqiqa</i>\n\n"
-                        f"Ushbu kodni markaz administratoriga ayting. Administrator ro'yxatdan o'tkazgach, "
-                        f"tizimga kirish uchun login va parolingiz shu yerga yuboriladi! 🚀"
+                    info_msg = (
+                        f"✅ <b>Telefon raqamingiz muvaffaqiyatli qabul qilindi:</b> +{phone_clean}\n\n"
+                        f"Administrator sizni tizimda ro'yxatdan o'tkazayotganda, tasdiqlash kodi va tizimga kirish login/parolingiz ushbu botga yuboriladi. 🚀"
                     )
-                    send_telegram_message(chat_id, otp_msg, reply_markup=remove_kb)
+                    send_telegram_message(chat_id, info_msg, reply_markup=remove_kb)
             return JsonResponse({'status': 'success'})
         
         # 2. Start command

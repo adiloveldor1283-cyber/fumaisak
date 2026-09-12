@@ -418,9 +418,9 @@
         <div id="eskiz-balance-box" style="display: none; margin-bottom: 20px; background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 12px; padding: 12px 18px; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <i class="fas fa-coins" style="color: #00f2fe; font-size: 18px;"></i>
-                <span style="font-size: 13.5px; color: white; font-weight: 600;">Eskiz.uz hisob balansi: <strong id="eskiz-balance-amount" style="color: #00ffaa;">Yuklanmoqda...</strong></span>
+                <span style="font-size: 13.5px; color: var(--text-primary); font-weight: 600;">Eskiz.uz hisob balansi: <strong id="eskiz-balance-amount" style="color: #00ffaa;">Yuklanmoqda...</strong></span>
             </div>
-            <span id="eskiz-user-info" style="font-size: 12px; color: rgba(255,255,255,0.5);"></span>
+            <span id="eskiz-user-info" style="font-size: 12px; color: var(--text-secondary);"></span>
         </div>
 
         <form method="POST">
@@ -440,7 +440,7 @@
                     <label for="eskiz-password" style="display: block; font-size: 11.5px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Eskiz.uz Yashirin kalit (API Parol) *</label>
                     <div style="position: relative;">
                         <input type="password" name="eskiz_password" id="eskiz-password" class="form-control" value="{{ setting.eskiz_password|default:'' }}" placeholder="Eskiz.uz API paroli" style="width: 100%; padding: 12px 45px 12px 16px; font-size: 14px;">
-                        <button type="button" onclick="togglePasswordVisibility('eskiz-password', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; font-size: 14px;">
+                        <button type="button" onclick="togglePasswordVisibility('eskiz-password', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 14px;">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
@@ -463,25 +463,25 @@
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px;">
                     <!-- Main Toggle -->
-                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: rgba(0, 242, 254, 0.04); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 10px; color: white; font-size: 13.5px; font-weight: 600;">
+                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: rgba(0, 242, 254, 0.04); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 10px; color: var(--text-primary); font-size: 13.5px; font-weight: 600;">
                         <input type="checkbox" name="sms_enabled" style="accent-color: #00f2fe; width: 18px; height: 18px;" {% if setting.sms_enabled %}checked{% endif %}>
                         <span>SMS Xizmatini yoqish</span>
                     </label>
 
                     <!-- On register -->
-                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; color: white; font-size: 13.5px; font-weight: 500;">
+                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; color: var(--text-primary); font-size: 13.5px; font-weight: 500;">
                         <input type="checkbox" name="sms_on_register" style="accent-color: #00f2fe; width: 18px; height: 18px;" {% if setting.sms_on_register %}checked{% endif %}>
                         <span>Yangi hisob ochilganda login/parol SMS yuborish</span>
                     </label>
 
                     <!-- On payment -->
-                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; color: white; font-size: 13.5px; font-weight: 500;">
+                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; color: var(--text-primary); font-size: 13.5px; font-weight: 500;">
                         <input type="checkbox" name="sms_on_payment" style="accent-color: #00f2fe; width: 18px; height: 18px;" {% if setting.sms_on_payment %}checked{% endif %}>
                         <span>To'lov qabul qilinganda SMS kvitansiya</span>
                     </label>
 
                     <!-- On absence -->
-                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; color: white; font-size: 13.5px; font-weight: 500;">
+                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; color: var(--text-primary); font-size: 13.5px; font-weight: 500;">
                         <input type="checkbox" name="sms_on_absence" style="accent-color: #00f2fe; width: 18px; height: 18px;" {% if setting.sms_on_absence %}checked{% endif %}>
                         <span>Darsga kelmaganda SMS ogohlantirish</span>
                     </label>
@@ -503,7 +503,7 @@
                 <div class="card-icon" style="color: #38bdf8; background: rgba(0, 136, 204, 0.15); border-color: rgba(0, 136, 204, 0.3);"><i class="fab fa-telegram-plane"></i></div>
                 <div>
                     <h3 class="card-title-custom" style="display: flex; align-items: center; gap: 10px;">
-                        Telegram Bot Integratsiyasi (0 so'm / Bepul)
+                        Telegram Bot Integratsiyasi
                         {% if setting.telegram_enabled %}
                             <span style="font-size: 11px; background: rgba(0, 255, 170, 0.15); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.3); padding: 2px 10px; border-radius: 20px; font-weight: 700;">FAOL</span>
                         {% else %}
@@ -530,7 +530,7 @@
                     <label for="tg-bot-token" style="display: block; font-size: 11.5px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Telegram Bot Token *</label>
                     <div style="position: relative;">
                         <input type="password" name="telegram_bot_token" id="tg-bot-token" class="form-control" value="{{ setting.telegram_bot_token|default:'' }}" placeholder="123456789:ABCdefGHIjklMNOpqrs..." style="width: 100%; padding: 12px 45px 12px 16px; font-size: 14px;">
-                        <button type="button" onclick="togglePasswordVisibility('tg-bot-token', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; font-size: 14px;">
+                        <button type="button" onclick="togglePasswordVisibility('tg-bot-token', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 14px;">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
@@ -552,25 +552,25 @@
                 </h4>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px;">
                     <!-- Enabled -->
-                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; color: white; font-size: 13.5px; font-weight: 500;">
+                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; color: var(--text-primary); font-size: 13.5px; font-weight: 500;">
                         <input type="checkbox" name="telegram_enabled" style="accent-color: #38bdf8; width: 18px; height: 18px;" {% if setting.telegram_enabled %}checked{% endif %}>
                         <span>Telegram Bot xizmatini yoqish</span>
                     </label>
 
                     <!-- On register -->
-                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; color: white; font-size: 13.5px; font-weight: 500;">
+                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; color: var(--text-primary); font-size: 13.5px; font-weight: 500;">
                         <input type="checkbox" name="telegram_on_register" style="accent-color: #38bdf8; width: 18px; height: 18px;" {% if setting.telegram_on_register %}checked{% endif %}>
                         <span>Ro'yxatdan o'tganda login/parol yuborish</span>
                     </label>
 
                     <!-- On payment -->
-                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; color: white; font-size: 13.5px; font-weight: 500;">
+                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; color: var(--text-primary); font-size: 13.5px; font-weight: 500;">
                         <input type="checkbox" name="telegram_on_payment" style="accent-color: #38bdf8; width: 18px; height: 18px;" {% if setting.telegram_on_payment %}checked{% endif %}>
                         <span>To'lov qabul qilinganda kvitansiya</span>
                     </label>
 
                     <!-- On absence -->
-                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; color: white; font-size: 13.5px; font-weight: 500;">
+                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; color: var(--text-primary); font-size: 13.5px; font-weight: 500;">
                         <input type="checkbox" name="telegram_on_absence" style="accent-color: #38bdf8; width: 18px; height: 18px;" {% if setting.telegram_on_absence %}checked{% endif %}>
                         <span>Darsga kelmaganda ogohlantirish</span>
                     </label>

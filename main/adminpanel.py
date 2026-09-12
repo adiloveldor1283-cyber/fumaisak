@@ -6949,76 +6949,53 @@ def send_phone_verification_otp_ajax(request):
 
     # --- TELEGRAM KANAL ORQALI TASDIQLASH ---
     if channel == 'telegram':
-        tg_reg = cache.get(f"tg_reg_otp_{phone_clean}")
         tg_chat_id = cache.get(f"tg_chat_by_phone_{phone_clean}")
 
-        if tg_reg and isinstance(tg_reg, dict):
-            otp_code = tg_reg.get('otp')
-            chat_id = tg_reg.get('chat_id')
-            request.session[otp_session_key] = {
-                'otp': otp_code,
-                'expires_at': time.time() + 600,
-                'verified': False,
-                'channel': 'telegram',
-                'chat_id': chat_id
-            }
-            if chat_id:
-                request.session[f'tg_chat_id_{phone_clean}'] = str(chat_id)
-            request.session[last_sent_key] = current_time
-            request.session.modified = True
-
-            return JsonResponse({
-                'success': True,
-                'channel': 'telegram',
-                'message': f"O'quvchining Telegram botiga tasdiqlash kodi chiqarilgan ({otp_code}). O'quvchidan kodni so'rab kiriting.",
-                'bot_username': bot_username,
-                'debug_code': otp_code if is_staff else None
-            })
-        elif tg_chat_id:
-            otp_code = generate_otp_code()
-            cache.set(f"tg_reg_otp_{phone_clean}", {
-                'otp': otp_code,
-                'chat_id': str(tg_chat_id),
-                'phone_clean': phone_clean,
-                'created_at': current_time,
-                'expires_at': current_time + 600
-            }, timeout=600)
-
-            request.session[otp_session_key] = {
-                'otp': otp_code,
-                'expires_at': current_time + 600,
-                'verified': False,
-                'channel': 'telegram',
-                'chat_id': str(tg_chat_id)
-            }
-            request.session[f'tg_chat_id_{phone_clean}'] = str(tg_chat_id)
-            request.session[last_sent_key] = current_time
-            request.session.modified = True
-
-            tg_text = (
-                f"✅ <b>Telefon raqamingiz:</b> +{phone_clean}\n\n"
-                f"🔢 <b>Ro'yxatdan o'tish kodingiz:</b> <code>{otp_code}</code>\n"
-                f"⏳ <i>Amal qilish muddati: 10 daqiqa</i>\n\n"
-                f"Ushbu kodni markaz administratoriga ayting."
-            )
-            send_telegram_message(str(tg_chat_id), tg_text)
-
-            return JsonResponse({
-                'success': True,
-                'channel': 'telegram',
-                'message': f"O'quvchining Telegram botiga 6 xonali tasdiqlash kodi yuborildi.",
-                'bot_username': bot_username,
-                'debug_code': otp_code if is_staff else None
-            })
-        else:
+        if not tg_chat_id:
             return JsonResponse({
                 'success': False,
                 'needs_contact': True,
                 'channel': 'telegram',
                 'bot_username': bot_username,
                 'bot_url': f"https://t.me/{bot_username}",
-                'message': f"O'quvchi avval markazimizning Telegram boti (@{bot_username})ga kirib '📱 Telefon raqamni ulashish' tugmasini bosishi kerak."
+                'message': f"O'quvchi yoki o'qituvchi avval @{bot_username} botga kirib '📱 Telefon raqamimni ulashish' tugmasi orqali bog'lansin!"
             })
+
+        otp_code = generate_otp_code()
+        cache.set(f"tg_reg_otp_{phone_clean}", {
+            'otp': str(otp_code),
+            'chat_id': str(tg_chat_id),
+            'phone_clean': phone_clean,
+            'created_at': current_time,
+            'expires_at': current_time + 600
+        }, timeout=600)
+
+        request.session[otp_session_key] = {
+            'otp': str(otp_code),
+            'expires_at': current_time + 600,
+            'verified': False,
+            'channel': 'telegram',
+            'chat_id': str(tg_chat_id)
+        }
+        request.session[f'tg_chat_id_{phone_clean}'] = str(tg_chat_id)
+        request.session[last_sent_key] = current_time
+        request.session.modified = True
+
+        tg_text = (
+            f"🔐 <b>Ro'yxatdan o'tish tasdiqlash kodi:</b> <code>{otp_code}</code>\n\n"
+            f"⏳ <i>Amal qilish muddati: 10 daqiqa</i>\n\n"
+            f"Ushbu kodni o'quv markazi administratoriga ayting. Administrator ro'yxatdan o'tkazgach, "
+            f"tizimga kirish uchun login va parolingiz shu yerga yuboriladi! 🚀"
+        )
+        send_telegram_message(str(tg_chat_id), tg_text)
+
+        return JsonResponse({
+            'success': True,
+            'channel': 'telegram',
+            'message': f"Foydalanuvchining Telegram botiga 6 xonali tasdiqlash kodi yuborildi.",
+            'bot_username': bot_username,
+            'debug_code': otp_code if is_staff else None
+        })
 
     # --- ODATIY SMS KANAL ORQALI TASDIQLASH ---
     if current_time - last_sent_time < 30:
@@ -7027,7 +7004,7 @@ def send_phone_verification_otp_ajax(request):
 
     otp_code = generate_otp_code()
     request.session[otp_session_key] = {
-        'otp': otp_code,
+        'otp': str(otp_code),
         'expires_at': current_time + 600,
         'verified': False,
         'channel': 'sms'
@@ -7069,10 +7046,10 @@ def verify_phone_otp_ajax(request):
     try:
         data = json.loads(request.body.decode('utf-8')) if request.content_type == 'application/json' else request.POST
         phone = data.get('phone_number', '').strip()
-        otp = data.get('otp_code', '').strip()
+        otp = str(data.get('otp_code', '')).strip()
     except Exception:
         phone = request.POST.get('phone_number', '').strip()
-        otp = request.POST.get('otp_code', '').strip()
+        otp = str(request.POST.get('otp_code', '')).strip()
 
     phone_clean = clean_phone_number(phone)
     if not phone_clean:
@@ -7084,28 +7061,31 @@ def verify_phone_otp_ajax(request):
     otp_session_key = f'phone_otp_{phone_clean}'
     stored_data = request.session.get(otp_session_key)
     tg_reg = cache.get(f"tg_reg_otp_{phone_clean}")
+    tg_chat_id = cache.get(f"tg_chat_by_phone_{phone_clean}")
 
     verified = False
-    chat_id = None
+    chat_id = tg_chat_id
 
     # Check session OTP
     if stored_data and isinstance(stored_data, dict):
-        if time.time() <= stored_data.get('expires_at', 0) and str(stored_data.get('otp')) == str(otp):
+        stored_otp = str(stored_data.get('otp', '')).strip()
+        if time.time() <= stored_data.get('expires_at', 0) and stored_otp == otp:
             verified = True
-            chat_id = stored_data.get('chat_id')
+            chat_id = stored_data.get('chat_id') or chat_id
 
     # Check Telegram cache OTP
     if not verified and tg_reg and isinstance(tg_reg, dict):
-        if time.time() <= tg_reg.get('expires_at', 0) and str(tg_reg.get('otp')) == str(otp):
+        tg_otp = str(tg_reg.get('otp', '')).strip()
+        if time.time() <= tg_reg.get('expires_at', 0) and tg_otp == otp:
             verified = True
-            chat_id = tg_reg.get('chat_id')
+            chat_id = tg_reg.get('chat_id') or chat_id
 
     if verified:
         request.session[otp_session_key] = {
             'otp': otp,
             'verified': True,
             'expires_at': time.time() + 600,
-            'chat_id': chat_id
+            'chat_id': str(chat_id) if chat_id else None
         }
         request.session[f'sms_verified_{phone_clean}'] = True
         if chat_id:

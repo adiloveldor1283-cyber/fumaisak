@@ -63,8 +63,8 @@ class Command(BaseCommand):
                         phone_clean = clean_phone_number(raw_phone)
                         
                         if phone_clean:
-                            # Save chat_id mapped to phone in cache
-                            cache.set(f"tg_chat_by_phone_{phone_clean}", str(chat_id), timeout=7200)
+                            # Save chat_id mapped to phone in cache for 24 hours
+                            cache.set(f"tg_chat_by_phone_{phone_clean}", str(chat_id), timeout=86400)
                             
                             # Check if user already exists in DB
                             existing_user = CustomUser.objects.filter(
@@ -91,27 +91,13 @@ class Command(BaseCommand):
                                 send_telegram_message(str(chat_id), welcome_msg, reply_markup=remove_kb)
                                 self.stdout.write(self.style.SUCCESS(f"Linked existing user by contact: {existing_user.username} (Chat ID: {chat_id})"))
                             else:
-                                # Generate Registration OTP for Admin Panel
-                                otp_code = generate_otp_code()
-                                cache_payload = {
-                                    'otp': otp_code,
-                                    'chat_id': str(chat_id),
-                                    'phone_clean': phone_clean,
-                                    'created_at': time.time(),
-                                    'expires_at': time.time() + 600
-                                }
-                                cache.set(f"tg_reg_otp_{phone_clean}", cache_payload, timeout=600)
-                                
                                 remove_kb = {"remove_keyboard": True}
-                                otp_msg = (
-                                    f"✅ <b>Telefon raqamingiz qabul qilindi:</b> +{phone_clean}\n\n"
-                                    f"🔢 <b>Sizning ro'yxatdan o'tish kodingiz:</b> <code>{otp_code}</code>\n"
-                                    f"⏳ <i>Amal qilish muddati: 10 daqiqa</i>\n\n"
-                                    f"Ushbu kodni markaz administratoriga ayting. Administrator ro'yxatdan o'tkazgach, "
-                                    f"tizimga kirish uchun login va parolingiz shu yerga yuboriladi! 🚀"
+                                info_msg = (
+                                    f"✅ <b>Telefon raqamingiz muvaffaqiyatli qabul qilindi:</b> +{phone_clean}\n\n"
+                                    f"Administrator sizni tizimda ro'yxatdan o'tkazayotganda, tasdiqlash kodi va tizimga kirish login/parolingiz ushbu botga yuboriladi. 🚀"
                                 )
-                                send_telegram_message(str(chat_id), otp_msg, reply_markup=remove_kb)
-                                self.stdout.write(self.style.SUCCESS(f"Generated Reg OTP {otp_code} for phone +{phone_clean} (Chat ID: {chat_id})"))
+                                send_telegram_message(str(chat_id), info_msg, reply_markup=remove_kb)
+                                self.stdout.write(self.style.SUCCESS(f"Contact registered for phone +{phone_clean} (Chat ID: {chat_id})"))
                         continue
 
                     # 3. Handle /start command
