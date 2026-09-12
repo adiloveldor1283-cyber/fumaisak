@@ -327,7 +327,21 @@ def teacher_profile_view(request):
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
-        if form_type == 'change_password':
+        if form_type == 'update_phone':
+            from main.sms_service import clean_phone_number
+            new_phone = request.POST.get('phone_number', '').strip()
+            phone_clean = clean_phone_number(new_phone)
+            if not phone_clean or len(phone_clean) != 12:
+                messages.error(request, "Iltimos, to'g'ri O'zbekiston telefon raqamini kiriting (masalan: +998 90 123 45 67)!", extra_tags='phone')
+            else:
+                formatted_phone = f"+{phone_clean}"
+                teacher.phone_number = formatted_phone
+                teacher.save()
+                log_action(teacher, "Telefon raqami o'zgartirildi", f"Yangi telefon: {formatted_phone}", request)
+                messages.success(request, "Telefon raqamingiz muvaffaqiyatli o'zgartirildi!", extra_tags='phone_success')
+                return redirect('teacher_profile')
+
+        elif form_type == 'change_password':
             old_password = request.POST.get('old_password')
             new_password1 = request.POST.get('new_password1')
             new_password2 = request.POST.get('new_password2')
@@ -343,6 +357,7 @@ def teacher_profile_view(request):
                 teacher.save()
                 update_session_auth_hash(request, teacher)
                 messages.success(request, "Parolingiz muvaffaqiyatli o‘zgartirildi!", extra_tags='password_img')
+                return redirect('teacher_profile')
 
         elif form_type == 'upload_image':
             if 'profile_image' in request.FILES:
@@ -357,8 +372,14 @@ def teacher_profile_view(request):
                 teacher.profile_image = image
                 teacher.save()
                 messages.success(request, "Rasmingiz muvaffaqiyatli o‘zgartirildi!", extra_tags='password_img')
+                return redirect('teacher_profile')
             else:
                 messages.error(request, "Rasm tanlanmadi.", extra_tags='password')
+                return redirect('teacher_profile')
+
+    subjects = teacher.subjects.all()
+    groups = teacher.teachers_groups.all().select_related('subject').prefetch_related('students')
+    total_students_count = CustomUser.objects.filter(student_groups__in=groups, role='student').distinct().count()
 
     telegram_link = None
     if not teacher.telegram_chat_id:
@@ -367,6 +388,9 @@ def teacher_profile_view(request):
 
     return render(request, 'teacher-profile.html', {
         'teacher': teacher,
+        'subjects': subjects,
+        'groups': groups,
+        'total_students_count': total_students_count,
         'telegram_link': telegram_link,
     })
 

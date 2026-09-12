@@ -393,7 +393,21 @@ def student_profile_view(request):
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
-        if form_type == 'change_password':
+        if form_type == 'update_phone':
+            from main.sms_service import clean_phone_number
+            new_phone = request.POST.get('phone_number', '').strip()
+            phone_clean = clean_phone_number(new_phone)
+            if not phone_clean or len(phone_clean) != 12:
+                messages.error(request, "Iltimos, to'g'ri O'zbekiston telefon raqamini kiriting (masalan: +998 90 123 45 67)!", extra_tags='phone')
+            else:
+                formatted_phone = f"+{phone_clean}"
+                student.phone_number = formatted_phone
+                student.save()
+                log_action(student, "Telefon raqami o'zgartirildi", f"Yangi telefon: {formatted_phone}", request)
+                messages.success(request, "Telefon raqamingiz muvaffaqiyatli yangilandi!", extra_tags='phone_success')
+                return redirect('student_profile')
+
+        elif form_type == 'change_password':
             old_password = request.POST.get('old_password')
             new_password1 = request.POST.get('new_password1')
             new_password2 = request.POST.get('new_password2')
@@ -409,6 +423,7 @@ def student_profile_view(request):
                 student.save()
                 update_session_auth_hash(request, student)
                 messages.success(request, "Parolingiz muvaffaqiyatli o‘zgartirildi!", extra_tags='passwordd_img')
+                return redirect('student_profile')
 
         elif form_type == 'upload_image':
             if 'profile_image' in request.FILES:
@@ -423,8 +438,20 @@ def student_profile_view(request):
                 student.profile_image = image
                 student.save()
                 messages.success(request, "Rasmingiz muvaffaqiyatli o‘zgartirildi!", extra_tags='passwordd_img')
+                return redirect('student_profile')
             else:
                 messages.error(request, "Rasm tanlanmadi.", extra_tags='passwordd')
+                return redirect('student_profile')
+
+    # Student guruhlari, fanlari va a'zolik ma'lumotlari
+    memberships = GroupStudentMembership.objects.filter(student=student).select_related('group', 'group__subject').prefetch_related('group__teachers').order_by('-joined_at')
+    groups = [m.group for m in memberships]
+    seen_subjects = set()
+    subjects = []
+    for g in groups:
+        if g.subject and g.subject.id not in seen_subjects:
+            seen_subjects.add(g.subject.id)
+            subjects.append(g.subject)
 
     # Telegram bot link generate
     telegram_link = None
@@ -434,6 +461,9 @@ def student_profile_view(request):
 
     return render(request, 'student-profile.html', {
         'student': student,
+        'memberships': memberships,
+        'groups': groups,
+        'subjects': subjects,
         'telegram_link': telegram_link
     })
 
