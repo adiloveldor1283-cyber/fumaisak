@@ -1278,39 +1278,46 @@
         <!-- ✈️ 4. Telegram ulanishi bo'limi -->
         <div id="telegram" class="profil-tarkib">
             {% if not teacher.telegram_chat_id %}
-            <div style="text-align: center; padding: 10px 0;">
-                <div style="width: 56px; height: 56px; background: rgba(0, 242, 254, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 26px; color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.25);">
+            <div style="text-align: center; padding: 15px 0;">
+                <div style="width: 64px; height: 64px; background: rgba(0, 242, 254, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 30px; color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.25); box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);">
                     <i class="fab fa-telegram-plane"></i>
                 </div>
-                <h4 class="telegram-title" style="color: white; font-size: 16px; font-weight: 800; margin-bottom: 8px;">Telegram bildirishnomalarini yoqish</h4>
+                <h4 class="telegram-title" style="color: white; font-size: 17px; font-weight: 800; margin-bottom: 8px;">Telegram bildirishnomalarini ulash</h4>
                 
-                <div class="instruction-box" style="text-align: left; max-width: 440px; margin: 0 auto 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 14px; font-size: 12.5px; line-height: 1.6; color: rgba(255,255,255,0.7);">
-                    <span style="font-weight: 700; color: white;">Bog'lash yo'riqnomasi:</span>
-                    <ol style="margin: 8px 0 0 18px; padding: 0;">
-                        <li>Telegramda <a href="https://t.me/lms_tizim_bot" target="_blank" style="color: #00f2fe; text-decoration: underline; font-weight: 700;">@lms_tizim_bot</a> ni ochib, <b>Start</b> bosing.</li>
-                        <li>Bot sizdan ulanish kodini kiritishni so'raydi.</li>
-                        <li>Pastdagi <b>"Kod shakllantirish"</b> tugmasini bosib, 6 xonali kod oling va botga yuboring.</li>
-                    </ol>
+                <p style="color: rgba(255,255,255,0.7); font-size: 13.5px; line-height: 1.6; max-width: 480px; margin: 0 auto 20px;">
+                    Dars jadvallari, o'quvchilar davomati, oylik maosh hisobotlari va muhim markaz xabarlarini to'g'ridan-to'g'ri Telegramingizda bepul va tezkor qabul qiling.
+                </p>
+
+                <div class="instruction-box" style="text-align: left; max-width: 460px; margin: 0 auto 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); padding: 16px 20px; border-radius: 14px; font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.8);">
+                    <div style="font-weight: 700; color: #38bdf8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-info-circle"></i> Tezkor bog'lash usuli:
+                    </div>
+                    <div style="margin-bottom: 6px;">1. Quyidagi <b>"Telegram botni ochish"</b> tugmasini bosing.</div>
+                    <div>2. Botda <b>"Start"</b> yoki <b>"📱 Telefon raqamimni ulashish"</b> tugmasini bossangiz, hisobingiz avtomatik bog'lanadi!</div>
                 </div>
 
-                <button type="button" onclick="generateOtpCode(this)" class="profil-btn" style="box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);">
-                    <i class="fas fa-key"></i> Kod shakllantirish
-                </button>
-
-                <div id="otp-display-container" class="otp-box" style="display: none; max-width: 320px; margin: 22px auto 0; padding: 16px; border-radius: 14px; background: rgba(0, 242, 254, 0.03); border: 1px dashed rgba(0, 242, 254, 0.35); box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
-                    <div style="font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Sizning ulanish kodingiz:</div>
-                    <div id="otp-code-val" style="font-size: 36px; font-weight: 900; color: #00f2fe; margin: 10px 0; letter-spacing: 6px; font-family: monospace;">000000</div>
-                    <div id="otp-countdown" style="font-size: 12px; color: #00ffaa; font-weight: 700;">Amal qilish muddati: 60 soniya</div>
-                </div>
+                {% if telegram_link %}
+                <a href="{{ telegram_link }}" target="_blank" class="profil-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; box-shadow: 0 0 25px rgba(0, 242, 254, 0.35); padding: 12px 28px; font-size: 14px;">
+                    <i class="fab fa-telegram-plane" style="font-size: 16px;"></i> Telegram botni ochish
+                </a>
+                {% elif bot_username %}
+                <a href="https://t.me/{{ bot_username }}" target="_blank" class="profil-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; box-shadow: 0 0 25px rgba(0, 242, 254, 0.35); padding: 12px 28px; font-size: 14px;">
+                    <i class="fab fa-telegram-plane" style="font-size: 16px;"></i> @{{ bot_username }} botini ochish
+                </a>
+                {% else %}
+                <a href="https://t.me/FumaIsakBot" target="_blank" class="profil-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; box-shadow: 0 0 25px rgba(0, 242, 254, 0.35); padding: 12px 28px; font-size: 14px;">
+                    <i class="fab fa-telegram-plane" style="font-size: 16px;"></i> Telegram botni ochish
+                </a>
+                {% endif %}
             </div>
             {% else %}
             <div style="text-align: center; padding: 15px 0;">
-                <div style="width: 56px; height: 56px; background: rgba(0, 255, 170, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 26px; color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.25); box-shadow: 0 0 15px rgba(0, 255, 170, 0.15);">
+                <div style="width: 60px; height: 60px; background: rgba(0, 255, 170, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 28px; color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.25); box-shadow: 0 0 18px rgba(0, 255, 170, 0.15);">
                     <i class="fas fa-check-circle"></i>
                 </div>
                 <h4 class="telegram-title" style="color: white; font-size: 16px; font-weight: 800; margin-bottom: 8px;">Telegram bot muvaffaqiyatli ulangan</h4>
-                <p style="color: rgba(255,255,255,0.6); font-size: 13px; line-height: 1.5; margin-bottom: 22px;">Sizning profilingiz Telegram botga ulangan. Barcha muhim bildirishnomalar profilingizga yuborib turiladi.</p>
-                <form method="POST" action="{% url 'disconnect_telegram' %}" style="margin: 0;">
+                <p style="color: rgba(255,255,255,0.7); font-size: 13.5px; line-height: 1.5; margin-bottom: 22px; max-width: 460px; margin-left: auto; margin-right: auto;">Sizning profilingiz Telegram botga ulangan. Barcha muhim bildirishnomalar profilingizga yuborib turiladi.</p>
+                <form method="POST" action="{% url 'disconnect_telegram' %}" style="margin: 0;" onsubmit="return confirm('Rostdan ham Telegram bot ulanishini uzmoqchimisiz?');">
                     {% csrf_token %}
                     <button type="submit" class="profil-btn" style="background: rgba(255, 74, 90, 0.1); border: 1px solid rgba(255, 74, 90, 0.3); color: #ff4a5a; box-shadow: none;">
                         <i class="fas fa-unlink"></i> Ulanishni uzish
@@ -1405,82 +1412,5 @@
         }
     }
 
-    /* --- 📱 TELEGRAM OTP GENERATSIYA --- */
-    let otpInterval = null;
-    function generateOtpCode(btn) {
-        if (otpInterval) clearInterval(otpInterval);
-        
-        const originalHtml = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yuklanmoqda...';
-        
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        const csrftoken = getCookie('csrftoken');
-        
-        fetch('/student/telegram/generate-otp/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken,
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            btn.innerHTML = '<i class="fas fa-sync-alt"></i> Kodni yangilash';
-            btn.disabled = false;
-            if (data.status === 'success') {
-                const displayContainer = document.getElementById('otp-display-container');
-                if (displayContainer) displayContainer.style.display = 'block';
-                
-                const codeVal = document.getElementById('otp-code-val');
-                if (codeVal) {
-                    codeVal.textContent = data.otp_code;
-                    codeVal.style.color = '#00f2fe';
-                }
-                
-                let timeLeft = data.expires_in || 60;
-                const countdownEl = document.getElementById('otp-countdown');
-                if (countdownEl) {
-                    countdownEl.style.color = '#00ffaa';
-                    countdownEl.textContent = `Amal qilish muddati: ${timeLeft} soniya`;
-                }
-                
-                otpInterval = setInterval(() => {
-                    timeLeft--;
-                    if (timeLeft <= 10 && countdownEl) {
-                        countdownEl.style.color = '#ff4a5a';
-                    }
-                    if (timeLeft <= 0) {
-                        clearInterval(otpInterval);
-                        if (countdownEl) countdownEl.textContent = "Kod muddati tugadi. Iltimos kodni yangilang.";
-                        if (codeVal) codeVal.style.color = 'rgba(255,255,255,0.2)';
-                    } else if (countdownEl) {
-                        countdownEl.textContent = `Amal qilish muddati: ${timeLeft} soniya`;
-                    }
-                }, 1000);
-            } else {
-                alert(data.message || "Kod olishda xatolik yuz berdi.");
-            }
-        })
-        .catch(err => {
-            btn.innerHTML = originalHtml;
-            btn.disabled = false;
-            alert("Xatolik: " + err.message);
-        });
-    }
 </script>
 {% endblock %}

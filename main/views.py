@@ -90,12 +90,71 @@ def telegram_webhook(request):
         return JsonResponse({'status': 'success'})
         
     chat = message.get('chat')
-    text = message.get('text', '').strip()
+    text = (message.get('text') or '').strip()
+    contact = message.get('contact')
     
     if chat:
         chat_id = str(chat.get('id'))
+        from django.core.cache import cache
+        from main.sms_service import clean_phone_number, generate_otp_code
+        from main.telegram_service import send_telegram_message
+        from django.db.models import Q
+        import time
+
         linked_user = CustomUser.objects.filter(telegram_chat_id=chat_id).first()
+
+        # 1. Contact Sharing (Request Contact button clicked)
+        if contact:
+            raw_phone = contact.get('phone_number', '')
+            phone_clean = clean_phone_number(raw_phone)
+            if phone_clean:
+                cache.set(f"tg_chat_by_phone_{phone_clean}", chat_id, timeout=7200)
+
+                existing_user = CustomUser.objects.filter(
+                    Q(phone_number=raw_phone) |
+                    Q(phone_number=f"+{phone_clean}") |
+                    Q(phone_number=phone_clean) |
+                    Q(phone_number__endswith=phone_clean[3:])
+                ).first()
+
+                if existing_user:
+                    existing_user.telegram_chat_id = chat_id
+                    existing_user.telegram_token = None
+                    existing_user.telegram_otp_code = None
+                    existing_user.telegram_otp_created_at = None
+                    existing_user.save()
+
+                    remove_kb = {"remove_keyboard": True}
+                    welcome_msg = (
+                        f"<b>Muvaffaqiyatli bog'landi!</b> ✅\n\n"
+                        f"Salom, <b>{existing_user.first_name or existing_user.username}</b>!\n"
+                        f"Sizning profilingiz ushbu Telegram hisobiga muvaffaqiyatli bog'landi.\n"
+                        f"Endi dars jadvallari, to'lov cheklari va muhim bildirishnomalar shu yerga keladi. 🚀"
+                    )
+                    send_telegram_message(chat_id, welcome_msg, reply_markup=remove_kb)
+                else:
+                    otp_code = generate_otp_code()
+                    cache_payload = {
+                        'otp': otp_code,
+                        'chat_id': chat_id,
+                        'phone_clean': phone_clean,
+                        'created_at': time.time(),
+                        'expires_at': time.time() + 600
+                    }
+                    cache.set(f"tg_reg_otp_{phone_clean}", cache_payload, timeout=600)
+
+                    remove_kb = {"remove_keyboard": True}
+                    otp_msg = (
+                        f"✅ <b>Telefon raqamingiz qabul qilindi:</b> +{phone_clean}\n\n"
+                        f"🔢 <b>Sizning ro'yxatdan o'tish kodingiz:</b> <code>{otp_code}</code>\n"
+                        f"⏳ <i>Amal qilish muddati: 10 daqiqa</i>\n\n"
+                        f"Ushbu kodni markaz administratoriga ayting. Administrator ro'yxatdan o'tkazgach, "
+                        f"tizimga kirish uchun login va parolingiz shu yerga yuboriladi! 🚀"
+                    )
+                    send_telegram_message(chat_id, otp_msg, reply_markup=remove_kb)
+            return JsonResponse({'status': 'success'})
         
+        # 2. Start command
         if text.startswith('/start'):
             parts = text.split()
             if len(parts) == 2 and parts[1].startswith('tg_'):
@@ -107,56 +166,52 @@ def telegram_webhook(request):
                     user.telegram_otp_code = None
                     user.telegram_otp_created_at = None
                     user.save()
+                    remove_kb = {"remove_keyboard": True}
                     welcome_msg = (
                         f"<b>Muvaffaqiyatli bog'landi!</b> ✅\n\n"
-                        f"Salom, {user.first_name} {user.last_name}!\n"
+                        f"Salom, <b>{user.first_name or user.username}</b>!\n"
                         f"Profilingiz ushbu Telegram hisobiga muvaffaqiyatli bog'landi.\n"
                         f"Endi siz to'lovlar, davomat va muhim e'lonlarni bot orqali tezkor qabul qilasiz."
                     )
-                    send_telegram_message(chat_id, welcome_msg)
+                    send_telegram_message(chat_id, welcome_msg, reply_markup=remove_kb)
                     return JsonResponse({'status': 'success'})
 
             if linked_user:
                 already_msg = (
                     f"<b>Siz tizimga bog'langansiz!</b> ✅\n\n"
-                    f"Salom, {linked_user.first_name} {linked_user.last_name}!\n"
+                    f"Salom, <b>{linked_user.first_name or linked_user.username}</b>!\n"
                     f"Siz ushbu Telegram hisobi orqali tizimga muvaffaqiyatli bog'langansiz va bildirishnomalarni qabul qilyapsiz."
                 )
                 send_telegram_message(chat_id, already_msg)
             else:
-                send_telegram_message(chat_id, "Salom! Profilingizni bog'lash uchun shaxsiy kabinetingizda shakllantirilgan 6 xonali ulanish kodini yuboring:")
-                
-        elif text.isdigit() and len(text) == 6:
-            if linked_user:
-                send_telegram_message(chat_id, "Siz tizimga bog'langansiz! ✅")
-            else:
-                from django.utils import timezone
-                user = CustomUser.objects.filter(telegram_otp_code=text).first()
-                if user:
-                    if user.telegram_otp_created_at:
-                        time_diff = timezone.now() - user.telegram_otp_created_at
-                        if time_diff.total_seconds() <= 60:
-                            user.telegram_chat_id = chat_id
-                            user.telegram_otp_code = None
-                            user.telegram_otp_created_at = None
-                            user.save()
-                            
-                            welcome_msg = (
-                                f"<b>Muvaffaqiyatli bog'landi!</b> ✅\n\n"
-                                f"Salom, {user.first_name} {user.last_name}!\n"
-                                f"Profilingiz ushbu Telegram hisobiga muvaffaqiyatli bog'landi.\n"
-                                f"Endi siz to'lovlar, davomat va muhim e'lonlarni bot orqali tezkor qabul qilasiz."
-                            )
-                            send_telegram_message(chat_id, welcome_msg)
-                        else:
-                            send_telegram_message(chat_id, "❌ Kodning amal qilish muddati tugagan (1 daqiqa). Iltimos shaxsiy kabinetingizdan qaytadan yangi kod shakllantiring.")
-                    else:
-                        send_telegram_message(chat_id, "❌ Ulanish kodi faollashtirilmagan. Iltimos shaxsiy kabinetingizdan qaytadan kod shakllantiring.")
-                else:
-                    send_telegram_message(chat_id, "❌ Kiritilgan ulanish kodi noto'g'ri. Iltimos tekshirib qaytadan kiriting.")
+                contact_kb = {
+                    "keyboard": [
+                        [{"text": "📱 Telefon raqamimni ulashish", "request_contact": True}]
+                    ],
+                    "resize_keyboard": True,
+                    "one_time_keyboard": True
+                }
+                prompt_msg = (
+                    f"<b>Assalomu alaykum!</b> 👋\n\n"
+                    f"O'quv markazimizning rasmiy botiga xush kelibsiz.\n\n"
+                    f"Tizimda ro'yxatdan o'tish yoki profilingizni bog'lash uchun quyidagi "
+                    f"<b>'📱 Telefon raqamimni ulashish'</b> tugmasini bosing:"
+                )
+                send_telegram_message(chat_id, prompt_msg, reply_markup=contact_kb)
         else:
             if not linked_user:
-                send_telegram_message(chat_id, "Salom! Profilingizni bog'lash uchun shaxsiy kabinetingizda shakllantirilgan 6 xonali ulanish kodini yuboring:")
+                contact_kb = {
+                    "keyboard": [
+                        [{"text": "📱 Telefon raqamimni ulashish", "request_contact": True}]
+                    ],
+                    "resize_keyboard": True,
+                    "one_time_keyboard": True
+                }
+                send_telegram_message(
+                    chat_id,
+                    "Ro'yxatdan o'tish yoki hisobingizni bog'lash uchun quyidagi <b>'📱 Telefon raqamimni ulashish'</b> tugmasini bosing:",
+                    reply_markup=contact_kb
+                )
                 
     return JsonResponse({'status': 'success'})
 

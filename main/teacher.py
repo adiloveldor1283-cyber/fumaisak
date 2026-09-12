@@ -381,9 +381,10 @@ def teacher_profile_view(request):
     groups = teacher.teachers_groups.all().select_related('subject').prefetch_related('students')
     total_students_count = CustomUser.objects.filter(student_groups__in=groups, role='student').distinct().count()
 
+    from main.telegram_service import get_bot_username, generate_telegram_link
+    bot_username = get_bot_username()
     telegram_link = None
     if not teacher.telegram_chat_id:
-        from main.telegram_service import generate_telegram_link
         telegram_link = generate_telegram_link(teacher)
 
     return render(request, 'teacher-profile.html', {
@@ -392,6 +393,7 @@ def teacher_profile_view(request):
         'groups': groups,
         'total_students_count': total_students_count,
         'telegram_link': telegram_link,
+        'bot_username': bot_username,
     })
 
 @teacher_required

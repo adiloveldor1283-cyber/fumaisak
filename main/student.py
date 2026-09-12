@@ -453,10 +453,11 @@ def student_profile_view(request):
             seen_subjects.add(g.subject.id)
             subjects.append(g.subject)
 
-    # Telegram bot link generate
+    # Telegram bot link and username
+    from main.telegram_service import get_bot_username, generate_telegram_link
+    bot_username = get_bot_username()
     telegram_link = None
     if not student.telegram_chat_id:
-        from main.telegram_service import generate_telegram_link
         telegram_link = generate_telegram_link(student)
 
     return render(request, 'student-profile.html', {
@@ -464,7 +465,8 @@ def student_profile_view(request):
         'memberships': memberships,
         'groups': groups,
         'subjects': subjects,
-        'telegram_link': telegram_link
+        'telegram_link': telegram_link,
+        'bot_username': bot_username,
     })
 
 
@@ -1792,7 +1794,7 @@ def disconnect_telegram(request):
         messages.success(request, "Telegram bot ulanishi muvaffaqiyatli uzildi.")
     if request.user.role == 'teacher':
         return redirect('teacher_profile')
-    return redirect('student_home')
+    return redirect('student_profile')
 
 
 import random
