@@ -1504,7 +1504,7 @@
                         {{ user.role }}
                     {% endif %}
                 </span>
-                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">{{ request.user.get_full_name }}</span>
+                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">{% if request.user.last_name or request.user.first_name %}{{ request.user.last_name }} {{ request.user.first_name }}{% else %}{{ request.user.username }}{% endif %}</span>
             </div>
         </div>
 

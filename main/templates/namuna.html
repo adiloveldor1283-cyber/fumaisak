@@ -406,7 +406,8 @@
                     {% else %}
                         {{ teacher.role }}
                     {% endif %}
-                <span>{{ teacher.get_full_name }}</span>
+                </span>
+                <span style="color: #ffffff; font-weight: 600; font-size: 13px;">{% if teacher.last_name or teacher.first_name %}{{ teacher.last_name }} {{ teacher.first_name }}{% else %}{{ teacher.username }}{% endif %}</span>
             </div>
         </div>
 
