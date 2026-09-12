@@ -6,6 +6,7 @@ from collections import defaultdict
 from itertools import groupby
 from operator import attrgetter
 
+from django.db.models import Q
 from django.contrib.auth.hashers import make_password
 from django.urls import reverse
 from django.utils import timezone
@@ -464,6 +465,19 @@ def add_student(request):
             messages.error(request, "Telefon raqami noto'g'ri formatda. Namuna: +998901234567", extra_tags='password_creat')
             return redirect('add_student')
 
+        # Check if phone number already exists in system (prevent duplicate/fake accounts)
+        existing_user = CustomUser.objects.filter(
+            Q(phone_number=phone_number) |
+            Q(phone_number=f"+{phone_clean}") |
+            Q(phone_number=phone_clean) |
+            Q(phone_number__endswith=phone_clean[3:])
+        ).first()
+        if existing_user:
+            role_map = {'student': "o'quvchi", 'teacher': "o'qituvchi", 'admin': "admin", 'reception': "reception"}
+            role_uz = role_map.get(existing_user.role, "foydalanuvchi")
+            messages.error(request, f"Ushbu telefon raqam (+{phone_clean}) bilan ro'yxatdan o'tgan {role_uz} allaqachon mavjud!", extra_tags='password_creat')
+            return redirect('add_student')
+
         # Check phone verification in session or via OTP
         is_verified = request.session.get(f'sms_verified_{phone_clean}', False)
         if not is_verified and otp_code:
@@ -694,6 +708,19 @@ def add_teacher(request):
         phone_clean = clean_phone_number(phone_number)
         if not phone_clean or len(phone_clean) != 12:
             messages.error(request, "Telefon raqami noto'g'ri formatda. Namuna: +998901234567", extra_tags='password_creat_teacher')
+            return redirect('add_teacher')
+
+        # Check if phone number already exists in system (prevent duplicate/fake accounts)
+        existing_user = CustomUser.objects.filter(
+            Q(phone_number=phone_number) |
+            Q(phone_number=f"+{phone_clean}") |
+            Q(phone_number=phone_clean) |
+            Q(phone_number__endswith=phone_clean[3:])
+        ).first()
+        if existing_user:
+            role_map = {'student': "o'quvchi", 'teacher': "o'qituvchi", 'admin': "admin", 'reception': "reception"}
+            role_uz = role_map.get(existing_user.role, "foydalanuvchi")
+            messages.error(request, f"Ushbu telefon raqam (+{phone_clean}) bilan ro'yxatdan o'tgan {role_uz} allaqachon mavjud!", extra_tags='password_creat_teacher')
             return redirect('add_teacher')
 
         # Check phone verification in session or via OTP
@@ -4128,6 +4155,18 @@ def add_subadmin(request):
             messages.error(request, f"'{username}' foydalanuvchi nomi tizimda mavjud.")
             return redirect('admin_settings')
 
+        phone_clean = clean_phone_number(phone_number)
+        if phone_clean:
+            existing_user = CustomUser.objects.filter(
+                Q(phone_number=phone_number) |
+                Q(phone_number=f"+{phone_clean}") |
+                Q(phone_number=phone_clean) |
+                Q(phone_number__endswith=phone_clean[3:])
+            ).first()
+            if existing_user:
+                messages.error(request, f"Ushbu telefon raqam (+{phone_clean}) bilan foydalanuvchi tizimda allaqachon mavjud.")
+                return redirect('admin_settings')
+
         try:
             user = CustomUser.objects.create(
                 username=username,
@@ -6804,6 +6843,21 @@ def send_phone_verification_otp_ajax(request):
     phone_clean = clean_phone_number(phone)
     if not phone_clean or len(phone_clean) != 12:
         return JsonResponse({'success': False, 'message': "Iltimos, to'g'ri telefon raqam kiriting (masalan: +998901234567)."})
+
+    # Dublikat tekshiruvi: Agar foydalanuvchi allaqachon mavjud bo'lsa, ortiqcha SMS yuborilmaydi
+    existing_user = CustomUser.objects.filter(
+        Q(phone_number=phone) |
+        Q(phone_number=f"+{phone_clean}") |
+        Q(phone_number=phone_clean) |
+        Q(phone_number__endswith=phone_clean[3:])
+    ).first()
+    if existing_user:
+        role_map = {'student': "o'quvchi", 'teacher': "o'qituvchi", 'admin': "admin", 'reception': "reception"}
+        role_uz = role_map.get(existing_user.role, "foydalanuvchi")
+        return JsonResponse({
+            'success': False,
+            'message': f"Ushbu telefon raqam (+{phone_clean}) bilan ro'yxatdan o'tgan {role_uz} tizimda allaqachon mavjud!"
+        })
 
     otp_session_key = f'phone_otp_{phone_clean}'
     last_sent_key = f'phone_otp_sent_time_{phone_clean}'
