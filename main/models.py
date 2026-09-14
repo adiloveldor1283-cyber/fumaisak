@@ -602,6 +602,23 @@ class LockedPage(models.Model):
         return f"{self.url_path} - {'Blocked' if self.is_active else 'Open'}"
 
 
+class MonitoringAPIKey(models.Model):
+    name = models.CharField(max_length=100, default="Netlify Dashboard", verbose_name="Kalit nomi")
+    key = models.CharField(max_length=128, unique=True, db_index=True, verbose_name="API Maxfiy Kaliti")
+    created_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Yaratgan admin")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan vaqt")
+    last_used_at = models.DateTimeField(null=True, blank=True, verbose_name="Oxirgi foydalanilgan vaqt")
+    is_active = models.BooleanField(default=True, verbose_name="Faol holatda", db_index=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.key[:12]}...)"
+
+    class Meta:
+        verbose_name = "Monitoring API Kaliti"
+        verbose_name_plural = "Monitoring API Kalitlari"
+        ordering = ['-created_at']
+
+
 class Book(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='books', verbose_name="Fan", db_index=True)
     title = models.CharField(max_length=255, verbose_name="Kitob nomi")

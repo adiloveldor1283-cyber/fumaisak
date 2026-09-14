@@ -249,6 +249,9 @@ urlpatterns = [
 
     # System Health, Monitoring & Error Logs
     path('adminpanel/monitoring/', monitoring_views.admin_monitoring_dashboard, name='admin_monitoring_dashboard'),
+    path('adminpanel/monitoring/keys/create/', monitoring_views.api_create_monitoring_key, name='api_create_monitoring_key'),
+    path('adminpanel/monitoring/keys/<int:key_id>/delete/', monitoring_views.api_delete_monitoring_key, name='api_delete_monitoring_key'),
+    path('adminpanel/monitoring/keys/<int:key_id>/toggle/', monitoring_views.api_toggle_monitoring_key, name='api_toggle_monitoring_key'),
     path('api/monitoring/overview/', monitoring_views.api_monitoring_overview, name='api_monitoring_overview'),
     path('api/monitoring/errors/', monitoring_views.api_monitoring_errors, name='api_monitoring_errors'),
     path('api/monitoring/errors/<int:error_id>/resolve/', monitoring_views.api_monitoring_resolve_error, name='api_monitoring_resolve_error'),

@@ -1,5 +1,6 @@
 import json
 import time
+import secrets
 import platform
 import django
 from datetime import timedelta
@@ -13,7 +14,7 @@ from django.db import connection
 from django.conf import settings
 from django.core.paginator import Paginator
 
-from main.models import SystemErrorLog, LockedPage, UserSession, CustomUser
+from main.models import SystemErrorLog, LockedPage, UserSession, CustomUser, MonitoringAPIKey
 from main.adminpanel import admin_required
 
 
@@ -70,18 +71,93 @@ def is_authorized_monitor(request):
         if auth_header.startswith('Bearer '):
             api_key = auth_header[7:].strip()
 
-    valid_keys = []
-    custom_key = getattr(settings, 'MONITORING_API_KEY', None)
-    if custom_key:
-        valid_keys.append(str(custom_key).strip())
-    sec_key = getattr(settings, 'SECRET_KEY', '')
-    if sec_key:
-        valid_keys.append(sec_key[:32].strip())
+    if api_key:
+        api_key_str = str(api_key).strip()
+        # A) Check database MonitoringAPIKey
+        try:
+            key_obj = MonitoringAPIKey.objects.filter(key=api_key_str, is_active=True).first()
+            if key_obj:
+                key_obj.last_used_at = timezone.now()
+                key_obj.save(update_fields=['last_used_at'])
+                return True, key_obj.created_by
+        except Exception:
+            pass
 
-    if api_key and api_key in valid_keys:
-        return True, None
+        # B) Fallback: custom key in settings or SECRET_KEY
+        valid_keys = []
+        custom_key = getattr(settings, 'MONITORING_API_KEY', None)
+        if custom_key:
+            valid_keys.append(str(custom_key).strip())
+        sec_key = getattr(settings, 'SECRET_KEY', '')
+        if sec_key:
+            valid_keys.append(sec_key[:32].strip())
+
+        if api_key_str in valid_keys:
+            return True, None
 
     return False, None
+
+
+# ==============================================================================
+# 🔑 API KEY MANAGEMENT (Admin Only)
+# ==============================================================================
+@admin_required
+@require_http_methods(["POST"])
+def api_create_monitoring_key(request):
+    try:
+        data = json.loads(request.body) if request.body else {}
+    except Exception:
+        data = {}
+
+    name = data.get('name', '').strip() or "Netlify Monitoring Dashboard"
+    raw_token = "vle_mon_" + secrets.token_urlsafe(28)
+
+    key_obj = MonitoringAPIKey.objects.create(
+        name=name[:100],
+        key=raw_token,
+        created_by=request.user,
+        is_active=True
+    )
+
+    return JsonResponse({
+        "success": True,
+        "message": "Yangi Monitoring API kaliti yaratildi!",
+        "key": {
+            "id": key_obj.id,
+            "name": key_obj.name,
+            "key": key_obj.key,
+            "created_at": key_obj.created_at.strftime("%d.%m.%Y %H:%M"),
+            "is_active": key_obj.is_active
+        }
+    })
+
+
+@admin_required
+@require_http_methods(["POST"])
+def api_delete_monitoring_key(request, key_id):
+    key_obj = get_object_or_404(MonitoringAPIKey, id=key_id)
+    key_name = key_obj.name
+    key_obj.delete()
+    return JsonResponse({
+        "success": True,
+        "message": f"'{key_name}' API kaliti o'chirildi va bekor qilindi.",
+        "id": key_id
+    })
+
+
+@admin_required
+@require_http_methods(["POST"])
+def api_toggle_monitoring_key(request, key_id):
+    key_obj = get_object_or_404(MonitoringAPIKey, id=key_id)
+    key_obj.is_active = not key_obj.is_active
+    key_obj.save(update_fields=['is_active'])
+    status_text = "faollashtirildi" if key_obj.is_active else "vaqtincha to'xtatildi"
+    return JsonResponse({
+        "success": True,
+        "message": f"API kaliti {status_text}.",
+        "id": key_id,
+        "is_active": key_obj.is_active
+    })
 
 
 # ==============================================================================
@@ -261,7 +337,6 @@ def api_monitoring_errors(request):
                 "full_name": log.resolved_by.get_full_name() or log.resolved_by.username
             }
 
-        # Parse request_data JSON if possible
         parsed_request_data = None
         if log.request_data:
             try:
@@ -432,6 +507,18 @@ def admin_monitoring_dashboard(request):
 
     db_health = get_db_health()
 
+    # If no API key exists, automatically create a primary default key for convenience
+    api_keys = list(MonitoringAPIKey.objects.all().order_by('-created_at'))
+    if not api_keys:
+        default_key = "vle_mon_" + secrets.token_urlsafe(28)
+        new_key = MonitoringAPIKey.objects.create(
+            name="Asosiy Monitoring Kaliti (Netlify)",
+            key=default_key,
+            created_by=request.user,
+            is_active=True
+        )
+        api_keys = [new_key]
+
     context = {
         'logs': logs_page,
         'unresolved_count': unresolved_count,
@@ -444,6 +531,7 @@ def admin_monitoring_dashboard(request):
         'query': query,
         'role': role,
         'method': method,
+        'api_keys': api_keys,
         'server_info': {
             'python_version': platform.python_version(),
             'django_version': django.get_version(),

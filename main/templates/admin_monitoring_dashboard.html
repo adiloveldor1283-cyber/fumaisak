@@ -154,6 +154,10 @@
         animation: modalAppear 0.25s ease-out;
     }
 
+    .diag-modal-content-sm {
+        max-width: 600px;
+    }
+
     @keyframes modalAppear {
         from { opacity: 0; transform: scale(0.96) translateY(10px); }
         to { opacity: 1; transform: scale(1) translateY(0); }
@@ -253,6 +257,11 @@
         </div>
 
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <!-- API Keys Manager Modal Trigger -->
+            <button onclick="openApiKeysModal()" style="background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc; font-weight: 700; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;">
+                <i class="fas fa-key"></i> API Kalitlari ({{ api_keys|length }})
+            </button>
+
             <!-- Auto-refresh interval -->
             <div style="display: flex; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); border-radius: 10px; padding: 6px 12px; font-size: 13px; color: var(--text-secondary); gap: 8px;">
                 <i class="fas fa-clock" style="color: #00f2fe;"></i>
@@ -372,7 +381,10 @@
             <span><i class="fas fa-code-branch" style="color: #ff9f43; margin-right: 5px;"></i> DEBUG: <strong>{% if server_info.debug_mode %}ON (Ishlab chiqish){% else %}OFF (Production){% endif %}</strong></span>
             <span><i class="fas fa-server" style="color: #a855f7; margin-right: 5px;"></i> Server Vaqti: <strong>{{ server_info.server_time }}</strong></span>
         </div>
-        <div>
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <button onclick="openApiKeysModal()" style="background: none; border: none; color: #c084fc; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px;">
+                <i class="fas fa-key"></i> API Kalitlari
+            </button>
             <a href="{% url 'api_monitoring_overview' %}" target="_blank" style="color: #00f2fe; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
                 <i class="fas fa-terminal"></i> REST API JSON <i class="fas fa-external-link-alt" style="font-size: 10px;"></i>
             </a>
@@ -583,6 +595,81 @@
 
 </div>
 
+<!-- 🔑 API Keys Management Modal -->
+<div class="diag-modal-backdrop" id="apiKeysModal" onclick="handleApiModalBackdrop(event)">
+    <div class="diag-modal-content diag-modal-content-sm" onclick="event.stopPropagation()">
+        <div style="padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-key" style="color: #c084fc; font-size: 18px;"></i>
+                <h3 style="color: #ffffff; font-size: 17px; font-weight: 800; margin: 0;">
+                    Monitoring API Kalitlari Boshqaruvi
+                </h3>
+            </div>
+            <button onclick="closeApiKeysModal()" style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 20px; cursor: pointer;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div style="padding: 20px 24px; overflow-y: auto; flex-grow: 1;">
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+                Ushbu maxfiy API kalitlari orqali Netlify yoki boshqa tashqi monitoring ilovangiz tizimga xavfsiz bog'lanadi.
+            </p>
+
+            <!-- Create New Key Input Form -->
+            <div style="display: flex; gap: 8px; margin-bottom: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-card); padding: 8px 12px; border-radius: 12px;">
+                <input type="text" id="newKeyNameInput" placeholder="Kalit nomi (masalan: Netlify Subdomain)" style="flex-grow: 1; background: transparent; border: none; outline: none; color: #ffffff; font-size: 13px;">
+                <button onclick="createNewApiKey()" style="background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc; font-weight: 700; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 12.5px; white-space: nowrap;">
+                    <i class="fas fa-plus"></i> Yangi Yaratish
+                </button>
+            </div>
+
+            <!-- Keys List Container -->
+            <div id="apiKeysListContainer" style="display: flex; flex-direction: column; gap: 12px;">
+                {% for k in api_keys %}
+                    <div id="key-card-{{ k.id }}" style="background: #060913; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <strong style="color: #ffffff; font-size: 13.5px;">{{ k.name }}</strong>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span id="key-badge-{{ k.id }}" style="font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 6px; {% if k.is_active %}background: rgba(0,255,170,0.1); color: #00ffaa; border: 1px solid rgba(0,255,170,0.3);{% else %}background: rgba(255,0,85,0.1); color: #ff0055; border: 1px solid rgba(255,0,85,0.3);{% endif %}">
+                                    {% if k.is_active %}FAOL{% else %}TO'XTATILGAN{% endif %}
+                                </span>
+                                <button onclick="toggleApiKey('{{ k.id }}')" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 11px;" title="Holatni o'zgartirish">
+                                    <i class="fas fa-power-off"></i>
+                                </button>
+                                <button onclick="deleteApiKey('{{ k.id }}')" style="background: rgba(255,0,85,0.1); border: 1px solid rgba(255,0,85,0.3); color: #ff0055; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 11px;" title="O'chirish (Revoke)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Key string with copy -->
+                        <div style="display: flex; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 6px 10px; gap: 8px;">
+                            <input type="password" id="key_val_{{ k.id }}" value="{{ k.key }}" readonly style="flex-grow: 1; background: transparent; border: none; outline: none; color: #00f2fe; font-family: monospace; font-size: 12px;">
+                            <button onclick="toggleKeyVisibility('{{ k.id }}')" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 12px;" title="Ko'rsatish / Yashirish">
+                                <i class="fas fa-eye" id="eye_icon_{{ k.id }}"></i>
+                            </button>
+                            <button onclick="copyDirectText('{{ k.key }}')" style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; font-weight: 700; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 11px;">
+                                <i class="fas fa-copy"></i> Nusxa
+                            </button>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 8px;">
+                            <span>Yaratilgan: {{ k.created_at|date:"d.m.Y H:i" }}</span>
+                            <span>Oxirgi foydalanish: {% if k.last_used_at %}{{ k.last_used_at|date:"d.m.Y H:i" }}{% else %}Foydalanilmagan{% endif %}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div style="padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: flex-end; background: rgba(0,0,0,0.2);">
+            <button onclick="closeApiKeysModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ffffff; font-weight: 700; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 13px;">
+                Yopish
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- 🔬 Diagnostic Modal -->
 <div class="diag-modal-backdrop" id="diagModalBackdrop" onclick="handleBackdropClick(event)">
     <div class="diag-modal-content" onclick="event.stopPropagation()">
@@ -748,7 +835,6 @@ function refreshDashboard(showSpinner = true) {
                 setTimeout(() => icon.classList.remove('fa-spin'), 400);
             }
             if (data && data.metrics) {
-                // Update Top Cards
                 const cardLatency = document.getElementById('cardDbLatency');
                 if (cardLatency && data.database) {
                     cardLatency.textContent = data.database.latency_ms + " ms";
@@ -767,8 +853,6 @@ function refreshDashboard(showSpinner = true) {
                     cardResolved.textContent = data.metrics.resolved_errors;
                 }
 
-                // Live status badge update
-                const badge = document.getElementById('liveBadge');
                 const dot = document.getElementById('livePulseDot');
                 if (data.status === 'healthy') {
                     if (dot) dot.className = 'live-pulse';
@@ -783,6 +867,122 @@ function refreshDashboard(showSpinner = true) {
             if (showSpinner && icon) icon.classList.remove('fa-spin');
             console.error('Monitoring refresh error:', err);
         });
+}
+
+// ==============================================================================
+// 🔑 API Keys Management
+// ==============================================================================
+function openApiKeysModal() {
+    document.getElementById('apiKeysModal').style.display = 'flex';
+}
+
+function closeApiKeysModal() {
+    document.getElementById('apiKeysModal').style.display = 'none';
+}
+
+function handleApiModalBackdrop(e) {
+    if (e.target.id === 'apiKeysModal') closeApiKeysModal();
+}
+
+function toggleKeyVisibility(keyId) {
+    const input = document.getElementById('key_val_' + keyId);
+    const icon = document.getElementById('eye_icon_' + keyId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+
+function copyDirectText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showToast("API Kalit nusxa olindi!");
+    });
+}
+
+function createNewApiKey() {
+    const nameInput = document.getElementById('newKeyNameInput');
+    const name = nameInput.value.trim() || "Netlify Monitoring Dashboard";
+
+    fetch("{% url 'api_create_monitoring_key' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie('csrftoken') || "",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name: name }),
+        credentials: "same-origin"
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast("Yangi API kaliti yaratildi!");
+            nameInput.value = '';
+            setTimeout(() => {
+                window.location.reload();
+            }, 800);
+        } else {
+            alert(data.error || "Xatolik yuz berdi");
+        }
+    });
+}
+
+function deleteApiKey(keyId) {
+    if (!confirm("Ushbu API kalitni o'chirishni tasdiqlaysizmi? (Ushbu kalitdan foydalanuvchi ilovalar bog'lana olmay qoladi)")) return;
+
+    fetch("/adminpanel/monitoring/keys/" + keyId + "/delete/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie('csrftoken') || "",
+            "Content-Type": "application/json"
+        },
+        credentials: "same-origin"
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message);
+            const card = document.getElementById('key-card-' + keyId);
+            if (card) card.remove();
+        } else {
+            alert(data.error || "Xatolik yuz berdi");
+        }
+    });
+}
+
+function toggleApiKey(keyId) {
+    fetch("/adminpanel/monitoring/keys/" + keyId + "/toggle/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie('csrftoken') || "",
+            "Content-Type": "application/json"
+        },
+        credentials: "same-origin"
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message);
+            const badge = document.getElementById('key-badge-' + keyId);
+            if (badge) {
+                if (data.is_active) {
+                    badge.textContent = "FAOL";
+                    badge.style.background = "rgba(0,255,170,0.1)";
+                    badge.style.color = "#00ffaa";
+                    badge.style.border = "1px solid rgba(0,255,170,0.3)";
+                } else {
+                    badge.textContent = "TO'XTATILGAN";
+                    badge.style.background = "rgba(255,0,85,0.1)";
+                    badge.style.color = "#ff0055";
+                    badge.style.border = "1px solid rgba(255,0,85,0.3)";
+                }
+            }
+        } else {
+            alert(data.error || "Xatolik yuz berdi");
+        }
+    });
 }
 
 // ==============================================================================
@@ -809,7 +1009,6 @@ function openDiagnosticsModal(errorId) {
     document.getElementById('modalIp').textContent = dataset.ip;
     document.getElementById('modalUserAgent').textContent = dataset.agent || "Noma'lum";
 
-    // Resolved status
     const isResolved = dataset.resolved === '1';
     const statusEl = document.getElementById('modalResolvedStatus');
     const resolveBtn = document.getElementById('modalResolveBtn');
@@ -821,7 +1020,6 @@ function openDiagnosticsModal(errorId) {
         if (resolveBtn) resolveBtn.style.display = 'inline-flex';
     }
 
-    // Payload formatted JSON
     let formattedPayload = dataset.payload;
     try {
         const obj = JSON.parse(dataset.payload);
@@ -829,13 +1027,9 @@ function openDiagnosticsModal(errorId) {
     } catch(e) {}
     document.getElementById('modalPayloadBox').textContent = formattedPayload || "Parametrlar mavjud emas.";
 
-    // Traceback
     document.getElementById('modalTracebackBox').textContent = tracebackText || "Traceback ma'lumoti topilmadi.";
 
-    // Switch to first tab
     switchDiagTab('overview');
-
-    // Show modal
     document.getElementById('diagModalBackdrop').style.display = 'flex';
 }
 
@@ -871,21 +1065,13 @@ function switchDiagTab(tabName) {
     }
 }
 
-// ==============================================================================
-// 📋 Copy to Clipboard
-// ==============================================================================
 function copyToClipboard(elementId) {
     const text = document.getElementById(elementId).textContent;
     navigator.clipboard.writeText(text).then(() => {
         showToast("Nusxa olindi!");
-    }).catch(err => {
-        console.error('Nusxa olishda xatolik:', err);
     });
 }
 
-// ==============================================================================
-// ✅ AJAX Resolve Logic
-// ==============================================================================
 function resolveErrorAjax(errorId, btnElement) {
     if (!confirm("Ushbu xatolikni hal etildi deb belgilamoqchimisiz?")) return;
 
@@ -905,7 +1091,6 @@ function resolveErrorAjax(errorId, btnElement) {
                 const parent = btnElement.parentElement;
                 parent.innerHTML = '<span style="color: #00ffaa; font-weight: 700; font-size: 12px;"><i class="fas fa-check-double"></i></span>';
             }
-            // Update raw data
             const rawEl = document.getElementById('raw_data_' + errorId);
             if (rawEl) {
                 rawEl.dataset.resolved = '1';
@@ -915,10 +1100,6 @@ function resolveErrorAjax(errorId, btnElement) {
         } else {
             alert(data.error || "Xatolik yuz berdi");
         }
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Server bilan bog'lanishda xatolik!");
     });
 }
 
@@ -955,16 +1136,9 @@ function bulkResolveAll() {
         } else {
             alert(data.error || "Xatolik yuz berdi");
         }
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Server bilan bog'lanishda xatolik!");
     });
 }
 
-// ==============================================================================
-// 🍞 Toast Helper
-// ==============================================================================
 function showToast(msg) {
     const toast = document.getElementById('monitorToast');
     const msgEl = document.getElementById('toastMsg');
