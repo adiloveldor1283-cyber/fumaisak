@@ -188,7 +188,7 @@ def api_monitoring_overview(request):
     if not is_auth:
         return cors_json_response({"error": "Ruxsat berilmagan. Admin autentifikatsiyasi yoki X-Monitoring-Key talab qilinadi."}, status=401)
 
-    now = timezone.now()
+    now = timezone.localtime(timezone.now())
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     last_24h_start = now - timedelta(hours=24)
     last_7d_start = now - timedelta(days=7)
@@ -244,6 +244,7 @@ def api_monitoring_overview(request):
     recent_errors = []
     for err in recent_qs:
         user_name = err.user.get_full_name() if err.user else "Anonim"
+        err_time = timezone.localtime(err.timestamp) if err.timestamp else None
         recent_errors.append({
             "id": err.id,
             "exception_type": err.exception_type or "UnhandledException",
@@ -254,7 +255,8 @@ def api_monitoring_overview(request):
             "user_phone": err.user_phone or "",
             "user_name": user_name,
             "ip_address": err.ip_address or "",
-            "timestamp": err.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            "timestamp": err_time.strftime("%d.%m.%Y %H:%M:%S") if err_time else "",
+            "timestamp_iso": err_time.isoformat() if err_time else ""
         })
 
     data = {
@@ -279,10 +281,11 @@ def api_monitoring_overview(request):
             "python_version": platform.python_version(),
             "django_version": django.get_version(),
             "debug_mode": settings.DEBUG,
-            "server_time": now.strftime("%Y-%m-%d %H:%M:%S UTC%z")
+            "server_time": now.strftime("%d.%m.%Y %H:%M:%S (Toshkent)")
         }
     }
     return cors_json_response(data)
+
 
 
 # ==============================================================================
@@ -360,6 +363,9 @@ def api_monitoring_errors(request):
             except Exception:
                 parsed_request_data = log.request_data
 
+        log_time = timezone.localtime(log.timestamp) if log.timestamp else None
+        res_time = timezone.localtime(log.resolved_at) if log.resolved_at else None
+
         results.append({
             "id": log.id,
             "url_path": log.url_path,
@@ -370,13 +376,13 @@ def api_monitoring_errors(request):
             "ip_address": log.ip_address or "",
             "user_agent": log.user_agent or "",
             "request_data": parsed_request_data,
-            "timestamp": log.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-            "timestamp_iso": log.timestamp.isoformat(),
+            "timestamp": log_time.strftime("%d.%m.%Y %H:%M:%S") if log_time else "",
+            "timestamp_iso": log_time.isoformat() if log_time else "",
             "user_role": log.user_role or "anonymous",
             "user_phone": log.user_phone or "",
             "user": user_info,
             "is_resolved": log.is_resolved,
-            "resolved_at": log.resolved_at.strftime("%Y-%m-%d %H:%M:%S") if log.resolved_at else None,
+            "resolved_at": res_time.strftime("%d.%m.%Y %H:%M:%S") if res_time else None,
             "resolved_by": resolved_by_info
         })
 
@@ -511,7 +517,7 @@ def admin_monitoring_dashboard(request):
     logs_page = paginator.get_page(page_number)
 
     # Overview stats for cards
-    now = timezone.now()
+    now = timezone.localtime(timezone.now())
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     last_24h_start = now - timedelta(hours=24)
 
@@ -552,7 +558,8 @@ def admin_monitoring_dashboard(request):
             'python_version': platform.python_version(),
             'django_version': django.get_version(),
             'debug_mode': settings.DEBUG,
-            'server_time': now.strftime("%d.%m.%Y %H:%M:%S")
+            'server_time': now.strftime("%d.%m.%Y %H:%M:%S (Toshkent)")
         }
     }
     return render(request, 'admin_monitoring_dashboard.html', context)
+
