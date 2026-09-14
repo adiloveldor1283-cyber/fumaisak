@@ -79,7 +79,15 @@
                 <td data-label="YARATILGAN SANA" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: rgba(255,255,255,0.6); font-family: monospace;">{{ group.created_at|date:"d.m.Y H:i" }}</td>
                 <td data-label="BATAFSIL" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: rgba(255, 255, 255, 0.85);"><a href="{% url 'edit_group_admin' group.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">Guruhga o'tish</a></td>
                 <td data-label="DARS JADVALI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: rgba(255, 255, 255, 0.85);"><a href="{% url 'edit_group_teacher_schedule' group.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.15); color: #fff; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">Jadval ko'rish</a></td>
-                <td data-label="TO'LOV BELGILASH" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: rgba(255, 255, 255, 0.85);"><a href="{% url 'add_group_payment' group.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">To'lov belgilash</a></td>
+                <td data-label="TO'LOV BELGILASH" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: rgba(255, 255, 255, 0.85);">
+                    {% if not group.is_active or "(yopilgan)" in group.name %}
+                        <span class="btn-otish" style="display: inline-flex; align-items: center; gap: 4px; padding: 8px 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.4); border-radius: 8px; font-size: 12.5px; font-weight: 600; cursor: not-allowed;" title="Guruh yopilgan (To'lov belgilash bloklangan)">
+                            <i class="fas fa-lock"></i> Qulflangan
+                        </span>
+                    {% else %}
+                        <a href="{% url 'add_group_payment' group.id %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">To'lov belgilash</a>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>

@@ -14,6 +14,15 @@
 </div>
 
 <div class="form-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); max-width: 600px; width: 100%; margin: 0 auto;">
+    {% if not group.is_active or "(yopilgan)" in group.name %}
+    <div style="background: rgba(255, 74, 90, 0.1); border: 1px solid rgba(255, 74, 90, 0.3); border-radius: 12px; padding: 14px 18px; margin-bottom: 22px; display: flex; align-items: center; gap: 12px; color: #ff4a5a;">
+        <i class="fas fa-lock" style="font-size: 20px; flex-shrink: 0;"></i>
+        <div style="font-size: 13px; font-weight: 600; line-height: 1.4;">
+            Ushbu guruh yopilgan. Yopilgan guruh uchun to'lov ma'lumotlarini o'zgartirish cheklangan!
+        </div>
+    </div>
+    {% endif %}
+
     <form method="POST">
         {% csrf_token %}
 
@@ -21,7 +30,7 @@
             <label for="start_date" style="display: block; font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">To'lov boshlanish sanasi (Darslar boshlanishi) *</label>
             <input type="date" class="form-control" id="start_date" name="start_date"
                    value="{{ initial_start_date|date:'Y-m-d' }}"
-                   required style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; color-scheme: dark; outline: none; transition: 0.3s;">
+                   {% if not group.is_active or "(yopilgan)" in group.name %}readonly disabled style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; color: rgba(255,255,255,0.4); color-scheme: dark; outline: none; cursor: not-allowed;"{% else %}required style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; color-scheme: dark; outline: none; transition: 0.3s;"{% endif %}>
             <small style="display: block; margin-top: 6px; font-size: 12px; color: rgba(255,255,255,0.4);">
                 <i class="fas fa-info-circle" style="color: #00f2fe;"></i> Tizim guruh ochilgan sanani ({{ group.created_at|date:'d.m.Y' }}) taklif qiladi, kerak bo'lsa o'zgartirishingiz mumkin.
             </small>
@@ -31,18 +40,22 @@
             <label for="duration" style="display: block; font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Kurs davomiyligi (oylarda) *</label>
             <input type="number" class="form-control" id="duration" name="duration"
                    value="{{ payment_info.course_duration_months|default:'' }}"
-                   placeholder="Masalan: 6" required style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; transition: 0.3s;">
+                   placeholder="Masalan: 6" {% if not group.is_active or "(yopilgan)" in group.name %}readonly disabled style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; color: rgba(255,255,255,0.4); outline: none; cursor: not-allowed;"{% else %}required style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; transition: 0.3s;"{% endif %}>
         </div>
 
         <div class="form-group" style="margin-bottom: 22px;">
             <label for="monthly_fee" style="display: block; font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Har oy uchun to'lov summasi (so'm) *</label>
             <input type="number" class="form-control" id="monthly_fee" name="monthly_fee"
                    value="{{ payment_info.monthly_fee|default:'' }}"
-                   placeholder="Masalan: 300000" required style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; transition: 0.3s;">
+                   placeholder="Masalan: 300000" {% if not group.is_active or "(yopilgan)" in group.name %}readonly disabled style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; color: rgba(255,255,255,0.4); outline: none; cursor: not-allowed;"{% else %}required style="width: 100%; padding: 12px 18px; font-size: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: white; outline: none; transition: 0.3s;"{% endif %}>
         </div>
 
         <div class="tugmalar" style="display: flex; gap: 12px; margin-top: 30px;">
-            <button type="submit" class="btn-submit" style="flex: 1; padding: 12px 24px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; transition: 0.3s; text-transform: uppercase;"><i class="fas fa-save" style="margin-right: 6px;"></i> Saqlash</button>
+            {% if not group.is_active or "(yopilgan)" in group.name %}
+                <button type="button" disabled style="flex: 1; padding: 12px 24px; background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.3); font-weight: 800; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; cursor: not-allowed; text-transform: uppercase;"><i class="fas fa-lock" style="margin-right: 6px;"></i> O'zgartirish taqiqlangan</button>
+            {% else %}
+                <button type="submit" class="btn-submit" style="flex: 1; padding: 12px 24px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #070a12; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; transition: 0.3s; text-transform: uppercase;"><i class="fas fa-save" style="margin-right: 6px;"></i> Saqlash</button>
+            {% endif %}
             <a href="{% url 'group_payment_list' %}" class="btn-cancel" style="flex: 1; padding: 12px 24px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); color: white; border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: 800; text-transform: uppercase; text-decoration: none; display: flex; align-items: center; justify-content: center;">Bekor qilish</a>
         </div>
     </form>

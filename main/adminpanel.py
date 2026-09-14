@@ -2991,6 +2991,10 @@ def add_group_payment(request, group_id):
     payment_info = getattr(group, 'payment_info', None)
 
     if request.method == "POST":
+        if group.is_closed or not group.is_active or "(yopilgan)" in group.name.lower():
+            messages.error(request, f"'{group.name}' guruhi yopilgan! Yopilgan guruh uchun to'lov ma'lumotlarini o'zgartirib bo'lmaydi.", extra_tags='payment_error')
+            return redirect('group_payment_list')
+
         duration = request.POST.get('duration')
         monthly_fee = request.POST.get('monthly_fee')
         start_date_str = request.POST.get('start_date')
