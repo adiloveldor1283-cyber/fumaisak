@@ -515,7 +515,7 @@
                     <span id="otp-countdown" style="font-size: 11.5px; color: rgba(255,255,255,0.5); font-weight: 600;"></span>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: stretch;">
-                    <input type="text" id="otp-input" maxlength="6" placeholder="______" style="flex: 1; padding: 10px 15px; font-size: 18px; font-weight: 800; letter-spacing: 6px; text-align: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(0,242,254,0.3); border-radius: 10px; color: #00f2fe; outline: none;">
+                    <input type="text" id="otp-input" maxlength="10" placeholder="______" autocomplete="one-time-code" inputmode="numeric" style="flex: 1; padding: 10px 15px; font-size: 18px; font-weight: 800; letter-spacing: 6px; text-align: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(0,242,254,0.3); border-radius: 10px; color: #00f2fe; outline: none;">
                     <button type="button" id="btn-verify-otp" class="btn-otp-verify" onclick="verifyPhoneOtp()">
                         <i class="fas fa-check-circle"></i> Tasdiqlash
                     </button>
@@ -583,6 +583,27 @@
         return cookieValue;
     }
     const csrftoken = getCookie('csrftoken');
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const otpInput = document.getElementById('otp-input');
+        if (otpInput) {
+            otpInput.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '').slice(0, 6);
+            });
+            otpInput.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pasteData = (e.clipboardData || window.clipboardData).getData('text');
+                const cleanDigits = pasteData.replace(/\D/g, '').slice(0, 6);
+                this.value = cleanDigits;
+            });
+            otpInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    verifyPhoneOtp();
+                }
+            });
+        }
+    });
 
     function setChannel(channel) {
         currentChannel = channel;
@@ -670,8 +691,9 @@
 
             if (data.success) {
                 document.getElementById('otp-verification-box').style.display = 'block';
-                document.getElementById('otp-input').value = '';
-                document.getElementById('otp-input').focus();
+                const otpIn = document.getElementById('otp-input');
+                otpIn.value = '';
+                otpIn.focus();
                 startCountdown(60);
                 showOtpAlert(data.message, true);
             } else {
@@ -689,10 +711,10 @@
     async function verifyPhoneOtp() {
         const phone = document.getElementById('phone_number').value.trim();
         const otpInput = document.getElementById('otp-input');
-        const otp = otpInput.value.trim();
+        const otp = otpInput.value.replace(/\D/g, '').trim();
 
         if (!otp || otp.length < 4) {
-            showOtpAlert("Iltimos, tasdiqlash kodini to'liq kiriting.", false);
+            showOtpAlert("Iltimos, tasdiqlash kodini to'liq kiriting (6 xonali raqam).", false);
             otpInput.focus();
             return;
         }
@@ -727,6 +749,7 @@
                 btnVerify.innerHTML = '<i class="fas fa-check-circle"></i> Tasdiqlash';
                 showOtpAlert(data.message || "Kod noto'g'ri yoki muddati o'tgan.", false);
                 otpInput.focus();
+                otpInput.select();
             }
         } catch (err) {
             btnVerify.disabled = false;

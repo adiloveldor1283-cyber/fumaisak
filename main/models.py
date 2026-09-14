@@ -280,6 +280,24 @@ class SiteSetting(models.Model):
         verbose_name_plural = "Logatip va Sozlamalar"
 
 
+class TelegramBotContact(models.Model):
+    phone_clean = models.CharField(max_length=20, unique=True, db_index=True, verbose_name="Tozalangan telefon raqami")
+    chat_id = models.CharField(max_length=50, db_index=True, verbose_name="Telegram Chat ID")
+    first_name = models.CharField(max_length=150, blank=True, null=True, verbose_name="Telegram Ism")
+    last_name = models.CharField(max_length=150, blank=True, null=True, verbose_name="Telegram Familiya")
+    username = models.CharField(max_length=150, blank=True, null=True, verbose_name="Telegram Username")
+    otp_code = models.CharField(max_length=10, blank=True, null=True, verbose_name="Oxirgi OTP kod")
+    otp_expires_at = models.DateTimeField(blank=True, null=True, verbose_name="OTP amal qilish muddati")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Oxirgi yangilangan vaqti")
+
+    def __str__(self):
+        return f"+{self.phone_clean} -> {self.chat_id}"
+
+    class Meta:
+        verbose_name = "Telegram Bot Kontakti"
+        verbose_name_plural = "Telegram Bot Kontaktlari"
+
+
 class ProfileSetting(models.Model):
     image = models.ImageField(upload_to='default/', blank=True, null=True, validators=[validate_image_file])
 

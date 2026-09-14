@@ -478,12 +478,20 @@ def add_student(request):
             messages.error(request, f"Ushbu telefon raqam (+{phone_clean}) bilan ro'yxatdan o'tgan {role_uz} allaqachon mavjud!", extra_tags='password_creat')
             return redirect('add_student')
 
-        # Check phone verification in session or via OTP
+        # Check phone verification in session or via OTP or DB
         is_verified = request.session.get(f'sms_verified_{phone_clean}', False)
         if not is_verified and otp_code:
+            import re
+            clean_input_otp = re.sub(r'\D', '', str(otp_code).strip())
             stored_otp_data = request.session.get(f'phone_otp_{phone_clean}')
             if stored_otp_data and isinstance(stored_otp_data, dict):
-                if str(stored_otp_data.get('otp')) == str(otp_code):
+                stored_otp = re.sub(r'\D', '', str(stored_otp_data.get('otp', '')))
+                if stored_otp == clean_input_otp:
+                    is_verified = True
+            if not is_verified:
+                from main.models import TelegramBotContact
+                tg_contact = TelegramBotContact.objects.filter(phone_clean=phone_clean).first()
+                if tg_contact and tg_contact.otp_code and re.sub(r'\D', '', tg_contact.otp_code) == clean_input_otp:
                     is_verified = True
 
         # Generate username if empty
@@ -509,8 +517,9 @@ def add_student(request):
         # Auto-generate secure strong password
         raw_password = generate_random_password(8)
 
-        # Check if telegram_chat_id is available in session or cache
+        # Check if telegram_chat_id is available in session, cache, or DB model
         from django.core.cache import cache
+        from main.models import TelegramBotContact
         tg_chat_id = request.session.get(f'tg_chat_id_{phone_clean}')
         if not tg_chat_id:
             tg_reg = cache.get(f"tg_reg_otp_{phone_clean}")
@@ -518,13 +527,20 @@ def add_student(request):
                 tg_chat_id = tg_reg.get('chat_id')
         if not tg_chat_id:
             tg_chat_id = cache.get(f"tg_chat_by_phone_{phone_clean}")
+        if not tg_chat_id:
+            tg_contact = TelegramBotContact.objects.filter(phone_clean=phone_clean).first()
+            if tg_contact:
+                tg_chat_id = tg_contact.chat_id
+
+        # Always save standardized +998... format
+        phone_standard = f"+{phone_clean}"
 
         # System creates account with empty names; student fills them during onboarding (O'RQ-547)
         user = CustomUser.objects.create(
             username=username,
             first_name="",
             last_name="",
-            phone_number=phone_number,
+            phone_number=phone_standard,
             password=make_password(raw_password),
             role=role,
             is_active=is_active,
@@ -564,6 +580,7 @@ def add_student(request):
         request.session.pop(f'sms_verified_{phone_clean}', None)
         request.session.pop(f'tg_chat_id_{phone_clean}', None)
         cache.delete(f"tg_reg_otp_{phone_clean}")
+        request.session.modified = True
 
         display_name = f"{user.first_name} {user.last_name}".strip() or user.phone_number
         log_action(request.user, "Talaba Qo'shildi", f"Yangi talaba qo'shildi: {user.phone_number} ({display_name})", request)
@@ -766,12 +783,20 @@ def add_teacher(request):
             messages.error(request, f"Ushbu telefon raqam (+{phone_clean}) bilan ro'yxatdan o'tgan {role_uz} allaqachon mavjud!", extra_tags='password_creat_teacher')
             return redirect('add_teacher')
 
-        # Check phone verification in session or via OTP
+        # Check phone verification in session or via OTP or DB
         is_verified = request.session.get(f'sms_verified_{phone_clean}', False)
         if not is_verified and otp_code:
+            import re
+            clean_input_otp = re.sub(r'\D', '', str(otp_code).strip())
             stored_otp_data = request.session.get(f'phone_otp_{phone_clean}')
             if stored_otp_data and isinstance(stored_otp_data, dict):
-                if str(stored_otp_data.get('otp')) == str(otp_code):
+                stored_otp = re.sub(r'\D', '', str(stored_otp_data.get('otp', '')))
+                if stored_otp == clean_input_otp:
+                    is_verified = True
+            if not is_verified:
+                from main.models import TelegramBotContact
+                tg_contact = TelegramBotContact.objects.filter(phone_clean=phone_clean).first()
+                if tg_contact and tg_contact.otp_code and re.sub(r'\D', '', tg_contact.otp_code) == clean_input_otp:
                     is_verified = True
 
         # Generate username if empty
@@ -797,8 +822,9 @@ def add_teacher(request):
         # Auto-generate secure strong password
         raw_password = generate_random_password(8)
 
-        # Check if telegram_chat_id is available in session or cache
+        # Check if telegram_chat_id is available in session, cache, or DB model
         from django.core.cache import cache
+        from main.models import TelegramBotContact
         tg_chat_id = request.session.get(f'tg_chat_id_{phone_clean}')
         if not tg_chat_id:
             tg_reg = cache.get(f"tg_reg_otp_{phone_clean}")
@@ -806,13 +832,20 @@ def add_teacher(request):
                 tg_chat_id = tg_reg.get('chat_id')
         if not tg_chat_id:
             tg_chat_id = cache.get(f"tg_chat_by_phone_{phone_clean}")
+        if not tg_chat_id:
+            tg_contact = TelegramBotContact.objects.filter(phone_clean=phone_clean).first()
+            if tg_contact:
+                tg_chat_id = tg_contact.chat_id
+
+        # Always save standardized +998... format
+        phone_standard = f"+{phone_clean}"
 
         # System creates teacher account with empty names; teacher fills them during onboarding (O'RQ-547)
         new_teacher = CustomUser.objects.create(
             username=username,
             first_name="",
             last_name="",
-            phone_number=phone_number,
+            phone_number=phone_standard,
             password=make_password(raw_password),
             role=role,
             is_active=is_active,
@@ -847,6 +880,7 @@ def add_teacher(request):
         request.session.pop(f'sms_verified_{phone_clean}', None)
         request.session.pop(f'tg_chat_id_{phone_clean}', None)
         cache.delete(f"tg_reg_otp_{phone_clean}")
+        request.session.modified = True
 
         display_name = f"{new_teacher.first_name} {new_teacher.last_name}".strip() or new_teacher.phone_number
         log_action(request.user, "O'qituvchi Qo'shildi", f"Yangi o'qituvchi qo'shildi: {new_teacher.phone_number} ({display_name})", request)
@@ -6960,9 +6994,12 @@ def send_phone_verification_otp_ajax(request):
     """
     Telefon raqamiga 6 xonali tasdiqlash kodini SMS yoki Telegram orqali yuboradi va sessiyada saqlaydi.
     """
+    import datetime
     import json
     import time
     from django.core.cache import cache
+    from django.utils import timezone
+    from main.models import TelegramBotContact
     from main.telegram_service import get_bot_username, send_telegram_message
 
     if request.method != 'POST':
@@ -6971,10 +7008,10 @@ def send_phone_verification_otp_ajax(request):
     try:
         data = json.loads(request.body.decode('utf-8')) if request.content_type == 'application/json' else request.POST
         phone = data.get('phone_number', '').strip()
-        channel = data.get('channel', 'sms').strip().lower()
+        channel = data.get('channel', 'telegram').strip().lower()
     except Exception:
         phone = request.POST.get('phone_number', '').strip()
-        channel = request.POST.get('channel', 'sms').strip().lower()
+        channel = request.POST.get('channel', 'telegram').strip().lower()
 
     phone_clean = clean_phone_number(phone)
     if not phone_clean or len(phone_clean) != 12:
@@ -7002,16 +7039,18 @@ def send_phone_verification_otp_ajax(request):
     bot_username = get_bot_username()
     is_staff = request.user.is_superuser or getattr(request.user, 'role', '') in ['admin', 'reception']
 
-    # Har yangi kod so'ralganda oldingi tasdiqlangan holat va sessiyalarni tozalash (qayta-qayta tasdiqlanib ketishni oldini olish)
+    # Har yangi kod so'ralganda oldingi tasdiqlangan holat va sessiyalarni tozalash
     request.session.pop(f'sms_verified_{phone_clean}', None)
     request.session.pop(f'tg_chat_id_{phone_clean}', None)
     request.session.pop(otp_session_key, None)
-    cache.delete(f"tg_reg_otp_{phone_clean}")
     request.session.modified = True
 
     # --- TELEGRAM KANAL ORQALI TASDIQLASH ---
     if channel == 'telegram':
         tg_chat_id = cache.get(f"tg_chat_by_phone_{phone_clean}")
+        tg_contact = TelegramBotContact.objects.filter(phone_clean=phone_clean).first()
+        if not tg_chat_id and tg_contact:
+            tg_chat_id = tg_contact.chat_id
 
         if not tg_chat_id:
             return JsonResponse({
@@ -7024,17 +7063,30 @@ def send_phone_verification_otp_ajax(request):
             })
 
         otp_code = generate_otp_code()
+        expires_at = current_time + 600
+
+        # Save OTP to database model
+        TelegramBotContact.objects.update_or_create(
+            phone_clean=phone_clean,
+            defaults={
+                'chat_id': str(tg_chat_id),
+                'otp_code': str(otp_code),
+                'otp_expires_at': timezone.now() + datetime.timedelta(minutes=10)
+            }
+        )
+
         cache.set(f"tg_reg_otp_{phone_clean}", {
             'otp': str(otp_code),
             'chat_id': str(tg_chat_id),
             'phone_clean': phone_clean,
             'created_at': current_time,
-            'expires_at': current_time + 600
+            'expires_at': expires_at
         }, timeout=600)
+        cache.set(f"tg_chat_by_phone_{phone_clean}", str(tg_chat_id), timeout=86400)
 
         request.session[otp_session_key] = {
             'otp': str(otp_code),
-            'expires_at': current_time + 600,
+            'expires_at': expires_at,
             'verified': False,
             'channel': 'telegram',
             'chat_id': str(tg_chat_id)
@@ -7094,11 +7146,14 @@ def send_phone_verification_otp_ajax(request):
 @login_required
 def verify_phone_otp_ajax(request):
     """
-    Telefon raqami va kiritilgan 6 xonali OTP kodni tekshiradi (SMS yoki Telegram kesh).
+    Telefon raqami va kiritilgan 6 xonali OTP kodni tekshiradi (Session, Cache yoki TelegramBotContact DB).
     """
     import json
+    import re
     import time
     from django.core.cache import cache
+    from django.utils import timezone
+    from main.models import TelegramBotContact
 
     if request.method != 'POST':
         return JsonResponse({'success': False, 'message': "Faqat POST so'rov qabul qilinadi."})
@@ -7106,62 +7161,72 @@ def verify_phone_otp_ajax(request):
     try:
         data = json.loads(request.body.decode('utf-8')) if request.content_type == 'application/json' else request.POST
         phone = data.get('phone_number', '').strip()
-        otp = str(data.get('otp_code', '')).strip()
+        raw_otp = data.get('otp_code', '')
     except Exception:
         phone = request.POST.get('phone_number', '').strip()
-        otp = str(request.POST.get('otp_code', '')).strip()
+        raw_otp = request.POST.get('otp_code', '')
 
     phone_clean = clean_phone_number(phone)
     if not phone_clean:
         return JsonResponse({'success': False, 'message': "Telefon raqami kiritilmagan."})
 
+    otp = re.sub(r'\D', '', str(raw_otp).strip())
     if not otp or len(otp) < 4:
-        return JsonResponse({'success': False, 'message': "Tasdiqlash kodi to'liq kiritilmagan."})
+        return JsonResponse({'success': False, 'message': "Iltimos, tasdiqlash kodini to'liq kiriting."})
 
     otp_session_key = f'phone_otp_{phone_clean}'
     stored_data = request.session.get(otp_session_key)
     tg_reg = cache.get(f"tg_reg_otp_{phone_clean}")
     tg_chat_id = cache.get(f"tg_chat_by_phone_{phone_clean}")
+    tg_contact = TelegramBotContact.objects.filter(phone_clean=phone_clean).first()
 
     verified = False
-    chat_id = tg_chat_id
+    chat_id = tg_chat_id or (tg_contact.chat_id if tg_contact else None)
+    now_ts = time.time()
 
-    # Check session OTP
+    # 1. Check session OTP
     if stored_data and isinstance(stored_data, dict):
-        stored_otp = str(stored_data.get('otp', '')).strip()
-        if time.time() <= stored_data.get('expires_at', 0) and stored_otp == otp:
+        stored_otp = re.sub(r'\D', '', str(stored_data.get('otp', '')).strip())
+        if now_ts <= stored_data.get('expires_at', 0) and stored_otp == otp:
             verified = True
             chat_id = stored_data.get('chat_id') or chat_id
 
-    # Check Telegram cache OTP
+    # 2. Check Telegram cache OTP
     if not verified and tg_reg and isinstance(tg_reg, dict):
-        tg_otp = str(tg_reg.get('otp', '')).strip()
-        if time.time() <= tg_reg.get('expires_at', 0) and tg_otp == otp:
+        tg_otp = re.sub(r'\D', '', str(tg_reg.get('otp', '')).strip())
+        if now_ts <= tg_reg.get('expires_at', 0) and tg_otp == otp:
             verified = True
             chat_id = tg_reg.get('chat_id') or chat_id
+
+    # 3. Check Database TelegramBotContact OTP
+    if not verified and tg_contact and tg_contact.otp_code:
+        db_otp = re.sub(r'\D', '', str(tg_contact.otp_code).strip())
+        if db_otp == otp:
+            if not tg_contact.otp_expires_at or tg_contact.otp_expires_at >= timezone.now():
+                verified = True
+                chat_id = tg_contact.chat_id or chat_id
 
     if verified:
         request.session[otp_session_key] = {
             'otp': otp,
             'verified': True,
-            'expires_at': time.time() + 600,
+            'expires_at': now_ts + 600,
             'chat_id': str(chat_id) if chat_id else None
         }
         request.session[f'sms_verified_{phone_clean}'] = True
         if chat_id:
             request.session[f'tg_chat_id_{phone_clean}'] = str(chat_id)
+            cache.set(f"tg_chat_by_phone_{phone_clean}", str(chat_id), timeout=86400)
         request.session.modified = True
-        # Bir marta tasdiqlangan kod keshdan o'chiriladi, qayta ishlatilmasligi uchun
-        cache.delete(f"tg_reg_otp_{phone_clean}")
+        
         return JsonResponse({
             'success': True,
             'message': "Telefon raqami muvaffaqiyatli tasdiqlandi!" + (" (Telegram bot bog'landi ✅)" if chat_id else ""),
             'telegram_linked': bool(chat_id)
         })
     else:
-        request.session.pop(f'sms_verified_{phone_clean}', None)
-        request.session.modified = True
-        return JsonResponse({'success': False, 'message': "Noto'g'ri yoki muddati o'tgan tasdiqlash kodi kiritildi. Qaytadan tekshiring."})
+        # Noto'g'ri kod kiritilganda sessiyadagi haqiqiy OTP kodni bekor qilmaymiz, foydalanuvchi to'g'ri kodni kiritishi mumkin
+        return JsonResponse({'success': False, 'message': "Tasdiqlash kodi noto'g'ri kiritildi. Iltimos, qaytadan tekshirib kiriting."})
 
 
 @admin_required

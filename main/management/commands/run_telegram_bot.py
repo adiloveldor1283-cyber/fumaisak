@@ -63,9 +63,21 @@ class Command(BaseCommand):
                         phone_clean = clean_phone_number(raw_phone)
                         
                         if phone_clean:
+                            from main.models import TelegramBotContact
+                            # Save to persistent database model
+                            TelegramBotContact.objects.update_or_create(
+                                phone_clean=phone_clean,
+                                defaults={
+                                    'chat_id': str(chat_id),
+                                    'first_name': contact.get('first_name') or chat.get('first_name', ''),
+                                    'last_name': contact.get('last_name') or chat.get('last_name', ''),
+                                    'username': chat.get('username', '')
+                                }
+                            )
+
                             # Save chat_id mapped to phone in cache for 24 hours
                             cache.set(f"tg_chat_by_phone_{phone_clean}", str(chat_id), timeout=86400)
-                            
+
                             # Check if user already exists in DB
                             existing_user = CustomUser.objects.filter(
                                 Q(phone_number=raw_phone) |
