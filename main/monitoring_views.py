@@ -4,7 +4,7 @@ import platform
 import django
 from datetime import timedelta
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
@@ -15,6 +15,22 @@ from django.core.paginator import Paginator
 
 from main.models import SystemErrorLog, LockedPage, UserSession, CustomUser
 from main.adminpanel import admin_required
+
+
+def cors_json_response(data, status=200):
+    response = JsonResponse(data, status=status, json_dumps_params={'ensure_ascii': False, 'indent': 2})
+    response["Access-Control-Allow-Origin"] = "*"
+    response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Monitoring-Key, X-CSRFToken"
+    return response
+
+
+def handle_cors_preflight():
+    response = HttpResponse()
+    response["Access-Control-Allow-Origin"] = "*"
+    response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Monitoring-Key, X-CSRFToken"
+    return response
 
 
 def get_db_health():
@@ -73,9 +89,12 @@ def is_authorized_monitor(request):
 # ==============================================================================
 @csrf_exempt
 def api_monitoring_overview(request):
+    if request.method == 'OPTIONS':
+        return handle_cors_preflight()
+
     is_auth, user = is_authorized_monitor(request)
     if not is_auth:
-        return JsonResponse({"error": "Ruxsat berilmagan. Admin autentifikatsiyasi yoki X-Monitoring-Key talab qilinadi."}, status=401)
+        return cors_json_response({"error": "Ruxsat berilmagan. Admin autentifikatsiyasi yoki X-Monitoring-Key talab qilinadi."}, status=401)
 
     now = timezone.now()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -171,7 +190,7 @@ def api_monitoring_overview(request):
             "server_time": now.strftime("%Y-%m-%d %H:%M:%S UTC%z")
         }
     }
-    return JsonResponse(data, json_dumps_params={'ensure_ascii': False, 'indent': 2})
+    return cors_json_response(data)
 
 
 # ==============================================================================
@@ -179,9 +198,12 @@ def api_monitoring_overview(request):
 # ==============================================================================
 @csrf_exempt
 def api_monitoring_errors(request):
+    if request.method == 'OPTIONS':
+        return handle_cors_preflight()
+
     is_auth, user = is_authorized_monitor(request)
     if not is_auth:
-        return JsonResponse({"error": "Ruxsat berilmagan."}, status=401)
+        return cors_json_response({"error": "Ruxsat berilmagan."}, status=401)
 
     status_filter = request.GET.get('status', 'unresolved').lower()
     role_filter = request.GET.get('role', '').strip()
@@ -267,7 +289,7 @@ def api_monitoring_errors(request):
             "resolved_by": resolved_by_info
         })
 
-    return JsonResponse({
+    return cors_json_response({
         "success": True,
         "count": paginator.count,
         "num_pages": paginator.num_pages,
@@ -275,18 +297,23 @@ def api_monitoring_errors(request):
         "has_next": page_obj.has_next(),
         "has_previous": page_obj.has_previous(),
         "results": results
-    }, json_dumps_params={'ensure_ascii': False})
+    })
 
 
 # ==============================================================================
 # ✅ REST API: Xatolikni hal etildi deb belgilash (Resolve)
 # ==============================================================================
 @csrf_exempt
-@require_http_methods(["POST"])
 def api_monitoring_resolve_error(request, error_id):
+    if request.method == 'OPTIONS':
+        return handle_cors_preflight()
+
+    if request.method != 'POST':
+        return cors_json_response({"error": "Faqat POST so'rovi qabul qilinadi."}, status=405)
+
     is_auth, user = is_authorized_monitor(request)
     if not is_auth:
-        return JsonResponse({"error": "Ruxsat berilmagan."}, status=401)
+        return cors_json_response({"error": "Ruxsat berilmagan."}, status=401)
 
     log = get_object_or_404(SystemErrorLog, id=error_id)
     log.is_resolved = True
@@ -295,7 +322,7 @@ def api_monitoring_resolve_error(request, error_id):
         log.resolved_by = user
     log.save()
 
-    return JsonResponse({
+    return cors_json_response({
         "success": True,
         "message": f"Xatolik #{error_id} muvaffaqiyatli hal etildi deb belgilandi.",
         "id": error_id,
@@ -307,11 +334,16 @@ def api_monitoring_resolve_error(request, error_id):
 # 🧹 REST API: Barcha / Tanlangan xatoliklarni ommaviy hal etish (Bulk Resolve)
 # ==============================================================================
 @csrf_exempt
-@require_http_methods(["POST"])
 def api_monitoring_bulk_resolve(request):
+    if request.method == 'OPTIONS':
+        return handle_cors_preflight()
+
+    if request.method != 'POST':
+        return cors_json_response({"error": "Faqat POST so'rovi qabul qilinadi."}, status=405)
+
     is_auth, user = is_authorized_monitor(request)
     if not is_auth:
-        return JsonResponse({"error": "Ruxsat berilmagan."}, status=401)
+        return cors_json_response({"error": "Ruxsat berilmagan."}, status=401)
 
     try:
         body = json.loads(request.body) if request.body else {}
@@ -337,9 +369,9 @@ def api_monitoring_bulk_resolve(request):
             resolved_by=resolved_by_user
         )
     else:
-        return JsonResponse({"error": "Hech qanday ID yoki all_unresolved parametri berilmadi."}, status=400)
+        return cors_json_response({"error": "Hech qanday ID yoki all_unresolved parametri berilmadi."}, status=400)
 
-    return JsonResponse({
+    return cors_json_response({
         "success": True,
         "message": f"{count} ta xatolik muvaffaqiyatli hal etildi deb belgilandi.",
         "resolved_count": count
