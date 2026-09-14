@@ -64,12 +64,27 @@ def is_authorized_monitor(request):
         if getattr(request.user, 'role', '') == 'admin' or request.user.is_superuser or request.user.is_staff:
             return True, request.user
 
-    # 2. API Key from header: X-Monitoring-Key or Authorization: Bearer <key>
+    # 2. Extract API Key from headers (X-Monitoring-Key, Authorization) or GET / POST params
     api_key = request.headers.get('X-Monitoring-Key') or request.META.get('HTTP_X_MONITORING_KEY')
     if not api_key:
         auth_header = request.headers.get('Authorization') or request.META.get('HTTP_AUTHORIZATION', '')
         if auth_header.startswith('Bearer '):
             api_key = auth_header[7:].strip()
+
+    # Query param fallback (?api_key=... or ?key=...)
+    if not api_key:
+        api_key = request.GET.get('api_key') or request.GET.get('key')
+
+    # POST parameter fallback
+    if not api_key and request.method == 'POST':
+        api_key = request.POST.get('api_key')
+        if not api_key and request.body:
+            try:
+                body_json = json.loads(request.body)
+                if isinstance(body_json, dict):
+                    api_key = body_json.get('api_key')
+            except Exception:
+                pass
 
     if api_key:
         api_key_str = str(api_key).strip()
@@ -96,6 +111,7 @@ def is_authorized_monitor(request):
             return True, None
 
     return False, None
+
 
 
 # ==============================================================================

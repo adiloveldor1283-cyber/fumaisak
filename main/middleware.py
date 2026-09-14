@@ -4,7 +4,40 @@ from django.utils import timezone
 from django.utils.cache import add_never_cache_headers
 from django.contrib.sessions.models import Session
 from django.core.cache import cache
+from django.http import HttpResponse
 from main.models import UserSession
+
+
+class MonitoringCorsMiddleware:
+    """
+    Tashqi domenlardan (masalan, Netlify yoki alohida subdomen/port) kelgan
+    /api/ so'rovlari va preflight (OPTIONS) so'rovlariga CORS ruxsat sarlavhalarini beradi.
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        path = request.path
+        is_api = path.startswith('/api/') or path.startswith('/api')
+
+        # Preflight OPTIONS so'rovi kelganda darhol 200 OK qaytarish
+        if request.method == 'OPTIONS' and is_api:
+            response = HttpResponse(status=200)
+            response['Access-Control-Allow-Origin'] = '*'
+            response['Access-Control-Allow-Methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+            response['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Monitoring-Key, X-CSRFToken, Accept, Origin, X-Requested-With'
+            response['Access-Control-Max-Age'] = '86400'
+            return response
+
+        response = self.get_response(request)
+
+        # Barcha /api/ javoblariga CORS sarlavhalarini qo'shish
+        if is_api:
+            response['Access-Control-Allow-Origin'] = '*'
+            response['Access-Control-Allow-Methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+            response['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Monitoring-Key, X-CSRFToken, Accept, Origin, X-Requested-With'
+
+        return response
 
 
 def parse_user_agent(ua_string):

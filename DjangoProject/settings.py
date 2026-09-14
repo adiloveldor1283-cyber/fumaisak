@@ -26,6 +26,7 @@ CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[
     'http://lms.upcode.uz',
     'https://*.railway.app',
     'https://*.up.railway.app',
+    'https://*.netlify.app',
     'http://127.0.0.1:8000',
     'http://localhost:8000',
 ])
@@ -60,6 +61,7 @@ UNFOLD = {
 import dj_database_url
 
 MIDDLEWARE = [
+    'main.middleware.MonitoringCorsMiddleware',  # Must be at the very top to handle API & preflights
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
