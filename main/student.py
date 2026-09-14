@@ -1683,7 +1683,11 @@ def student_dtm_register(request, exam_id):
         messages.warning(request, "Siz ushbu imtihonga ro'yxatdan o'tib bo'lgansiz.")
         return redirect('student_dtm_list')
 
-    subjects = ["Matematika", "Fizika", "Kimyo", "Biologiya", "Ingliz tili", "Ona tili", "Tarix", "Geografiya"]
+    # DTM savollar bazasidagi va tizimdagi fanlar ro'yxati
+    db_subjects = list(DTMQuestionPool.objects.values_list('subject', flat=True).distinct().order_by('subject'))
+    if not db_subjects:
+        db_subjects = list(Subject.objects.values_list('name', flat=True).distinct().order_by('name'))
+    subjects = db_subjects if db_subjects else ["Matematika", "Fizika", "Kimyo", "Biologiya", "Ingliz tili", "Ona tili", "Tarix", "Geografiya"]
 
     if request.method == 'POST':
         block1 = request.POST.get('block1_subject')
