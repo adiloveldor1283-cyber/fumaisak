@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'import_export',
 ]
 
+from django.urls import reverse_lazy
+
 UNFOLD = {
     "SITE_TITLE": "DjangoProject.utils.get_admin_site_title",
     "SITE_HEADER": "DjangoProject.utils.get_admin_site_header",
@@ -56,9 +58,80 @@ UNFOLD = {
     "SHOW_HISTORY": True,
     "SIDEBAR": {
         "show_search": True,
-        "show_all_applications": True,
+        "show_all_applications": False,
+        "navigation": [
+            {
+                "title": "Foydalanuvchilar va Guruhlar",
+                "separator": True,
+                "items": [
+                    {"title": "Foydalanuvchilar (Xodimlar/O'quvchilar)", "icon": "people", "link": reverse_lazy("admin:main_customuser_changelist")},
+                    {"title": "Guruhlar", "icon": "groups", "link": reverse_lazy("admin:main_group_changelist")},
+                    {"title": "Guruh a'zoligi", "icon": "group_add", "link": reverse_lazy("admin:main_groupstudentmembership_changelist")},
+                    {"title": "Dars jadvali", "icon": "calendar_month", "link": reverse_lazy("admin:main_schedule_changelist")},
+                    {"title": "Davomat", "icon": "fact_check", "link": reverse_lazy("admin:main_attendance_changelist")},
+                    {"title": "Telegram Bot kontaktlari", "icon": "send", "link": reverse_lazy("admin:main_telegrambotcontact_changelist")},
+                    {"title": "Faol seanslar (Qurilmalar)", "icon": "devices", "link": reverse_lazy("admin:main_usersession_changelist")},
+                ],
+            },
+            {
+                "title": "Fanlar, Darslar va O'quv Materiallari",
+                "separator": True,
+                "items": [
+                    {"title": "Fanlar", "icon": "subject", "link": reverse_lazy("admin:main_subject_changelist")},
+                    {"title": "Fan materiallari", "icon": "folder", "link": reverse_lazy("admin:main_subjectmaterial_changelist")},
+                    {"title": "Dars kundaligi", "icon": "menu_book", "link": reverse_lazy("admin:main_grouplesson_changelist")},
+                    {"title": "Kitoblar kutubxonasi", "icon": "auto_stories", "link": reverse_lazy("admin:main_book_changelist")},
+                    {"title": "Video darslar", "icon": "video_library", "link": reverse_lazy("admin:main_groupvideo_changelist")},
+                    {"title": "Vazifalar", "icon": "assignment", "link": reverse_lazy("admin:main_assignment_changelist")},
+                    {"title": "Topshirilgan vazifalar", "icon": "assignment_turned_in", "link": reverse_lazy("admin:main_assignmentsubmission_changelist")},
+                ],
+            },
+            {
+                "title": "Moliya, To'lovlar va Hamyon",
+                "separator": True,
+                "items": [
+                    {"title": "Guruh to'lov tariflari", "icon": "price_change", "link": reverse_lazy("admin:main_grouppaymentinfo_changelist")},
+                    {"title": "O'quvchilar to'lovlari", "icon": "receipt_long", "link": reverse_lazy("admin:main_studentpayment_changelist")},
+                    {"title": "O'qituvchi oylik to'lovlari", "icon": "payments", "link": reverse_lazy("admin:main_teachersalarypayment_changelist")},
+                    {"title": "Virtual hamyon operatsiyalari", "icon": "account_balance_wallet", "link": reverse_lazy("admin:main_wallettransaction_changelist")},
+                    {"title": "Onlayn buyurtmalar", "icon": "shopping_cart", "link": reverse_lazy("admin:main_paymentorder_changelist")},
+                    {"title": "Payme tranzaksiyalari", "icon": "credit_card", "link": reverse_lazy("admin:main_paymetransaction_changelist")},
+                    {"title": "Click tranzaksiyalari", "icon": "payment", "link": reverse_lazy("admin:main_clicktransaction_changelist")},
+                ],
+            },
+            {
+                "title": "Testlar va Imtihonlar (DTM & AI)",
+                "separator": True,
+                "items": [
+                    {"title": "Guruh testlari (Quiz)", "icon": "quiz", "link": reverse_lazy("admin:main_quiz_changelist")},
+                    {"title": "Test savollari", "icon": "help_outline", "link": reverse_lazy("admin:main_question_changelist")},
+                    {"title": "Test natijalari", "icon": "assessment", "link": reverse_lazy("admin:main_studentquizresult_changelist")},
+                    {"title": "DTM Imtihonlar", "icon": "history_edu", "link": reverse_lazy("admin:main_dtmexam_changelist")},
+                    {"title": "DTM Ro'yxatdan o'tganlar", "icon": "app_registration", "link": reverse_lazy("admin:main_dtmregistration_changelist")},
+                    {"title": "DTM Savollar banki", "icon": "inventory_2", "link": reverse_lazy("admin:main_dtmquestionpool_changelist")},
+                    {"title": "DTM Test natijalari", "icon": "grade", "link": reverse_lazy("admin:main_studentdtmexamresult_changelist")},
+                    {"title": "AI Individual testlar", "icon": "smart_toy", "link": reverse_lazy("admin:main_aiquiz_changelist")},
+                    {"title": "AI Test savollari", "icon": "psychology", "link": reverse_lazy("admin:main_aiquestion_changelist")},
+                    {"title": "AI O'quv rejalari", "icon": "insights", "link": reverse_lazy("admin:main_studentaiplan_changelist")},
+                ],
+            },
+            {
+                "title": "Tizim va Xavfsizlik Sozlamalari",
+                "separator": True,
+                "items": [
+                    {"title": "Logotip, SMS & Bot Sozlamalari", "icon": "settings", "link": reverse_lazy("admin:main_sitesetting_changelist")},
+                    {"title": "Profil rasmlari sozlamasi", "icon": "manage_accounts", "link": reverse_lazy("admin:main_profilesetting_changelist")},
+                    {"title": "Tizim e'lonlari", "icon": "campaign", "link": reverse_lazy("admin:main_systemannouncement_changelist")},
+                    {"title": "Audit loglar (Harakatlar)", "icon": "security", "link": reverse_lazy("admin:main_auditlog_changelist")},
+                    {"title": "Xatoliklar jurnali (Error logs)", "icon": "bug_report", "link": reverse_lazy("admin:main_systemerrorlog_changelist")},
+                    {"title": "Bloklangan sahifalar", "icon": "lock", "link": reverse_lazy("admin:main_lockedpage_changelist")},
+                    {"title": "Monitoring API kalitlari", "icon": "key", "link": reverse_lazy("admin:main_monitoringapikey_changelist")},
+                ],
+            },
+        ],
     },
 }
+
 
 import dj_database_url
 
