@@ -65,6 +65,9 @@ def check_attendance_eligibility(teacher, group):
     Davomat topshirish mumkinligini tekshiradi.
     Qaytaradi: (allowed: bool, error_message: str | None)
     """
+    if group.is_closed or not group.is_active:
+        return False, "Ushbu guruh yopilgan (arxivlangan), unga davomat olib bo'lmaydi!"
+
     today = timezone.localdate()
     days_map = {0: 'monday', 1: 'tuesday', 2: 'wednesday',
                 3: 'thursday', 4: 'friday', 5: 'saturday', 6: 'sunday'}
@@ -423,6 +426,10 @@ def group_detail_view(request, group_id):
 
     # Dars yozish (POST)
     if request.method == 'POST' and request.POST.get('action') == 'add_lesson':
+        if group.is_closed or not group.is_active:
+            messages.error(request, "Yopilgan guruhga yangi dars mavzusi qo'shib bo'lmaydi!")
+            return redirect('group_detail', group_id=group.id)
+
         topic = request.POST.get('topic', '').strip()
         notes = request.POST.get('notes', '').strip()
         homework = request.POST.get('homework', '').strip()

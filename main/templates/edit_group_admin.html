@@ -286,7 +286,11 @@
         </div>
 
         <div style="display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap;">
-            <button type="submit" class="btn-submit"><i class="fas fa-save" style="margin-right: 6px;"></i> O'zgarishlarni saqlash</button>
+            {% if not group.is_active or "(yopilgan)" in group.name %}
+                <button type="button" class="btn-submit" style="opacity: 0.6; cursor: not-allowed; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); box-shadow: none;" title="Guruh yopilgan. Tahrirlash uchun avval qayta oching."><i class="fas fa-lock" style="margin-right: 6px;"></i> Guruh yopilgan (Tahrirlash bloklangan)</button>
+            {% else %}
+                <button type="submit" class="btn-submit"><i class="fas fa-save" style="margin-right: 6px;"></i> O'zgarishlarni saqlash</button>
+            {% endif %}
         </div>
     </form>
 

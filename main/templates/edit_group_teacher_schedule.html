@@ -147,9 +147,23 @@
 
 {% block content %}
 <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-    <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">{{ group.name }} - dars jadvalini tahrirlash</h2>
-    <a href="{% url 'all_groups_admin' %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">Guruhlar ro'yxatiga qaytish</a>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="{% url 'all_groups_admin' %}" class="btn-otish" style="display: inline-block; padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;"><i class="fas fa-chevron-left" style="margin-right: 5px;"></i> Orqaga</a>
+        <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">{{ group.name }} - dars jadvali</h2>
+    </div>
+    {% if group.is_closed %}
+    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 10px; font-size: 12.5px; font-weight: 700; background: rgba(255, 74, 90, 0.15); color: #ff4a5a; border: 1px solid rgba(255, 74, 90, 0.3);">
+        <i class="fas fa-archive"></i> Ushbu guruh yopilgan (Jadval qulflangan)
+    </span>
+    {% endif %}
 </div>
+
+{% if group.is_closed %}
+<div style="background: rgba(255, 74, 90, 0.1); border: 1px solid rgba(255, 74, 90, 0.25); border-radius: 14px; padding: 14px 18px; margin-bottom: 20px; color: #ffffff; font-size: 13px; display: flex; align-items: center; gap: 10px;">
+    <i class="fas fa-exclamation-triangle" style="color: #ff4a5a; font-size: 18px;"></i>
+    <span>Ushbu guruh arxivlangan. Yopilgan guruhlar uchun dars jadvalini o'zgartirib bo'lmaydi. O'zgartirish kiritish uchun avval guruhni qayta oching.</span>
+</div>
+{% endif %}
 
 <form method="POST">
     {% csrf_token %}
@@ -178,12 +192,13 @@
                                             <input type="text"
                                                    name="schedule-{{ teacher.id }}-{{ day_value }}"
                                                    value="{{ entry.time }}{% if entry.readonly %} ({{ entry.group_name }}){% endif %}"
-                                                   {% if entry.readonly %}readonly{% endif %}>
-                                            {% if not entry.readonly %}
+                                                   {% if entry.readonly or group.is_closed %}readonly{% endif %}>
+                                            {% if not entry.readonly and not group.is_closed %}
                                                 <button type="button" class="remove-btn" onclick="removeInput(this)">−</button>
                                             {% endif %}
                                         </div>
                                     {% endfor %}
+                                    {% if not group.is_closed %}
                                     <div class="input-wrapper">
                                         <input type="text"
                                                name="schedule-{{ teacher.id }}-{{ day_value }}"
@@ -191,6 +206,7 @@
                                         <button type="button" class="add-btn"
                                                 onclick="addInput('{{ teacher.id }}', '{{ day_value }}')">+</button>
                                     </div>
+                                    {% endif %}
                                 </div>
                             </td>
                         {% endfor %}
@@ -200,7 +216,11 @@
         </table>
     </div>
     <div class="submit-wrapper">
-        <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Jadvalni saqlash</button>
+        {% if group.is_closed %}
+            <button type="button" class="btn-submit" style="opacity: 0.5; cursor: not-allowed; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); box-shadow: none;" title="Guruh yopilgan"><i class="fas fa-lock"></i> Jadval qulflangan</button>
+        {% else %}
+            <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Jadvalni saqlash</button>
+        {% endif %}
     </div>
 </form>
 {% endblock %}

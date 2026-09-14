@@ -325,6 +325,8 @@ def edit_group_admin(request, group_id):
             
             log_action(request.user, "Guruh Qayta Ochildi", f"Guruh qayta ochildi: {group.name} (ID: {group.id})", request)
             messages.success(request, f"'{group.name}' guruhi muvaffaqiyatli qayta ochildi.", extra_tags='edit_group')
+        if group.is_closed or not group.is_active:
+            messages.error(request, "Yopilgan (arxivlangan) guruh tarkibini tahrirlab bo'lmaydi! Avval guruhni qayta oching.", extra_tags='edit_group')
             return redirect('edit_group_admin', group_id=group.id)
 
         group.name = request.POST.get('group-name')
@@ -476,7 +478,7 @@ def students_list_admin(request):
 
 @subadmin_permission_required('manage_students')
 def add_student(request):
-    groups = Group.objects.all().order_by('name')
+    groups = Group.objects.filter(is_active=True).order_by('name')
 
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
@@ -589,7 +591,8 @@ def add_student(request):
         if group_id:
             try:
                 group_obj = Group.objects.get(id=group_id)
-                GroupStudentMembership.objects.get_or_create(student=user, group=group_obj)
+                if not group_obj.is_closed and group_obj.is_active:
+                    GroupStudentMembership.objects.get_or_create(student=user, group=group_obj)
             except (Group.DoesNotExist, ValueError):
                 pass
 
@@ -2285,6 +2288,10 @@ def edit_group_teacher_schedule(request, group_id):
     days = DAYS_OF_WEEK
 
     if request.method == 'POST':
+        if group.is_closed or not group.is_active:
+            messages.error(request, "Yopilgan guruh uchun dars jadvalini o'zgartirib bo'lmaydi! Avval guruhni qayta oching.")
+            return redirect('edit_group_teacher_schedule', group_id=group.id)
+
         validation_errors = []
         for teacher in teachers:
             for day_value, _ in days:
@@ -2408,8 +2415,8 @@ def edit_group_teacher_schedule(request, group_id):
 
 @subadmin_permission_required('manage_schedules')
 def all_group_schedules_view(request):
-    groups = Group.objects.all().select_related('subject').prefetch_related('teachers')
-    schedules = Schedule.objects.select_related('group', 'teacher', 'group__subject').order_by('group', 'day', 'start_time')
+    groups = Group.objects.filter(is_active=True).select_related('subject').prefetch_related('teachers')
+    schedules = Schedule.objects.filter(group__is_active=True).select_related('group', 'teacher', 'group__subject').order_by('group', 'day', 'start_time')
 
     group_schedules = {}
     for schedule in schedules:
@@ -2485,6 +2492,9 @@ def add_topshiriq(request):
                 return redirect('add_topshiriq')
 
         group = Group.objects.get(id=group_id)
+        if group.is_closed or not group.is_active:
+            messages.error(request, "Yopilgan guruhga yangi topshiriq qo'shib bo'lmaydi!")
+            return redirect('add_topshiriq')
         teacher = CustomUser.objects.get(id=teacher_id)
 
         parsed_deadline = parse_datetime(deadline) if isinstance(deadline, str) else deadline
@@ -2508,7 +2518,7 @@ def add_topshiriq(request):
         messages.success(request, "Topshiriq muvaffaqiyatli yaratildi!")
         return redirect('admin_assignment_list')  # topshiriq ro'yxatiga qaytish
 
-    groups = Group.objects.all()
+    groups = Group.objects.filter(is_active=True).order_by('name')
     teachers = CustomUser.objects.filter(role='teacher')
 
     return render(request, 'add-topshiriq.html', {
@@ -2577,7 +2587,7 @@ def edit_topshiriq(request, assignment_id):
         assignment.save()
         return redirect('admin_assignment_list')
 
-    groups = Group.objects.all()
+    groups = Group.objects.filter(is_active=True).order_by('name')
     teachers = CustomUser.objects.filter(role='teacher')
 
     return render(request, 'edit-topshiriq-admin.html', {
@@ -3864,7 +3874,7 @@ def export_payments_csv(request):
 @subadmin_permission_required('manage_attendance')
 def admin_attendance_overview(request):
 
-    groups = Group.objects.all().prefetch_related('students')
+    groups = Group.objects.filter(is_active=True).prefetch_related('students')
     
     # 1. Tezkor guruhlar statistikasi (1 ta agregat so'rov orqali)
     group_agg = Attendance.objects.values('group_id').annotate(
@@ -4018,6 +4028,10 @@ def admin_update_attendance_ajax(request):
 
             if new_status not in ['present', 'absent']:
                 return JsonResponse({'success': False, 'error': 'Noto\'g\'ri status'}, status=400)
+
+            group = Group.objects.filter(id=group_id).first()
+            if not group or group.is_closed or not group.is_active:
+                return JsonResponse({'success': False, 'error': "Ushbu guruh yopilgan (arxivlangan), unga davomat kiritib bo'lmaydi!"}, status=400)
 
             from datetime import datetime
             d = datetime.strptime(date_str, '%Y-%m-%d').date()
