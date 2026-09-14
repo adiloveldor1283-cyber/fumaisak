@@ -3481,32 +3481,45 @@ def student_payment_pdf(request, student_id):
 
 
 from main.models import SystemAnnouncement
+from django.utils.dateparse import parse_datetime
+from django.utils import timezone
+
+
+def _format_announcement_dt_iso(dt):
+    if not dt:
+        return ""
+    try:
+        if timezone.is_naive(dt):
+            dt = timezone.make_aware(dt)
+        return timezone.localtime(dt).strftime('%Y-%m-%dT%H:%M')
+    except Exception:
+        try:
+            return dt.strftime('%Y-%m-%dT%H:%M')
+        except Exception:
+            return str(dt)[:16]
+
 
 @subadmin_permission_required('manage_announcements')
 def announcement_list(request):
-
     announcements = SystemAnnouncement.objects.all().order_by('-created_at')
     return render(request, 'announcement_list.html', {
         'announcements': announcements
     })
 
+
 @subadmin_permission_required('manage_announcements')
 def create_announcement(request):
-
     if request.method == 'POST':
-        title = request.POST.get('title')
-        message = request.POST.get('message')
-        target_role = request.POST.get('target_role')
-        category = request.POST.get('category')
+        title = request.POST.get('title', '').strip()
+        message = request.POST.get('message', '').strip()
+        target_role = request.POST.get('target_role', 'all')
+        category = request.POST.get('category', 'always_show')
         start_time = request.POST.get('start_time')
         end_time = request.POST.get('end_time')
         is_active = request.POST.get('is_active') == 'on'
 
-        from django.utils.dateparse import parse_datetime
-        from django.utils import timezone
-        
-        st = parse_datetime(start_time)
-        et = parse_datetime(end_time)
+        st = parse_datetime(start_time) if start_time else None
+        et = parse_datetime(end_time) if end_time else None
         
         if st and timezone.is_naive(st):
             st = timezone.make_aware(st)
@@ -3533,25 +3546,22 @@ def create_announcement(request):
         'button_text': "Yuborish"
     })
 
+
 @subadmin_permission_required('manage_announcements')
 def edit_announcement(request, announcement_id):
-
     announcement = get_object_or_404(SystemAnnouncement, id=announcement_id)
 
     if request.method == 'POST':
-        title = request.POST.get('title')
-        message = request.POST.get('message')
-        target_role = request.POST.get('target_role')
-        category = request.POST.get('category')
+        title = request.POST.get('title', '').strip()
+        message = request.POST.get('message', '').strip()
+        target_role = request.POST.get('target_role', 'all')
+        category = request.POST.get('category', 'always_show')
         start_time = request.POST.get('start_time')
         end_time = request.POST.get('end_time')
         is_active = request.POST.get('is_active') == 'on'
 
-        from django.utils.dateparse import parse_datetime
-        from django.utils import timezone
-        
-        st = parse_datetime(start_time)
-        et = parse_datetime(end_time)
+        st = parse_datetime(start_time) if start_time else None
+        et = parse_datetime(end_time) if end_time else None
         
         if st and timezone.is_naive(st):
             st = timezone.make_aware(st)
@@ -3572,8 +3582,8 @@ def edit_announcement(request, announcement_id):
             messages.success(request, "Tizim xabari yangilandi.")
             return redirect('announcement_list')
 
-    st_iso = timezone.localtime(announcement.start_time).strftime('%Y-%m-%dT%H:%M') if announcement.start_time else ""
-    et_iso = timezone.localtime(announcement.end_time).strftime('%Y-%m-%dT%H:%M') if announcement.end_time else ""
+    st_iso = _format_announcement_dt_iso(announcement.start_time)
+    et_iso = _format_announcement_dt_iso(announcement.end_time)
 
     return render(request, 'announcement_form.html', {
         'announcement': announcement,
@@ -3583,9 +3593,9 @@ def edit_announcement(request, announcement_id):
         'button_text': "Saqlash"
     })
 
-@admin_required
-def delete_announcement(request, announcement_id):
 
+@subadmin_permission_required('manage_announcements')
+def delete_announcement(request, announcement_id):
     announcement = get_object_or_404(SystemAnnouncement, id=announcement_id)
     announcement.delete()
     messages.success(request, "Tizim xabari muvaffaqiyatli o'chirildi.")
