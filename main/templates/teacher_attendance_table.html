@@ -778,14 +778,21 @@
         <!-- Student Heatmap Cards List -->
         <div class="heatmap-students-list" id="heatmap-students-list">
             {% for row in attendance_list %}
-                <div class="student-heatmap-card" data-student-name="{{ row.student.get_full_name|lower }}">
+                <div class="student-heatmap-card {% if row.student.is_archived or not row.student.is_active %}card-archived{% endif %}" data-student-name="{{ row.student.get_full_name|lower }}" style="{% if row.student.is_archived or not row.student.is_active %}opacity: 0.8; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.02);{% endif %}">
                     <div class="student-card-header">
                         <div class="student-avatar-info">
-                            <div class="student-avatar">
+                            <div class="student-avatar" style="{% if row.student.is_archived or not row.student.is_active %}border-color: rgba(239, 68, 68, 0.4); color: #ef4444; background: rgba(239, 68, 68, 0.1);{% endif %}">
                                 {{ row.student.first_name|first|upper }}{{ row.student.last_name|first|upper }}
                             </div>
                             <div class="student-name-box">
-                                <span class="student-name">{{ row.student.get_full_name }}</span>
+                                <span class="student-name">
+                                    {{ row.student.get_full_name }}
+                                    {% if row.student.is_archived %}
+                                        <span style="display: inline-flex; align-items: center; gap: 3px; font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); font-weight: 700; margin-left: 6px;"><i class="fas fa-archive"></i> Arxivlangan</span>
+                                    {% elif not row.student.is_active %}
+                                        <span style="display: inline-flex; align-items: center; gap: 3px; font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); font-weight: 700; margin-left: 6px;"><i class="fas fa-ban"></i> Bloklangan</span>
+                                    {% endif %}
+                                </span>
                                 <span class="student-stat-summary" id="heatmap-summary-{{ forloop.counter }}">
                                     Yuklanmoqda...
                                 </span>
@@ -834,8 +841,15 @@
             </thead>
             <tbody id="jadval-qatorlari">
                 {% for row in attendance_list %}
-                    <tr class="attendance-row">
-                        <td class="sticky-col-name">{{ row.student.get_full_name }}</td>
+                    <tr class="attendance-row" style="{% if row.student.is_archived or not row.student.is_active %}background: rgba(239, 68, 68, 0.02); opacity: 0.85;{% endif %}">
+                        <td class="sticky-col-name">
+                            {{ row.student.get_full_name }}
+                            {% if row.student.is_archived %}
+                                <span style="display: inline-flex; align-items: center; gap: 3px; font-size: 10px; padding: 1px 5px; border-radius: 4px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); font-weight: 700; margin-left: 6px;"><i class="fas fa-archive"></i> Arxivlangan</span>
+                            {% elif not row.student.is_active %}
+                                <span style="display: inline-flex; align-items: center; gap: 3px; font-size: 10px; padding: 1px 5px; border-radius: 4px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); font-weight: 700; margin-left: 6px;"><i class="fas fa-ban"></i> Bloklangan</span>
+                            {% endif %}
+                        </td>
                         {% for cell in row.dates %}
                             <td class="attendance-cell date-col" data-date="{{ cell.date|date:'Y-m-d' }}">
                                 <span class="attendance-badge {% if cell.status == 'present' %}present{% elif cell.status == 'absent' %}absent{% else %}none{% endif %}">

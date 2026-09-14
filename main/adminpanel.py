@@ -6560,6 +6560,12 @@ def admin_top_up_wallet(request):
         
         student = get_object_or_404(CustomUser, id=student_id, role='student')
         
+        # Check if student is archived or inactive
+        if student.is_archived or not student.is_active:
+            display_name = student.get_full_name() or student.phone_number
+            messages.error(request, f"Ushbu o'quvchi ({display_name}) arxivlangan/bloklangan! Uning hamyon balansini to'ldirish taqiqlangan.")
+            return redirect('admin_wallets')
+        
         try:
             amount_val = float(amount)
             if amount_val <= 0:

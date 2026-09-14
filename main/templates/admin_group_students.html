@@ -185,6 +185,7 @@
         <select id="status-filter" style="padding: 12px 18px; font-size: 13.5px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; background: #0c101d; color: #ffffff; outline: none; cursor: pointer; transition: 0.3s;">
             <option value="">Hammasi</option>
             <option value="faol">Faol</option>
+            <option value="arxivlangan">Arxivlangan</option>
             <option value="bloklangan">Bloklangan</option>
         </select>
     </div>
@@ -207,7 +208,7 @@
         </thead>
         <tbody id="group-body">
             {% for item in students_data %}
-            <tr>
+            <tr style="{% if item.student.is_archived or not item.student.is_active %}opacity: 0.85; background: rgba(239, 68, 68, 0.02);{% endif %}">
                 <td data-label="№" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
                 <td data-label="FAMILIYASI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ item.student.last_name }}</td>
                 <td data-label="ISMI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ item.student.first_name }}</td>
@@ -223,7 +224,9 @@
                     {% endif %}
                 </td>
                 <td data-label="HOLATI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
-                    {% if item.student.is_active %}
+                    {% if item.student.is_archived %}
+                        <span class="status-badge status-archived" data-status="arxivlangan" style="padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);"><i class="fas fa-archive"></i> Arxivlangan</span>
+                    {% elif item.student.is_active %}
                         <span class="status-badge status-active" data-status="faol" style="padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(0, 255, 170, 0.1); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.2);">Faol</span>
                     {% else %}
                         <span class="status-badge status-blocked" data-status="bloklangan" style="padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(255, 0, 85, 0.1); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.2);">Bloklangan</span>

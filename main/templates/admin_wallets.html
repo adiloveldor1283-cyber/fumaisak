@@ -106,11 +106,20 @@
 {% endblock %}
 
 {% block content %}
-<!-- Sarlavha va Qidiruv -->
-<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+<!-- Sarlavha va Qidiruv / Filtrlar -->
+<div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
     <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin: 0;">O'quvchilar virtual hamyonlari</h2>
     
-    <input type="text" id="wallet-search" placeholder="Ism yoki telefon raqami bo'yicha qidirish..." style="padding: 10px 16px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; outline: none; width: 280px;">
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <!-- Status Filter Pills -->
+        <div style="display: flex; gap: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 4px 6px; border-radius: 12px;">
+            <button type="button" class="wallet-filter-btn active" data-filter="all" onclick="setWalletFilter('all', this)" style="padding: 6px 12px; border: none; background: rgba(0,242,254,0.15); color: #00f2fe; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;">Hammasi</button>
+            <button type="button" class="wallet-filter-btn" data-filter="active" onclick="setWalletFilter('active', this)" style="padding: 6px 12px; border: none; background: transparent; color: rgba(255,255,255,0.6); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;">Faol</button>
+            <button type="button" class="wallet-filter-btn" data-filter="archived" onclick="setWalletFilter('archived', this)" style="padding: 6px 12px; border: none; background: transparent; color: rgba(255,255,255,0.6); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;">Arxivlangan</button>
+        </div>
+
+        <input type="text" id="wallet-search" placeholder="Ism yoki telefon bo'yicha qidirish..." style="padding: 10px 16px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; outline: none; width: 260px; font-size: 13px;">
+    </div>
 </div>
 
 <!-- Students list with balances -->
@@ -120,6 +129,7 @@
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); background: #080d1a; position: sticky; top: 0; z-index: 10;">
                     <th>FOYDALANUVCHI</th>
                     <th>TELEFON RAQAMI</th>
+                    <th>HOLATI</th>
                     <th>JORIY BALANS</th>
                     <th>QO'SHILGAN SANA</th>
                     <th>AMALLAR</th>
@@ -127,13 +137,34 @@
             </thead>
             <tbody id="student-wallets-table">
                 {% for student in students %}
-                <tr class="student-wallet-row" data-name="{{ student.get_full_name|lower }}" data-phone="{{ student.phone_number }}">
-                    <td style="font-weight: 700; color: #ffffff;">{% if student.first_name or student.last_name or student.middle_name %}{{ student.get_full_name }}{% else %}<span style="color: #f59e0b; font-size: 12px; font-weight: 600;"><i class="fas fa-clock"></i> Tasdiqlanmoqda</span>{% endif %}</td>
+                <tr class="student-wallet-row" data-name="{{ student.get_full_name|lower }}" data-phone="{{ student.phone_number }}" data-status="{% if student.is_archived %}archived{% elif student.is_active %}active{% else %}archived{% endif %}" style="{% if student.is_archived or not student.is_active %}opacity: 0.75; background: rgba(239, 68, 68, 0.02);{% endif %}">
+                    <td style="font-weight: 700; color: #ffffff;">
+                        {% if student.first_name or student.last_name or student.middle_name %}
+                            {{ student.get_full_name }}
+                        {% else %}
+                            <span style="color: #f59e0b; font-size: 12px; font-weight: 600;"><i class="fas fa-clock"></i> Tasdiqlanmoqda</span>
+                        {% endif %}
+                    </td>
                     <td style="font-family: monospace;">{{ student.phone_number }}</td>
-                    <td style="color: #00ffaa; font-weight: 800; font-size: 15px;">{{ student.balance }} UZS</td>
+                    <td>
+                        {% if student.is_archived %}
+                            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);"><i class="fas fa-archive"></i> Arxivlangan</span>
+                        {% elif student.is_active %}
+                            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba(0, 255, 170, 0.1); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.25);"><i class="fas fa-check-circle"></i> Faol</span>
+                        {% else %}
+                            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3);"><i class="fas fa-ban"></i> Bloklangan</span>
+                        {% endif %}
+                    </td>
+                    <td style="color: {% if student.is_archived or not student.is_active %}#94a3b8{% else %}#00ffaa{% endif %}; font-weight: 800; font-size: 15px;">{{ student.balance }} UZS</td>
                     <td>{{ student.joined_at|date:"d.m.Y" }}</td>
                     <td>
-                        <button onclick="openTopUpModal('{{ student.id }}', '{{ student.get_full_name|default:student.phone_number|escapejs }}')" style="padding: 6px 12px; background: rgba(0, 255, 170, 0.08); border: 1px solid rgba(0, 255, 170, 0.2); color: #00ffaa; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: 0.3s;" onmouseover="this.style.background='#00ffaa'; this.style.color='#000000';"><i class="fas fa-plus"></i> Balansni to'ldirish</button>
+                        {% if student.is_archived or not student.is_active %}
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.4); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: not-allowed;" title="Arxivlangan o'quvchi hamyonini to'ldirish taqiqlangan">
+                                <i class="fas fa-lock"></i> To'ldirish yopiq
+                            </span>
+                        {% else %}
+                            <button onclick="openTopUpModal('{{ student.id }}', '{{ student.get_full_name|default:student.phone_number|escapejs }}')" style="padding: 6px 12px; background: rgba(0, 255, 170, 0.08); border: 1px solid rgba(0, 255, 170, 0.2); color: #00ffaa; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: 0.3s;" onmouseover="this.style.background='#00ffaa'; this.style.color='#000000';" onmouseout="this.style.background='rgba(0, 255, 170, 0.08)'; this.style.color='#00ffaa';"><i class="fas fa-plus"></i> Balansni to'ldirish</button>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -224,24 +255,44 @@
 
 {% block extra_js %}
 <script>
-    // Search Live Filter
+    // Search & Status Filter
     const searchInput = document.getElementById('wallet-search');
     const rows = document.querySelectorAll('.student-wallet-row');
+    let currentFilter = 'all';
+
+    function setWalletFilter(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('.wallet-filter-btn').forEach(b => {
+            b.classList.remove('active');
+            b.style.background = 'transparent';
+            b.style.color = 'rgba(255,255,255,0.6)';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'rgba(0,242,254,0.15)';
+        btn.style.color = '#00f2fe';
+        filterWalletRows();
+    }
+
+    function filterWalletRows() {
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        rows.forEach(row => {
+            const name = (row.getAttribute('data-name') || '').toLowerCase();
+            const phone = (row.getAttribute('data-phone') || '').toLowerCase();
+            const status = row.getAttribute('data-status') || '';
+
+            const matchesQuery = !query || name.includes(query) || phone.includes(query);
+            const matchesStatus = (currentFilter === 'all') || (currentFilter === status);
+
+            if (matchesQuery && matchesStatus) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
     
     if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const query = searchInput.value.toLowerCase().trim();
-            rows.forEach(row => {
-                const name = row.getAttribute('data-name').toLowerCase();
-                const phone = row.getAttribute('data-phone').toLowerCase();
-                
-                if (name.includes(query) || phone.includes(query)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
+        searchInput.addEventListener('input', filterWalletRows);
     }
 
     function openTopUpModal(studentId, studentName) {

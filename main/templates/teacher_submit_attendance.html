@@ -342,15 +342,22 @@
                 </thead>
                 <tbody id="jadval-qatorlari">
                     {% for student in students %}
-                        <tr>
+                        <tr class="{% if student.is_archived or not student.is_active %}row-archived{% endif %}" style="{% if student.is_archived or not student.is_active %}background: rgba(239, 68, 68, 0.03); opacity: 0.85; border-left: 3px solid #ef4444;{% endif %}">
                             <td data-label="№" style="font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
-                            <td data-label="Familiya" style="font-weight: 700; color: #ffffff;">{{ student.last_name }}</td>
+                            <td data-label="Familiya" style="font-weight: 700; color: #ffffff;">
+                                {{ student.last_name }}
+                                {% if student.is_archived %}
+                                    <span style="display: inline-flex; align-items: center; gap: 3px; font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); font-weight: 700; margin-left: 6px;"><i class="fas fa-archive"></i> Arxivlangan</span>
+                                {% elif not student.is_active %}
+                                    <span style="display: inline-flex; align-items: center; gap: 3px; font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); font-weight: 700; margin-left: 6px;"><i class="fas fa-ban"></i> Bloklangan</span>
+                                {% endif %}
+                            </td>
                             <td data-label="Ism">{{ student.first_name }}</td>
                             <td data-label="Sharif" style="color: rgba(255, 255, 255, 0.85);">{{ student.middle_name|default:"-" }}</td>
                             <td data-label="Davomati" style="text-align: center;">
                                 <select name="status_{{ student.id }}">
-                                    <option value="present">Kelgan</option>
-                                    <option value="absent">Kelmadi</option>
+                                    <option value="present" {% if not student.is_archived and student.is_active %}selected{% endif %}>Kelgan</option>
+                                    <option value="absent" {% if student.is_archived or not student.is_active %}selected{% endif %}>Kelmadi</option>
                                 </select>
                             </td>
                         </tr>
