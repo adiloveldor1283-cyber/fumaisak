@@ -236,26 +236,34 @@ def circular_favicon_view(request):
     if cached_favicon:
         return HttpResponse(cached_favicon, content_type="image/png")
 
-    image_path = None
+    img_source = None
     try:
         setting = SiteSetting.objects.first()
         if setting and setting.image:
             try:
-                image_path = setting.image.path
+                if hasattr(setting.image, 'file') and setting.image.file:
+                    img_source = setting.image.file
             except Exception:
-                pass
+                try:
+                    if hasattr(setting.image, 'path') and os.path.exists(setting.image.path):
+                        img_source = setting.image.path
+                except Exception:
+                    pass
     except Exception:
         pass
 
-    if not image_path or not os.path.exists(image_path):
-        image_path = os.path.join(settings.BASE_DIR, 'static', 'imgs', 'images_9.webp')
+    if not img_source:
+        fallback_path = os.path.join(settings.BASE_DIR, 'static', 'imgs', 'images_9.webp')
+        if os.path.exists(fallback_path):
+            img_source = fallback_path
 
     try:
-        img = Image.open(image_path).convert("RGBA")
-        size = min(img.size)
-        left = (img.width - size) // 2
-        top = (img.height - size) // 2
-        img = img.crop((left, top, left + size, top + size))
+        if img_source:
+            img = Image.open(img_source).convert("RGBA")
+            size = min(img.size)
+            left = (img.width - size) // 2
+            top = (img.height - size) // 2
+            img = img.crop((left, top, left + size, top + size))
         
         target_size = (128, 128)
         img = img.resize(target_size, Image.Resampling.LANCZOS)

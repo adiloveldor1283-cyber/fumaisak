@@ -5,8 +5,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Shaxsiy ma'lumotlar Nizomi va Profilni faollashtirish</title>
+    {% if global_image %}
+    <link rel="icon" type="image/png" href="{{ global_image }}">
+    <link rel="shortcut icon" type="image/png" href="{{ global_image }}">
+    <link rel="apple-touch-icon" href="{{ global_image }}">
+    {% else %}
     <link rel="icon" type="image/png" href="{% url 'circular_favicon' %}">
     <link rel="shortcut icon" type="image/png" href="{% url 'circular_favicon' %}">
+    <link rel="apple-touch-icon" href="{% url 'circular_favicon' %}">
+    {% endif %}
 
     <!-- Fonts & FontAwesome -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
