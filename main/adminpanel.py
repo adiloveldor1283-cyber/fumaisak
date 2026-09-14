@@ -6851,7 +6851,20 @@ def send_debt_reminder_api(request):
     try:
         data = json.loads(request.body.decode('utf-8'))
         student_id = data.get('student_id')
-        msg_text = data.get('message')
+        msg_text = data.get('message', '')
+        if msg_text:
+            msg_text = (
+                str(msg_text)
+                .replace('\\u0027', "'")
+                .replace('\\u002D', "-")
+                .replace('\\u002d', "-")
+                .replace('\\u0022', '"')
+                .replace('\\u002F', '/')
+                .replace('\\u002f', '/')
+                .replace('\\u003C', '<')
+                .replace('\\u003E', '>')
+                .replace('\\u0026', '&')
+            )
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Noto'g'ri ma'lumotlar formati."}, status=400)
         

@@ -157,7 +157,7 @@
                                 <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
                                     <!-- Telegram eslatma yuborish -->
                                     {% if debt.student.telegram_chat_id %}
-                                    <button onclick="sendTelegramBotReminder({{ debt.student.id }}, '{{ debt.raw_message|escapejs }}', this)" title="Bot orqali to'g'ridan-to'g'ri eslatish" style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(0, 242, 254, 0.2)';" onmouseout="this.style.background='rgba(0, 242, 254, 0.1)';">
+                                    <button class="tg-debtor-btn" data-student-id="{{ debt.student.id }}" data-message="{{ debt.raw_message }}" onclick="sendTelegramBotReminder(this.dataset.studentId, this.dataset.message, this)" title="Bot orqali to'g'ridan-to'g'ri eslatish" style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(0, 242, 254, 0.2)';" onmouseout="this.style.background='rgba(0, 242, 254, 0.1)';">
                                         <i class="fas fa-robot" style="font-size: 14px;"></i>
                                     </button>
                                     {% else %}
@@ -166,7 +166,7 @@
                                     </a>
                                     {% endif %}
                                     <!-- Xabarni nusxalash -->
-                                    <button onclick="copyEslatmaText('{{ debt.raw_message|escapejs }}')" title="Xabar matnini nusxalash" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #00ffaa; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(0, 255, 170, 0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.03)';">
+                                    <button data-message="{{ debt.raw_message }}" onclick="copyEslatmaText(this.dataset.message)" title="Xabar matnini nusxalash" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #00ffaa; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(0, 255, 170, 0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.03)';">
                                         <i class="far fa-copy" style="font-size: 14px;"></i>
                                     </button>
                                     <!-- To'lov kiritish -->
@@ -274,7 +274,7 @@
     }
 
     async function sendBulkTelegramReminders() {
-        const buttons = Array.from(document.querySelectorAll('button[onclick^="sendTelegramBotReminder"]'));
+        const buttons = Array.from(document.querySelectorAll('.tg-debtor-btn'));
         if (buttons.length === 0) {
             alert("Telegram ulab qo'yilgan qarzdor talabalar topilmadi.");
             return;
@@ -295,18 +295,8 @@
             const btn = buttons[i];
             btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
             
-            // Extract arguments safely from the onclick attribute text
-            const onclickStr = btn.getAttribute('onclick');
-            // Safe evaluation of the button arguments to get clean studentId and message
-            const argsStr = onclickStr.substring(onclickStr.indexOf('(') + 1, onclickStr.lastIndexOf(','));
-            const parts = argsStr.split(',');
-            const studentId = parts[0].trim();
-            // strip the quotes around the message string
-            let message = parts.slice(1).join(',').trim();
-            if (message.startsWith("'") && message.endsWith("'")) {
-                message = message.substring(1, message.length - 1);
-            }
-            message = message.replace(/\\'/g, "'").replace(/\\"/g, '"');
+            const studentId = btn.dataset.studentId;
+            const message = btn.dataset.message || '';
             
             bulkBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Yuborilmoqda (${i + 1}/${buttons.length})...`;
             
