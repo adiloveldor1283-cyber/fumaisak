@@ -10,6 +10,39 @@
         flex-direction: column;
     }
 
+    /* 🎨 Theme Aware Monitoring Variables */
+    :root {
+        --mon-card-bg: rgba(11, 15, 25, 0.6);
+        --mon-card-border: rgba(255, 255, 255, 0.08);
+        --mon-subcard-bg: rgba(255, 255, 255, 0.03);
+        --mon-subcard-border: rgba(255, 255, 255, 0.06);
+        --mon-table-head-bg: #080d1a;
+        --mon-modal-bg: #0b0f19;
+        --mon-terminal-bg: #050811;
+        --mon-terminal-text: #e6edf3;
+        --mon-input-bg: rgba(255, 255, 255, 0.03);
+        --mon-input-border: rgba(255, 255, 255, 0.08);
+        --mon-text-primary: #ffffff;
+        --mon-text-secondary: rgba(255, 255, 255, 0.6);
+        --mon-text-muted: rgba(255, 255, 255, 0.4);
+    }
+
+    html.light-theme, body.light-theme {
+        --mon-card-bg: #ffffff;
+        --mon-card-border: #e2e8f0;
+        --mon-subcard-bg: #f8fafc;
+        --mon-subcard-border: #e2e8f0;
+        --mon-table-head-bg: #f1f5f9;
+        --mon-modal-bg: #ffffff;
+        --mon-terminal-bg: #0f172a;
+        --mon-terminal-text: #f8fafc;
+        --mon-input-bg: #ffffff;
+        --mon-input-border: #cbd5e1;
+        --mon-text-primary: #0f172a;
+        --mon-text-secondary: #475569;
+        --mon-text-muted: #94a3b8;
+    }
+
     /* Live Pulsing Dot */
     .live-pulse {
         display: inline-block;
@@ -55,21 +88,22 @@
     }
 
     .monitor-card {
-        background: rgba(11, 15, 25, 0.55);
-        border: 1px solid var(--border-card);
+        background: var(--mon-card-bg);
+        border: 1px solid var(--mon-card-border);
         border-radius: 16px;
         padding: 20px;
         position: relative;
         overflow: hidden;
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
     }
 
     .monitor-card:hover {
         transform: translateY(-2px);
-        border-color: rgba(0, 242, 254, 0.3);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        border-color: rgba(0, 242, 254, 0.4);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     }
 
     .monitor-card-icon {
@@ -89,13 +123,14 @@
         letter-spacing: -0.5px;
         line-height: 1.1;
         margin-bottom: 4px;
-        color: var(--text-primary);
+        color: var(--mon-text-primary);
+        font-family: monospace;
     }
 
     .monitor-card-label {
         font-size: 13px;
         font-weight: 600;
-        color: var(--text-secondary);
+        color: var(--mon-text-secondary);
     }
 
     /* Method Badges */
@@ -108,10 +143,10 @@
         letter-spacing: 0.5px;
         font-family: monospace;
     }
-    .badge-method-get { background: rgba(0, 242, 254, 0.12); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); }
-    .badge-method-post { background: rgba(0, 255, 170, 0.12); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.3); }
-    .badge-method-put { background: rgba(255, 159, 67, 0.12); color: #ff9f43; border: 1px solid rgba(255, 159, 67, 0.3); }
-    .badge-method-delete { background: rgba(255, 0, 85, 0.12); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.3); }
+    .badge-method-get { background: rgba(0, 242, 254, 0.12); color: #0284c7; border: 1px solid rgba(0, 242, 254, 0.3); }
+    .badge-method-post { background: rgba(0, 255, 170, 0.12); color: #059669; border: 1px solid rgba(0, 255, 170, 0.3); }
+    .badge-method-put { background: rgba(255, 159, 67, 0.12); color: #ea580c; border: 1px solid rgba(255, 159, 67, 0.3); }
+    .badge-method-delete { background: rgba(255, 0, 85, 0.12); color: #e11d48; border: 1px solid rgba(255, 0, 85, 0.3); }
 
     /* Role Badges */
     .badge-role {
@@ -121,10 +156,10 @@
         font-size: 11.5px;
         font-weight: 700;
     }
-    .badge-role-admin { background: rgba(255, 0, 85, 0.12); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.25); }
-    .badge-role-teacher { background: rgba(0, 242, 254, 0.12); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.25); }
-    .badge-role-student { background: rgba(0, 255, 170, 0.12); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.25); }
-    .badge-role-anon { background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); border: 1px solid rgba(255, 255, 255, 0.12); }
+    .badge-role-admin { background: rgba(255, 0, 85, 0.12); color: #e11d48; border: 1px solid rgba(255, 0, 85, 0.25); }
+    .badge-role-teacher { background: rgba(0, 242, 254, 0.12); color: #0284c7; border: 1px solid rgba(0, 242, 254, 0.25); }
+    .badge-role-student { background: rgba(0, 255, 170, 0.12); color: #059669; border: 1px solid rgba(0, 255, 170, 0.25); }
+    .badge-role-anon { background: var(--mon-subcard-bg); color: var(--mon-text-secondary); border: 1px solid var(--mon-subcard-border); }
 
     /* Diagnostics Modal */
     .diag-modal-backdrop {
@@ -141,21 +176,21 @@
     }
 
     .diag-modal-content {
-        background: #0b0f19;
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: var(--mon-modal-bg);
+        border: 1px solid var(--mon-card-border);
         border-radius: 20px;
         width: 100%;
         max-width: 950px;
         max-height: 90vh;
         display: flex;
         flex-direction: column;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
         overflow: hidden;
         animation: modalAppear 0.25s ease-out;
     }
 
     .diag-modal-content-sm {
-        max-width: 600px;
+        max-width: 620px;
     }
 
     @keyframes modalAppear {
@@ -168,7 +203,7 @@
         background: transparent;
         border: none;
         border-bottom: 2px solid transparent;
-        color: var(--text-secondary);
+        color: var(--mon-text-secondary);
         font-weight: 700;
         font-size: 13.5px;
         cursor: pointer;
@@ -176,19 +211,19 @@
     }
 
     .diag-tab-btn.active {
-        color: #00f2fe;
-        border-bottom-color: #00f2fe;
-        background: rgba(0, 242, 254, 0.05);
+        color: #0284c7;
+        border-bottom-color: #0284c7;
+        background: rgba(0, 242, 254, 0.08);
     }
 
     .diag-code-box {
-        background: #050811;
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: var(--mon-terminal-bg);
+        border: 1px solid var(--mon-card-border);
         border-radius: 12px;
         padding: 16px;
         font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
         font-size: 12.5px;
-        color: #e6edf3;
+        color: var(--mon-terminal-text);
         white-space: pre-wrap;
         word-break: break-all;
         max-height: 380px;
@@ -199,18 +234,18 @@
         display: flex;
         justify-content: space-between;
         padding: 10px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid var(--mon-subcard-border);
         font-size: 13.5px;
     }
 
     .diag-info-label {
-        color: var(--text-secondary);
+        color: var(--mon-text-secondary);
         font-weight: 600;
         width: 35%;
     }
 
     .diag-info-value {
-        color: var(--text-primary);
+        color: var(--mon-text-primary);
         font-weight: 700;
         width: 65%;
         word-break: break-all;
@@ -221,12 +256,12 @@
         position: fixed;
         bottom: 25px;
         right: 25px;
-        background: #0f172a;
-        border: 1px solid #00ffaa;
-        color: #ffffff;
+        background: var(--mon-modal-bg);
+        border: 1px solid #10b981;
+        color: var(--mon-text-primary);
         padding: 14px 22px;
         border-radius: 12px;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
         display: none;
         align-items: center;
         gap: 12px;
@@ -244,51 +279,51 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; flex-wrap: wrap; gap: 15px;">
         <div>
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-                <h2 style="font-size: 24px; font-weight: 800; color: var(--text-primary); border-left: 4px solid var(--accent-primary); padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">
+                <h2 style="font-size: 24px; font-weight: 800; color: var(--mon-text-primary); border-left: 4px solid #0284c7; padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">
                     Tizim Salomatligi va Monitoringi
                 </h2>
-                <span id="liveBadge" style="display: inline-flex; align-items: center; background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.3); color: #00ffaa; font-size: 11.5px; font-weight: 800; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px;">
+                <span id="liveBadge" style="display: inline-flex; align-items: center; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #059669; font-size: 11.5px; font-weight: 800; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px;">
                     <span class="live-pulse" id="livePulseDot"></span> LIVE MONITOR
                 </span>
             </div>
-            <p style="color: var(--text-secondary); font-size: 13.5px; font-weight: 500; margin-bottom: 0; padding-left: 16px;">
+            <p style="color: var(--mon-text-secondary); font-size: 13.5px; font-weight: 500; margin-bottom: 0; padding-left: 16px;">
                 Real vaqt rejimida barcha unhandled exception xatoliklar, so'rov parametrlari va server holati nazorati
             </p>
         </div>
 
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <!-- API Keys Manager Modal Trigger -->
-            <button onclick="openApiKeysModal()" style="background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc; font-weight: 700; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;">
+            <button onclick="openApiKeysModal()" style="background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.4); color: #9333ea; font-weight: 700; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;">
                 <i class="fas fa-key"></i> API Kalitlari ({{ api_keys|length }})
             </button>
 
             <!-- Auto-refresh interval -->
-            <div style="display: flex; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); border-radius: 10px; padding: 6px 12px; font-size: 13px; color: var(--text-secondary); gap: 8px;">
-                <i class="fas fa-clock" style="color: #00f2fe;"></i>
+            <div style="display: flex; align-items: center; background: var(--mon-subcard-bg); border: 1px solid var(--mon-card-border); border-radius: 10px; padding: 6px 12px; font-size: 13px; color: var(--mon-text-secondary); gap: 8px;">
+                <i class="fas fa-clock" style="color: #0284c7;"></i>
                 <label for="autoRefreshSelect" style="margin: 0; font-weight: 600;">Avto-yangilash:</label>
-                <select id="autoRefreshSelect" onchange="changeAutoRefresh(this.value)" style="background: transparent; border: none; color: var(--text-primary); font-weight: 700; outline: none; cursor: pointer;">
-                    <option value="0" style="background: #0c101d;">O'chiq</option>
-                    <option value="10" selected style="background: #0c101d;">10 soniya</option>
-                    <option value="30" style="background: #0c101d;">30 soniya</option>
-                    <option value="60" style="background: #0c101d;">1 daqiqa</option>
+                <select id="autoRefreshSelect" onchange="changeAutoRefresh(this.value)" style="background: transparent; border: none; color: var(--mon-text-primary); font-weight: 700; outline: none; cursor: pointer;">
+                    <option value="0" style="background: var(--mon-modal-bg); color: var(--mon-text-primary);">O'chiq</option>
+                    <option value="10" selected style="background: var(--mon-modal-bg); color: var(--mon-text-primary);">10 soniya</option>
+                    <option value="30" style="background: var(--mon-modal-bg); color: var(--mon-text-primary);">30 soniya</option>
+                    <option value="60" style="background: var(--mon-modal-bg); color: var(--mon-text-primary);">1 daqiqa</option>
                 </select>
             </div>
 
             <!-- Manual Refresh Button -->
-            <button onclick="refreshDashboard(true)" id="refreshBtn" style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; font-weight: 700; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;">
+            <button onclick="refreshDashboard(true)" id="refreshBtn" style="background: rgba(2, 132, 199, 0.1); border: 1px solid rgba(2, 132, 199, 0.3); color: #0284c7; font-weight: 700; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;">
                 <i class="fas fa-sync-alt" id="refreshIcon"></i> Yangilash
             </button>
 
             <!-- Bulk Resolve Button -->
             {% if unresolved_count > 0 %}
-            <button onclick="bulkResolveAll()" style="background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.3); color: #00ffaa; font-weight: 700; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;">
+            <button onclick="bulkResolveAll()" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #059669; font-weight: 700; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;">
                 <i class="fas fa-check-double"></i> Barchasini hal qilish
             </button>
             {% endif %}
 
             <!-- Locked Pages Link -->
-            <a href="{% url 'admin_locked_pages' %}" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); color: var(--text-primary); font-weight: 700; padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;">
-                <i class="fas fa-lock" style="color: #ff0055;"></i> Bloklanganlar ({{ locked_count }})
+            <a href="{% url 'admin_locked_pages' %}" style="background: var(--mon-subcard-bg); border: 1px solid var(--mon-card-border); color: var(--mon-text-primary); font-weight: 700; padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;">
+                <i class="fas fa-lock" style="color: #e11d48;"></i> Bloklanganlar ({{ locked_count }})
             </a>
         </div>
     </div>
@@ -299,39 +334,39 @@
         <div class="monitor-card">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <div class="monitor-card-value" id="cardDbLatency" style="color: #00ffaa;">
+                    <div class="monitor-card-value" id="cardDbLatency" style="color: #059669;">
                         {{ db_health.latency_ms }} ms
                     </div>
                     <div class="monitor-card-label">Ma'lumotlar Bazasi (DB Ping)</div>
                 </div>
-                <div class="monitor-card-icon" style="background: rgba(0, 255, 170, 0.12); color: #00ffaa;">
+                <div class="monitor-card-icon" style="background: rgba(16, 185, 129, 0.12); color: #059669;">
                     <i class="fas fa-database"></i>
                 </div>
             </div>
-            <div style="margin-top: 10px; font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
-                <span style="color: #00ffaa; font-weight: 700;">● Engine: {{ db_health.engine|upper }}</span>
+            <div style="margin-top: 10px; font-size: 12px; color: var(--mon-text-secondary); display: flex; align-items: center; gap: 6px;">
+                <span style="color: #059669; font-weight: 700;">● Engine: {{ db_health.engine|upper }}</span>
                 <span>• Holat: {% if db_health.connected %}Barqaror{% else %}Ulanish uzilgan{% endif %}</span>
             </div>
         </div>
 
         <!-- Unresolved Errors -->
-        <div class="monitor-card" style="{% if unresolved_count > 0 %}border-color: rgba(255, 0, 85, 0.4); background: rgba(255, 0, 85, 0.03);{% endif %}">
+        <div class="monitor-card" style="{% if unresolved_count > 0 %}border-color: rgba(225, 29, 72, 0.4); background: rgba(225, 29, 72, 0.04);{% endif %}">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <div class="monitor-card-value" id="cardUnresolvedCount" style="color: {% if unresolved_count > 0 %}#ff0055{% else %}#00ffaa{% endif %};">
+                    <div class="monitor-card-value" id="cardUnresolvedCount" style="color: {% if unresolved_count > 0 %}#e11d48{% else %}#059669{% endif %};">
                         {{ unresolved_count }}
                     </div>
                     <div class="monitor-card-label">Faol (Hal qilinmagan) Xatoliklar</div>
                 </div>
-                <div class="monitor-card-icon" style="background: rgba(255, 0, 85, 0.12); color: #ff0055;">
+                <div class="monitor-card-icon" style="background: rgba(225, 29, 72, 0.12); color: #e11d48;">
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
             </div>
-            <div style="margin-top: 10px; font-size: 12px; color: var(--text-secondary);">
+            <div style="margin-top: 10px; font-size: 12px; color: var(--mon-text-secondary);">
                 {% if unresolved_count > 0 %}
-                    <span style="color: #ff0055; font-weight: 700;"><i class="fas fa-bell"></i> E'tibor talab qilinadi</span>
+                    <span style="color: #e11d48; font-weight: 700;"><i class="fas fa-bell"></i> E'tibor talab qilinadi</span>
                 {% else %}
-                    <span style="color: #00ffaa; font-weight: 700;"><i class="fas fa-check-circle"></i> Barcha xatoliklar bartaraf etilgan</span>
+                    <span style="color: #059669; font-weight: 700;"><i class="fas fa-check-circle"></i> Barcha xatoliklar bartaraf etilgan</span>
                 {% endif %}
             </div>
         </div>
@@ -340,16 +375,16 @@
         <div class="monitor-card">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <div class="monitor-card-value" id="cardTodayCount" style="color: #00f2fe;">
+                    <div class="monitor-card-value" id="cardTodayCount" style="color: #0284c7;">
                         {{ today_count }}
                     </div>
                     <div class="monitor-card-label">Bugungi xatoliklar (Jami)</div>
                 </div>
-                <div class="monitor-card-icon" style="background: rgba(0, 242, 254, 0.12); color: #00f2fe;">
+                <div class="monitor-card-icon" style="background: rgba(2, 132, 199, 0.12); color: #0284c7;">
                     <i class="fas fa-calendar-day"></i>
                 </div>
             </div>
-            <div style="margin-top: 10px; font-size: 12px; color: var(--text-secondary);">
+            <div style="margin-top: 10px; font-size: 12px; color: var(--mon-text-secondary);">
                 <span>Oxirgi 24 soatda: <strong>{{ last_24h_count }} ta</strong></span>
             </div>
         </div>
@@ -358,34 +393,34 @@
         <div class="monitor-card">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <div class="monitor-card-value" id="cardResolvedCount" style="color: #a855f7;">
+                    <div class="monitor-card-value" id="cardResolvedCount" style="color: #9333ea;">
                         {{ resolved_count }}
                     </div>
                     <div class="monitor-card-label">Hal etilgan xatoliklar jami</div>
                 </div>
-                <div class="monitor-card-icon" style="background: rgba(168, 85, 247, 0.12); color: #a855f7;">
+                <div class="monitor-card-icon" style="background: rgba(147, 51, 234, 0.12); color: #9333ea;">
                     <i class="fas fa-clipboard-check"></i>
                 </div>
             </div>
-            <div style="margin-top: 10px; font-size: 12px; color: var(--text-secondary);">
+            <div style="margin-top: 10px; font-size: 12px; color: var(--mon-text-secondary);">
                 <span>Muvaffaqiyatli bartaraf etilgan jurnallar</span>
             </div>
         </div>
     </div>
 
     <!-- 🛠️ Server Environment & Diagnostics Mini-Strip -->
-    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-card); border-radius: 12px; padding: 10px 18px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 12.5px; color: var(--text-secondary);">
-        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-            <span><i class="fab fa-python" style="color: #00f2fe; margin-right: 5px;"></i> Python <strong>{{ server_info.python_version }}</strong></span>
-            <span><i class="fas fa-layer-group" style="color: #00ffaa; margin-right: 5px;"></i> Django <strong>{{ server_info.django_version }}</strong></span>
-            <span><i class="fas fa-code-branch" style="color: #ff9f43; margin-right: 5px;"></i> DEBUG: <strong>{% if server_info.debug_mode %}ON (Ishlab chiqish){% else %}OFF (Production){% endif %}</strong></span>
-            <span><i class="fas fa-server" style="color: #a855f7; margin-right: 5px;"></i> Server Vaqti: <strong>{{ server_info.server_time }}</strong></span>
+    <div style="background: var(--mon-card-bg); border: 1px solid var(--mon-card-border); border-radius: 12px; padding: 12px 18px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 12.5px; color: var(--mon-text-secondary);">
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <span><i class="fab fa-python" style="color: #0284c7; margin-right: 5px;"></i> Python: <strong style="color: var(--mon-text-primary);">{{ server_info.python_version }}</strong></span>
+            <span><i class="fas fa-layer-group" style="color: #059669; margin-right: 5px;"></i> Django: <strong style="color: var(--mon-text-primary);">{{ server_info.django_version }}</strong></span>
+            <span><i class="fas fa-code-branch" style="color: #ea580c; margin-right: 5px;"></i> DEBUG: <strong style="color: var(--mon-text-primary);">{% if server_info.debug_mode %}ON (Ishlab chiqish){% else %}OFF (Production){% endif %}</strong></span>
+            <span><i class="fas fa-server" style="color: #9333ea; margin-right: 5px;"></i> Server Vaqti: <strong style="color: var(--mon-text-primary);">{{ server_info.server_time }}</strong></span>
         </div>
         <div style="display: flex; align-items: center; gap: 14px;">
-            <button onclick="openApiKeysModal()" style="background: none; border: none; color: #c084fc; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px;">
+            <button onclick="openApiKeysModal()" style="background: none; border: none; color: #9333ea; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px;">
                 <i class="fas fa-key"></i> API Kalitlari
             </button>
-            <a href="{% url 'api_monitoring_overview' %}" target="_blank" style="color: #00f2fe; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+            <a href="{% url 'api_monitoring_overview' %}" target="_blank" style="color: #0284c7; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
                 <i class="fas fa-terminal"></i> REST API JSON <i class="fas fa-external-link-alt" style="font-size: 10px;"></i>
             </a>
         </div>
@@ -395,13 +430,13 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
         <!-- Status Tabs -->
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <a href="?status=unresolved{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid {% if current_status == 'unresolved' %}#ff0055; background: rgba(255,0,85,0.12); color: #ff0055;{% else %}var(--border-card); background: rgba(255,255,255,0.02); color: var(--text-secondary);{% endif %} transition: 0.2s;">
+            <a href="?status=unresolved{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid {% if current_status == 'unresolved' %}#e11d48; background: rgba(225, 29, 72, 0.12); color: #e11d48;{% else %}var(--mon-card-border); background: var(--mon-card-bg); color: var(--mon-text-secondary);{% endif %} transition: 0.2s;">
                 <i class="fas fa-fire-alt" style="margin-right: 4px;"></i> Faol ({{ unresolved_count }})
             </a>
-            <a href="?status=resolved{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid {% if current_status == 'resolved' %}#00ffaa; background: rgba(0, 255, 170, 0.12); color: #00ffaa;{% else %}var(--border-card); background: rgba(255,255,255,0.02); color: var(--text-secondary);{% endif %} transition: 0.2s;">
+            <a href="?status=resolved{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid {% if current_status == 'resolved' %}#059669; background: rgba(16, 185, 129, 0.12); color: #059669;{% else %}var(--mon-card-border); background: var(--mon-card-bg); color: var(--mon-text-secondary);{% endif %} transition: 0.2s;">
                 <i class="fas fa-check" style="margin-right: 4px;"></i> Hal qilinganlar ({{ resolved_count }})
             </a>
-            <a href="?status=all{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid {% if current_status == 'all' %}#00f2fe; background: rgba(0, 242, 254, 0.12); color: #00f2fe;{% else %}var(--border-card); background: rgba(255,255,255,0.02); color: var(--text-secondary);{% endif %} transition: 0.2s;">
+            <a href="?status=all{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid {% if current_status == 'all' %}#0284c7; background: rgba(2, 132, 199, 0.12); color: #0284c7;{% else %}var(--mon-card-border); background: var(--mon-card-bg); color: var(--mon-text-secondary);{% endif %} transition: 0.2s;">
                 Barchasi
             </a>
         </div>
@@ -411,29 +446,29 @@
             <input type="hidden" name="status" value="{{ current_status }}">
 
             <!-- Metod filtri -->
-            <select name="method" onchange="this.form.submit()" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-card); border-radius: 10px; padding: 7px 12px; color: var(--text-primary); font-size: 13px; font-weight: 600; outline: none;">
-                <option value="" style="background: #0c101d;">Metod (Barchasi)</option>
-                <option value="GET" {% if method == 'GET' %}selected{% endif %} style="background: #0c101d;">GET</option>
-                <option value="POST" {% if method == 'POST' %}selected{% endif %} style="background: #0c101d;">POST</option>
+            <select name="method" onchange="this.form.submit()" style="background: var(--mon-input-bg); border: 1px solid var(--mon-input-border); border-radius: 10px; padding: 7px 12px; color: var(--mon-text-primary); font-size: 13px; font-weight: 600; outline: none;">
+                <option value="" style="background: var(--mon-modal-bg); color: var(--mon-text-primary);">Metod (Barchasi)</option>
+                <option value="GET" {% if method == 'GET' %}selected{% endif %} style="background: var(--mon-modal-bg); color: var(--mon-text-primary);">GET</option>
+                <option value="POST" {% if method == 'POST' %}selected{% endif %} style="background: var(--mon-modal-bg); color: var(--mon-text-primary);">POST</option>
             </select>
 
             <!-- Rol filtri -->
-            <select name="role" onchange="this.form.submit()" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-card); border-radius: 10px; padding: 7px 12px; color: var(--text-primary); font-size: 13px; font-weight: 600; outline: none;">
-                <option value="" style="background: #0c101d;">Rol (Barchasi)</option>
-                <option value="admin" {% if role == 'admin' %}selected{% endif %} style="background: #0c101d;">Admin</option>
-                <option value="teacher" {% if role == 'teacher' %}selected{% endif %} style="background: #0c101d;">O'qituvchi</option>
-                <option value="student" {% if role == 'student' %}selected{% endif %} style="background: #0c101d;">O'quvchi</option>
-                <option value="anonymous" {% if role == 'anonymous' %}selected{% endif %} style="background: #0c101d;">Anonim / Mehmon</option>
+            <select name="role" onchange="this.form.submit()" style="background: var(--mon-input-bg); border: 1px solid var(--mon-input-border); border-radius: 10px; padding: 7px 12px; color: var(--mon-text-primary); font-size: 13px; font-weight: 600; outline: none;">
+                <option value="" style="background: var(--mon-modal-bg); color: var(--mon-text-primary);">Rol (Barchasi)</option>
+                <option value="admin" {% if role == 'admin' %}selected{% endif %} style="background: var(--mon-modal-bg); color: var(--mon-text-primary);">Admin</option>
+                <option value="teacher" {% if role == 'teacher' %}selected{% endif %} style="background: var(--mon-modal-bg); color: var(--mon-text-primary);">O'qituvchi</option>
+                <option value="student" {% if role == 'student' %}selected{% endif %} style="background: var(--mon-modal-bg); color: var(--mon-text-primary);">O'quvchi</option>
+                <option value="anonymous" {% if role == 'anonymous' %}selected{% endif %} style="background: var(--mon-modal-bg); color: var(--mon-text-primary);">Anonim / Mehmon</option>
             </select>
 
             <!-- Qidiruv input -->
-            <div style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-card); border-radius: 10px; padding: 3px 12px; width: 240px;">
-                <input type="text" name="query" value="{{ query }}" placeholder="Qidirish (URL, xabar, IP...)" style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 5px 0;">
-                <button type="submit" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 0 4px;"><i class="fas fa-search"></i></button>
+            <div style="display: flex; align-items: center; background: var(--mon-input-bg); border: 1px solid var(--mon-input-border); border-radius: 10px; padding: 3px 12px; width: 240px;">
+                <input type="text" name="query" value="{{ query }}" placeholder="Qidirish (URL, xabar, IP...)" style="background: transparent; border: none; outline: none; color: var(--mon-text-primary); font-size: 13px; width: 100%; padding: 5px 0;">
+                <button type="submit" style="background: none; border: none; color: var(--mon-text-secondary); cursor: pointer; padding: 0 4px;"><i class="fas fa-search"></i></button>
             </div>
 
             {% if query or role or method or current_status != 'unresolved' %}
-                <a href="{% url 'admin_monitoring_dashboard' %}" style="padding: 7px 14px; border-radius: 10px; background: rgba(255,0,85,0.08); border: 1px solid rgba(255,0,85,0.25); color: #ff0055; text-decoration: none; font-size: 13px; font-weight: 700;">
+                <a href="{% url 'admin_monitoring_dashboard' %}" style="padding: 7px 14px; border-radius: 10px; background: rgba(225, 29, 72, 0.08); border: 1px solid rgba(225, 29, 72, 0.25); color: #e11d48; text-decoration: none; font-size: 13px; font-weight: 700;">
                     Tozalash
                 </a>
             {% endif %}
@@ -441,26 +476,26 @@
     </div>
 
     <!-- 📑 Errors Table Container -->
-    <div style="flex-grow: 1; overflow-y: auto; background: rgba(11, 15, 25, 0.5); border: 1px solid var(--border-card); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); margin-bottom: 20px;">
+    <div style="flex-grow: 1; overflow-y: auto; background: var(--mon-card-bg); border: 1px solid var(--mon-card-border); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(0,0,0,0.06); margin-bottom: 20px;">
         <table style="width: 100%; border-collapse: collapse; text-align: left;" id="errorsTable">
             <thead>
-                <tr style="border-bottom: 1px solid var(--border-card); background: #080d1a; position: sticky; top: 0; z-index: 10;">
-                    <th style="padding: 14px 18px; color: #00f2fe; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 14%;">VAQT</th>
-                    <th style="padding: 14px 18px; color: #00f2fe; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 18%;">XATOLIK VA METOD</th>
-                    <th style="padding: 14px 18px; color: #00f2fe; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 22%;">URL MANZILI</th>
-                    <th style="padding: 14px 18px; color: #00f2fe; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 20%;">KIMDAN (FOYDALANUVCHI)</th>
-                    <th style="padding: 14px 18px; color: #00f2fe; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 14%;">IP VA QURILMA</th>
-                    <th style="padding: 14px 18px; color: #00f2fe; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 12%; text-align: center;">AMAL</th>
+                <tr style="border-bottom: 1px solid var(--mon-card-border); background: var(--mon-table-head-bg); position: sticky; top: 0; z-index: 10;">
+                    <th style="padding: 14px 18px; color: #0284c7; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 14%;">VAQT</th>
+                    <th style="padding: 14px 18px; color: #0284c7; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 18%;">XATOLIK VA METOD</th>
+                    <th style="padding: 14px 18px; color: #0284c7; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 22%;">URL MANZILI</th>
+                    <th style="padding: 14px 18px; color: #0284c7; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 20%;">KIMDAN (FOYDALANUVCHI)</th>
+                    <th style="padding: 14px 18px; color: #0284c7; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 14%;">IP VA QURILMA</th>
+                    <th style="padding: 14px 18px; color: #0284c7; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 12%; text-align: center;">AMAL</th>
                 </tr>
             </thead>
             <tbody id="errorRowsContainer">
                 {% if logs %}
                     {% for log in logs %}
-                        <tr id="error-row-{{ log.id }}" style="border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)';" onmouseout="this.style.background='none';">
+                        <tr id="error-row-{{ log.id }}" style="border-bottom: 1px solid var(--mon-subcard-border); transition: background 0.2s;">
                             <!-- Vaqt -->
-                            <td style="padding: 14px 18px; font-size: 12.5px; font-family: monospace; color: var(--text-secondary); font-weight: 600;">
-                                <div style="color: var(--text-primary); font-weight: 700;">{{ log.timestamp|date:"d.m.Y" }}</div>
-                                <div style="color: #00f2fe; font-size: 11.5px;">{{ log.timestamp|date:"H:i:s" }}</div>
+                            <td style="padding: 14px 18px; font-size: 12.5px; font-family: monospace; color: var(--mon-text-secondary); font-weight: 600;">
+                                <div style="color: var(--mon-text-primary); font-weight: 700;">{{ log.timestamp|date:"d.m.Y" }}</div>
+                                <div style="color: #0284c7; font-size: 11.5px;">{{ log.timestamp|date:"H:i:s" }}</div>
                             </td>
 
                             <!-- Xatolik turi va Metod -->
@@ -469,27 +504,27 @@
                                     <span class="badge-method badge-method-{{ log.http_method|lower }}">
                                         {{ log.http_method }}
                                     </span>
-                                    <span style="font-weight: 800; color: #ff0055; font-size: 13px; font-family: monospace;">
+                                    <span style="font-weight: 800; color: #e11d48; font-size: 13px; font-family: monospace;">
                                         {{ log.exception_type|default:"Exception" }}
                                     </span>
                                 </div>
-                                <div style="font-size: 12.5px; color: var(--text-secondary); max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ log.error_message }}">
+                                <div style="font-size: 12.5px; color: var(--mon-text-secondary); max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ log.error_message }}">
                                     {{ log.error_message }}
                                 </div>
                             </td>
 
                             <!-- URL Manzili -->
                             <td style="padding: 14px 18px; font-size: 13px; font-family: monospace; font-weight: 600; word-break: break-all;">
-                                <span style="color: #ff9f43;">{{ log.url_path }}</span>
+                                <span style="color: #ea580c;">{{ log.url_path }}</span>
                             </td>
 
                             <!-- Foydalanuvchi & Rol -->
                             <td style="padding: 14px 18px;">
-                                <div style="font-weight: 700; color: var(--text-primary); font-size: 13.5px; margin-bottom: 2px;">
+                                <div style="font-weight: 700; color: var(--mon-text-primary); font-size: 13.5px; margin-bottom: 2px;">
                                     {% if log.user %}
                                         {{ log.user.get_full_name|default:log.user.username }}
                                     {% else %}
-                                        <span style="color: var(--text-secondary); font-style: italic;">Anonim tashrif</span>
+                                        <span style="color: var(--mon-text-muted); font-style: italic;">Anonim tashrif</span>
                                     {% endif %}
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
@@ -504,17 +539,17 @@
                                     {% endif %}
 
                                     {% if log.user_phone %}
-                                        <span style="font-size: 11.5px; color: var(--text-secondary); font-family: monospace;">{{ log.user_phone }}</span>
+                                        <span style="font-size: 11.5px; color: var(--mon-text-muted); font-family: monospace;">{{ log.user_phone }}</span>
                                     {% endif %}
                                 </div>
                             </td>
 
                             <!-- IP va Qurilma -->
-                            <td style="padding: 14px 18px; font-size: 12px; color: var(--text-secondary);">
-                                <div style="font-family: monospace; color: #00f2fe; font-weight: 700;">
+                            <td style="padding: 14px 18px; font-size: 12px; color: var(--mon-text-secondary);">
+                                <div style="font-family: monospace; color: #0284c7; font-weight: 700;">
                                     {{ log.ip_address|default:"127.0.0.1" }}
                                 </div>
-                                <div style="font-size: 11px; max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ log.user_agent }}">
+                                <div style="font-size: 11px; color: var(--mon-text-muted); max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ log.user_agent }}">
                                     {{ log.user_agent|default:"Noma'lum brauzer" }}
                                 </div>
                             </td>
@@ -523,17 +558,17 @@
                             <td style="padding: 14px 18px; text-align: center;">
                                 <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
                                     <!-- Inspect Button -->
-                                    <button onclick="openDiagnosticsModal('{{ log.id }}')" style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; font-weight: 700; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: 0.2s;" title="Tashxis qo'yish (Traceback & Parametrlar)">
+                                    <button onclick="openDiagnosticsModal('{{ log.id }}')" style="background: rgba(2, 132, 199, 0.1); border: 1px solid rgba(2, 132, 199, 0.3); color: #0284c7; font-weight: 700; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: 0.2s;" title="Tashxis qo'yish (Traceback & Parametrlar)">
                                         <i class="fas fa-search-plus"></i> Tashxis
                                     </button>
 
                                     <!-- Quick Resolve Button -->
                                     {% if not log.is_resolved %}
-                                        <button onclick="resolveErrorAjax('{{ log.id }}', this)" style="background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.3); color: #00ffaa; font-weight: 700; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: 0.2s;" title="Hal etildi deb belgilash">
+                                        <button onclick="resolveErrorAjax('{{ log.id }}', this)" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #059669; font-weight: 700; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: 0.2s;" title="Hal etildi deb belgilash">
                                             <i class="fas fa-check"></i>
                                         </button>
                                     {% else %}
-                                        <span style="color: #00ffaa; font-weight: 700; font-size: 12px;" title="Hal etilgan"><i class="fas fa-check-double"></i></span>
+                                        <span style="color: #059669; font-weight: 700; font-size: 12px;" title="Hal etilgan"><i class="fas fa-check-double"></i></span>
                                     {% endif %}
                                 </div>
 
@@ -559,11 +594,11 @@
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 50px 20px;">
-                            <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-card); border-radius: 16px; padding: 40px 20px; text-align: center; max-width: 480px; margin: 0 auto;">
-                                <i class="fas fa-shield-alt" style="font-size: 40px; color: #00ffaa; margin-bottom: 14px; display: inline-block;"></i>
-                                <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Hech qanday xatolik topilmadi</h4>
-                                <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">Tanlangan filtrlar bo'yicha tizimda hech qanday xatolik qayd etilmagan.</p>
+                        <td colspan="6" style="text-align: center; color: var(--mon-text-secondary); padding: 50px 20px;">
+                            <div style="background: var(--mon-subcard-bg); border: 1px solid var(--mon-card-border); border-radius: 16px; padding: 40px 20px; text-align: center; max-width: 480px; margin: 0 auto;">
+                                <i class="fas fa-shield-alt" style="font-size: 40px; color: #059669; margin-bottom: 14px; display: inline-block;"></i>
+                                <h4 style="font-size: 16px; font-weight: 700; color: var(--mon-text-primary); margin-bottom: 8px;">Hech qanday xatolik topilmadi</h4>
+                                <p style="font-size: 13px; color: var(--mon-text-secondary); margin: 0;">Tanlangan filtrlar bo'yicha tizimda hech qanday xatolik qayd etilmagan.</p>
                             </div>
                         </td>
                     </tr>
@@ -576,17 +611,17 @@
     {% if logs.has_other_pages %}
     <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px;">
         {% if logs.has_previous %}
-            <a href="?page={{ logs.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 6px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); border-radius: 8px; color: var(--text-primary); text-decoration: none; font-size: 13px; font-weight: 700;">
+            <a href="?page={{ logs.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 6px 14px; background: var(--mon-card-bg); border: 1px solid var(--mon-card-border); border-radius: 8px; color: var(--mon-text-primary); text-decoration: none; font-size: 13px; font-weight: 700;">
                 <i class="fas fa-chevron-left"></i> Oldingi
             </a>
         {% endif %}
 
-        <span style="color: var(--text-secondary); font-size: 13px; font-weight: 600; padding: 0 10px;">
+        <span style="color: var(--mon-text-secondary); font-size: 13px; font-weight: 600; padding: 0 10px;">
             Sahifa {{ logs.number }} / {{ logs.paginator.num_pages }}
         </span>
 
         {% if logs.has_next %}
-            <a href="?page={{ logs.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 6px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); border-radius: 8px; color: var(--text-primary); text-decoration: none; font-size: 13px; font-weight: 700;">
+            <a href="?page={{ logs.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 6px 14px; background: var(--mon-card-bg); border: 1px solid var(--mon-card-border); border-radius: 8px; color: var(--mon-text-primary); text-decoration: none; font-size: 13px; font-weight: 700;">
                 Keyingi <i class="fas fa-chevron-right"></i>
             </a>
         {% endif %}
@@ -598,27 +633,27 @@
 <!-- 🔑 API Keys Management Modal -->
 <div class="diag-modal-backdrop" id="apiKeysModal" onclick="handleApiModalBackdrop(event)">
     <div class="diag-modal-content diag-modal-content-sm" onclick="event.stopPropagation()">
-        <div style="padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
+        <div style="padding: 18px 24px; border-bottom: 1px solid var(--mon-card-border); display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-key" style="color: #c084fc; font-size: 18px;"></i>
-                <h3 style="color: #ffffff; font-size: 17px; font-weight: 800; margin: 0;">
+                <i class="fas fa-key" style="color: #9333ea; font-size: 18px;"></i>
+                <h3 style="color: var(--mon-text-primary); font-size: 17px; font-weight: 800; margin: 0;">
                     Monitoring API Kalitlari Boshqaruvi
                 </h3>
             </div>
-            <button onclick="closeApiKeysModal()" style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 20px; cursor: pointer;">
+            <button onclick="closeApiKeysModal()" style="background: none; border: none; color: var(--mon-text-secondary); font-size: 20px; cursor: pointer;">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
         <div style="padding: 20px 24px; overflow-y: auto; flex-grow: 1;">
-            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+            <p style="font-size: 13px; color: var(--mon-text-secondary); margin-bottom: 16px;">
                 Ushbu maxfiy API kalitlari orqali Netlify yoki boshqa tashqi monitoring ilovangiz tizimga xavfsiz bog'lanadi.
             </p>
 
             <!-- Create New Key Input Form -->
-            <div style="display: flex; gap: 8px; margin-bottom: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-card); padding: 8px 12px; border-radius: 12px;">
-                <input type="text" id="newKeyNameInput" placeholder="Kalit nomi (masalan: Netlify Subdomain)" style="flex-grow: 1; background: transparent; border: none; outline: none; color: #ffffff; font-size: 13px;">
-                <button onclick="createNewApiKey()" style="background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc; font-weight: 700; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 12.5px; white-space: nowrap;">
+            <div style="display: flex; gap: 8px; margin-bottom: 20px; background: var(--mon-input-bg); border: 1px solid var(--mon-input-border); padding: 8px 12px; border-radius: 12px;">
+                <input type="text" id="newKeyNameInput" placeholder="Kalit nomi (masalan: Netlify Subdomain)" style="flex-grow: 1; background: transparent; border: none; outline: none; color: var(--mon-text-primary); font-size: 13px;">
+                <button onclick="createNewApiKey()" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); color: #9333ea; font-weight: 700; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 12.5px; white-space: nowrap;">
                     <i class="fas fa-plus"></i> Yangi Yaratish
                 </button>
             </div>
@@ -626,34 +661,34 @@
             <!-- Keys List Container -->
             <div id="apiKeysListContainer" style="display: flex; flex-direction: column; gap: 12px;">
                 {% for k in api_keys %}
-                    <div id="key-card-{{ k.id }}" style="background: #060913; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 16px;">
+                    <div id="key-card-{{ k.id }}" style="background: var(--mon-subcard-bg); border: 1px solid var(--mon-card-border); border-radius: 12px; padding: 14px 16px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <strong style="color: #ffffff; font-size: 13.5px;">{{ k.name }}</strong>
+                            <strong style="color: var(--mon-text-primary); font-size: 13.5px;">{{ k.name }}</strong>
                             <div style="display: flex; align-items: center; gap: 6px;">
-                                <span id="key-badge-{{ k.id }}" style="font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 6px; {% if k.is_active %}background: rgba(0,255,170,0.1); color: #00ffaa; border: 1px solid rgba(0,255,170,0.3);{% else %}background: rgba(255,0,85,0.1); color: #ff0055; border: 1px solid rgba(255,0,85,0.3);{% endif %}">
+                                <span id="key-badge-{{ k.id }}" style="font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 6px; {% if k.is_active %}background: rgba(16,185,129,0.1); color: #059669; border: 1px solid rgba(16,185,129,0.3);{% else %}background: rgba(225,29,72,0.1); color: #e11d48; border: 1px solid rgba(225,29,72,0.3);{% endif %}">
                                     {% if k.is_active %}FAOL{% else %}TO'XTATILGAN{% endif %}
                                 </span>
-                                <button onclick="toggleApiKey('{{ k.id }}')" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 11px;" title="Holatni o'zgartirish">
+                                <button onclick="toggleApiKey('{{ k.id }}')" style="background: var(--mon-input-bg); border: 1px solid var(--mon-card-border); color: var(--mon-text-secondary); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 11px;" title="Holatni o'zgartirish">
                                     <i class="fas fa-power-off"></i>
                                 </button>
-                                <button onclick="deleteApiKey('{{ k.id }}')" style="background: rgba(255,0,85,0.1); border: 1px solid rgba(255,0,85,0.3); color: #ff0055; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 11px;" title="O'chirish (Revoke)">
+                                <button onclick="deleteApiKey('{{ k.id }}')" style="background: rgba(225,29,72,0.1); border: 1px solid rgba(225,29,72,0.3); color: #e11d48; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 11px;" title="O'chirish (Revoke)">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Key string with copy -->
-                        <div style="display: flex; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 6px 10px; gap: 8px;">
-                            <input type="password" id="key_val_{{ k.id }}" value="{{ k.key }}" readonly style="flex-grow: 1; background: transparent; border: none; outline: none; color: #00f2fe; font-family: monospace; font-size: 12px;">
-                            <button onclick="toggleKeyVisibility('{{ k.id }}')" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 12px;" title="Ko'rsatish / Yashirish">
+                        <div style="display: flex; align-items: center; background: var(--mon-input-bg); border: 1px solid var(--mon-input-border); border-radius: 8px; padding: 6px 10px; gap: 8px;">
+                            <input type="password" id="key_val_{{ k.id }}" value="{{ k.key }}" readonly style="flex-grow: 1; background: transparent; border: none; outline: none; color: #0284c7; font-family: monospace; font-size: 12px; font-weight: 700;">
+                            <button onclick="toggleKeyVisibility('{{ k.id }}')" style="background: none; border: none; color: var(--mon-text-secondary); cursor: pointer; font-size: 12px;" title="Ko'rsatish / Yashirish">
                                 <i class="fas fa-eye" id="eye_icon_{{ k.id }}"></i>
                             </button>
-                            <button onclick="copyDirectText('{{ k.key }}')" style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; font-weight: 700; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 11px;">
+                            <button onclick="copyDirectText('{{ k.key }}')" style="background: rgba(2, 132, 199, 0.1); border: 1px solid rgba(2, 132, 199, 0.3); color: #0284c7; font-weight: 700; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 11px;">
                                 <i class="fas fa-copy"></i> Nusxa
                             </button>
                         </div>
 
-                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 8px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--mon-text-muted); margin-top: 8px;">
                             <span>Yaratilgan: {{ k.created_at|date:"d.m.Y H:i" }}</span>
                             <span>Oxirgi foydalanish: {% if k.last_used_at %}{{ k.last_used_at|date:"d.m.Y H:i" }}{% else %}Foydalanilmagan{% endif %}</span>
                         </div>
@@ -662,8 +697,8 @@
             </div>
         </div>
 
-        <div style="padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: flex-end; background: rgba(0,0,0,0.2);">
-            <button onclick="closeApiKeysModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ffffff; font-weight: 700; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 13px;">
+        <div style="padding: 16px 24px; border-top: 1px solid var(--mon-card-border); display: flex; justify-content: flex-end; background: var(--mon-subcard-bg);">
+            <button onclick="closeApiKeysModal()" style="background: var(--mon-card-bg); border: 1px solid var(--mon-card-border); color: var(--mon-text-primary); font-weight: 700; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 13px;">
                 Yopish
             </button>
         </div>
@@ -674,20 +709,20 @@
 <div class="diag-modal-backdrop" id="diagModalBackdrop" onclick="handleBackdropClick(event)">
     <div class="diag-modal-content" onclick="event.stopPropagation()">
         <!-- Modal Header -->
-        <div style="padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
+        <div style="padding: 18px 24px; border-bottom: 1px solid var(--mon-card-border); display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <span id="modalMethodBadge" class="badge-method badge-method-post">POST</span>
-                <h3 id="modalTitle" style="color: #ffffff; font-size: 17px; font-weight: 800; margin: 0; font-family: monospace;">
+                <h3 id="modalTitle" style="color: var(--mon-text-primary); font-size: 17px; font-weight: 800; margin: 0; font-family: monospace;">
                     TypeError: cannot unpack non-iterable
                 </h3>
             </div>
-            <button onclick="closeDiagnosticsModal()" style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 20px; cursor: pointer; padding: 4px 8px; border-radius: 6px;">
+            <button onclick="closeDiagnosticsModal()" style="background: none; border: none; color: var(--mon-text-secondary); font-size: 20px; cursor: pointer; padding: 4px 8px; border-radius: 6px;">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
         <!-- Modal Tabs Navigation -->
-        <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2); padding: 0 16px;">
+        <div style="display: flex; border-bottom: 1px solid var(--mon-card-border); background: var(--mon-subcard-bg); padding: 0 16px;">
             <button class="diag-tab-btn active" id="tabBtnOverview" onclick="switchDiagTab('overview')">
                 <i class="fas fa-info-circle"></i> Umumiy Tashxis
             </button>
@@ -703,17 +738,17 @@
         <div style="padding: 24px; overflow-y: auto; flex-grow: 1;">
             <!-- Tab 1: Overview -->
             <div id="diagTabOverview">
-                <div style="background: rgba(255, 0, 85, 0.08); border: 1px solid rgba(255, 0, 85, 0.3); border-radius: 12px; padding: 14px 18px; margin-bottom: 18px;">
-                    <div style="font-size: 11px; font-weight: 800; color: #ff0055; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">Xatolik Xabari:</div>
-                    <div id="modalErrorMessage" style="color: #ffffff; font-weight: 700; font-size: 14px; word-break: break-word;"></div>
+                <div style="background: rgba(225, 29, 72, 0.08); border: 1px solid rgba(225, 29, 72, 0.3); border-radius: 12px; padding: 14px 18px; margin-bottom: 18px;">
+                    <div style="font-size: 11px; font-weight: 800; color: #e11d48; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">Xatolik Xabari:</div>
+                    <div id="modalErrorMessage" style="color: var(--mon-text-primary); font-weight: 700; font-size: 14px; word-break: break-word;"></div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div>
-                        <h4 style="font-size: 13px; font-weight: 700; color: #00f2fe; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">So'rov Tafsilotlari</h4>
+                        <h4 style="font-size: 13px; font-weight: 700; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">So'rov Tafsilotlari</h4>
                         <div class="diag-info-row">
                             <span class="diag-info-label">URL Manzili:</span>
-                            <span class="diag-info-value" id="modalUrl" style="color: #ff9f43; font-family: monospace;"></span>
+                            <span class="diag-info-value" id="modalUrl" style="color: #ea580c; font-family: monospace;"></span>
                         </div>
                         <div class="diag-info-row">
                             <span class="diag-info-label">HTTP Metod:</span>
@@ -730,7 +765,7 @@
                     </div>
 
                     <div>
-                        <h4 style="font-size: 13px; font-weight: 700; color: #00f2fe; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Foydalanuvchi va Tarmoq</h4>
+                        <h4 style="font-size: 13px; font-weight: 700; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Foydalanuvchi va Tarmoq</h4>
                         <div class="diag-info-row">
                             <span class="diag-info-label">Foydalanuvchi:</span>
                             <span class="diag-info-value" id="modalUser"></span>
@@ -745,22 +780,22 @@
                         </div>
                         <div class="diag-info-row">
                             <span class="diag-info-label">IP Manzil:</span>
-                            <span class="diag-info-value" id="modalIp" style="color: #00ffaa; font-family: monospace;"></span>
+                            <span class="diag-info-value" id="modalIp" style="color: #059669; font-family: monospace;"></span>
                         </div>
                     </div>
                 </div>
 
                 <div style="margin-top: 15px;">
-                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600;">User-Agent (Brauzer / Qurilma):</div>
-                    <div id="modalUserAgent" style="font-size: 12px; font-family: monospace; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 8px 12px; border-radius: 8px; word-break: break-all;"></div>
+                    <div style="font-size: 12px; color: var(--mon-text-secondary); margin-bottom: 4px; font-weight: 600;">User-Agent (Brauzer / Qurilma):</div>
+                    <div id="modalUserAgent" style="font-size: 12px; font-family: monospace; color: var(--mon-text-secondary); background: var(--mon-subcard-bg); border: 1px solid var(--mon-card-border); padding: 8px 12px; border-radius: 8px; word-break: break-all;"></div>
                 </div>
             </div>
 
             <!-- Tab 2: Payload -->
             <div id="diagTabPayload" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <span style="font-size: 12.5px; color: var(--text-secondary);">Ushbu so'rov yuborilganda uzatilgan xavfsizlangan parametrlar (JSON):</span>
-                    <button onclick="copyToClipboard('modalPayloadBox')" style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; font-weight: 700; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11.5px;">
+                    <span style="font-size: 12.5px; color: var(--mon-text-secondary);">Ushbu so'rov yuborilganda uzatilgan xavfsizlangan parametrlar (JSON):</span>
+                    <button onclick="copyToClipboard('modalPayloadBox')" style="background: rgba(2, 132, 199, 0.1); border: 1px solid rgba(2, 132, 199, 0.3); color: #0284c7; font-weight: 700; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11.5px;">
                         <i class="fas fa-copy"></i> Nusxa olish
                     </button>
                 </div>
@@ -770,23 +805,23 @@
             <!-- Tab 3: Traceback -->
             <div id="diagTabTraceback" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <span style="font-size: 12.5px; color: var(--text-secondary);">Python Stack Trace (To'liq xatolik ketma-ketligi):</span>
-                    <button onclick="copyToClipboard('modalTracebackBox')" style="background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.3); color: #ff0055; font-weight: 700; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11.5px;">
+                    <span style="font-size: 12.5px; color: var(--mon-text-secondary);">Python Stack Trace (To'liq xatolik ketma-ketligi):</span>
+                    <button onclick="copyToClipboard('modalTracebackBox')" style="background: rgba(225, 29, 72, 0.1); border: 1px solid rgba(225, 29, 72, 0.3); color: #e11d48; font-weight: 700; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11.5px;">
                         <i class="fas fa-copy"></i> Traceback nusxasi
                     </button>
                 </div>
-                <pre class="diag-code-box" id="modalTracebackBox" style="color: #ff0055;"></pre>
+                <pre class="diag-code-box" id="modalTracebackBox" style="color: #e11d48;"></pre>
             </div>
         </div>
 
         <!-- Modal Footer -->
-        <div style="padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);">
+        <div style="padding: 16px 24px; border-top: 1px solid var(--mon-card-border); display: flex; justify-content: space-between; align-items: center; background: var(--mon-subcard-bg);">
             <div id="modalResolveContainer">
-                <button id="modalResolveBtn" onclick="resolveFromModal()" style="background: rgba(0, 255, 170, 0.12); border: 1px solid rgba(0, 255, 170, 0.4); color: #00ffaa; font-weight: 700; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 8px;">
+                <button id="modalResolveBtn" onclick="resolveFromModal()" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.4); color: #059669; font-weight: 700; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 8px;">
                     <i class="fas fa-check-circle"></i> Hal etildi deb belgilash
                 </button>
             </div>
-            <button onclick="closeDiagnosticsModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ffffff; font-weight: 700; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 13px;">
+            <button onclick="closeDiagnosticsModal()" style="background: var(--mon-card-bg); border: 1px solid var(--mon-card-border); color: var(--mon-text-primary); font-weight: 700; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 13px;">
                 Yopish
             </button>
         </div>
@@ -795,7 +830,7 @@
 
 <!-- 🔔 Toast Notification -->
 <div id="monitorToast">
-    <i class="fas fa-check-circle" style="color: #00ffaa; font-size: 18px;"></i>
+    <i class="fas fa-check-circle" style="color: #059669; font-size: 18px;"></i>
     <span id="toastMsg">Amal muvaffaqiyatli bajarildi!</span>
 </div>
 
@@ -842,7 +877,7 @@ function refreshDashboard(showSpinner = true) {
                 const cardUnresolved = document.getElementById('cardUnresolvedCount');
                 if (cardUnresolved) {
                     cardUnresolved.textContent = data.metrics.unresolved_errors;
-                    cardUnresolved.style.color = data.metrics.unresolved_errors > 0 ? '#ff0055' : '#00ffaa';
+                    cardUnresolved.style.color = data.metrics.unresolved_errors > 0 ? '#e11d48' : '#059669';
                 }
                 const cardToday = document.getElementById('cardTodayCount');
                 if (cardToday) {
@@ -969,14 +1004,14 @@ function toggleApiKey(keyId) {
             if (badge) {
                 if (data.is_active) {
                     badge.textContent = "FAOL";
-                    badge.style.background = "rgba(0,255,170,0.1)";
-                    badge.style.color = "#00ffaa";
-                    badge.style.border = "1px solid rgba(0,255,170,0.3)";
+                    badge.style.background = "rgba(16,185,129,0.1)";
+                    badge.style.color = "#059669";
+                    badge.style.border = "1px solid rgba(16,185,129,0.3)";
                 } else {
                     badge.textContent = "TO'XTATILGAN";
-                    badge.style.background = "rgba(255,0,85,0.1)";
-                    badge.style.color = "#ff0055";
-                    badge.style.border = "1px solid rgba(255,0,85,0.3)";
+                    badge.style.background = "rgba(225,29,72,0.1)";
+                    badge.style.color = "#e11d48";
+                    badge.style.border = "1px solid rgba(225,29,72,0.3)";
                 }
             }
         } else {
@@ -1013,10 +1048,10 @@ function openDiagnosticsModal(errorId) {
     const statusEl = document.getElementById('modalResolvedStatus');
     const resolveBtn = document.getElementById('modalResolveBtn');
     if (isResolved) {
-        statusEl.innerHTML = '<span style="color: #00ffaa; font-weight: 700;"><i class="fas fa-check-double"></i> Hal qilingan (' + dataset.resolvedAt + ')</span>';
+        statusEl.innerHTML = '<span style="color: #059669; font-weight: 700;"><i class="fas fa-check-double"></i> Hal qilingan (' + dataset.resolvedAt + ')</span>';
         if (resolveBtn) resolveBtn.style.display = 'none';
     } else {
-        statusEl.innerHTML = '<span style="color: #ff0055; font-weight: 700;"><i class="fas fa-clock"></i> Hal etilmagan</span>';
+        statusEl.innerHTML = '<span style="color: #e11d48; font-weight: 700;"><i class="fas fa-clock"></i> Hal etilmagan</span>';
         if (resolveBtn) resolveBtn.style.display = 'inline-flex';
     }
 
@@ -1089,7 +1124,7 @@ function resolveErrorAjax(errorId, btnElement) {
             showToast("Xatolik #" + errorId + " hal etildi deb belgilandi!");
             if (btnElement) {
                 const parent = btnElement.parentElement;
-                parent.innerHTML = '<span style="color: #00ffaa; font-weight: 700; font-size: 12px;"><i class="fas fa-check-double"></i></span>';
+                parent.innerHTML = '<span style="color: #059669; font-weight: 700; font-size: 12px;"><i class="fas fa-check-double"></i></span>';
             }
             const rawEl = document.getElementById('raw_data_' + errorId);
             if (rawEl) {
@@ -1110,7 +1145,7 @@ function resolveFromModal() {
     const rowBtn = document.querySelector('#error-row-' + currentOpenErrorId + ' button[title="Hal etildi deb belgilash"]');
     if (rowBtn) {
         const parent = rowBtn.parentElement;
-        parent.innerHTML = '<span style="color: #00ffaa; font-weight: 700; font-size: 12px;"><i class="fas fa-check-double"></i></span>';
+        parent.innerHTML = '<span style="color: #059669; font-weight: 700; font-size: 12px;"><i class="fas fa-check-double"></i></span>';
     }
 }
 
