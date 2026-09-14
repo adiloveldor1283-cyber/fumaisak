@@ -2936,25 +2936,39 @@ def add_group_payment(request, group_id):
     if request.method == "POST":
         duration = request.POST.get('duration')
         monthly_fee = request.POST.get('monthly_fee')
+        start_date_str = request.POST.get('start_date')
+
+        start_date = None
+        if start_date_str:
+            try:
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                pass
 
         if payment_info:
             payment_info.course_duration_months = duration
             payment_info.monthly_fee = monthly_fee
+            if start_date:
+                payment_info.start_date = start_date
             payment_info.save()
             messages.success(request, f"'{group.name}' guruhi to‘lov ma'lumotlari yangilandi.", extra_tags='payment_success')
         else:
             GroupPaymentInfo.objects.create(
                 group=group,
                 course_duration_months=duration,
-                monthly_fee=monthly_fee
+                monthly_fee=monthly_fee,
+                start_date=start_date
             )
             messages.success(request, f"'{group.name}' guruhi to‘lov ma'lumotlari muvaffaqiyatli saqlandi.", extra_tags='payment_success')
 
         return redirect('group_payment_list')
 
+    initial_start_date = payment_info.start_date if (payment_info and payment_info.start_date) else (group.created_at.date() if group.created_at else timezone.now().date())
+
     return render(request, 'add_payment.html', {
         'group': group,
-        'payment_info': payment_info
+        'payment_info': payment_info,
+        'initial_start_date': initial_start_date
     })
 
 
@@ -2962,39 +2976,83 @@ def add_group_payment(request, group_id):
 # Guruhdagi o‘quvchilar ro‘yxati
 @subadmin_permission_required('manage_payments')
 def group_students(request, group_id):
-
+    from main.payment_cycle_service import get_student_payment_cycles
     group = get_object_or_404(Group, id=group_id)
     students = group.students.all()
+    
+    # Har bir o'quvchi uchun to'lov holati va davrlarini hisoblaymiz
+    students_data = []
+    for s in students:
+        cycles = get_student_payment_cycles(s, group)
+        paid_cycles = [c for c in cycles if c['status'] == 'paid']
+        due_unpaid = [c for c in cycles if c['is_due'] and c['remaining_debt'] > 0]
+        
+        last_paid_label = paid_cycles[-1]['label'] if paid_cycles else "To'lanmagan"
+        total_debt = sum(c['remaining_debt'] for c in due_unpaid)
+        
+        membership = GroupStudentMembership.objects.filter(student=s, group=group).first()
+        joined_at = membership.joined_at if membership else s.created_at
+
+        students_data.append({
+            'student': s,
+            'joined_at': joined_at,
+            'total_debt': total_debt,
+            'last_paid_label': last_paid_label,
+            'has_debt': total_debt > 0,
+            'cycles': cycles,
+        })
+
     months = [m[0] for m in StudentPayment.MONTH_CHOICES]
-    return render(request, "admin_group_students.html", {"group": group, "students": students, "months": months,})
+    return render(request, "admin_group_students.html", {
+        "group": group,
+        "students": students,
+        "students_data": students_data,
+        "months": months,
+    })
+
+
+@subadmin_permission_required('manage_payments')
+def api_get_student_cycles(request, group_id, student_id):
+    from main.payment_cycle_service import get_student_payment_cycles
+    group = get_object_or_404(Group, id=group_id)
+    student = get_object_or_404(CustomUser, id=student_id, role="student")
+    
+    cycles = get_student_payment_cycles(student, group)
+    return JsonResponse({
+        'status': 'success',
+        'student_name': student.get_full_name() or student.username,
+        'balance': float(student.balance or 0),
+        'cycles': cycles
+    })
+
 
 # O‘quvchi uchun to‘lov kiritish
 @subadmin_permission_required('manage_payments')
 def student_payment(request, group_id, student_id):
-
+    from main.payment_cycle_service import get_student_payment_cycles
     group = get_object_or_404(Group, id=group_id)
     student = get_object_or_404(CustomUser, id=student_id, role="student")
     payment_info = get_object_or_404(GroupPaymentInfo, group=group)
 
     if request.method == "POST":
-        month = request.POST.get("month")
+        month = request.POST.get("month", "").strip()
         amount_paid = request.POST.get("amount_paid")
         pay_from_balance = request.POST.get("pay_from_balance") == '1'
 
         if not month or not amount_paid:
             messages.error(request, "Barcha maydonlarni to‘ldiring!", extra_tags='import_success')
-            return redirect("student_payment", group_id=group.id, student_id=student.id)
+            return redirect("group_students", group_id=group.id)
 
         try:
             amount_paid_val = float(amount_paid)
         except ValueError:
             messages.error(request, "To'lov summasi noto'g'ri kiritildi.", extra_tags='import_success')
-            return redirect("student_payment", group_id=group.id, student_id=student.id)
+            return redirect("group_students", group_id=group.id)
 
         if pay_from_balance:
             if student.balance < amount_paid_val:
-                messages.error(request, "O'quvchi balansida yetarli mablag' mablag'lar mavjud emas!", extra_tags='import_success')
-                return redirect("student_payment", group_id=group.id, student_id=student.id)
+                messages.error(request, "O'quvchi balansida yetarli mablag' mavjud emas!", extra_tags='import_success')
+                return redirect("group_students", group_id=group.id)
 
             with transaction.atomic():
                 student.refresh_from_db()
@@ -3005,8 +3063,27 @@ def student_payment(request, group_id, student_id):
                     student=student,
                     amount=-amount_paid_val,
                     transaction_type='payment',
-                    description=f"Guruh {group.name} uchun {month} oyi to'lovi hamyondan yechildi."
+                    description=f"Guruh {group.name} uchun {month} to'lovi hamyondan yechildi."
                 )
+
+        # Davr parametrlarini aniqlaymiz
+        cycle_number = None
+        period_start = None
+        period_end = None
+        
+        cycles = get_student_payment_cycles(student, group)
+        for c in cycles:
+            if c['label'] == month or month.startswith(f"{c['cycle_number']}-oy"):
+                cycle_number = c['cycle_number']
+                if isinstance(c['start_date'], str):
+                    period_start = datetime.strptime(c['start_date'], '%Y-%m-%d').date()
+                else:
+                    period_start = c['start_date']
+                if isinstance(c['end_date'], str):
+                    period_end = datetime.strptime(c['end_date'], '%Y-%m-%d').date()
+                else:
+                    period_end = c['end_date']
+                break
 
         # To‘lov yozuvini yaratamiz va saqlaymiz
         payment = StudentPayment.objects.create(
@@ -3014,8 +3091,11 @@ def student_payment(request, group_id, student_id):
             group=group,
             month=month,
             amount_paid=amount_paid_val,
+            cycle_number=cycle_number,
+            period_start=period_start,
+            period_end=period_end,
         )
-        log_action(request.user, "To'lov Kiritildi", f"{student.get_full_name()} uchun {group.name} guruhiga {month} oyi uchun {amount_paid_val} so'm to'lov kiritildi. (ID: {payment.id})", request)
+        log_action(request.user, "To'lov Kiritildi", f"{student.get_full_name()} uchun {group.name} guruhiga {month} to'lovi ({amount_paid_val} so'm) kiritildi. (ID: {payment.id})", request)
 
         # PDF linkni yaratamiz
         pdf_url = reverse("payment_receipt", args=[payment.id])
@@ -3029,7 +3109,7 @@ def student_payment(request, group_id, student_id):
                     f"<b>Yangi To'lov Qabul Qilindi</b> ✅\n\n"
                     f"<b>O'quvchi:</b> {student.get_full_name()}\n"
                     f"<b>Guruh:</b> {group.name}\n"
-                    f"<b>Oy:</b> {payment.get_month_display()}\n"
+                    f"<b>To'lov davri:</b> {payment.month}\n"
                     f"<b>To'lov summasi:</b> {formatted_amount} so'm\n\n"
                     f"Sizning to'lovingiz tizimga muvaffaqiyatli kiritildi. Rahmat!\n\n"
                     f"ℹ️ <i>To'lov chekini shaxsiy profilingizga (lms.upcode.uz) kirib, to'lovlar tarixidan yuklab olishingiz mumkin.</i>"
@@ -3641,142 +3721,54 @@ from django.db.models import Sum
 
 @subadmin_permission_required('manage_payments')
 def debtors_list(request):
-
-    MONTH_MAPPING = {
-        1: "Yanvar", 2: "Fevral", 3: "Mart", 4: "Aprel",
-        5: "May", 6: "Iyun", 7: "Iyul", 8: "Avgust",
-        9: "Sentabr", 10: "Oktabr", 11: "Noyabr", 12: "Dekabr"
-    }
-    
-    current_month_num = timezone.now().month
-    default_month = MONTH_MAPPING.get(current_month_num, "Yanvar")
-    
-    selected_month = request.GET.get('month', default_month)
+    from main.payment_cycle_service import get_all_group_debtors
     selected_group_id = request.GET.get('group', 'all')
-    
     groups = Group.objects.select_related('payment_info').all()
-    
-    if selected_group_id != 'all':
-        groups_to_check = groups.filter(id=selected_group_id)
-    else:
-        groups_to_check = groups
 
-    debtors = []
-
-    for group in groups_to_check:
-        if not hasattr(group, 'payment_info'):
-            continue
-        
-        monthly_fee = group.payment_info.monthly_fee
-        if monthly_fee <= 0:
-            continue
-        
-        students = group.students.all()
-        
-        for student in students:
-            total_paid = StudentPayment.objects.filter(
-                student=student,
-                group=group,
-                month=selected_month
-            ).aggregate(total=Sum('amount_paid'))['total'] or 0
-            
-            if total_paid < monthly_fee:
-                debt_amount = monthly_fee - total_paid
-                student_name = f"{student.first_name} {student.last_name}" if (student.first_name or student.last_name) else student.username
-                
-                # Pre-filled telegram message text
-                msg = f"Salom! Hurmatli {student_name}, {group.name} guruhi uchun {selected_month} oyi to'lovidan {int(debt_amount):,} so'm qarzdorligingiz mavjud. Iltimos, to'lovni tez orada amalga oshiring. Rahmat!"
-                tg_share_url = f"https://t.me/share/url?text={urllib.parse.quote(msg)}"
-                
-                debtors.append({
-                    'student': student,
-                    'student_name': student_name,
-                    'group': group,
-                    'monthly_fee': monthly_fee,
-                    'total_paid': total_paid,
-                    'debt_amount': debt_amount,
-                    'telegram_url': tg_share_url,
-                    'raw_message': msg,
-                })
-                
-    debtors.sort(key=lambda x: x['debt_amount'], reverse=True)
-    months = [m for m in MONTH_MAPPING.values()]
+    debtors = get_all_group_debtors(selected_group_id)
 
     return render(request, 'debtors_list.html', {
         'debtors': debtors,
         'groups': groups,
-        'months': months,
-        'selected_month': selected_month,
         'selected_group_id': selected_group_id,
     })
 
 
 @subadmin_permission_required('manage_payments')
 def export_debtors_csv(request):
-
-    MONTH_MAPPING = {
-        1: "Yanvar", 2: "Fevral", 3: "Mart", 4: "Aprel",
-        5: "May", 6: "Iyun", 7: "Iyul", 8: "Avgust",
-        9: "Sentabr", 10: "Oktabr", 11: "Noyabr", 12: "Dekabr"
-    }
-    
-    current_month_num = timezone.now().month
-    default_month = MONTH_MAPPING.get(current_month_num, "Yanvar")
-    
-    selected_month = request.GET.get('month', default_month)
+    from main.payment_cycle_service import get_all_group_debtors
     selected_group_id = request.GET.get('group', 'all')
-    
-    groups = Group.objects.select_related('payment_info').all()
-    if selected_group_id != 'all':
-        groups_to_check = groups.filter(id=selected_group_id)
-    else:
-        groups_to_check = groups
+    debtors = get_all_group_debtors(selected_group_id)
 
     import tablib
     headers = [
         "O'quvchi", 
         "Telefon raqami", 
         "Guruh", 
-        "To'lov oyi", 
+        "Qarzdorlik davri", 
         "Kurs narxi (so'm)", 
         "To'lagan (so'm)", 
         "Qarz miqdori (so'm)"
     ]
     data = tablib.Dataset(headers=headers)
 
-    for group in groups_to_check:
-        if not hasattr(group, 'payment_info'):
-            continue
-        monthly_fee = group.payment_info.monthly_fee
-        if monthly_fee <= 0:
-            continue
-        
-        students = group.students.all()
-        for student in students:
-            total_paid = StudentPayment.objects.filter(
-                student=student,
-                group=group,
-                month=selected_month
-            ).aggregate(total=Sum('amount_paid'))['total'] or 0
-            
-            if total_paid < monthly_fee:
-                debt_amount = monthly_fee - total_paid
-                student_name = f"{student.first_name} {student.last_name}" if (student.first_name or student.last_name) else student.username
-                data.append([
-                    student_name,
-                    student.phone_number,
-                    group.name,
-                    selected_month,
-                    float(monthly_fee),
-                    float(total_paid),
-                    float(debt_amount)
-                ])
+    for d in debtors:
+        phone = d['student'].phone_number or '-'
+        data.append([
+            d['student_name'],
+            phone,
+            d['group'].name,
+            d.get('period_label', '-'),
+            float(d['monthly_fee']),
+            float(d['total_paid']),
+            float(d['debt_amount'])
+        ])
 
     response = HttpResponse(
         data.export('xlsx'),
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-    response['Content-Disposition'] = f'attachment; filename="qarzdorlar_{selected_month}.xlsx"'
+    response['Content-Disposition'] = f'attachment; filename="qarzdorlar_{timezone.now().strftime("%Y_%m_%d")}.xlsx"'
     return response
 
 
@@ -4516,12 +4508,28 @@ def get_student_discount(request, group_id, student_id, month):
     student = get_object_or_404(CustomUser, id=student_id, role="student")
 
     MONTH_NAMES = ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"]
-    MONTH_NUMBERS = {name: idx + 1 for idx, name in enumerate(MONTH_NAMES)}
+    MONTH_NUMBERS = {name.lower(): idx + 1 for idx, name in enumerate(MONTH_NAMES)}
 
-    if month not in MONTH_NUMBERS:
-        return JsonResponse({'error': 'Noto\'g\'ri oy'}, status=400)
+    current_month_num = None
+    month_str = (month or "").strip().lower()
+    if month_str in MONTH_NUMBERS:
+        current_month_num = MONTH_NUMBERS[month_str]
+    else:
+        import re
+        date_match = re.search(r'(\d{2})\.(\d{2})\.(\d{4})', month_str)
+        if date_match:
+            try:
+                current_month_num = int(date_match.group(2))
+            except ValueError:
+                pass
+        if not current_month_num:
+            for name, num in MONTH_NUMBERS.items():
+                if name in month_str:
+                    current_month_num = num
+                    break
 
-    current_month_num = MONTH_NUMBERS[month]
+    if not current_month_num:
+        current_month_num = timezone.now().month
 
     if current_month_num == 1:
         prev_month_num = 12

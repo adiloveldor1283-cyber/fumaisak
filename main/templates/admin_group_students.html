@@ -190,7 +190,7 @@
     </div>
 </div>
 
-{% if students %}
+{% if students_data %}
 <div class="jadval-container" style="flex-grow: 1; overflow-y: auto; overflow-x: auto; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
     <table class="group-table" style="width: 100%; border-collapse: collapse; text-align: left;">
         <thead>
@@ -200,38 +200,38 @@
                 <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">ISMI</th>
                 <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">SHARIFI</th>
                 <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">QO'SHILGAN SANA</th>
-                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">GURUHLARI</th>
+                <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">TO'LOV HOLATI</th>
                 <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">HOLATI</th>
                 <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: #080d1a;">TO'LOV AMALI</th>
             </tr>
         </thead>
         <tbody id="group-body">
-            {% for student in students %}
+            {% for item in students_data %}
             <tr>
                 <td data-label="№" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
-                <td data-label="FAMILIYASI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ student.last_name }}</td>
-                <td data-label="ISMI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ student.first_name }}</td>
-                <td data-label="SHARIFI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: rgba(255, 255, 255, 0.85);">{{ student.middle_name|default:"-" }}</td>
-                <td data-label="QO'SHILGAN SANA" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ student.joined_at|date:"d.m.Y H:i" }}</td>
-                <td data-label="GURUHLARI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
-                    {% if student.student_groups.all %}
-                        {% for group in student.student_groups.all %}
-                            <span style="background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; font-size: 12px; margin-right: 4px;">{{ group.name }}</span>
-                        {% endfor %}
+                <td data-label="FAMILIYASI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ item.student.last_name }}</td>
+                <td data-label="ISMI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ item.student.first_name }}</td>
+                <td data-label="SHARIFI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: rgba(255, 255, 255, 0.85);">{{ item.student.middle_name|default:"-" }}</td>
+                <td data-label="QO'SHILGAN SANA" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ item.joined_at|date:"d.m.Y" }}</td>
+                <td data-label="TO'LOV HOLATI" style="padding: 16px 20px; font-size: 13.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                    {% if item.has_debt %}
+                        <span style="color: #ff4a5a; font-weight: 800;"><i class="fas fa-exclamation-circle" style="font-size: 12px; margin-right: 4px;"></i> Qarz: {{ item.total_debt|floatformat:0 }} so'm</span>
+                        <div style="font-size: 11.5px; color: rgba(255,255,255,0.4); margin-top: 3px;">So'nggi: {{ item.last_paid_label }}</div>
                     {% else %}
-                        <span style="color: rgba(255,255,255,0.3)">Yo'q</span>
+                        <span style="color: #00ffaa; font-weight: 700;"><i class="fas fa-check-circle" style="font-size: 12px; margin-right: 4px;"></i> To'liq to'langan</span>
+                        <div style="font-size: 11.5px; color: rgba(255,255,255,0.4); margin-top: 3px;">{{ item.last_paid_label }}</div>
                     {% endif %}
                 </td>
                 <td data-label="HOLATI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
-                    {% if student.is_active %}
+                    {% if item.student.is_active %}
                         <span class="status-badge status-active" data-status="faol" style="padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(0, 255, 170, 0.1); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.2);">Faol</span>
                     {% else %}
                         <span class="status-badge status-blocked" data-status="bloklangan" style="padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; background: rgba(255, 0, 85, 0.1); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.2);">Bloklangan</span>
                     {% endif %}
                 </td>
                 <td data-label="TO'LOV AMALI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
-                    <button class="btn-otish" onclick="openModal('{{ student.id }}', '{{ student.get_full_name }}', '{{ student.balance }}')" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">
-                        To'lov qo'shish
+                    <button class="btn-otish" onclick="openModal('{{ item.student.id }}', '{{ item.student.get_full_name }}', '{{ item.student.balance }}')" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">
+                        <i class="fas fa-plus-circle" style="margin-right: 4px;"></i> To'lov qo'shish
                     </button>
                 </td>
             </tr>
@@ -262,10 +262,11 @@
 
         rows.forEach(row => {
             const lastName = row.children[1].textContent.toLowerCase();
+            const firstName = row.children[2].textContent.toLowerCase();
             const statusSpan = row.querySelector('.status-badge');
             const status = statusSpan ? statusSpan.getAttribute('data-status') : '';
 
-            const matchesQuery = lastName.includes(query);
+            const matchesQuery = lastName.includes(query) || firstName.includes(query);
             const matchesStatus = !selectedStatus || status === selectedStatus;
 
             row.style.display = (matchesQuery && matchesStatus) ? '' : 'none';
@@ -286,7 +287,41 @@
         document.getElementById("paymentForm").action = "{% url 'student_payment' group.id 0 %}".replace("/0/", "/" + studentId + "/");
         document.getElementById("paymentModal").style.display = "flex";
         document.getElementById("pay_from_balance_checkbox").checked = false;
-        fetchStudentDiscount();
+        
+        const monthSelect = document.getElementById("month");
+        monthSelect.innerHTML = '<option value="">To\'lov davrlari yuklanmoqda...</option>';
+        
+        fetch(`/adminpanel/api/get-student-cycles/{{ group.id }}/${studentId}/`)
+            .then(res => res.json())
+            .then(data => {
+                monthSelect.innerHTML = '';
+                if (data.cycles && data.cycles.length > 0) {
+                    let firstUnpaidIndex = -1;
+                    data.cycles.forEach((cycle, idx) => {
+                        const opt = document.createElement('option');
+                        opt.value = cycle.label;
+                        opt.textContent = `${cycle.label} — ${cycle.status_label}`;
+                        opt.style.backgroundColor = '#0c101d';
+                        opt.style.color = cycle.status === 'paid' ? '#00ffaa' : (cycle.status === 'unpaid' ? '#ff808b' : '#ffffff');
+                        opt.dataset.remainingDebt = cycle.remaining_debt;
+                        opt.dataset.monthlyFee = cycle.monthly_fee;
+                        monthSelect.appendChild(opt);
+                        if (cycle.status !== 'paid' && firstUnpaidIndex === -1) {
+                            firstUnpaidIndex = idx;
+                        }
+                    });
+                    if (firstUnpaidIndex !== -1) {
+                        monthSelect.selectedIndex = firstUnpaidIndex;
+                    }
+                } else {
+                    monthSelect.innerHTML = '<option value="">Davrlar topilmadi</option>';
+                }
+                fetchStudentDiscount();
+            })
+            .catch(err => {
+                console.error("Cycles load error:", err);
+                fetchStudentDiscount();
+            });
     }
 
     function fetchStudentDiscount() {
@@ -296,7 +331,7 @@
         const discountReason = document.getElementById("discountReason");
         const amountField = document.getElementById("amount_paid");
 
-        if (!currentStudentIdForDiscount) return;
+        if (!currentStudentIdForDiscount || !month) return;
 
         discountContainer.style.display = "block";
         discountBadge.innerText = "Yuklanmoqda...";
@@ -304,7 +339,11 @@
         discountBadge.style.background = "rgba(255,255,255,0.05)";
         discountBadge.style.border = "1px solid rgba(255,255,255,0.1)";
 
-        fetch(`/adminpanel/api/get-discount/{{ group.id }}/${currentStudentIdForDiscount}/${month}/`)
+        // Get selected option to check remaining debt
+        const selectedOpt = document.getElementById("month").selectedOptions[0];
+        const remainingDebt = selectedOpt ? parseFloat(selectedOpt.dataset.remainingDebt) : null;
+
+        fetch(`/adminpanel/api/get-discount/{{ group.id }}/${currentStudentIdForDiscount}/${encodeURIComponent(month)}/`)
             .then(res => res.json())
             .then(data => {
                 if (data.discount_percent > 0) {
@@ -322,17 +361,27 @@
                     discountBadge.style.color = "rgba(255,255,255,0.4)";
                     discountBadge.style.border = "1px solid rgba(255,255,255,0.1)";
                     discountReason.innerText = data.reason;
-                    amountField.value = data.final_amount;
+                    
+                    if (remainingDebt !== null && remainingDebt > 0 && remainingDebt < data.final_amount) {
+                        amountField.value = remainingDebt;
+                    } else {
+                        amountField.value = data.final_amount;
+                    }
                 }
             })
             .catch(err => {
                 console.error("Discount loading error:", err);
                 discountContainer.style.display = "none";
+                if (remainingDebt !== null && remainingDebt > 0) {
+                    amountField.value = remainingDebt;
+                }
             });
     }
+
     function closeModal() {
         document.getElementById("paymentModal").style.display = "none";
     }
+
     window.onclick = function(event) {
         let modal = document.getElementById("paymentModal");
         if (event.target === modal) {

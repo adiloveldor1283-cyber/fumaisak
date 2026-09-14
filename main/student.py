@@ -932,53 +932,19 @@ def student_payment_view(request):
                     'desc': f"O'tgan oyda davomat {round(attendance_rate * 100)}% va o'rtacha ball {round(avg_score)}%"
                 }
 
-        # Calculate monthly debt breakdown
-        now_dt = timezone.now()
-        start_year = m.joined_at.year
-        start_month = m.joined_at.month
-        
-        end_year = now_dt.year
-        end_month = now_dt.month
-        
-        monthly_fee = payment_info.monthly_fee
-        course_duration = payment_info.course_duration_months
-        
+        # Calculate monthly debt breakdown using cycle service
+        from main.payment_cycle_service import get_student_payment_cycles
+        cycles = get_student_payment_cycles(student, group)
         monthly_debts = []
-        if monthly_fee > 0:
-            curr_year = start_year
-            curr_month = start_month
-            count = 0
-            
-            MONTH_MAPPING = {
-                1: "Yanvar", 2: "Fevral", 3: "Mart", 4: "Aprel",
-                5: "May", 6: "Iyun", 7: "Iyul", 8: "Avgust",
-                9: "Sentabr", 10: "Oktabr", 11: "Noyabr", 12: "Dekabr"
-            }
-            
-            while count < course_duration:
-                if (curr_year > end_year) or (curr_year == end_year and curr_month > end_month):
-                    break
-                    
-                month_name = MONTH_MAPPING[curr_month]
-                
-                # How much paid for this specific month in this group
-                paid_for_month = sum(p.amount_paid for p in group_payments if p.month == month_name)
-                
-                if paid_for_month < monthly_fee:
-                    debt_amt = monthly_fee - paid_for_month
-                    monthly_debts.append({
-                        'month': month_name,
-                        'year': curr_year,
-                        'fee': monthly_fee,
-                        'paid': paid_for_month,
-                        'debt': debt_amt
-                    })
-                    
-                curr_month += 1
-                if curr_month > 12:
-                    curr_month = 1
-                    curr_year += 1
-                count += 1
+        for c in cycles:
+            if c['is_due'] and c['remaining_debt'] > 0:
+                monthly_debts.append({
+                    'month': c['label'],
+                    'year': c['start_date_str'],
+                    'fee': c['monthly_fee'],
+                    'paid': c['total_paid'],
+                    'debt': c['remaining_debt']
+                })
 
         sorted_group_payments = sorted(group_payments, key=lambda x: x.paid_at, reverse=True)
 
@@ -991,7 +957,8 @@ def student_payment_view(request):
             'total_paid': total_paid,
             'remaining': payment_info.total_fee() - total_paid,
             'badge': badge,
-            'monthly_debts': monthly_debts
+            'monthly_debts': monthly_debts,
+            'cycles': cycles
         })
 
     context = {

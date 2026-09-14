@@ -313,11 +313,19 @@ class GroupPaymentInfo(models.Model):
     group = models.OneToOneField(Group, on_delete=models.CASCADE, related_name="payment_info")
     course_duration_months = models.PositiveIntegerField(verbose_name="Kurs davomiyligi (oy)")
     monthly_fee = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Har oy uchun to'lov summasi")
+    start_date = models.DateField(null=True, blank=True, verbose_name="To'lov boshlanish sanasi")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def total_fee(self):
         return self.course_duration_months * self.monthly_fee
+
+    def get_start_date(self):
+        if self.start_date:
+            return self.start_date
+        if self.group and self.group.created_at:
+            return self.group.created_at.date()
+        return timezone.now().date()
 
     def __str__(self):
         return f"{self.group.name} - {self.monthly_fee} so'm/oy"
@@ -341,9 +349,15 @@ class StudentPayment(models.Model):
 
     student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'role': 'student'}, db_index=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, db_index=True)
-    month = models.CharField(max_length=20, choices=MONTH_CHOICES, db_index=True)
+    month = models.CharField(max_length=120, db_index=True)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    cycle_number = models.PositiveIntegerField(null=True, blank=True, verbose_name="Oy tartib raqami")
+    period_start = models.DateField(null=True, blank=True, verbose_name="To'lov davri boshlanishi")
+    period_end = models.DateField(null=True, blank=True, verbose_name="To'lov davri tugashi")
     paid_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    def get_month_display(self):
+        return self.month
 
     def __str__(self):
         return f"{self.student} - {self.month} - {self.amount_paid}"

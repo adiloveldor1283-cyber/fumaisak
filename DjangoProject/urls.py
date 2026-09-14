@@ -90,6 +90,7 @@ urlpatterns = [
     path('adminpanel/audit-logs/', adminpanel.admin_audit_logs, name='admin_audit_logs'),
     path('adminpanel/api/financial-stats/', adminpanel.admin_financial_stats_api, name='admin_financial_stats_api'),
     path('adminpanel/api/warning-students/', adminpanel.admin_warning_students_api, name='admin_warning_students_api'),
+    path('adminpanel/api/get-student-cycles/<int:group_id>/<int:student_id>/', adminpanel.api_get_student_cycles, name='api_get_student_cycles'),
     path('adminpanel/api/get-discount/<int:group_id>/<int:student_id>/<str:month>/', adminpanel.get_student_discount, name='get_student_discount'),
     path('teacher/api/past-questions/', teacher.teacher_past_questions_api, name='teacher_past_questions_api'),
     path('adminpanel/student-password/<int:student_id>/', adminpanel.reset_student_password, name='student_password'),
