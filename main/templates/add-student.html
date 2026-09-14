@@ -242,126 +242,198 @@
         }
         .btn-submit, .btn-cancel {
             width: 100%;
+        }
+    }
+
     /* --- LIGHT MODE SPECIFIC OVERRIDES --- */
     html.light-theme .form-card,
-    body.light-theme .form-card,
-    body.light-mode .form-card {
+    body.light-theme .form-card {
         background: #ffffff !important;
         border: 1px solid #cbd5e1 !important;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
     }
     html.light-theme .sarlavha,
-    body.light-theme .sarlavha,
-    body.light-mode .sarlavha {
+    body.light-theme .sarlavha {
         color: #0f172a !important;
+        border-left-color: #0284c7 !important;
     }
     html.light-theme .btn-otish,
-    body.light-theme .btn-otish,
-    body.light-mode .btn-otish {
+    body.light-theme .btn-otish {
         background: #f1f5f9 !important;
         border: 1px solid #cbd5e1 !important;
         color: #334155 !important;
     }
     html.light-theme .btn-otish:hover,
-    body.light-theme .btn-otish:hover,
-    body.light-mode .btn-otish:hover {
+    body.light-theme .btn-otish:hover {
         background: #e2e8f0 !important;
-    }
-    html.light-theme .form-group label,
-    body.light-theme .form-group label,
-    body.light-mode .form-group label {
-        color: #475569 !important;
-    }
-    html.light-theme .form-control,
-    body.light-theme .form-control,
-    body.light-mode .form-control {
-        background: #ffffff !important;
-        border: 1px solid #cbd5e1 !important;
         color: #0f172a !important;
     }
+    html.light-theme .section-title,
+    body.light-theme .section-title {
+        background: #f0f9ff !important;
+        border-left: 4px solid #0284c7 !important;
+        color: #0284c7 !important;
+    }
+    html.light-theme .form-group label,
+    body.light-theme .form-group label {
+        color: #334155 !important;
+    }
+    html.light-theme .form-control,
+    body.light-theme .form-control {
+        background: #ffffff !important;
+        border: 1.5px solid #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    html.light-theme .form-control:focus,
+    body.light-theme .form-control:focus {
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
+    }
+    html.light-theme .form-control::placeholder,
+    body.light-theme .form-control::placeholder {
+        color: #94a3b8 !important;
+    }
     html.light-theme select.form-control option,
-    body.light-theme select.form-control option,
-    body.light-mode select.form-control option {
+    body.light-theme select.form-control option {
         background: #ffffff !important;
         color: #0f172a !important;
     }
     html.light-theme .info,
-    body.light-theme .info,
-    body.light-mode .info {
+    body.light-theme .info {
         color: #64748b !important;
     }
     html.light-theme .btn-channel-tab,
-    body.light-theme .btn-channel-tab,
-    body.light-mode .btn-channel-tab {
+    body.light-theme .btn-channel-tab {
         background: #f8fafc !important;
-        border: 1px solid #cbd5e1 !important;
-        color: #64748b !important;
+        border: 1.5px solid #cbd5e1 !important;
+        color: #475569 !important;
+        font-weight: 700 !important;
     }
     html.light-theme .btn-channel-tab:hover,
-    body.light-theme .btn-channel-tab:hover,
-    body.light-mode .btn-channel-tab:hover {
-        background: #f1f5f9 !important;
+    body.light-theme .btn-channel-tab:hover {
+        background: #e2e8f0 !important;
+        border-color: #94a3b8 !important;
         color: #0f172a !important;
     }
     html.light-theme .btn-channel-tab.active-tg,
-    body.light-theme .btn-channel-tab.active-tg,
-    body.light-mode .btn-channel-tab.active-tg {
-        background: rgba(2, 132, 199, 0.12) !important;
-        border-color: #0284c7 !important;
+    body.light-theme .btn-channel-tab.active-tg {
+        background: #e0f2fe !important;
+        border: 2px solid #0284c7 !important;
         color: #0284c7 !important;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.18) !important;
     }
     html.light-theme .btn-channel-tab.active-sms,
-    body.light-theme .btn-channel-tab.active-sms,
-    body.light-mode .btn-channel-tab.active-sms {
-        background: rgba(14, 165, 233, 0.12) !important;
-        border-color: #0ea5e9 !important;
-        color: #0ea5e9 !important;
+    body.light-theme .btn-channel-tab.active-sms {
+        background: #e0f2fe !important;
+        border: 2px solid #0284c7 !important;
+        color: #0284c7 !important;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.18) !important;
+    }
+    html.light-theme .btn-otp-action,
+    body.light-theme .btn-otp-action {
+        background: #e0f2fe !important;
+        border: 1.5px solid #0284c7 !important;
+        color: #0284c7 !important;
+    }
+    html.light-theme .btn-otp-action:hover:not(:disabled),
+    body.light-theme .btn-otp-action:hover:not(:disabled) {
+        background: #0284c7 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25) !important;
+    }
+    html.light-theme .btn-otp-action:disabled,
+    body.light-theme .btn-otp-action:disabled {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #94a3b8 !important;
+    }
+    html.light-theme #otp-verification-box,
+    body.light-theme #otp-verification-box {
+        background: #f0fdf4 !important;
+        border: 1.5px dashed #10b981 !important;
+    }
+    html.light-theme #otp-verification-box label,
+    body.light-theme #otp-verification-box label {
+        color: #047857 !important;
+    }
+    html.light-theme #otp-verification-box #otp-countdown,
+    body.light-theme #otp-verification-box #otp-countdown {
+        color: #64748b !important;
+    }
+    html.light-theme #otp-input,
+    body.light-theme #otp-input {
+        background: #ffffff !important;
+        border: 1.5px solid #10b981 !important;
+        color: #047857 !important;
+    }
+    html.light-theme #otp-input::placeholder,
+    body.light-theme #otp-input::placeholder {
+        color: #94a3b8 !important;
+    }
+    html.light-theme .btn-otp-verify,
+    body.light-theme .btn-otp-verify {
+        background: linear-gradient(135deg, #10b981, #059669) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
+    }
+    html.light-theme #phone-verified-badge,
+    body.light-theme #phone-verified-badge {
+        background: #ecfdf5 !important;
+        border: 1.5px solid #a7f3d0 !important;
+        color: #059669 !important;
     }
     html.light-theme .radio-konteyner,
-    body.light-theme .radio-konteyner,
-    body.light-mode .radio-konteyner {
+    body.light-theme .radio-konteyner {
         background: #f8fafc !important;
-        border: 1px solid #cbd5e1 !important;
+        border: 1.5px solid #cbd5e1 !important;
     }
     html.light-theme .radio-konteyner label,
-    body.light-theme .radio-konteyner label,
-    body.light-mode .radio-konteyner label {
+    body.light-theme .radio-konteyner label {
         color: #0f172a !important;
     }
+    html.light-theme .btn-submit,
+    body.light-theme .btn-submit {
+        background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3) !important;
+    }
     html.light-theme .btn-cancel,
-    body.light-theme .btn-cancel,
-    body.light-mode .btn-cancel {
+    body.light-theme .btn-cancel {
         background: #f1f5f9 !important;
-        border: 1px solid #cbd5e1 !important;
+        border: 1.5px solid #cbd5e1 !important;
         color: #475569 !important;
     }
     html.light-theme .btn-cancel:hover,
-    body.light-theme .btn-cancel:hover,
-    body.light-mode .btn-cancel:hover {
+    body.light-theme .btn-cancel:hover {
         background: #e2e8f0 !important;
         color: #0f172a !important;
     }
     html.light-theme .notice-box-legal,
-    body.light-theme .notice-box-legal,
-    body.light-mode .notice-box-legal {
-        background: rgba(2, 132, 199, 0.06) !important;
-        border-color: rgba(2, 132, 199, 0.25) !important;
+    body.light-theme .notice-box-legal {
+        background: #f0f9ff !important;
+        border: 1.5px solid #bae6fd !important;
+    }
+    html.light-theme .notice-box-legal div[style*="background"],
+    body.light-theme .notice-box-legal div[style*="background"] {
+        background: #e0f2fe !important;
+        color: #0284c7 !important;
+    }
+    html.light-theme .notice-box-legal strong,
+    body.light-theme .notice-box-legal strong {
+        color: #0284c7 !important;
     }
     html.light-theme .notice-box-legal .notice-text,
-    body.light-theme .notice-box-legal .notice-text,
-    body.light-mode .notice-box-legal .notice-text {
+    body.light-theme .notice-box-legal .notice-text {
         color: #334155 !important;
     }
     html.light-theme #tg-guide-box,
-    body.light-theme #tg-guide-box,
-    body.light-mode #tg-guide-box {
-        background: rgba(2, 132, 199, 0.08) !important;
-        border-color: rgba(2, 132, 199, 0.3) !important;
+    body.light-theme #tg-guide-box {
+        background: #f0f9ff !important;
+        border: 1.5px solid #bae6fd !important;
         color: #1e293b !important;
     }
     html.light-theme #tg-guide-box strong,
-    body.light-theme #tg-guide-box strong,
-    body.light-mode #tg-guide-box strong {
+    body.light-theme #tg-guide-box strong {
         color: #0284c7 !important;
     }
 </style>
