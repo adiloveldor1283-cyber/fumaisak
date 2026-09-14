@@ -65,7 +65,7 @@ def check_attendance_eligibility(teacher, group):
     Davomat topshirish mumkinligini tekshiradi.
     Qaytaradi: (allowed: bool, error_message: str | None)
     """
-    if group.is_closed or not group.is_active:
+    if group.is_closed or not group.is_active or "(yopilgan)" in group.name.lower():
         return False, "Ushbu guruh yopilgan (arxivlangan), unga davomat olib bo'lmaydi!"
 
     today = timezone.localdate()
@@ -426,7 +426,7 @@ def group_detail_view(request, group_id):
 
     # Dars yozish (POST)
     if request.method == 'POST' and request.POST.get('action') == 'add_lesson':
-        if group.is_closed or not group.is_active:
+        if group.is_closed or not group.is_active or "(yopilgan)" in group.name.lower():
             messages.error(request, "Yopilgan guruhga yangi dars mavzusi qo'shib bo'lmaydi!")
             return redirect('group_detail', group_id=group.id)
 
@@ -652,6 +652,10 @@ def add_questions(request, group_id):
 
     group = get_object_or_404(Group, id=group_id, teachers=teacher)
 
+    if group.is_closed or not group.is_active or "(yopilgan)" in group.name.lower():
+        messages.error(request, f"'{group.name}' guruhi yopilgan! Yopilgan guruhga yangi test tuzib bo'lmaydi.", extra_tags='test_modal')
+        return redirect('create_quiz')
+
     if request.method == 'POST':
         title = request.POST.get('title', '').strip()
         time_limit = request.POST.get('time_limit')
@@ -723,6 +727,10 @@ def quiz_detail(request, quiz_id):
     questions = quiz.questions.prefetch_related('answers')
 
     if request.method == 'POST':
+        if quiz.group and (quiz.group.is_closed or not quiz.group.is_active or "(yopilgan)" in quiz.group.name.lower()):
+            messages.error(request, "Yopilgan guruh testlarini tahrirlash cheklangan!", extra_tags='test_modal')
+            return redirect('create_quiz')
+
         # Quiz nomi va vaqtini yangilash
         quiz.title = request.POST.get('title', quiz.title)
         quiz.time_limit = int(request.POST.get('time_limit', quiz.time_limit))
@@ -951,6 +959,11 @@ def teacher_deadline(request):
 
         # Barcha maydonlar to‘ldirilganini tekshirish
         if title and group_id and deadline_str and file and max_score:
+            group = get_object_or_404(Group, id=group_id, teachers=teacher)
+            if group.is_closed or not group.is_active or "(yopilgan)" in group.name.lower():
+                messages.error(request, f"'{group.name}' guruhi yopilgan! Yopilgan guruhga yangi topshiriq yuklab bo'lmaydi.", extra_tags='topshir_modal')
+                return redirect('teacher_deadline')
+
             from main.validators import validate_document_file
             from django.core.exceptions import ValidationError
             try:
@@ -959,7 +972,8 @@ def teacher_deadline(request):
                 return render(request, 'teacher-upload-deadline.html', get_enriched_context(assignments_list, ve.message))
             try:
                 deadline = timezone.datetime.fromisoformat(deadline_str)
-                deadline = timezone.make_aware(deadline)  # timezone bilan
+                if timezone.is_naive(deadline):
+                    deadline = timezone.make_aware(deadline)
             except Exception:
                 return render(request, 'teacher-upload-deadline.html', get_enriched_context(assignments_list, "Noto‘g‘ri sana kiritildi."))
 
@@ -967,7 +981,6 @@ def teacher_deadline(request):
             if deadline < timezone.now() + timedelta(days=3):
                 return render(request, 'teacher-upload-deadline.html', get_enriched_context(assignments_list, "Topshiriq muddati kamida 3 kun keyingi sana bo‘lishi kerak."))
 
-            group = get_object_or_404(Group, id=group_id, teachers=teacher)
             assignment = Assignment.objects.create(
                 title=title,
                 teacher=teacher,
@@ -991,6 +1004,10 @@ def edit_assignment(request, assignment_id):
         return HttpResponseBadRequest("Faqat POST so‘rov qabul qilinadi.")
 
     assignment = get_object_or_404(Assignment, id=assignment_id, teacher=teacher)
+
+    if assignment.group and (assignment.group.is_closed or not assignment.group.is_active or "(yopilgan)" in assignment.group.name.lower()):
+        messages.error(request, "Yopilgan guruh topshiriqlarini tahrirlash cheklangan!", extra_tags='topshir_modal')
+        return redirect('teacher_deadline')
 
     # POST'dan kelgan ma'lumotlar
     new_title = request.POST.get('title')
@@ -1021,6 +1038,9 @@ def edit_assignment(request, assignment_id):
     if new_group_id and str(assignment.group.id) != str(new_group_id):
         try:
             new_group = Group.objects.get(id=new_group_id, teachers=teacher)
+            if new_group.is_closed or not new_group.is_active or "(yopilgan)" in new_group.name.lower():
+                messages.error(request, "Yopilgan guruhga topshiriqni ko'chirib bo'lmaydi!", extra_tags='topshir_modal')
+                return redirect('teacher_deadline')
             assignment.group = new_group
         except Group.DoesNotExist:
             return HttpResponseBadRequest("Guruh topilmadi.")
@@ -1360,6 +1380,9 @@ def teacher_media_gallery(request):
                 return redirect('teacher_media_gallery')
 
         group = get_object_or_404(Group, id=group_id, teachers=teacher)
+        if group.is_closed or not group.is_active or "(yopilgan)" in group.name.lower():
+            messages.error(request, f"'{group.name}' guruhi yopilgan! Yopilgan guruhga video dars yuklab bo'lmaydi.", extra_tags='video_toast')
+            return redirect('teacher_media_gallery')
 
         video = GroupVideo.objects.create(
             title=title,
@@ -1391,6 +1414,10 @@ def teacher_edit_video(request, video_id):
 
     video = get_object_or_404(GroupVideo, id=video_id, teacher=teacher)
 
+    if video.group and (video.group.is_closed or not video.group.is_active or "(yopilgan)" in video.group.name.lower()):
+        messages.error(request, "Yopilgan guruh video darslarini tahrirlash cheklangan!", extra_tags='video_toast')
+        return redirect('teacher_media_gallery')
+
     if request.method == 'POST':
         title = request.POST.get('title')
         description = request.POST.get('description')
@@ -1405,14 +1432,18 @@ def teacher_edit_video(request, video_id):
                 messages.error(request, err_msg)
                 return redirect('teacher_media_gallery')
 
+        if group_id and str(video.group.id) != str(group_id):
+            group = get_object_or_404(Group, id=group_id, teachers=teacher)
+            if group.is_closed or not group.is_active or "(yopilgan)" in group.name.lower():
+                messages.error(request, "Yopilgan guruhga video darsni o'tkazib bo'lmaydi!", extra_tags='video_toast')
+                return redirect('teacher_media_gallery')
+            video.group = group
+
         if title:
             video.title = title
         video.description = description
         if youtube_link is not None:
             video.youtube_link = youtube_link
-        if group_id:
-            group = get_object_or_404(Group, id=group_id, teachers=teacher)
-            video.group = group
         if video_file:
             video.video_file = video_file
 

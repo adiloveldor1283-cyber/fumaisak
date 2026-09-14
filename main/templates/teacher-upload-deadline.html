@@ -1555,7 +1555,11 @@
                         <!-- DESKTOP CELL 9: Amallar -->
                         <td class="desktop-only-cell" style="text-align: center;">
                             <div class="actions-cell-wrap" style="justify-content: center;">
-                                {% if not assignment.has_submissions %}
+                                {% if assignment.group.is_closed or not assignment.group.is_active or "(yopilgan)" in assignment.group.name %}
+                                    <span class="btn-action-disabled" title="Guruh yopilgan (Tahrirlash bloklangan)">
+                                        <i class="fas fa-lock"></i> Qulflangan
+                                    </span>
+                                {% elif not assignment.has_submissions %}
                                     <a href="javascript:void(0);" class="btn-action-secondary edit-assignment-btn"
                                        data-assignment-id="{{ assignment.id }}"
                                        data-title="{{ assignment.title }}"
@@ -1618,7 +1622,11 @@
                 <select name="group_id" required>
                     <option value="" disabled selected>Guruhni tanlang...</option>
                     {% for group in groups %}
-                        <option value="{{ group.id }}">{{ group.name }}</option>
+                        {% if not group.is_active or "(yopilgan)" in group.name %}
+                            <option value="{{ group.id }}" disabled style="color: rgba(255,255,255,0.35);">{{ group.name }} (Yopilgan - Bloklangan)</option>
+                        {% else %}
+                            <option value="{{ group.id }}">{{ group.name }}</option>
+                        {% endif %}
                     {% endfor %}
                 </select>
 
@@ -1662,7 +1670,11 @@
                 <label><i class="fas fa-users" style="margin-right: 4px;"></i> Guruh:</label>
                 <select name="group_id" id="editGroup" required>
                     {% for group in groups %}
-                        <option value="{{ group.id }}">{{ group.name }}</option>
+                        {% if not group.is_active or "(yopilgan)" in group.name %}
+                            <option value="{{ group.id }}" disabled style="color: rgba(255,255,255,0.35);">{{ group.name }} (Yopilgan - Bloklangan)</option>
+                        {% else %}
+                            <option value="{{ group.id }}">{{ group.name }}</option>
+                        {% endif %}
                     {% endfor %}
                 </select>
 

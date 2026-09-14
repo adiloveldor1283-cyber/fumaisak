@@ -976,9 +976,15 @@
         </div>
         <div class="guruhlar-qatori">
             {% for group in groups %}
-                <a href="{% url 'add_questions' group.id %}" class="guruh-btn">
-                    <i class="fas fa-folder-plus"></i> {{ group.name }}
-                </a>
+                {% if not group.is_active or "(yopilgan)" in group.name %}
+                    <span class="guruh-btn" style="opacity: 0.5; cursor: not-allowed; background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.4);" title="Guruh yopilgan (Test tuzish bloklangan)">
+                        <i class="fas fa-lock"></i> {{ group.name }} (Yopilgan)
+                    </span>
+                {% else %}
+                    <a href="{% url 'add_questions' group.id %}" class="guruh-btn">
+                        <i class="fas fa-folder-plus"></i> {{ group.name }}
+                    </a>
+                {% endif %}
             {% empty %}
                 <div style="color: rgba(255,255,255,0.4); font-size: 13px; font-style: italic;">
                     Biriktirilgan guruhlar mavjud emas.

@@ -876,7 +876,12 @@
             <a href="{% url 'teacher_group_list' %}" class="btn-back-icon" title="Guruhlar ro'yxatiga qaytish">
                 <i class="fas fa-arrow-left"></i>
             </a>
-            <h2 class="group-title-heading">Guruh: {{ group.name }}</h2>
+            <h2 class="group-title-heading">
+                Guruh: {{ group.name }}
+                {% if not group.is_active or "(yopilgan)" in group.name %}
+                    <span style="display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba(255, 74, 90, 0.15); color: #ff4a5a; border: 1px solid rgba(255, 74, 90, 0.3); margin-left: 6px; vertical-align: middle;">Yopilgan</span>
+                {% endif %}
+            </h2>
         </div>
         <div class="group-actions-box">
             <form class="search-form" onsubmit="event.preventDefault();" id="search-form-block">
@@ -966,45 +971,55 @@
 
     <!-- TAB 2: LESSON JOURNAL -->
     <div id="tab-lessons" class="tab-content">
-        <!-- Yangi dars mavzusi yozish -->
-        <div class="lesson-card">
-            <h3 style="color: #ffffff; font-size: 14.5px; font-weight: 800; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;"><i class="fas fa-plus-circle" style="color: #00f2fe; margin-right: 6px;"></i> Yangi dars mavzusi va konspekt qo'shish</h3>
-            <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 12px;">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="add_lesson">
-                
-                <div class="lesson-form-row" style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <div style="flex: 2; min-width: 180px;">
-                        <label style="display: block; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px;">Dars mavzusi</label>
-                        <input type="text" name="topic" required placeholder="Masalan: Present Simple o'tildi" class="form-control">
-                    </div>
-                    <div style="flex: 1; min-width: 130px;">
-                        <label style="display: block; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px;">Sana</label>
-                        <input type="date" name="date" class="form-control">
-                    </div>
-                </div>
-
-                <div class="lesson-form-row" style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 180px;">
-                        <label style="display: block; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px;">Konspekt / Dars rejasi</label>
-                        <textarea name="notes" placeholder="Mavzuga oid tushuntirish..." rows="2" class="form-control" style="resize: vertical; font-family: inherit;"></textarea>
-                    </div>
-                    <div style="flex: 1; min-width: 180px;">
-                        <label style="display: block; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px;">Uyga vazifa</label>
-                        <textarea name="homework" placeholder="O'quvchilar uchun vazifa..." rows="2" class="form-control" style="resize: vertical; font-family: inherit;"></textarea>
-                    </div>
-                </div>
-
+        {% if not group.is_active or "(yopilgan)" in group.name %}
+            <!-- Guruh yopilganligi haqida ogohlantirish -->
+            <div class="lesson-card" style="background: rgba(255, 74, 90, 0.08); border: 1px solid rgba(255, 74, 90, 0.25); border-radius: 14px; padding: 18px 20px; color: #ff4a5a; font-weight: 600; font-size: 13.5px; display: flex; align-items: center; gap: 14px;">
+                <i class="fas fa-lock" style="font-size: 24px; flex-shrink: 0;"></i>
                 <div>
-                    <label style="display: block; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px;">Dars materiallari</label>
-                    <input type="file" name="file" class="form-control">
+                    Ushbu guruh yopilgan. Yangi dars mavzusi, konspekt yoki fayl yuklash cheklangan. Guruhning o'tilgan darslar tarixi bilan quyida tanishishingiz mumkin.
                 </div>
+            </div>
+        {% else %}
+            <!-- Yangi dars mavzusi yozish -->
+            <div class="lesson-card">
+                <h3 style="color: #ffffff; font-size: 14.5px; font-weight: 800; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;"><i class="fas fa-plus-circle" style="color: #00f2fe; margin-right: 6px;"></i> Yangi dars mavzusi va konspekt qo'shish</h3>
+                <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 12px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_lesson">
+                    
+                    <div class="lesson-form-row" style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <div style="flex: 2; min-width: 180px;">
+                            <label style="display: block; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px;">Dars mavzusi</label>
+                            <input type="text" name="topic" required placeholder="Masalan: Present Simple o'tildi" class="form-control">
+                        </div>
+                        <div style="flex: 1; min-width: 130px;">
+                            <label style="display: block; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px;">Sana</label>
+                            <input type="date" name="date" class="form-control">
+                        </div>
+                    </div>
 
-                <div>
-                    <button type="submit" class="guruh-btn"><i class="fas fa-save"></i> Darsni saqlash</button>
-                </div>
-            </form>
-        </div>
+                    <div class="lesson-form-row" style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 180px;">
+                            <label style="display: block; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px;">Konspekt / Dars rejasi</label>
+                            <textarea name="notes" placeholder="Mavzuga oid tushuntirish..." rows="2" class="form-control" style="resize: vertical; font-family: inherit;"></textarea>
+                        </div>
+                        <div style="flex: 1; min-width: 180px;">
+                            <label style="display: block; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px;">Uyga vazifa</label>
+                            <textarea name="homework" placeholder="O'quvchilar uchun vazifa..." rows="2" class="form-control" style="resize: vertical; font-family: inherit;"></textarea>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="display: block; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px;">Dars materiallari</label>
+                        <input type="file" name="file" class="form-control">
+                    </div>
+
+                    <div>
+                        <button type="submit" class="guruh-btn"><i class="fas fa-save"></i> Darsni saqlash</button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
 
         <!-- Darslar tarixi ro'yxati -->
         <div class="jadval-container">

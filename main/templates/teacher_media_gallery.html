@@ -1397,17 +1397,23 @@
                                     <i class="fas fa-play-circle"></i> Video darsni tomosha qilish
                                 </button>
 
-                                <a href="javascript:void(0);" class="btn-action-secondary edit-video-btn"
-                                   data-id="{{ video.id }}"
-                                   data-title="{{ video.title }}"
-                                   data-desc="{{ video.description|default:'' }}"
-                                   data-group="{{ video.group.id }}"
-                                   data-youtube="{{ video.youtube_link|default:'' }}">
-                                    <i class="fas fa-edit"></i> Tahrirlash
-                                </a>
+                                {% if video.group.is_closed or not video.group.is_active or "(yopilgan)" in video.group.name %}
+                                    <span class="btn-action-disabled" style="opacity: 0.5; cursor: not-allowed; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.4); border-radius: 10px; font-size: 12.5px; font-weight: 600;" title="Guruh yopilgan (Tahrirlash bloklangan)">
+                                        <i class="fas fa-lock"></i> Qulflangan
+                                    </span>
+                                {% else %}
+                                    <a href="javascript:void(0);" class="btn-action-secondary edit-video-btn"
+                                       data-id="{{ video.id }}"
+                                       data-title="{{ video.title }}"
+                                       data-desc="{{ video.description|default:'' }}"
+                                       data-group="{{ video.group.id }}"
+                                       data-youtube="{{ video.youtube_link|default:'' }}">
+                                        <i class="fas fa-edit"></i> Tahrirlash
+                                    </a>
+                                {% endif %}
 
                                 <a href="{% url 'teacher_delete_video' video.id %}" class="btn-action-danger"
-                                   onclick="return confirm('Haqiqatan ham bu video darsni o'chirmoqchisiz?')">
+                                   onclick="return confirm('Haqiqatan ham bu video darsni o\'chirmoqchisiz?')">
                                     <i class="fas fa-trash-alt"></i> O'chirish
                                 </a>
                             </div>
@@ -1459,14 +1465,20 @@
 
                         <!-- DESKTOP CELL 7: Tahrirlash -->
                         <td class="desktop-only-cell" style="text-align: center;">
-                            <a href="javascript:void(0);" class="btn-action-secondary edit-video-btn"
-                               data-id="{{ video.id }}"
-                               data-title="{{ video.title }}"
-                               data-desc="{{ video.description|default:'' }}"
-                               data-group="{{ video.group.id }}"
-                               data-youtube="{{ video.youtube_link|default:'' }}">
-                                <i class="fas fa-edit"></i> Tahrirlash
-                            </a>
+                            {% if video.group.is_closed or not video.group.is_active or "(yopilgan)" in video.group.name %}
+                                <span class="btn-action-disabled" style="opacity: 0.5; cursor: not-allowed; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.4); border-radius: 10px; font-size: 12.5px; font-weight: 600;" title="Guruh yopilgan (Tahrirlash bloklangan)">
+                                    <i class="fas fa-lock"></i> Qulflangan
+                                </span>
+                            {% else %}
+                                <a href="javascript:void(0);" class="btn-action-secondary edit-video-btn"
+                                   data-id="{{ video.id }}"
+                                   data-title="{{ video.title }}"
+                                   data-desc="{{ video.description|default:'' }}"
+                                   data-group="{{ video.group.id }}"
+                                   data-youtube="{{ video.youtube_link|default:'' }}">
+                                    <i class="fas fa-edit"></i> Tahrirlash
+                                </a>
+                            {% endif %}
                         </td>
 
                         <!-- DESKTOP CELL 8: O'chirish -->
@@ -1519,7 +1531,11 @@
                 <select name="group_id" required>
                     <option value="" disabled selected>Guruhni tanlang...</option>
                     {% for group in groups %}
-                        <option value="{{ group.id }}">{{ group.name }}</option>
+                        {% if not group.is_active or "(yopilgan)" in group.name %}
+                            <option value="{{ group.id }}" disabled style="color: rgba(255,255,255,0.35);">{{ group.name }} (Yopilgan - Bloklangan)</option>
+                        {% else %}
+                            <option value="{{ group.id }}">{{ group.name }}</option>
+                        {% endif %}
                     {% endfor %}
                 </select>
 
@@ -1562,7 +1578,11 @@
                 <label><i class="fas fa-users" style="margin-right: 4px;"></i> Guruh:</label>
                 <select name="group_id" id="editGroup" required>
                     {% for group in groups %}
-                        <option value="{{ group.id }}">{{ group.name }}</option>
+                        {% if not group.is_active or "(yopilgan)" in group.name %}
+                            <option value="{{ group.id }}" disabled style="color: rgba(255,255,255,0.35);">{{ group.name }} (Yopilgan - Bloklangan)</option>
+                        {% else %}
+                            <option value="{{ group.id }}">{{ group.name }}</option>
+                        {% endif %}
                     {% endfor %}
                 </select>
 

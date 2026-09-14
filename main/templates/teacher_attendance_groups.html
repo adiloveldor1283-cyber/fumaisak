@@ -541,16 +541,27 @@
                         <td>
                             <div class="group-info-wrap">
                                 <div class="group-icon-box"><i class="fas fa-users"></i></div>
-                                <span class="group-name-text">{{ group.name }}</span>
+                                <span class="group-name-text">
+                                    {{ group.name }}
+                                    {% if not group.is_active or "(yopilgan)" in group.name %}
+                                        <span style="display: inline-block; padding: 2px 7px; border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba(255, 74, 90, 0.15); color: #ff4a5a; border: 1px solid rgba(255, 74, 90, 0.3); margin-left: 6px;">Yopilgan</span>
+                                    {% endif %}
+                                </span>
                             </div>
                         </td>
                         <td>
                             <span class="date-badge"><i class="far fa-calendar-alt"></i> {{ group.created_at|date:"d.m.Y H:i" }}</span>
                         </td>
                         <td style="text-align: center;">
-                            <a href="#" onclick="checkClassAndTakeAttendance(event, {{ group.id }})" class="btn-action-primary">
-                                <i class="fas fa-calendar-check"></i> Davomat olish
-                            </a>
+                            {% if not group.is_active or "(yopilgan)" in group.name %}
+                                <span class="btn-action-disabled" style="display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 7px 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.4); border-radius: 10px; font-size: 12.5px; font-weight: 600; cursor: not-allowed;" title="Guruh yopilgan (Davomat olib bo'lmaydi)">
+                                    <i class="fas fa-lock"></i> Qulflangan
+                                </span>
+                            {% else %}
+                                <a href="#" onclick="checkClassAndTakeAttendance(event, {{ group.id }})" class="btn-action-primary">
+                                    <i class="fas fa-calendar-check"></i> Davomat olish
+                                </a>
+                            {% endif %}
                         </td>
                         <td style="text-align: center;">
                             <a href="{% url 'teacher_group_attendance' group.id %}" class="btn-action-secondary">
