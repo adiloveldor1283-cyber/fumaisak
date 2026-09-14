@@ -176,8 +176,8 @@ def admin_dashboard(request):
         'subj_counts': json.dumps(subj_counts),
         'att_present': att_present,
         'att_absent': att_absent,
-        'growth_months': json.dumps(growth_months),
-        'growth_counts': json.dumps(growth_counts),
+        'growth_months': growth_months,
+        'growth_counts': growth_counts,
     })
 
 @role_required(['admin', 'reception'])
@@ -4496,15 +4496,59 @@ def admin_audit_logs(request):
 
 @role_required(['admin', 'reception'])
 def admin_financial_stats_api(request):
+    import re
+    from collections import defaultdict
 
-    all_months = StudentPayment.objects.values_list('month', flat=True).distinct()
-    available_years = set()
-    for m in all_months:
-        parts = m.split()
-        if len(parts) == 2 and parts[1].isdigit():
-            available_years.add(int(parts[1]))
-    
-    available_years = sorted(list(available_years), reverse=True)
+    MONTH_NAMES = ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"]
+    MONTH_MAP = {name.lower(): i + 1 for i, name in enumerate(MONTH_NAMES)}
+
+    def parse_payment_date(month_str, paid_at, period_start):
+        month_str = (month_str or '').strip()
+        
+        # 1. Format: 'Yanvar 2026'
+        parts = month_str.split()
+        if len(parts) == 2 and parts[0].lower() in MONTH_MAP and parts[1].isdigit():
+            return int(parts[1]), MONTH_MAP[parts[0].lower()]
+            
+        # 2. Cycle format: '1-oy (14.09.2026 - 14.10.2026)'
+        date_match = re.search(r'(\d{2})\.(\d{2})\.(\d{4})', month_str)
+        if date_match:
+            m = int(date_match.group(2))
+            y = int(date_match.group(3))
+            if 1 <= m <= 12:
+                return y, m
+                
+        # 3. Format: 'Yanvar' (without year)
+        if month_str.lower() in MONTH_MAP:
+            m = MONTH_MAP[month_str.lower()]
+            if paid_at:
+                y = paid_at.year
+            elif period_start:
+                y = period_start.year
+            else:
+                y = timezone.now().year
+            return y, m
+            
+        # 4. Fallback to period_start or paid_at
+        if period_start:
+            return period_start.year, period_start.month
+        if paid_at:
+            return paid_at.year, paid_at.month
+        return timezone.now().year, timezone.now().month
+
+    available_years_set = set()
+    payments_qs = StudentPayment.objects.select_related('group').values(
+        'id', 'month', 'paid_at', 'period_start', 'amount_paid', 'group_id', 'group__name'
+    )
+
+    parsed_payments = []
+    for p in payments_qs:
+        y, m = parse_payment_date(p['month'], p['paid_at'], p['period_start'])
+        if y:
+            available_years_set.add(y)
+        parsed_payments.append((y, m, p['amount_paid'], p['group_id'], p['group__name']))
+
+    available_years = sorted(list(available_years_set), reverse=True)
     if not available_years:
         available_years = [timezone.now().year]
 
@@ -4514,34 +4558,32 @@ def admin_financial_stats_api(request):
     else:
         selected_year = available_years[0]
 
-    MONTH_NAMES = ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"]
-    year_suffix = f" {selected_year}"
+    monthly_totals = defaultdict(float)
+    group_totals = defaultdict(lambda: {'name': '', 'total': 0.0})
 
-    # Filter payments for the selected year once
-    payments_this_year = StudentPayment.objects.filter(month__endswith=year_suffix)
-
-    # 1. Aggregate monthly payments in a single query
-    monthly_totals = payments_this_year.values('month').annotate(total=Sum('amount_paid'))
-    monthly_totals_map = {item['month']: item['total'] for item in monthly_totals}
+    for y, m, amount, group_id, group_name in parsed_payments:
+        if y == selected_year:
+            amt = float(amount or 0)
+            if 1 <= m <= 12:
+                monthly_totals[m] += amt
+            if group_id and amt > 0:
+                g_name = group_name or f"Guruh #{group_id}"
+                group_totals[group_id]['name'] = g_name
+                group_totals[group_id]['total'] += amt
 
     monthly_revenue = []
-    for month_name in MONTH_NAMES:
-        month_query = f"{month_name}{year_suffix}"
-        total = monthly_totals_map.get(month_query) or 0
+    for idx, month_name in enumerate(MONTH_NAMES, start=1):
         monthly_revenue.append({
             'month': month_name,
-            'total': float(total)
+            'total': round(monthly_totals[idx], 2)
         })
 
-    # 2. Aggregate payments by group in a single query
     group_payments = []
-    group_totals = payments_this_year.values('group_id', 'group__name').annotate(total=Sum('amount_paid'))
-    for item in group_totals:
-        total = item['total'] or 0
-        if total > 0:
+    for g_id, g_info in sorted(group_totals.items(), key=lambda x: x[1]['total'], reverse=True):
+        if g_info['total'] > 0:
             group_payments.append({
-                'group_name': item['group__name'] or f"Guruh #{item['group_id']}",
-                'total': float(total)
+                'group_name': g_info['name'],
+                'total': round(g_info['total'], 2)
             })
 
     return JsonResponse({

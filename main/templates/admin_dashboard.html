@@ -341,10 +341,17 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    if (typeof Chart === 'undefined') {
+        document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>');
+    }
+</script>
+<script>
 let warningStudentsData = [];
 
 function filterWarningStudents() {
-    const query = document.getElementById('warningSearchInput').value.toLowerCase().trim();
+    const searchInput = document.getElementById('warningSearchInput');
+    if (!searchInput) return;
+    const query = searchInput.value.toLowerCase().trim();
     const cards = document.querySelectorAll('.warning-student-card');
     let visibleCount = 0;
     
@@ -359,18 +366,20 @@ function filterWarningStudents() {
     });
     
     const totalSpan = document.getElementById('warning-total-count');
-    if (query === '') {
-        totalSpan.textContent = warningStudentsData.length;
-    } else {
-        totalSpan.textContent = visibleCount + ' (topildi)';
+    if (totalSpan) {
+        if (query === '') {
+            totalSpan.textContent = warningStudentsData.length;
+        } else {
+            totalSpan.textContent = visibleCount + ' (topildi)';
+        }
     }
 }
 
 document.addEventListener("DOMContentLoaded", function() {
     let revenueChartInstance = null;
     let groupShareChartInstance = null;
-
-    const yearSelector = document.getElementById('yearSelector');
+    let growthChartInstance = null;
+    let attendanceChartInstance = null;
 
     // Fetch and load warning students dynamically via AJAX
     function loadWarningStudents() {
@@ -381,30 +390,30 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (!panelContainer || !gridEl) return;
 
-        // Briefly display warning panel container while loading
         panelContainer.style.display = 'block';
 
         fetch("{% url 'admin_warning_students_api' %}")
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
             .then(data => {
                 const students = data.warning_students || [];
-                warningStudentsData = students; // Save globally
+                warningStudentsData = students;
                 
                 if (students.length === 0) {
-                    // Hide the warning panel container if there are no warning students
                     panelContainer.style.display = 'none';
                     return;
                 }
 
                 if (loadingEl) loadingEl.remove();
-
-                totalSpan.textContent = students.length;
+                if (totalSpan) totalSpan.textContent = students.length;
 
                 let html = '';
                 students.forEach(item => {
                     const firstChar = item.student ? item.student.charAt(0) : '?';
                     let reasonsHtml = '';
-                    item.reasons.forEach(reason => {
+                    (item.reasons || []).forEach(reason => {
                         reasonsHtml += `<li style="margin-bottom: 2px;">${reason}</li>`;
                     });
 
@@ -414,11 +423,11 @@ document.addEventListener("DOMContentLoaded", function() {
                             ${firstChar}
                         </div>
                         <div style="flex: 1; min-width: 0;">
-                            <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.student}</h4>
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.student || ''}</h4>
                             <div style="display: flex; flex-direction: column; gap: 3px; margin-top: 6px; font-size: 11.5px; color: var(--text-secondary);">
-                                <span><strong style="color: var(--text-primary);">Guruh:</strong> ${item.group}</span>
-                                <span><strong style="color: var(--text-primary);">Fan:</strong> ${item.subject}</span>
-                                <span><strong style="color: var(--text-primary);">O'qituvchi:</strong> ${item.teacher}</span>
+                                <span><strong style="color: var(--text-primary);">Guruh:</strong> ${item.group || '-'}</span>
+                                <span><strong style="color: var(--text-primary);">Fan:</strong> ${item.subject || '-'}</span>
+                                <span><strong style="color: var(--text-primary);">O'qituvchi:</strong> ${item.teacher || '-'}</span>
                             </div>
                             <ul style="margin: 8px 0 0 0; padding-left: 16px; font-size: 11.5px; color: var(--text-warning-title); font-weight: 600; line-height: 1.4;">
                                 ${reasonsHtml}
@@ -436,160 +445,262 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     }
 
+    function getThemeStyles() {
+        const isLight = document.documentElement.classList.contains('light-theme') || document.body.classList.contains('light-theme');
+        return {
+            isLight: isLight,
+            accentColor: isLight ? '#0284c7' : '#00f2fe',
+            bgColor: isLight ? 'rgba(2, 132, 199, 0.12)' : 'rgba(0, 242, 254, 0.12)',
+            gridColor: isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.06)',
+            textColor: isLight ? '#475569' : 'rgba(255, 255, 255, 0.65)',
+            chartBorder: isLight ? '#ffffff' : '#0c101d',
+            tooltipBg: isLight ? '#ffffff' : '#0f172a',
+            tooltipTitle: isLight ? '#0f172a' : '#ffffff',
+            tooltipBorder: isLight ? '#e2e8f0' : '#1e293b',
+            palette: isLight ? [
+                '#0284c7', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444',
+                '#06b6d4', '#ec4899', '#3b82f6', '#14b8a6', '#f97316'
+            ] : [
+                '#00f2fe', '#00ffaa', '#ffb000', '#9b51e0', '#ff0055',
+                '#4facfe', '#ec008c', '#38ef7d', '#ff9f43', '#00d2ff'
+            ]
+        };
+    }
+
     function loadCharts(year) {
         const revenueChartEl = document.getElementById('revenueChart');
         const groupShareChartEl = document.getElementById('groupShareChart');
-        if (!revenueChartEl || !groupShareChartEl) return;
+        if (!revenueChartEl && !groupShareChartEl) return;
 
         let url = "{% url 'admin_financial_stats_api' %}";
         if (year) {
-            url += `?year=${year}`;
+            url += `?year=${encodeURIComponent(year)}`;
         }
 
         fetch(url)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('API request failed');
+                return response.json();
+            })
             .then(data => {
                 // Populate Year Dropdown if empty
                 const yearSelector = document.getElementById('yearSelector');
-                if (yearSelector && yearSelector.options.length === 0) {
-                    const isLightMode = document.documentElement.classList.contains('light-theme');
-                    data.available_years.forEach(yr => {
-                        const opt = document.createElement('option');
-                        opt.value = yr;
-                        opt.textContent = `${yr}-yil`;
-                        if (yr === data.selected_year) {
-                            opt.selected = true;
-                        }
-                        opt.style.backgroundColor = isLightMode ? '#ffffff' : '#0c101d';
-                        opt.style.color = isLightMode ? '#0f172a' : '#ffffff';
-                        yearSelector.appendChild(opt);
-                    });
+                if (yearSelector) {
+                    if (yearSelector.options.length === 0 && data.available_years && data.available_years.length > 0) {
+                        yearSelector.innerHTML = '';
+                        data.available_years.forEach(yr => {
+                            const opt = document.createElement('option');
+                            opt.value = yr;
+                            opt.textContent = `${yr}-yil`;
+                            if (yr === data.selected_year) {
+                                opt.selected = true;
+                            }
+                            yearSelector.appendChild(opt);
+                        });
 
-                    yearSelector.addEventListener('change', function() {
-                        loadCharts(this.value);
-                    });
+                        yearSelector.onchange = function() {
+                            loadCharts(this.value);
+                        };
+                    } else if (data.selected_year) {
+                        yearSelector.value = data.selected_year;
+                    }
                 }
 
-                // Check light theme state dynamically
-                const isLight = document.documentElement.classList.contains('light-theme') || document.body.classList.contains('light-theme');
-                const accentColor = isLight ? '#0284c7' : '#00f2fe';
-                const bgColor = isLight ? 'rgba(2, 132, 199, 0.08)' : 'rgba(0, 242, 254, 0.1)';
-                const gridColor = isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)';
-                const textColor = isLight ? '#64748b' : 'rgba(255, 255, 255, 0.6)';
+                if (typeof Chart === 'undefined') {
+                    console.warn("Chart.js library is not loaded yet.");
+                    return;
+                }
+
+                const theme = getThemeStyles();
 
                 // 1. Revenue line chart
-                const monthlyData = data.monthly_revenue;
-                const revenueLabels = monthlyData.map(item => item.month);
-                const revenueValues = monthlyData.map(item => item.total);
-
-                const ctx1 = document.getElementById('revenueChart').getContext('2d');
-                
-                if (revenueChartInstance) {
-                    revenueChartInstance.destroy();
-                }
-
-                revenueChartInstance = new Chart(ctx1, {
-                    type: 'line',
-                    data: {
-                        labels: revenueLabels,
-                        datasets: [{
-                            label: "Oylik to'lov (so'm)",
-                            data: revenueValues,
-                            borderColor: accentColor,
-                            backgroundColor: bgColor,
-                            borderWidth: 3,
-                            pointBackgroundColor: accentColor,
-                            pointBorderColor: '#ffffff',
-                            pointHoverRadius: 7,
-                            tension: 0.4,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            y: {
-                                grid: { color: gridColor },
-                                ticks: { color: textColor, font: { weight: '600' } }
-                            },
-                            x: {
-                                grid: { display: false },
-                                ticks: { color: textColor, font: { weight: '600' } }
-                            }
-                        }
+                if (revenueChartEl) {
+                    if (revenueChartInstance) {
+                        revenueChartInstance.destroy();
+                        revenueChartInstance = null;
                     }
-                });
+                    const existingChart = Chart.getChart(revenueChartEl);
+                    if (existingChart) existingChart.destroy();
 
-                // 2. Group share doughnut chart
-                const groupData = data.group_payments;
-                const groupLabels = groupData.map(item => item.group_name);
-                const groupValues = groupData.map(item => item.total);
+                    const monthlyData = data.monthly_revenue || [];
+                    const revenueLabels = monthlyData.map(item => item.month);
+                    const revenueValues = monthlyData.map(item => item.total);
 
-                const chartColors = isLight ? [
-                    '#0284c7', '#ef4444', '#10b981', '#8b5cf6', '#f59e0b',
-                    '#3b82f6', '#14b8a6', '#ec4899', '#f97316', '#06b6d4'
-                ] : [
-                    '#00f2fe', '#ff0055', '#00ffaa', '#9b51e0', '#ff9f43',
-                    '#4facfe', '#00ff87', '#f36', '#ffb000', '#ec008c'
-                ];
-                const chartBorder = isLight ? '#ffffff' : '#0c101d';
-
-                const ctx2 = document.getElementById('groupShareChart').getContext('2d');
-
-                if (groupShareChartInstance) {
-                    groupShareChartInstance.destroy();
-                }
-
-                groupShareChartInstance = new Chart(ctx2, {
-                    type: 'doughnut',
-                    data: {
-                        labels: groupLabels,
-                        datasets: [{
-                            data: groupValues,
-                            backgroundColor: chartColors.slice(0, groupValues.length),
-                            borderColor: chartBorder,
-                            borderWidth: 2,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: isLight ? '#475569' : 'rgba(255, 255, 255, 0.7)',
-                                    font: { size: 11, weight: '700' },
-                                    boxWidth: 12,
-                                    padding: 15
+                    const ctx1 = revenueChartEl.getContext('2d');
+                    revenueChartInstance = new Chart(ctx1, {
+                        type: 'line',
+                        data: {
+                            labels: revenueLabels,
+                            datasets: [{
+                                label: "Oylik tushum",
+                                data: revenueValues,
+                                borderColor: theme.accentColor,
+                                backgroundColor: theme.bgColor,
+                                borderWidth: 3,
+                                pointBackgroundColor: theme.accentColor,
+                                pointBorderColor: theme.chartBorder,
+                                pointBorderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 7,
+                                tension: 0.35,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: theme.tooltipBg,
+                                    titleColor: theme.tooltipTitle,
+                                    bodyColor: theme.accentColor,
+                                    borderColor: theme.tooltipBorder,
+                                    borderWidth: 1,
+                                    padding: 10,
+                                    displayColors: false,
+                                    callbacks: {
+                                        label: function(context) {
+                                            const val = context.parsed.y !== null ? context.parsed.y : context.raw;
+                                            return "To'lov: " + Number(val).toLocaleString('uz-UZ') + " so'm";
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    grid: { color: theme.gridColor },
+                                    ticks: {
+                                        color: theme.textColor,
+                                        font: { weight: '600', size: 11 },
+                                        callback: function(value) {
+                                            if (value >= 1000000000) {
+                                                return (value / 1000000000).toFixed(1) + " mlrd";
+                                            } else if (value >= 1000000) {
+                                                return (value / 1000000).toFixed(value % 1000000 === 0 ? 0 : 1) + " mln";
+                                            } else if (value >= 1000) {
+                                                return (value / 1000).toFixed(0) + " ming";
+                                            }
+                                            return value;
+                                        }
+                                    }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { color: theme.textColor, font: { weight: '600', size: 11 } }
                                 }
                             }
                         }
+                    });
+                }
+
+                // 2. Group share doughnut chart
+                if (groupShareChartEl) {
+                    if (groupShareChartInstance) {
+                        groupShareChartInstance.destroy();
+                        groupShareChartInstance = null;
                     }
-                });
+                    const existingChart = Chart.getChart(groupShareChartEl);
+                    if (existingChart) existingChart.destroy();
+
+                    const groupData = (data.group_payments || []).slice(0, 10);
+                    let groupLabels = groupData.map(item => item.group_name);
+                    let groupValues = groupData.map(item => item.total);
+
+                    const hasData = groupValues.length > 0 && groupValues.some(v => v > 0);
+                    if (!hasData) {
+                        groupLabels = ["To'lovlar yo'q"];
+                        groupValues = [1];
+                    }
+
+                    const ctx2 = groupShareChartEl.getContext('2d');
+                    groupShareChartInstance = new Chart(ctx2, {
+                        type: 'doughnut',
+                        data: {
+                            labels: groupLabels,
+                            datasets: [{
+                                data: groupValues,
+                                backgroundColor: !hasData 
+                                    ? [theme.isLight ? '#e2e8f0' : '#1e293b']
+                                    : theme.palette.slice(0, groupValues.length),
+                                borderColor: theme.chartBorder,
+                                borderWidth: 2,
+                                hoverOffset: hasData ? 5 : 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '65%',
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: theme.textColor,
+                                        font: { size: 11, weight: '700' },
+                                        boxWidth: 10,
+                                        padding: 10
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: theme.tooltipBg,
+                                    titleColor: theme.tooltipTitle,
+                                    bodyColor: theme.accentColor,
+                                    borderColor: theme.tooltipBorder,
+                                    borderWidth: 1,
+                                    padding: 10,
+                                    callbacks: {
+                                        label: function(context) {
+                                            if (!hasData) {
+                                                return "Bu yil uchun to'lovlar mavjud emas";
+                                            }
+                                            const val = context.raw || 0;
+                                            return context.label + ": " + Number(val).toLocaleString('uz-UZ') + " so'm";
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(err => {
+                console.error("Failed to load financial stats charts:", err);
             });
     }
 
-    loadCharts();
-    loadWarningStudents();
-
     // 3. Student growth chart (Bar chart)
-    const isLightModeLocal = document.documentElement.classList.contains('light-theme') || document.body.classList.contains('light-theme');
-    const gridColorLocal = isLightModeLocal ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)';
-    const textColorLocal = isLightModeLocal ? '#64748b' : 'rgba(255, 255, 255, 0.6)';
+    function renderGrowthChart() {
+        const ctxGrowth = document.getElementById('growthChart');
+        if (!ctxGrowth || typeof Chart === 'undefined') return;
 
-    const growthMonths = JSON.parse(document.getElementById('growth-months-data').textContent);
-    const growthCounts = JSON.parse(document.getElementById('growth-counts-data').textContent);
-    
-    const ctxGrowth = document.getElementById('growthChart');
-    if (ctxGrowth) {
+        if (growthChartInstance) {
+            growthChartInstance.destroy();
+            growthChartInstance = null;
+        }
+        const existingChart = Chart.getChart(ctxGrowth);
+        if (existingChart) existingChart.destroy();
+
+        let growthMonths = [];
+        let growthCounts = [];
+        const growthMonthsEl = document.getElementById('growth-months-data');
+        const growthCountsEl = document.getElementById('growth-counts-data');
+
+        if (growthMonthsEl && growthCountsEl) {
+            try {
+                growthMonths = JSON.parse(growthMonthsEl.textContent);
+                growthCounts = JSON.parse(growthCountsEl.textContent);
+                if (typeof growthMonths === 'string') growthMonths = JSON.parse(growthMonths);
+                if (typeof growthCounts === 'string') growthCounts = JSON.parse(growthCounts);
+            } catch(e) {
+                console.error("Failed to parse growth data:", e);
+            }
+        }
+
+        const theme = getThemeStyles();
         const ctxG = ctxGrowth.getContext('2d');
         const gradient = ctxG.createLinearGradient(0, 0, 0, 220);
-        if (isLightModeLocal) {
+        if (theme.isLight) {
             gradient.addColorStop(0, '#0284c7');
             gradient.addColorStop(1, 'rgba(2, 132, 199, 0.08)');
         } else {
@@ -597,7 +708,7 @@ document.addEventListener("DOMContentLoaded", function() {
             gradient.addColorStop(1, 'rgba(0, 242, 254, 0.05)');
         }
 
-        new Chart(ctxG, {
+        growthChartInstance = new Chart(ctxG, {
             type: 'bar',
             data: {
                 labels: growthMonths,
@@ -605,7 +716,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     label: "Yangi o'quvchilar soni",
                     data: growthCounts,
                     backgroundColor: gradient,
-                    borderColor: isLightModeLocal ? '#0284c7' : '#00f2fe',
+                    borderColor: theme.accentColor,
                     borderWidth: 1.5,
                     borderRadius: 8,
                     maxBarThickness: 28,
@@ -615,19 +726,32 @@ document.addEventListener("DOMContentLoaded", function() {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false }
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: theme.tooltipBg,
+                        titleColor: theme.tooltipTitle,
+                        bodyColor: theme.accentColor,
+                        borderColor: theme.tooltipBorder,
+                        borderWidth: 1,
+                        padding: 10,
+                        callbacks: {
+                            label: function(context) {
+                                return "O'quvchilar: " + context.raw + " nafar";
+                            }
+                        }
+                    }
                 },
                 scales: {
                     y: {
                         grid: { 
-                            color: gridColorLocal,
+                            color: theme.gridColor,
                             drawBorder: false
                         },
-                        ticks: { color: textColorLocal, font: { weight: '600', size: 10 } }
+                        ticks: { color: theme.textColor, font: { weight: '600', size: 10 } }
                     },
                     x: {
                         grid: { display: false },
-                        ticks: { color: textColorLocal, font: { weight: '600', size: 10 } }
+                        ticks: { color: theme.textColor, font: { weight: '600', size: 10 } }
                     }
                 }
             }
@@ -635,40 +759,72 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // 4. Attendance Rate Chart (Doughnut Chart)
-    const attPresent = {{ att_present }};
-    const attAbsent = {{ att_absent }};
-    const ctxAtt = document.getElementById('attendanceRateChart');
-    if (ctxAtt) {
+    function renderAttendanceChart() {
+        const ctxAtt = document.getElementById('attendanceRateChart');
+        if (!ctxAtt || typeof Chart === 'undefined') return;
+
+        if (attendanceChartInstance) {
+            attendanceChartInstance.destroy();
+            attendanceChartInstance = null;
+        }
+        const existingChart = Chart.getChart(ctxAtt);
+        if (existingChart) existingChart.destroy();
+
+        const attPresent = {{ att_present|default:0 }};
+        const attAbsent = {{ att_absent|default:0 }};
+
+        const theme = getThemeStyles();
         if (attPresent === 0 && attAbsent === 0) {
             const parent = ctxAtt.parentElement;
             ctxAtt.style.display = 'none';
-            const emptyNotice = document.createElement('div');
-            emptyNotice.style.cssText = 'height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); text-align: center; gap: 10px;';
-            emptyNotice.innerHTML = '<i class="fas fa-calendar-times" style="font-size: 32px; opacity: 0.5;"></i><span style="font-size: 13px; font-weight: 600;">Oxirgi 1 haftada davomat kiritilmagan</span>';
-            parent.appendChild(emptyNotice);
+            if (!parent.querySelector('.empty-att-notice')) {
+                const emptyNotice = document.createElement('div');
+                emptyNotice.className = 'empty-att-notice';
+                emptyNotice.style.cssText = 'height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); text-align: center; gap: 10px;';
+                emptyNotice.innerHTML = '<i class="fas fa-calendar-times" style="font-size: 32px; opacity: 0.5;"></i><span style="font-size: 13px; font-weight: 600;">Oxirgi 1 haftada davomat kiritilmagan</span>';
+                parent.appendChild(emptyNotice);
+            }
         } else {
-            new Chart(ctxAtt.getContext('2d'), {
+            ctxAtt.style.display = 'block';
+            const notice = ctxAtt.parentElement.querySelector('.empty-att-notice');
+            if (notice) notice.remove();
+
+            attendanceChartInstance = new Chart(ctxAtt.getContext('2d'), {
                 type: 'doughnut',
                 data: {
                     labels: ['Kelganlar', 'Kelmaganlar'],
                     datasets: [{
                         data: [attPresent, attAbsent],
-                        backgroundColor: isLightModeLocal ? ['#10b981', '#ef4444'] : ['#00ffaa', '#ff0055'],
-                        borderColor: isLightModeLocal ? '#ffffff' : '#0c101d',
+                        backgroundColor: theme.isLight ? ['#10b981', '#ef4444'] : ['#00ffaa', '#ff0055'],
+                        borderColor: theme.chartBorder,
                         borderWidth: 2,
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    cutout: '65%',
                     plugins: {
                         legend: {
                             position: 'bottom',
                             labels: {
-                                color: isLightModeLocal ? '#475569' : 'rgba(255, 255, 255, 0.7)',
+                                color: theme.textColor,
                                 font: { size: 11, weight: '700' },
                                 boxWidth: 12,
                                 padding: 15
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: theme.tooltipBg,
+                            titleColor: theme.tooltipTitle,
+                            bodyColor: theme.accentColor,
+                            borderColor: theme.tooltipBorder,
+                            borderWidth: 1,
+                            padding: 10,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ": " + context.raw + " ta";
+                                }
                             }
                         }
                     }
@@ -677,11 +833,19 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    // Initialize all
+    loadCharts();
+    loadWarningStudents();
+    renderGrowthChart();
+    renderAttendanceChart();
+
     // Re-render charts on dynamic theme switch
     document.addEventListener('themeChanged', function() {
         const yearSelector = document.getElementById('yearSelector');
         const activeYear = yearSelector ? yearSelector.value : '';
         loadCharts(activeYear);
+        renderGrowthChart();
+        renderAttendanceChart();
     });
 });
 </script>
