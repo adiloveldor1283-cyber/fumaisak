@@ -345,105 +345,244 @@
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
         <h3 style="font-size: 14px; font-weight: 800; color: var(--text-primary); border-left: 4px solid var(--accent-primary); padding-left: 10px; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">O'qituvchilar maosh jadvali ({{ month_str }})</h3>
         
-        <!-- JS Search Input -->
-        <div class="search-container" style="margin-bottom: 0;">
-            <i class="fas fa-search" style="color: var(--text-muted); font-size: 13px;"></i>
-            <input type="text" id="teacherSearch" placeholder="Ism yoki telefon raqami bo'yicha qidirish..." onkeyup="filterTeachers()">
+        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <!-- Tab switches -->
+            <div style="display: flex; gap: 6px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-card); border-radius: 12px; padding: 4px;">
+                <button type="button" id="tabActiveTeachers" onclick="switchTeacherTab('active')" style="padding: 7px 16px; border-radius: 8px; border: none; background: rgba(0, 242, 254, 0.2); color: #00f2fe; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-chalkboard-teacher"></i> Faol ({{ active_teachers_count }})
+                </button>
+                <button type="button" id="tabArchivedTeachers" onclick="switchTeacherTab('archived')" style="padding: 7px 16px; border-radius: 8px; border: none; background: transparent; color: var(--text-secondary); font-size: 12.5px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-archive"></i> Arxivlangan ({{ archived_teachers_count }})
+                </button>
+            </div>
+
+            <!-- JS Search Input -->
+            <div class="search-container" style="margin-bottom: 0;">
+                <i class="fas fa-search" style="color: var(--text-muted); font-size: 13px;"></i>
+                <input type="text" id="teacherSearch" placeholder="Ism yoki telefon raqami bo'yicha qidirish..." onkeyup="filterTeachers()">
+            </div>
         </div>
     </div>
     
-    <div class="jadval-container">
-        <table class="premium-table" id="teachersTable">
-            <thead>
-                <tr>
-                    <th>O'QITUVCHI</th>
-                    <th style="text-align: center;">DARSLAR SONI</th>
-                    <th>JAMI TUSHUM</th>
-                    <th>HISOBLANGAN MAOSH</th>
-                    <th>TO'LANGAN</th>
-                    <th>QOLDIQ</th>
-                    <th style="text-align: center;">AMALLAR</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in salary_report %}
-                <tr class="teacher-row" id="teacher-row-{{ item.teacher.id }}" onclick="toggleTeacherDetails('{{ item.teacher.id }}')">
-                    <td style="font-weight: 700; color: var(--text-primary);">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="teacher-avatar" style="background: rgba(0, 242, 254, 0.08); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-primary); font-weight: 800; font-size: 13px;">
-                                {{ item.teacher.first_name|first }}
+    <!-- Active Teachers Container -->
+    <div id="activeTeachersContainer">
+        {% if salary_report %}
+        <div class="jadval-container">
+            <table class="premium-table" id="teachersTable">
+                <thead>
+                    <tr>
+                        <th>O'QITUVCHI</th>
+                        <th style="text-align: center;">DARSLAR SONI</th>
+                        <th>JAMI TUSHUM</th>
+                        <th>HISOBLANGAN MAOSH</th>
+                        <th>TO'LANGAN</th>
+                        <th>QOLDIQ</th>
+                        <th style="text-align: center;">AMALLAR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in salary_report %}
+                    <tr class="teacher-row" id="teacher-row-{{ item.teacher.id }}" onclick="toggleTeacherDetails('{{ item.teacher.id }}')">
+                        <td style="font-weight: 700; color: var(--text-primary);">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="teacher-avatar" style="background: rgba(0, 242, 254, 0.08); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-primary); font-weight: 800; font-size: 13px;">
+                                    {{ item.teacher.first_name|first }}
+                                </div>
+                                <div>
+                                    <span class="teacher-name" style="display: block; color: var(--text-primary);">{{ item.teacher.get_full_name }}</span>
+                                    <span class="teacher-phone" style="display: block; font-size: 11px; color: var(--text-muted); font-weight: 500;">{{ item.teacher.phone_number }}</span>
+                                </div>
                             </div>
-                            <div>
-                                <span class="teacher-name" style="display: block; color: var(--text-primary);">{{ item.teacher.get_full_name }}</span>
-                                <span class="teacher-phone" style="display: block; font-size: 11px; color: var(--text-muted); font-weight: 500;">{{ item.teacher.phone_number }}</span>
+                        </td>
+                        <td style="text-align: center; font-weight: 700; color: var(--text-primary);">{{ item.total_lessons }} ta</td>
+                        <td class="amount-accent" style="color: var(--accent-primary); font-weight: 700;">{{ item.total_revenue|floatformat:2 }} UZS</td>
+                        <td style="font-weight: 800; color: var(--text-primary);">{{ item.total_earned|floatformat:2 }} UZS</td>
+                        <td class="amount-success" style="color: #00ffaa; font-weight: 700;">{{ item.total_paid|floatformat:2 }} UZS</td>
+                        <td class="{% if item.balance > 0 %}amount-danger{% else %}amount-success{% endif %}" style="color: {% if item.balance > 0 %}#ff4f4f{% else %}#00ffaa{% endif %}; font-weight: 800;">{{ item.balance|floatformat:2 }} UZS</td>
+                        <td style="text-align: center;" onclick="event.stopPropagation();">
+                            <button onclick="toggleTeacherDetails('{{ item.teacher.id }}')" class="btn-secondary-custom" style="padding: 6px 14px; background: var(--bg-input); border: 1px solid var(--border-input); color: var(--text-primary); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px;"><i class="fas fa-list"></i> Guruhlar</button>
+                        </td>
+                    </tr>
+                    
+                    <!-- Expanded details container -->
+                    <tr class="details-row" id="details-row-{{ item.teacher.id }}" style="display: none;">
+                        <td colspan="7" style="padding: 15px 25px; border-bottom: 1px solid var(--border-card);">
+                            <div style="border-left: 3px solid var(--accent-primary); padding-left: 15px;">
+                               <h5 style="margin-top: 0; margin-bottom: 12px; font-size: 12px; font-weight: 800; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 0.5px;">Guruhlar kesimidagi maosh hisob-kitoblari</h5>
+                               {% if item.groups_data %}
+                               <div style="overflow-x: auto;">
+                                   <table style="width: 100%; font-size: 12.5px; border-collapse: collapse;">
+                                      <thead>
+                                         <tr style="background: var(--table-header-bg);">
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; white-space: nowrap;">GURUH NOMI</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">FAN</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">O'TKAZILGAN DARSLAR</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">GURUH TUSHUMI</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">MAOSH TARIFI</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">HISOBLANGAN MAOSH</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">TO'LANGAN</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">QOLDIQ</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">AMALLAR</th>
+                                         </tr>
+                                      </thead>
+                                      <tbody>
+                                         {% for gd in item.groups_data %}
+                                         <tr style="border-bottom: 1px solid var(--table-border);">
+                                            <td style="padding: 10px 12px; font-weight: 700; color: var(--text-primary); white-space: nowrap;">
+                                                {{ gd.group.name }}
+                                                {% if gd.group.is_closed %}
+                                                    <span style="font-size: 10px; background: rgba(255, 170, 0, 0.15); color: #ffaa00; border: 1px solid rgba(255, 170, 0, 0.3); padding: 1px 5px; border-radius: 4px; margin-left: 4px;">Yopilgan</span>
+                                                {% endif %}
+                                            </td>
+                                            <td style="padding: 10px 12px; text-align: center; color: var(--text-secondary); white-space: nowrap;">{{ gd.group.subject.name }}</td>
+                                            <td style="padding: 10px 12px; text-align: center; font-weight: 700; color: var(--text-primary); white-space: nowrap;">{{ gd.lessons_count }} ta dars</td>
+                                            <td class="amount-accent" style="padding: 10px 12px; text-align: center; color: var(--accent-primary); font-weight: 700; white-space: nowrap;">{{ gd.total_collected|floatformat:2 }} UZS</td>
+                                            <td style="padding: 10px 12px; text-align: center; white-space: nowrap;">
+                                               {% if gd.group.salary_type == 'percent' %}
+                                                  <span class="amount-success" style="color: #00ffaa; font-weight: 700;">{{ gd.group.salary_rate|floatformat:0 }}% (Tushumdan)</span>
+                                               {% else %}
+                                                  <span class="amount-accent" style="color: #4facfe; font-weight: 700;">{{ gd.group.salary_rate }} UZS (Darsbay)</span>
+                                               {% endif %}
+                                            </td>
+                                            <td style="padding: 10px 12px; text-align: center; font-weight: 700; color: var(--text-primary); white-space: nowrap;">{{ gd.earned|floatformat:2 }} UZS</td>
+                                            <td class="amount-success" style="padding: 10px 12px; text-align: center; color: #00ffaa; font-weight: 700; white-space: nowrap;">{{ gd.already_paid|floatformat:2 }} UZS</td>
+                                            <td class="{% if gd.balance > 0 %}amount-danger{% else %}amount-success{% endif %}" style="padding: 10px 12px; text-align: center; color: {% if gd.balance > 0 %}#ff4f4f{% else %}#00ffaa{% endif %}; font-weight: 800; white-space: nowrap;">{{ gd.balance|floatformat:2 }} UZS</td>
+                                            <td style="padding: 10px 12px; text-align: center; white-space: nowrap;">
+                                               <button onclick="openPayModal('{{ item.teacher.id }}', '{{ item.teacher.get_full_name|escapejs }}', '{{ gd.group.id }}', '{{ gd.group.name }}', '{{ gd.balance }}')" style="padding: 6px 12px; background: var(--accent-bg-glow); border: 1px solid var(--accent-border-glow); color: var(--accent-primary); border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: 0.3s;">To'lov qilish</button>
+                                            </td>
+                                         </tr>
+                                         {% endfor %}
+                                      </tbody>
+                                   </table>
+                               </div>
+                               {% else %}
+                               <p style="color: var(--text-muted); font-style: italic; margin: 5px 0;">Bu o'qituvchiga guruhlar biriktirilmagan.</p>
+                               {% endif %}
                             </div>
-                        </div>
-                    </td>
-                    <td style="text-align: center; font-weight: 700; color: var(--text-primary);">{{ item.total_lessons }} ta</td>
-                    <td class="amount-accent" style="color: var(--accent-primary); font-weight: 700;">{{ item.total_revenue|floatformat:2 }} UZS</td>
-                    <td style="font-weight: 800; color: var(--text-primary);">{{ item.total_earned|floatformat:2 }} UZS</td>
-                    <td class="amount-success" style="color: #00ffaa; font-weight: 700;">{{ item.total_paid|floatformat:2 }} UZS</td>
-                    <td class="{% if item.balance > 0 %}amount-danger{% else %}amount-success{% endif %}" style="color: {% if item.balance > 0 %}#ff4f4f{% else %}#00ffaa{% endif %}; font-weight: 800;">{{ item.balance|floatformat:2 }} UZS</td>
-                    <td style="text-align: center;" onclick="event.stopPropagation();">
-                        <button onclick="toggleTeacherDetails('{{ item.teacher.id }}')" class="btn-secondary-custom" style="padding: 6px 14px; background: var(--bg-input); border: 1px solid var(--border-input); color: var(--text-primary); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px;"><i class="fas fa-list"></i> Guruhlar</button>
-                    </td>
-                </tr>
-                
-                <!-- Expanded details container -->
-                <tr class="details-row" id="details-row-{{ item.teacher.id }}" style="display: none;">
-                    <td colspan="7" style="padding: 15px 25px; border-bottom: 1px solid var(--border-card);">
-                        <div style="border-left: 3px solid var(--accent-primary); padding-left: 15px;">
-                           <h5 style="margin-top: 0; margin-bottom: 12px; font-size: 12px; font-weight: 800; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 0.5px;">Guruhlar kesimidagi maosh hisob-kitoblari</h5>
-                           {% if item.groups_data %}
-                           <div style="overflow-x: auto;">
-                               <table style="width: 100%; font-size: 12.5px; border-collapse: collapse;">
-                                  <thead>
-                                     <tr style="background: var(--table-header-bg);">
-                                        <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; white-space: nowrap;">GURUH NOMI</th>
-                                        <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">FAN</th>
-                                        <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">O'TKAZILGAN DARSLAR</th>
-                                        <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">GURUH TUSHUMI</th>
-                                        <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">MAOSH TARIFI</th>
-                                        <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">HISOBLANGAN MAOSH</th>
-                                        <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">TO'LANGAN</th>
-                                        <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">QOLDIQ</th>
-                                        <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">AMALLAR</th>
-                                     </tr>
-                                  </thead>
-                                  <tbody>
-                                     {% for gd in item.groups_data %}
-                                     <tr style="border-bottom: 1px solid var(--table-border);">
-                                        <td style="padding: 10px 12px; font-weight: 700; color: var(--text-primary); white-space: nowrap;">{{ gd.group.name }}</td>
-                                        <td style="padding: 10px 12px; text-align: center; color: var(--text-secondary); white-space: nowrap;">{{ gd.group.subject.name }}</td>
-                                        <td style="padding: 10px 12px; text-align: center; font-weight: 700; color: var(--text-primary); white-space: nowrap;">{{ gd.lessons_count }} ta dars</td>
-                                        <td class="amount-accent" style="padding: 10px 12px; text-align: center; color: var(--accent-primary); font-weight: 700; white-space: nowrap;">{{ gd.total_collected|floatformat:2 }} UZS</td>
-                                        <td style="padding: 10px 12px; text-align: center; white-space: nowrap;">
-                                           {% if gd.group.salary_type == 'percent' %}
-                                              <span class="amount-success" style="color: #00ffaa; font-weight: 700;">{{ gd.group.salary_rate|floatformat:0 }}% (Tushumdan)</span>
-                                           {% else %}
-                                              <span class="amount-accent" style="color: #4facfe; font-weight: 700;">{{ gd.group.salary_rate }} UZS (Darsbay)</span>
-                                           {% endif %}
-                                        </td>
-                                        <td style="padding: 10px 12px; text-align: center; font-weight: 700; color: var(--text-primary); white-space: nowrap;">{{ gd.earned|floatformat:2 }} UZS</td>
-                                        <td class="amount-success" style="padding: 10px 12px; text-align: center; color: #00ffaa; font-weight: 700; white-space: nowrap;">{{ gd.already_paid|floatformat:2 }} UZS</td>
-                                        <td class="{% if gd.balance > 0 %}amount-danger{% else %}amount-success{% endif %}" style="padding: 10px 12px; text-align: center; color: {% if gd.balance > 0 %}#ff4f4f{% else %}#00ffaa{% endif %}; font-weight: 800; white-space: nowrap;">{{ gd.balance|floatformat:2 }} UZS</td>
-                                        <td style="padding: 10px 12px; text-align: center; white-space: nowrap;">
-                                           <button onclick="openPayModal('{{ item.teacher.id }}', '{{ item.teacher.get_full_name|escapejs }}', '{{ gd.group.id }}', '{{ gd.group.name }}', '{{ gd.balance }}')" style="padding: 6px 12px; background: var(--accent-bg-glow); border: 1px solid var(--accent-border-glow); color: var(--accent-primary); border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: 0.3s;">To'lov qilish</button>
-                                        </td>
-                                     </tr>
-                                     {% endfor %}
-                                  </tbody>
-                               </table>
-                           </div>
-                           {% else %}
-                           <p style="color: var(--text-muted); font-style: italic; margin: 5px 0;">Bu o'qituvchiga guruhlar biriktirilmagan.</p>
-                           {% endif %}
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="padding: 40px 20px; text-align: center; color: var(--text-muted); font-style: italic;">
+            <i class="fas fa-user-check" style="font-size: 32px; display: block; margin-bottom: 12px; color: rgba(0, 242, 254, 0.2);"></i>
+            Faol o'qituvchilar mavjud emas.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Archived Teachers Container -->
+    <div id="archivedTeachersContainer" style="display: none;">
+        {% if archived_salary_report %}
+        <div class="jadval-container">
+            <table class="premium-table" id="archivedTeachersTable">
+                <thead>
+                    <tr>
+                        <th>O'QITUVCHI (ARXIVLANGAN)</th>
+                        <th style="text-align: center;">DARSLAR SONI</th>
+                        <th>JAMI TUSHUM</th>
+                        <th>HISOBLANGAN MAOSH</th>
+                        <th>TO'LANGAN</th>
+                        <th>QOLDIQ</th>
+                        <th style="text-align: center;">AMALLAR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in archived_salary_report %}
+                    <tr class="teacher-row" id="archived-teacher-row-{{ item.teacher.id }}" onclick="toggleTeacherDetails('archived-{{ item.teacher.id }}')">
+                        <td style="font-weight: 700; color: var(--text-primary);">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="teacher-avatar" style="background: rgba(255, 74, 90, 0.1); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ff6b6b; font-weight: 800; font-size: 13px;">
+                                    <i class="fas fa-archive" style="font-size: 13px;"></i>
+                                </div>
+                                <div>
+                                    <span class="teacher-name" style="display: flex; align-items: center; gap: 6px; color: var(--text-primary);">
+                                        {{ item.teacher.get_full_name }}
+                                        <span style="font-size: 10px; background: rgba(255, 74, 90, 0.15); color: #ff6b6b; border: 1px solid rgba(255, 74, 90, 0.3); padding: 1px 6px; border-radius: 4px; font-weight: 700;">Arxivlangan</span>
+                                    </span>
+                                    <span class="teacher-phone" style="display: block; font-size: 11px; color: var(--text-muted); font-weight: 500;">{{ item.teacher.phone_number }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="text-align: center; font-weight: 700; color: var(--text-primary);">{{ item.total_lessons }} ta</td>
+                        <td class="amount-accent" style="color: var(--accent-primary); font-weight: 700;">{{ item.total_revenue|floatformat:2 }} UZS</td>
+                        <td style="font-weight: 800; color: var(--text-primary);">{{ item.total_earned|floatformat:2 }} UZS</td>
+                        <td class="amount-success" style="color: #00ffaa; font-weight: 700;">{{ item.total_paid|floatformat:2 }} UZS</td>
+                        <td class="{% if item.balance > 0 %}amount-danger{% else %}amount-success{% endif %}" style="color: {% if item.balance > 0 %}#ff4f4f{% else %}#00ffaa{% endif %}; font-weight: 800;">{{ item.balance|floatformat:2 }} UZS</td>
+                        <td style="text-align: center;" onclick="event.stopPropagation();">
+                            <button onclick="toggleTeacherDetails('archived-{{ item.teacher.id }}')" class="btn-secondary-custom" style="padding: 6px 14px; background: var(--bg-input); border: 1px solid var(--border-input); color: var(--text-primary); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px;"><i class="fas fa-list"></i> Guruhlar</button>
+                        </td>
+                    </tr>
+                    
+                    <!-- Expanded details container for archived teacher -->
+                    <tr class="details-row" id="details-row-archived-{{ item.teacher.id }}" style="display: none;">
+                        <td colspan="7" style="padding: 15px 25px; border-bottom: 1px solid var(--border-card); background: rgba(255, 74, 90, 0.02);">
+                            <div style="border-left: 3px solid #ff6b6b; padding-left: 15px;">
+                               <h5 style="margin-top: 0; margin-bottom: 12px; font-size: 12px; font-weight: 800; color: #ff6b6b; text-transform: uppercase; letter-spacing: 0.5px;">Guruhlar kesimidagi arxivlangan hisob-kitoblar</h5>
+                               {% if item.groups_data %}
+                               <div style="overflow-x: auto;">
+                                   <table style="width: 100%; font-size: 12.5px; border-collapse: collapse;">
+                                      <thead>
+                                         <tr style="background: var(--table-header-bg);">
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; white-space: nowrap;">GURUH NOMI</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">FAN</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">O'TKAZILGAN DARSLAR</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">GURUH TUSHUMI</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">MAOSH TARIFI</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">HISOBLANGAN MAOSH</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">TO'LANGAN</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">QOLDIQ</th>
+                                            <th style="padding: 10px 12px; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; text-align: center; white-space: nowrap;">AMALLAR</th>
+                                         </tr>
+                                      </thead>
+                                      <tbody>
+                                         {% for gd in item.groups_data %}
+                                         <tr style="border-bottom: 1px solid var(--table-border);">
+                                            <td style="padding: 10px 12px; font-weight: 700; color: var(--text-primary); white-space: nowrap;">
+                                                {{ gd.group.name }}
+                                                {% if gd.group.is_closed %}
+                                                    <span style="font-size: 10px; background: rgba(255, 170, 0, 0.15); color: #ffaa00; border: 1px solid rgba(255, 170, 0, 0.3); padding: 1px 5px; border-radius: 4px; margin-left: 4px;">Yopilgan</span>
+                                                {% endif %}
+                                            </td>
+                                            <td style="padding: 10px 12px; text-align: center; color: var(--text-secondary); white-space: nowrap;">{{ gd.group.subject.name }}</td>
+                                            <td style="padding: 10px 12px; text-align: center; font-weight: 700; color: var(--text-primary); white-space: nowrap;">{{ gd.lessons_count }} ta dars</td>
+                                            <td class="amount-accent" style="padding: 10px 12px; text-align: center; color: var(--accent-primary); font-weight: 700; white-space: nowrap;">{{ gd.total_collected|floatformat:2 }} UZS</td>
+                                            <td style="padding: 10px 12px; text-align: center; white-space: nowrap;">
+                                               {% if gd.group.salary_type == 'percent' %}
+                                                  <span class="amount-success" style="color: #00ffaa; font-weight: 700;">{{ gd.group.salary_rate|floatformat:0 }}% (Tushumdan)</span>
+                                               {% else %}
+                                                  <span class="amount-accent" style="color: #4facfe; font-weight: 700;">{{ gd.group.salary_rate }} UZS (Darsbay)</span>
+                                               {% endif %}
+                                            </td>
+                                            <td style="padding: 10px 12px; text-align: center; font-weight: 700; color: var(--text-primary); white-space: nowrap;">{{ gd.earned|floatformat:2 }} UZS</td>
+                                            <td class="amount-success" style="padding: 10px 12px; text-align: center; color: #00ffaa; font-weight: 700; white-space: nowrap;">{{ gd.already_paid|floatformat:2 }} UZS</td>
+                                            <td class="{% if gd.balance > 0 %}amount-danger{% else %}amount-success{% endif %}" style="padding: 10px 12px; text-align: center; color: {% if gd.balance > 0 %}#ff4f4f{% else %}#00ffaa{% endif %}; font-weight: 800; white-space: nowrap;">{{ gd.balance|floatformat:2 }} UZS</td>
+                                            <td style="padding: 10px 12px; text-align: center; white-space: nowrap;">
+                                               <button onclick="openPayModal('{{ item.teacher.id }}', '{{ item.teacher.get_full_name|escapejs }}', '{{ gd.group.id }}', '{{ gd.group.name }}', '{{ gd.balance }}')" style="padding: 6px 12px; background: var(--accent-bg-glow); border: 1px solid var(--accent-border-glow); color: var(--accent-primary); border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: 0.3s;">To'lov qilish</button>
+                                            </td>
+                                         </tr>
+                                         {% endfor %}
+                                      </tbody>
+                                   </table>
+                               </div>
+                               {% else %}
+                               <p style="color: var(--text-muted); font-style: italic; margin: 5px 0;">Bu o'qituvchiga guruhlar biriktirilmagan.</p>
+                               {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="padding: 40px 20px; text-align: center; color: var(--text-muted); font-style: italic;">
+            <i class="fas fa-archive" style="font-size: 32px; display: block; margin-bottom: 12px; color: rgba(255, 74, 90, 0.2);"></i>
+            Arxivlangan o'qituvchilar mavjud emas.
+        </div>
+        {% endif %}
     </div>
 </div>
 
@@ -533,33 +672,75 @@
 
 {% block extra_js %}
 <script>
+    let currentTeacherTab = 'active';
+
+    function switchTeacherTab(tab) {
+        currentTeacherTab = tab;
+        const activeBtn = document.getElementById('tabActiveTeachers');
+        const archivedBtn = document.getElementById('tabArchivedTeachers');
+        const activeContainer = document.getElementById('activeTeachersContainer');
+        const archivedContainer = document.getElementById('archivedTeachersContainer');
+
+        if (tab === 'active') {
+            if (activeBtn) {
+                activeBtn.style.background = 'rgba(0, 242, 254, 0.2)';
+                activeBtn.style.color = '#00f2fe';
+            }
+            if (archivedBtn) {
+                archivedBtn.style.background = 'transparent';
+                archivedBtn.style.color = 'var(--text-secondary)';
+            }
+            if (activeContainer) activeContainer.style.display = 'block';
+            if (archivedContainer) archivedContainer.style.display = 'none';
+        } else {
+            if (archivedBtn) {
+                archivedBtn.style.background = 'rgba(255, 74, 90, 0.2)';
+                archivedBtn.style.color = '#ff6b6b';
+            }
+            if (activeBtn) {
+                activeBtn.style.background = 'transparent';
+                activeBtn.style.color = 'var(--text-secondary)';
+            }
+            if (archivedContainer) archivedContainer.style.display = 'block';
+            if (activeContainer) activeContainer.style.display = 'none';
+        }
+        filterTeachers();
+    }
+
     // Toggle details collapsible row
     function toggleTeacherDetails(teacherId) {
         const detailsRow = document.getElementById('details-row-' + teacherId);
-        if (detailsRow.style.display === 'none') {
-            detailsRow.style.display = 'table-row';
-        } else {
-            detailsRow.style.display = 'none';
+        if (detailsRow) {
+            if (detailsRow.style.display === 'none' || detailsRow.style.display === '') {
+                detailsRow.style.display = 'table-row';
+            } else {
+                detailsRow.style.display = 'none';
+            }
         }
     }
 
     // Live search JS filter
     function filterTeachers() {
         const input = document.getElementById('teacherSearch').value.toLowerCase();
-        const table = document.getElementById('teachersTable');
+        const tableId = currentTeacherTab === 'active' ? 'teachersTable' : 'archivedTeachersTable';
+        const table = document.getElementById(tableId);
+        if (!table) return;
         const rows = table.getElementsByClassName('teacher-row');
         
         for (let i = 0; i < rows.length; i++) {
-            const nameSpan = rows[i].querySelector('.teacher-name').textContent.toLowerCase();
-            const phoneSpan = rows[i].querySelector('.teacher-phone').textContent.toLowerCase();
-            const teacherId = rows[i].id.replace('teacher-row-', '');
-            const detailsRow = document.getElementById('details-row-' + teacherId);
+            const nameEl = rows[i].querySelector('.teacher-name');
+            const phoneEl = rows[i].querySelector('.teacher-phone');
+            const nameSpan = nameEl ? nameEl.textContent.toLowerCase() : '';
+            const phoneSpan = phoneEl ? phoneEl.textContent.toLowerCase() : '';
+            const rawId = rows[i].id.replace('teacher-row-', '').replace('archived-teacher-row-', '');
+            const prefix = currentTeacherTab === 'active' ? '' : 'archived-';
+            const detailsRow = document.getElementById('details-row-' + prefix + rawId);
             
             if (nameSpan.includes(input) || phoneSpan.includes(input)) {
                 rows[i].style.display = 'table-row';
             } else {
                 rows[i].style.display = 'none';
-                detailsRow.style.display = 'none'; // Close expanded details of filtered out rows
+                if (detailsRow) detailsRow.style.display = 'none'; // Close expanded details of filtered out rows
             }
         }
     }

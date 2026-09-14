@@ -37,6 +37,10 @@ class CustomUser(AbstractUser):
     terms_accepted = models.BooleanField(default=False, verbose_name="Nizomga rozilik berilganmi", db_index=True)
     terms_accepted_at = models.DateTimeField(blank=True, null=True, verbose_name="Rozilik berilgan sana")
     terms_accepted_ip = models.CharField(max_length=50, blank=True, null=True, verbose_name="Rozilik berilgan IP")
+    
+    # Soft-delete & Arxiv
+    is_archived = models.BooleanField(default=False, verbose_name="Arxivlangan", db_index=True)
+    archived_at = models.DateTimeField(blank=True, null=True, verbose_name="Arxivlangan vaqti")
 
     def get_full_name(self):
         """

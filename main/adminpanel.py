@@ -437,18 +437,31 @@ def students_list_admin(request):
             messages.error(request, "Faqat bosh administrator o'quvchilarni o'chira oladi!", extra_tags='edit_user')
             return redirect('students_list_admin')
         selected_ids = request.POST.getlist('selected_users')
-        if selected_ids:
-            deleted_count = CustomUser.objects.filter(id__in=selected_ids, role='student').delete()[0]
-            log_action(request.user, "Talabalar O'chirildi", f"{deleted_count} ta talaba ro'yxatdan o'chirildi. (IDs: {selected_ids})", request)
-            messages.success(request, f"{deleted_count} ta o‘quvchi muvaffaqiyatli o‘chirildi.", extra_tags='edit_user')
-        else:
+        action = request.POST.get('action')
+
+        if not selected_ids:
             messages.warning(request, "Hech qanday o‘quvchi tanlanmadi.", extra_tags='edit_user')
-        return redirect('students_list_admin')  # nomini urls.py dan tekshiring!
+            return redirect('students_list_admin')
+
+        if action in ['delete', 'archive']:
+            students_to_archive = CustomUser.objects.filter(id__in=selected_ids, role='student')
+            archived_count = students_to_archive.update(is_archived=True, is_active=False, archived_at=timezone.now())
+            log_action(request.user, "Talabalar Arxivlandi", f"{archived_count} ta talaba arxivlandi. (IDs: {selected_ids})", request)
+            messages.success(request, f"{archived_count} ta o‘quvchi muvaffaqiyatli arxivlandi. Barcha to'lovlar va natijalar tarixi to'liq saqlab qolindi.", extra_tags='edit_user')
+        elif action == 'restore':
+            students_to_restore = CustomUser.objects.filter(id__in=selected_ids, role='student')
+            restored_count = students_to_restore.update(is_archived=False, is_active=True, archived_at=None)
+            log_action(request.user, "Talabalar Qayta Tiklandi", f"{restored_count} ta talaba arxivdan tiklandi. (IDs: {selected_ids})", request)
+            messages.success(request, f"{restored_count} ta o‘quvchi arxivdan muvaffaqiyatli qayta tiklandi.", extra_tags='edit_user')
+        else:
+            messages.warning(request, "Noto'g'ri amal tanlandi.", extra_tags='edit_user')
+        return redirect('students_list_admin')
 
     # GET so‘rov bo‘lsa - ro‘yxatni qaytaradi
-    students = CustomUser.objects.filter(role='student')
+    students = CustomUser.objects.filter(role='student').prefetch_related('student_groups')
     total_students = students.count()
-    active_students = students.filter(is_active=True).count()
+    active_students = students.filter(is_archived=False, is_active=True).count()
+    archived_students = students.filter(is_archived=True).count()
     inactive_students = students.filter(is_active=False).count()
     groups = Group.objects.all()
 
@@ -456,6 +469,7 @@ def students_list_admin(request):
         'students': students,
         'total_students': total_students,
         'active_students': active_students,
+        'archived_students': archived_students,
         'inactive_students': inactive_students,
         'groups': groups,
     })
@@ -681,18 +695,31 @@ def teachers_list_admin(request):
             messages.error(request, "Faqat bosh administrator o'qituvchilarni o'chira oladi!", extra_tags='teacher_list')
             return redirect('teachers_list_admin')
         selected_ids = request.POST.getlist('selected_users')
-        if selected_ids:
-            deleted_count = CustomUser.objects.filter(id__in=selected_ids, role='teacher').delete()[0]
-            log_action(request.user, "O'qituvchilar O'chirildi", f"{deleted_count} ta o'qituvchi o'chirildi. (IDs: {selected_ids})", request)
-            messages.success(request, f"{deleted_count} ta o‘qituvchi muvaffaqiyatli o‘chirildi.", extra_tags='teacher_list')
-        else:
+        action = request.POST.get('action')
+
+        if not selected_ids:
             messages.warning(request, "Hech qanday o‘qituvchi tanlanmadi.", extra_tags='teacher_list')
+            return redirect('teachers_list_admin')
+
+        if action in ['delete', 'archive']:
+            teachers_to_archive = CustomUser.objects.filter(id__in=selected_ids, role='teacher')
+            archived_count = teachers_to_archive.update(is_archived=True, is_active=False, archived_at=timezone.now())
+            log_action(request.user, "O'qituvchilar Arxivlandi", f"{archived_count} ta o'qituvchi arxivlandi. (IDs: {selected_ids})", request)
+            messages.success(request, f"{archived_count} ta o‘qituvchi muvaffaqiyatli arxivlandi. Barcha maosh va darslar tarixi to'liq saqlab qolindi.", extra_tags='teacher_list')
+        elif action == 'restore':
+            teachers_to_restore = CustomUser.objects.filter(id__in=selected_ids, role='teacher')
+            restored_count = teachers_to_restore.update(is_archived=False, is_active=True, archived_at=None)
+            log_action(request.user, "O'qituvchilar Qayta Tiklandi", f"{restored_count} ta o'qituvchi arxivdan tiklandi. (IDs: {selected_ids})", request)
+            messages.success(request, f"{restored_count} ta o‘qituvchi arxivdan muvaffaqiyatli qayta tiklandi.", extra_tags='teacher_list')
+        else:
+            messages.warning(request, "Noto'g'ri amal tanlandi.", extra_tags='teacher_list')
         return redirect('teachers_list_admin')
 
     # GET so‘rov bo‘lsa - ro‘yxatni qaytaradi
     teachers = CustomUser.objects.filter(role='teacher').prefetch_related('subjects', 'teachers_groups')
     total_teachers = teachers.count()
-    active_teachers = teachers.filter(is_active=True).count()
+    active_teachers = teachers.filter(is_archived=False, is_active=True).count()
+    archived_teachers = teachers.filter(is_archived=True).count()
     inactive_teachers = teachers.filter(is_active=False).count()
     subjects = Subject.objects.all().order_by('name')
 
@@ -700,6 +727,7 @@ def teachers_list_admin(request):
         'teachers': teachers,
         'total_teachers': total_teachers,
         'active_teachers': active_teachers,
+        'archived_teachers': archived_teachers,
         'inactive_teachers': inactive_teachers,
         'subjects': subjects,
     })
@@ -4397,8 +4425,12 @@ def delete_subadmin(request, subadmin_id):
     if request.method == 'POST':
         try:
             name = f"{sub_admin.first_name} {sub_admin.last_name}"
-            sub_admin.delete()
-            messages.success(request, f"Sub-admin ({name}) muvaffaqiyatli o'chirildi.")
+            sub_admin.is_active = False
+            sub_admin.is_archived = True
+            sub_admin.archived_at = timezone.now()
+            sub_admin.save()
+            log_action(request.user, "Sub-admin Arxivlandi", f"Sub-admin ({name}) arxivlandi.", request)
+            messages.success(request, f"Sub-admin ({name}) muvaffaqiyatli arxivlandi.")
         except Exception as e:
             messages.error(request, f"Xatolik yuz berdi: {str(e)}")
     return redirect('admin_settings')
@@ -6216,7 +6248,8 @@ def admin_salaries_view(request):
         (9, "Sentabr"), (10, "Oktabr"), (11, "Noyabr"), (12, "Dekabr")
     ]
     
-    teachers = CustomUser.objects.filter(role='teacher').prefetch_related('teachers_groups', 'teachers_groups__subject')
+    active_teachers = CustomUser.objects.filter(role='teacher', is_archived=False).prefetch_related('teachers_groups', 'teachers_groups__subject')
+    archived_teachers = CustomUser.objects.filter(role='teacher', is_archived=True).prefetch_related('teachers_groups', 'teachers_groups__subject')
     
     month_name = dict(months_list)[month_val]
     month_str = f"{month_name} {year_val}"
@@ -6235,58 +6268,62 @@ def admin_salaries_view(request):
     for p in salary_payments:
         paid_lookup[(p['teacher_id'], p['group_id'])] = float(p['total_paid'] or 0)
         
-    salary_report = []
-    total_earned_overall = 0
-    total_paid_overall = 0
-    
-    for teacher in teachers:
-        teacher_groups_data = []
-        teacher_earned = 0.0
-        teacher_paid = 0.0
-        teacher_lessons = 0
-        teacher_revenue = 0.0
-        
-        for group in teacher.teachers_groups.all():
-            lessons_count = group_lessons.get(group.id, 0)
-            total_collected = group_payments.get(group.id, 0.0)
+    def _calc_salary_report(teachers_qs):
+        report = []
+        tot_earned = 0.0
+        tot_paid = 0.0
+        for teacher in teachers_qs:
+            teacher_groups_data = []
+            teacher_earned = 0.0
+            teacher_paid = 0.0
+            teacher_lessons = 0
+            teacher_revenue = 0.0
             
-            earned = 0.0
-            if group.salary_type == 'percent':
-                earned = total_collected * float(group.salary_rate) / 100.0
-            elif group.salary_type == 'fixed':
-                earned = lessons_count * float(group.salary_rate)
+            for group in teacher.teachers_groups.all():
+                lessons_count = group_lessons.get(group.id, 0)
+                total_collected = group_payments.get(group.id, 0.0)
                 
-            already_paid = paid_lookup.get((teacher.id, group.id), 0.0)
-            balance = earned - already_paid
-            
-            teacher_earned += earned
-            teacher_paid += already_paid
-            teacher_lessons += lessons_count
-            teacher_revenue += total_collected
-            
-            total_earned_overall += earned
-            total_paid_overall += already_paid
-            
-            teacher_groups_data.append({
-                'group': group,
-                'lessons_count': lessons_count,
-                'total_collected': total_collected,
-                'earned': earned,
-                'already_paid': already_paid,
-                'balance': balance
+                earned = 0.0
+                if group.salary_type == 'percent':
+                    earned = total_collected * float(group.salary_rate) / 100.0
+                elif group.salary_type == 'fixed':
+                    earned = lessons_count * float(group.salary_rate)
+                    
+                already_paid = paid_lookup.get((teacher.id, group.id), 0.0)
+                balance = earned - already_paid
+                
+                teacher_earned += earned
+                teacher_paid += already_paid
+                teacher_lessons += lessons_count
+                teacher_revenue += total_collected
+                
+                tot_earned += earned
+                tot_paid += already_paid
+                
+                teacher_groups_data.append({
+                    'group': group,
+                    'lessons_count': lessons_count,
+                    'total_collected': total_collected,
+                    'earned': earned,
+                    'already_paid': already_paid,
+                    'balance': balance
+                })
+                
+            report.append({
+                'teacher': teacher,
+                'groups_data': teacher_groups_data,
+                'total_earned': teacher_earned,
+                'total_paid': teacher_paid,
+                'balance': teacher_earned - teacher_paid,
+                'total_lessons': teacher_lessons,
+                'total_revenue': teacher_revenue
             })
-            
-        salary_report.append({
-            'teacher': teacher,
-            'groups_data': teacher_groups_data,
-            'total_earned': teacher_earned,
-            'total_paid': teacher_paid,
-            'balance': teacher_earned - teacher_paid,
-            'total_lessons': teacher_lessons,
-            'total_revenue': teacher_revenue
-        })
+        return report, tot_earned, tot_paid
+
+    salary_report, total_earned_overall, total_paid_overall = _calc_salary_report(active_teachers)
+    archived_salary_report, archived_earned_overall, archived_paid_overall = _calc_salary_report(archived_teachers)
         
-    recent_salary_payments = TeacherSalaryPayment.objects.select_related('teacher', 'group', 'paid_by').order_by('-paid_at')[:10]
+    recent_salary_payments = TeacherSalaryPayment.objects.select_related('teacher', 'group', 'paid_by').order_by('-paid_at')[:15]
     
     # 6 oylik trend ma'lumotlari (Revenue vs Payroll)
     trend_labels = []
@@ -6312,6 +6349,9 @@ def admin_salaries_view(request):
         
     return render(request, 'admin_salaries.html', {
         'salary_report': salary_report,
+        'archived_salary_report': archived_salary_report,
+        'active_teachers_count': len(salary_report),
+        'archived_teachers_count': len(archived_salary_report),
         'months_list': months_list,
         'selected_month': month_val,
         'selected_year': year_val,
@@ -6319,6 +6359,9 @@ def admin_salaries_view(request):
         'total_earned_overall': total_earned_overall,
         'total_paid_overall': total_paid_overall,
         'total_balance_overall': total_earned_overall - total_paid_overall,
+        'archived_earned_overall': archived_earned_overall,
+        'archived_paid_overall': archived_paid_overall,
+        'archived_balance_overall': archived_earned_overall - archived_paid_overall,
         'recent_salary_payments': recent_salary_payments,
         'trend_labels': trend_labels,
         'trend_revenues': trend_revenues,
