@@ -478,6 +478,40 @@
             display: none;
         }
 
+        /* Sidebar Floating Flyout Tooltip (When Sidebar is Collapsed) */
+        #sidebar-floating-tooltip {
+            position: fixed;
+            z-index: 999999;
+            pointer-events: none;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.4;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-8px);
+            transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.15s;
+            background: #0c101d;
+            color: #ffffff;
+            border: 1px solid rgba(0, 242, 254, 0.35);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 242, 254, 0.2);
+        }
+
+        html.light-theme #sidebar-floating-tooltip {
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12), 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        #sidebar-floating-tooltip.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
         /* --- Active Menu Styles --- */
         .sidebar ul li.active {
             background: var(--menu-item-active-bg);
@@ -1895,10 +1929,91 @@
 
         function toggleSidebar() {
             sidebar.classList.toggle('collapsed');
+            const tooltip = document.getElementById('sidebar-floating-tooltip');
+            if (tooltip) tooltip.classList.remove('visible');
         }
 
         if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
         if (mainToggle) mainToggle.addEventListener('click', toggleSidebar);
+
+        // --- SIDEBAR FLOATING FLYOUT TOOLTIP (When Sidebar is Collapsed) ---
+        (function() {
+            let tooltip = document.getElementById('sidebar-floating-tooltip');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.id = 'sidebar-floating-tooltip';
+                document.body.appendChild(tooltip);
+            }
+
+            const sidebarEl = document.getElementById('sidebar');
+            if (!sidebarEl) return;
+
+            function getLinkTooltipText(link) {
+                const span = link.querySelector('span');
+                if (!span) return '';
+                const badge = link.querySelector('span span');
+                let badgeText = '';
+                if (badge && badge.textContent.trim()) {
+                    badgeText = ` (${badge.textContent.trim()})`;
+                }
+                let mainText = '';
+                span.childNodes.forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        mainText += node.textContent;
+                    } else if (node.nodeType === Node.ELEMENT_NODE && node !== badge) {
+                        mainText += node.textContent;
+                    }
+                });
+                mainText = mainText.trim();
+                if (!mainText) {
+                    mainText = span.textContent.trim();
+                }
+                return mainText ? (mainText + badgeText) : '';
+            }
+
+            function hideTooltip() {
+                tooltip.classList.remove('visible');
+            }
+
+            sidebarEl.addEventListener('mouseover', function(e) {
+                if (!sidebarEl.classList.contains('collapsed')) {
+                    hideTooltip();
+                    return;
+                }
+
+                const link = e.target.closest('.menu-container ul li a');
+                if (link) {
+                    const title = getLinkTooltipText(link);
+                    if (title) {
+                        tooltip.textContent = title;
+                        tooltip.classList.add('visible');
+
+                        const rect = link.getBoundingClientRect();
+                        const tooltipHeight = tooltip.offsetHeight || 32;
+                        const topPos = rect.top + (rect.height / 2) - (tooltipHeight / 2);
+                        const leftPos = rect.right + 12;
+
+                        tooltip.style.top = `${Math.max(8, topPos)}px`;
+                        tooltip.style.left = `${leftPos}px`;
+                    }
+                }
+            });
+
+            sidebarEl.addEventListener('mouseout', function(e) {
+                const link = e.target.closest('.menu-container ul li a');
+                const related = e.relatedTarget ? e.relatedTarget.closest('.menu-container ul li a') : null;
+                if (link && link !== related) {
+                    hideTooltip();
+                }
+            });
+
+            const menuContainer = sidebarEl.querySelector('.menu-container');
+            if (menuContainer) {
+                menuContainer.addEventListener('scroll', hideTooltip, { passive: true });
+            }
+            window.addEventListener('resize', hideTooltip);
+            window.addEventListener('scroll', hideTooltip, { passive: true });
+        })();
 
         // Sidebar accordion category collapse
         document.addEventListener('DOMContentLoaded', () => {
