@@ -102,6 +102,7 @@ def complete_payment_order(order: PaymentOrder, provider_transaction_id: str = "
             f"💰 Summa: <b>{order.amount:,.0f} so'm</b>\n"
             f"💳 To'lov turi: <b>{order.provider.capitalize()}</b>\n"
             f"🧾 Chek ID: <code>#ORD-{order.id}</code>\n\n"
+            f"ℹ️ <i>To'lov chekini shaxsiy profilingizga (lms.upcode.uz) kirib, to'lovlar tarixidan yuklab olishingiz mumkin.</i>\n\n"
             f"Rahmat, darslaringizda omad tilaymiz!"
         )
     else:

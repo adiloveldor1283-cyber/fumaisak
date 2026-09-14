@@ -2941,16 +2941,16 @@ def add_group_payment(request, group_id):
             payment_info.course_duration_months = duration
             payment_info.monthly_fee = monthly_fee
             payment_info.save()
-            messages.success(request, "To‘lov ma'lumotlari yangilandi.", extra_tags='payment_success')
+            messages.success(request, f"'{group.name}' guruhi to‘lov ma'lumotlari yangilandi.", extra_tags='payment_success')
         else:
             GroupPaymentInfo.objects.create(
                 group=group,
                 course_duration_months=duration,
                 monthly_fee=monthly_fee
             )
-            messages.success(request, "To‘lov ma'lumotlari qo‘shildi.", extra_tags='payment_success')
+            messages.success(request, f"'{group.name}' guruhi to‘lov ma'lumotlari muvaffaqiyatli saqlandi.", extra_tags='payment_success')
 
-        return redirect('add_group_payment', group_id=group.id)
+        return redirect('group_payment_list')
 
     return render(request, 'add_payment.html', {
         'group': group,
@@ -3024,16 +3024,15 @@ def student_payment(request, group_id, student_id):
         if student.telegram_chat_id:
             from main.telegram_service import send_telegram_message
             try:
-                formatted_amount = f"{int(amount_paid):,}".replace(",", " ")
-                receipt_url = request.build_absolute_uri(pdf_url)
+                formatted_amount = f"{int(amount_paid_val):,}".replace(",", " ")
                 tg_text = (
                     f"<b>Yangi To'lov Qabul Qilindi</b> ✅\n\n"
-                    f"<b>Talaba:</b> {student.first_name} {student.last_name}\n"
+                    f"<b>O'quvchi:</b> {student.get_full_name()}\n"
                     f"<b>Guruh:</b> {group.name}\n"
                     f"<b>Oy:</b> {payment.get_month_display()}\n"
                     f"<b>To'lov summasi:</b> {formatted_amount} so'm\n\n"
-                    f"Sizning to'lovingiz tizimga muvaffaqiyatli kiritildi. Rahmat!\n"
-                    f"📄 <a href='{receipt_url}'>To'lov chekini yuklab olish</a>"
+                    f"Sizning to'lovingiz tizimga muvaffaqiyatli kiritildi. Rahmat!\n\n"
+                    f"ℹ️ <i>To'lov chekini shaxsiy profilingizga (lms.upcode.uz) kirib, to'lovlar tarixidan yuklab olishingiz mumkin.</i>"
                 )
                 send_telegram_message(student.telegram_chat_id, tg_text)
             except Exception as e:
