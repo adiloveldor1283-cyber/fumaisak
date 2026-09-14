@@ -427,7 +427,7 @@
                     </td>
                     <td data-label="Amallar" style="text-align: center;">
                         {% if item.submission %}
-                            <button class="btn-otish" onclick="openModal('{{ item.student.id }}', '{{ item.student.get_full_name }}', '{% if item.submission.file %}{{ item.submission.file.url }}{% endif %}', '{{ item.submission.grade|default:'' }}')"><i class="fas fa-marker" style="margin-right: 6px;"></i>Baholash</button>
+                            <button class="btn-otish" data-student-id="{{ item.student.id }}" data-student-name="{{ item.student.get_full_name }}" data-file-url="{% if item.submission.file %}{{ item.submission.file.url }}{% endif %}" data-grade="{{ item.submission.grade|default:'' }}" onclick="openModal(this.dataset.studentId, this.dataset.studentName, this.dataset.fileUrl, this.dataset.grade)"><i class="fas fa-marker" style="margin-right: 6px;"></i>Baholash</button>
                         {% else %}
                             <span style="color: rgba(255,255,255,0.2);">—</span>
                         {% endif %}

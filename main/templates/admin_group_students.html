@@ -230,7 +230,7 @@
                     {% endif %}
                 </td>
                 <td data-label="TO'LOV AMALI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
-                    <button class="btn-otish" onclick="openModal('{{ item.student.id }}', '{{ item.student.get_full_name }}', '{{ item.student.balance }}')" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">
+                    <button class="btn-otish" data-student-id="{{ item.student.id }}" data-student-name="{{ item.student.get_full_name }}" data-student-balance="{{ item.student.balance }}" onclick="openModal(this.dataset.studentId, this.dataset.studentName, this.dataset.studentBalance)" style="display: inline-block; padding: 8px 16px; background: rgba(0, 242, 254, 0.07); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; text-align: center; cursor: pointer;">
                         <i class="fas fa-plus-circle" style="margin-right: 4px;"></i> To'lov qo'shish
                     </button>
                 </td>
@@ -283,7 +283,8 @@
         currentStudentIdForDiscount = studentId;
         const nameEl = document.getElementById("modalStudentNameText");
         if (nameEl) nameEl.innerText = studentName;
-        document.getElementById("studentBalanceSpan").innerText = parseFloat(studentBalance).toLocaleString('uz-UZ') || '0';
+        const bal = parseFloat(studentBalance);
+        document.getElementById("studentBalanceSpan").innerText = isNaN(bal) ? '0' : bal.toLocaleString('uz-UZ');
         document.getElementById("paymentForm").action = "{% url 'student_payment' group.id 0 %}".replace("/0/", "/" + studentId + "/");
         document.getElementById("paymentModal").style.display = "flex";
         document.getElementById("pay_from_balance_checkbox").checked = false;

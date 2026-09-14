@@ -505,7 +505,7 @@
                         <td>
                             {% if item.submission %}
                                 <!-- Modalni ochuvchi tugma -->
-                                <button onclick="openModal('{{ item.student.id }}', '{{ item.student.get_full_name }}', '{{ item.submission.file.url }}', '{{ item.submission.score|default:'' }}')">Baholash</button>
+                                <button onclick="openModal('{{ item.student.id }}', '{{ item.student.get_full_name|escapejs }}', '{{ item.submission.file.url }}', '{{ item.submission.score|default:'' }}')">Baholash</button>
                             {% else %}
                                 —
                             {% endif %}
