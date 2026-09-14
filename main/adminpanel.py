@@ -299,14 +299,33 @@ def edit_group_admin(request, group_id):
     if request.method == 'POST':
         if 'delete' in request.POST:
             if request.user.role != 'admin' and not request.user.is_superuser:
-                messages.error(request, "Faqat bosh administrator guruhni o'chira oladi!", extra_tags='edit_group')
+                messages.error(request, "Faqat bosh administrator guruhni yopa oladi!", extra_tags='edit_group')
                 return redirect('edit_group_admin', group_id=group.id)
-            group_name = group.name
-            group_id_val = group.id
-            group.delete()
-            log_action(request.user, "Guruh O'chirildi", f"Guruh o'chirildi: {group_name} (ID: {group_id_val})", request)
-            messages.success(request, "Guruh muvaffaqiyatli o‘chirildi.", extra_tags='edit_group')
+            
+            group.is_active = False
+            group.closed_at = timezone.now()
+            if "(yopilgan)" not in group.name.lower():
+                group.name = f"{group.name.strip()} (yopilgan)"
+            group.save()
+            
+            log_action(request.user, "Guruh Yopildi", f"Guruh yopildi va arxivlandi: {group.name} (ID: {group.id})", request)
+            messages.success(request, f"'{group.name}' guruhi muvaffaqiyatli yopildi. Barcha to'lov tarixi va qarzdorliklar to'liq saqlab qolindi.", extra_tags='edit_group')
             return redirect('all_groups_admin')
+
+        if 'reopen' in request.POST:
+            if request.user.role != 'admin' and not request.user.is_superuser:
+                messages.error(request, "Faqat bosh administrator guruhni qayta faollashtira oladi!", extra_tags='edit_group')
+                return redirect('edit_group_admin', group_id=group.id)
+            
+            import re
+            group.is_active = True
+            group.closed_at = None
+            group.name = re.sub(r'\s*\([yY]opilgan\)\s*$', '', group.name).strip()
+            group.save()
+            
+            log_action(request.user, "Guruh Qayta Ochildi", f"Guruh qayta ochildi: {group.name} (ID: {group.id})", request)
+            messages.success(request, f"'{group.name}' guruhi muvaffaqiyatli qayta ochildi.", extra_tags='edit_group')
+            return redirect('edit_group_admin', group_id=group.id)
 
         group.name = request.POST.get('group-name')
         

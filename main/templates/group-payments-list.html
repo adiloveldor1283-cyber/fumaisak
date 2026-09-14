@@ -32,7 +32,12 @@
             {% for group in groups %}
             <tr>
                 <td data-label="№" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #4facfe;">{{ forloop.counter }}</td>
-                <td data-label="GURUH NOMI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">{{ group.name }}</td>
+                <td data-label="GURUH NOMI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-weight: 700; color: #ffffff;">
+                    {{ group.name }}
+                    {% if not group.is_active or "(yopilgan)" in group.name %}
+                        <span style="display: inline-block; padding: 2px 7px; border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba(255, 74, 90, 0.15); color: #ff4a5a; border: 1px solid rgba(255, 74, 90, 0.3); margin-left: 6px;">Yopilgan</span>
+                    {% endif %}
+                </td>
                 <td data-label="YARATILGAN VAQTI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-family: monospace; color: rgba(255,255,255,0.6);">{{ group.created_at|date:"d.m.Y H:i" }}</td>
                 <td data-label="KURS DAVOMIYLIGI" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #00ffaa; font-weight: 600;">{{ group.payment_info.course_duration_months }} oy</td>
                 <td data-label="OYLIK TO'LOV" style="padding: 16px 20px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); color: #00f2fe; font-weight: 700;">{{ group.payment_info.monthly_fee }} so'm</td>

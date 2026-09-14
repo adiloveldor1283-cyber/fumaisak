@@ -178,7 +178,29 @@
         </a>
         <h2 class="sarlavha" style="font-size: 22px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Guruhni tahrirlash ({{ group.name }})</h2>
     </div>
+    {% if not group.is_active or "(yopilgan)" in group.name %}
+    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 10px; font-size: 12.5px; font-weight: 700; background: rgba(255, 74, 90, 0.15); color: #ff4a5a; border: 1px solid rgba(255, 74, 90, 0.3);">
+        <i class="fas fa-archive"></i> Ushbu guruh yopilgan
+    </span>
+    {% endif %}
 </div>
+
+{% if not group.is_active or "(yopilgan)" in group.name %}
+<div style="background: rgba(255, 74, 90, 0.1); border: 1px solid rgba(255, 74, 90, 0.25); border-radius: 16px; padding: 16px 20px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <i class="fas fa-info-circle" style="color: #ff4a5a; font-size: 20px;"></i>
+        <div>
+            <div style="font-weight: 700; color: #ffffff; font-size: 14px;">Guruh yopilgan (Arxivda)</div>
+            <div style="color: rgba(255,255,255,0.6); font-size: 12.5px;">Ushbu guruhning barcha to'lov tarixi, kvitantsiyalari va qarzdorliklari saqlab qolingan. Kerak bo'lsa uni qayta ochishingiz mumkin.</div>
+        </div>
+    </div>
+    <form method="POST" onsubmit="return confirm('Haqiqatan ham ushbu guruhni qayta ochmoqchimisiz?');" style="margin: 0;">
+        {% csrf_token %}
+        <input type="hidden" name="reopen" value="true">
+        <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #00ffaa, #00b4d8); color: #070a12; padding: 8px 18px; font-size: 12.5px;"><i class="fas fa-box-open" style="margin-right: 6px;"></i> Guruhni qayta ochish</button>
+    </form>
+</div>
+{% endif %}
 
 <div class="form-card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); margin-bottom: 25px;">
     <form method="POST" id="mainGroupForm">
@@ -268,12 +290,14 @@
         </div>
     </form>
 
-    <!-- Guruhni o'chirish formasi -->
-    <form method="POST" onsubmit="return confirm('Haqiqatan ham ushbu guruhni o\'chirmoqchimisiz? Guruhga tegishli barcha ma\'lumotlar o\'chirilishi mumkin.');" style="margin-top: -54px; text-align: right;">
+    <!-- Guruhni yopish (Arxivlash) formasi -->
+    {% if group.is_active and "(yopilgan)" not in group.name %}
+    <form method="POST" onsubmit="return confirm('Haqiqatan ham ushbu guruhni yopmoqchimisiz? Guruh yopilganda barcha to\'lov tarixi, kvitantsiyalar va qarzdorliklar to\'liq saqlanadi.');" style="margin-top: -54px; text-align: right;">
         {% csrf_token %}
         <input type="hidden" name="delete" value="true">
-        <button type="submit" class="btn-danger-action"><i class="fas fa-trash-alt" style="margin-right: 6px;"></i> Guruhni o'chirish</button>
+        <button type="submit" class="btn-danger-action"><i class="fas fa-archive" style="margin-right: 6px;"></i> Guruhni yopish (Arxivlash)</button>
     </form>
+    {% endif %}
 </div>
 {% endblock %}
 

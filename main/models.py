@@ -92,6 +92,8 @@ class Group(models.Model):
     students = models.ManyToManyField(CustomUser, through='GroupStudentMembership', related_name='student_groups', limit_choices_to={'role': 'student'})
     teachers = models.ManyToManyField(CustomUser, related_name='teachers_groups', limit_choices_to={'role': 'teacher'})
     created_at = models.DateTimeField(verbose_name='Guruh ochilgan vaqti', default=timezone.now, db_index=True)
+    is_active = models.BooleanField(default=True, verbose_name="Faol / Ochiq guruh", db_index=True)
+    closed_at = models.DateTimeField(null=True, blank=True, verbose_name="Guruh yopilgan vaqti")
     
     # O'qituvchi maoshi parametrlari
     salary_type = models.CharField(max_length=15, choices=(('percent', "Foizli (Tushumdan)"), ('fixed', "Darsbay (Ruxsat etilgan fixed)")), default='percent', verbose_name="Maosh turi")
@@ -99,6 +101,10 @@ class Group(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def is_closed(self):
+        return not self.is_active or "(yopilgan)" in self.name.lower()
 
 
 class GroupStudentMembership(models.Model):
