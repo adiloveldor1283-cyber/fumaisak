@@ -569,16 +569,27 @@ class StudentDTMExamResult(models.Model):
 
 class SystemErrorLog(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='error_logs', db_index=True)
+    user_role = models.CharField(max_length=30, blank=True, null=True, verbose_name="Foydalanuvchi roli", db_index=True)
+    user_phone = models.CharField(max_length=30, blank=True, null=True, verbose_name="Foydalanuvchi telefoni")
     url_path = models.CharField(max_length=255, verbose_name="Xatolik yuz bergan URL", db_index=True)
+    http_method = models.CharField(max_length=10, default='GET', verbose_name="HTTP Metod", db_index=True)
+    exception_type = models.CharField(max_length=150, blank=True, null=True, verbose_name="Xatolik turi (Exception)", db_index=True)
     error_message = models.TextField(verbose_name="Xatolik xabari")
     traceback = models.TextField(verbose_name="Traceback tafsiloti")
+    ip_address = models.CharField(max_length=50, blank=True, null=True, verbose_name="IP Manzil", db_index=True)
+    user_agent = models.TextField(blank=True, null=True, verbose_name="Qurilma va Brauzer (User-Agent)")
+    request_data = models.TextField(blank=True, null=True, verbose_name="So'rov parametrlari (JSON)")
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Vaqti", db_index=True)
     is_resolved = models.BooleanField(default=False, verbose_name="Hal etildi", db_index=True)
     resolved_at = models.DateTimeField(null=True, blank=True, verbose_name="Hal etilgan vaqt")
     resolved_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='resolved_errors', verbose_name="Hal etgan shaxs")
 
     def __str__(self):
-        return f"Error on {self.url_path} ({self.timestamp})"
+        return f"{self.exception_type or 'Error'} on {self.url_path} ({self.timestamp})"
+
+    class Meta:
+        verbose_name = "Tizim xatolik jurnali"
+        verbose_name_plural = "Tizim xatolik jurnallari"
 
 
 class LockedPage(models.Model):

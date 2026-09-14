@@ -220,18 +220,58 @@ class ErrorTrackingMiddleware:
         return response
 
     def process_exception(self, request, exception):
+        import json
         import traceback
         from main.models import SystemErrorLog, LockedPage
+        from main.utils import get_client_ip
         
         user = request.user if request.user and request.user.is_authenticated else None
+        user_role = getattr(user, 'role', 'guest') if user else 'anonymous'
+        user_phone = getattr(user, 'phone_number', '') if user else ''
         tb_str = traceback.format_exc()
         
-        SystemErrorLog.objects.create(
-            user=user,
-            url_path=request.path,
-            error_message=str(exception),
-            traceback=tb_str
-        )
+        # Sanitize GET/POST request data to avoid saving passwords/tokens in plaintext
+        safe_data = {}
+        try:
+            if request.GET:
+                safe_data['GET'] = dict(request.GET.items())
+            if request.POST:
+                post_copy = {}
+                sensitive_keys = {'password', 'new_password1', 'new_password2', 'old_password', 'secret', 'token', 'csrfmiddlewaretoken'}
+                for k, v in request.POST.items():
+                    if any(s in k.lower() for s in sensitive_keys):
+                        post_copy[k] = "******"
+                    else:
+                        post_copy[k] = v
+                safe_data['POST'] = post_copy
+        except Exception:
+            pass
+
+        req_data_json = json.dumps(safe_data, ensure_ascii=False) if safe_data else ""
+        exc_type = type(exception).__name__
+        full_url = request.get_full_path()
+        try:
+            ip_addr = get_client_ip(request)
+        except Exception:
+            ip_addr = request.META.get('REMOTE_ADDR')
+        user_agent = request.META.get('HTTP_USER_AGENT', '')
+
+        try:
+            SystemErrorLog.objects.create(
+                user=user,
+                user_role=user_role,
+                user_phone=user_phone,
+                url_path=full_url[:255],
+                http_method=request.method,
+                exception_type=exc_type[:150],
+                error_message=str(exception),
+                traceback=tb_str,
+                ip_address=ip_addr,
+                user_agent=user_agent,
+                request_data=req_data_json
+            )
+        except Exception as log_err:
+            print(f"Error logging SystemErrorLog: {log_err}")
         
         path = request.path
         if not self.is_whitelisted(path):

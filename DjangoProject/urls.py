@@ -20,7 +20,7 @@ from django.views.static import serve
 
 from django.conf import settings
 from django.conf.urls.static import static
-from main import views, teacher, student, adminpanel, payment_views
+from main import views, teacher, student, adminpanel, payment_views, monitoring_views
 
 urlpatterns = [
     path('favicon.ico', views.circular_favicon_view, name='favicon_ico'),
@@ -247,8 +247,13 @@ urlpatterns = [
     path('student/dtm/', student.student_dtm_list, name='student_dtm_list'),
     path('student/dtm/register/<int:exam_id>/', student.student_dtm_register, name='student_dtm_register'),
 
-    # System Error logs and Locked pages
-    path('adminpanel/error-logs/', adminpanel.admin_error_logs, name='admin_error_logs'),
+    # System Health, Monitoring & Error Logs
+    path('adminpanel/monitoring/', monitoring_views.admin_monitoring_dashboard, name='admin_monitoring_dashboard'),
+    path('api/monitoring/overview/', monitoring_views.api_monitoring_overview, name='api_monitoring_overview'),
+    path('api/monitoring/errors/', monitoring_views.api_monitoring_errors, name='api_monitoring_errors'),
+    path('api/monitoring/errors/<int:error_id>/resolve/', monitoring_views.api_monitoring_resolve_error, name='api_monitoring_resolve_error'),
+    path('api/monitoring/errors/bulk-resolve/', monitoring_views.api_monitoring_bulk_resolve, name='api_monitoring_bulk_resolve'),
+    path('adminpanel/error-logs/', monitoring_views.admin_monitoring_dashboard, name='admin_error_logs'),
     path('adminpanel/error-logs/resolve/<int:log_id>/', adminpanel.admin_resolve_error, name='admin_resolve_error'),
     path('adminpanel/locked-pages/', adminpanel.admin_locked_pages, name='admin_locked_pages'),
     path('adminpanel/locked-pages/unlock/<int:page_id>/', adminpanel.admin_unlock_page, name='admin_unlock_page'),

@@ -1783,9 +1783,9 @@
                 <li><a href="{% url 'admin_sessions' %}"><i class="fas fa-users-cog"></i><span> Faol seanslar</span></a></li>
                 <li><a href="{% url 'admin_audit_logs' %}"><i class="fas fa-history"></i><span> Audit jurnali</span></a></li>
                 <li>
-                    <a href="{% url 'admin_error_logs' %}">
-                        <i class="fas fa-bug"></i>
-                        <span> Xatoliklar jurnali</span>
+                    <a href="{% url 'admin_monitoring_dashboard' %}">
+                        <i class="fas fa-heartbeat" style="color: #00f2fe;"></i>
+                        <span> Tizim Monitoringi</span>
                         {% if unread_errors_count > 0 %}
                             <span style="display: inline-block; background: #ff0055; color: #ffffff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 8px; margin-left: 6px; vertical-align: middle; box-shadow: 0 0 8px rgba(255, 0, 85, 0.4);">
                                 {{ unread_errors_count }}

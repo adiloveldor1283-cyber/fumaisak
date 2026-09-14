@@ -1,0 +1,995 @@
+{% extends "baseadmin.html" %}
+
+{% block title %}Tizim Salomatligi va Monitoringi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .konteyner {
+        overflow-y: auto !important;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Live Pulsing Dot */
+    .live-pulse {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #00ffaa;
+        box-shadow: 0 0 0 rgba(0, 255, 170, 0.4);
+        animation: pulseAnimation 2s infinite;
+        vertical-align: middle;
+        margin-right: 6px;
+    }
+
+    .live-pulse.critical {
+        background: #ff0055;
+        box-shadow: 0 0 0 rgba(255, 0, 85, 0.4);
+        animation: pulseAnimationRed 1.5s infinite;
+    }
+
+    .live-pulse.warning {
+        background: #ff9f43;
+        box-shadow: 0 0 0 rgba(255, 159, 67, 0.4);
+    }
+
+    @keyframes pulseAnimation {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 170, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(0, 255, 170, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 170, 0); }
+    }
+
+    @keyframes pulseAnimationRed {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 0, 85, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 0, 85, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 0, 85, 0); }
+    }
+
+    /* Modern Card Grid */
+    .monitoring-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .monitor-card {
+        background: rgba(11, 15, 25, 0.55);
+        border: 1px solid var(--border-card);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .monitor-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(0, 242, 254, 0.3);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    .monitor-card-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        margin-bottom: 14px;
+    }
+
+    .monitor-card-value {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        line-height: 1.1;
+        margin-bottom: 4px;
+        color: var(--text-primary);
+    }
+
+    .monitor-card-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    /* Method Badges */
+    .badge-method {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        font-family: monospace;
+    }
+    .badge-method-get { background: rgba(0, 242, 254, 0.12); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); }
+    .badge-method-post { background: rgba(0, 255, 170, 0.12); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.3); }
+    .badge-method-put { background: rgba(255, 159, 67, 0.12); color: #ff9f43; border: 1px solid rgba(255, 159, 67, 0.3); }
+    .badge-method-delete { background: rgba(255, 0, 85, 0.12); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.3); }
+
+    /* Role Badges */
+    .badge-role {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-size: 11.5px;
+        font-weight: 700;
+    }
+    .badge-role-admin { background: rgba(255, 0, 85, 0.12); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.25); }
+    .badge-role-teacher { background: rgba(0, 242, 254, 0.12); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.25); }
+    .badge-role-student { background: rgba(0, 255, 170, 0.12); color: #00ffaa; border: 1px solid rgba(0, 255, 170, 0.25); }
+    .badge-role-anon { background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); border: 1px solid rgba(255, 255, 255, 0.12); }
+
+    /* Diagnostics Modal */
+    .diag-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .diag-modal-content {
+        background: #0b0f19;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 20px;
+        width: 100%;
+        max-width: 950px;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+        animation: modalAppear 0.25s ease-out;
+    }
+
+    @keyframes modalAppear {
+        from { opacity: 0; transform: scale(0.96) translateY(10px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .diag-tab-btn {
+        padding: 10px 18px;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: var(--text-secondary);
+        font-weight: 700;
+        font-size: 13.5px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .diag-tab-btn.active {
+        color: #00f2fe;
+        border-bottom-color: #00f2fe;
+        background: rgba(0, 242, 254, 0.05);
+    }
+
+    .diag-code-box {
+        background: #050811;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 16px;
+        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        font-size: 12.5px;
+        color: #e6edf3;
+        white-space: pre-wrap;
+        word-break: break-all;
+        max-height: 380px;
+        overflow-y: auto;
+    }
+
+    .diag-info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 13.5px;
+    }
+
+    .diag-info-label {
+        color: var(--text-secondary);
+        font-weight: 600;
+        width: 35%;
+    }
+
+    .diag-info-value {
+        color: var(--text-primary);
+        font-weight: 700;
+        width: 65%;
+        word-break: break-all;
+    }
+
+    /* Toast Notification */
+    #monitorToast {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        background: #0f172a;
+        border: 1px solid #00ffaa;
+        color: #ffffff;
+        padding: 14px 22px;
+        border-radius: 12px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        display: none;
+        align-items: center;
+        gap: 12px;
+        z-index: 10000;
+        font-weight: 600;
+        font-size: 14px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="padding: 10px; display: flex; flex-direction: column; width: 100%;">
+
+    <!-- 🔝 Header & Live Status Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; flex-wrap: wrap; gap: 15px;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                <h2 style="font-size: 24px; font-weight: 800; color: var(--text-primary); border-left: 4px solid var(--accent-primary); padding-left: 12px; letter-spacing: -0.5px; margin: 0; line-height: 1;">
+                    Tizim Salomatligi va Monitoringi
+                </h2>
+                <span id="liveBadge" style="display: inline-flex; align-items: center; background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.3); color: #00ffaa; font-size: 11.5px; font-weight: 800; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px;">
+                    <span class="live-pulse" id="livePulseDot"></span> LIVE MONITOR
+                </span>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 13.5px; font-weight: 500; margin-bottom: 0; padding-left: 16px;">
+                Real vaqt rejimida barcha unhandled exception xatoliklar, so'rov parametrlari va server holati nazorati
+            </p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <!-- Auto-refresh interval -->
+            <div style="display: flex; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); border-radius: 10px; padding: 6px 12px; font-size: 13px; color: var(--text-secondary); gap: 8px;">
+                <i class="fas fa-clock" style="color: #00f2fe;"></i>
+                <label for="autoRefreshSelect" style="margin: 0; font-weight: 600;">Avto-yangilash:</label>
+                <select id="autoRefreshSelect" onchange="changeAutoRefresh(this.value)" style="background: transparent; border: none; color: var(--text-primary); font-weight: 700; outline: none; cursor: pointer;">
+                    <option value="0" style="background: #0c101d;">O'chiq</option>
+                    <option value="10" selected style="background: #0c101d;">10 soniya</option>
+                    <option value="30" style="background: #0c101d;">30 soniya</option>
+                    <option value="60" style="background: #0c101d;">1 daqiqa</option>
+                </select>
+            </div>
+
+            <!-- Manual Refresh Button -->
+            <button onclick="refreshDashboard(true)" id="refreshBtn" style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; font-weight: 700; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;">
+                <i class="fas fa-sync-alt" id="refreshIcon"></i> Yangilash
+            </button>
+
+            <!-- Bulk Resolve Button -->
+            {% if unresolved_count > 0 %}
+            <button onclick="bulkResolveAll()" style="background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.3); color: #00ffaa; font-weight: 700; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;">
+                <i class="fas fa-check-double"></i> Barchasini hal qilish
+            </button>
+            {% endif %}
+
+            <!-- Locked Pages Link -->
+            <a href="{% url 'admin_locked_pages' %}" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); color: var(--text-primary); font-weight: 700; padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;">
+                <i class="fas fa-lock" style="color: #ff0055;"></i> Bloklanganlar ({{ locked_count }})
+            </a>
+        </div>
+    </div>
+
+    <!-- 📊 Key Metric Cards -->
+    <div class="monitoring-grid">
+        <!-- DB & Server Health -->
+        <div class="monitor-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div class="monitor-card-value" id="cardDbLatency" style="color: #00ffaa;">
+                        {{ db_health.latency_ms }} ms
+                    </div>
+                    <div class="monitor-card-label">Ma'lumotlar Bazasi (DB Ping)</div>
+                </div>
+                <div class="monitor-card-icon" style="background: rgba(0, 255, 170, 0.12); color: #00ffaa;">
+                    <i class="fas fa-database"></i>
+                </div>
+            </div>
+            <div style="margin-top: 10px; font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+                <span style="color: #00ffaa; font-weight: 700;">● Engine: {{ db_health.engine|upper }}</span>
+                <span>• Holat: {% if db_health.connected %}Barqaror{% else %}Ulanish uzilgan{% endif %}</span>
+            </div>
+        </div>
+
+        <!-- Unresolved Errors -->
+        <div class="monitor-card" style="{% if unresolved_count > 0 %}border-color: rgba(255, 0, 85, 0.4); background: rgba(255, 0, 85, 0.03);{% endif %}">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div class="monitor-card-value" id="cardUnresolvedCount" style="color: {% if unresolved_count > 0 %}#ff0055{% else %}#00ffaa{% endif %};">
+                        {{ unresolved_count }}
+                    </div>
+                    <div class="monitor-card-label">Faol (Hal qilinmagan) Xatoliklar</div>
+                </div>
+                <div class="monitor-card-icon" style="background: rgba(255, 0, 85, 0.12); color: #ff0055;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+            </div>
+            <div style="margin-top: 10px; font-size: 12px; color: var(--text-secondary);">
+                {% if unresolved_count > 0 %}
+                    <span style="color: #ff0055; font-weight: 700;"><i class="fas fa-bell"></i> E'tibor talab qilinadi</span>
+                {% else %}
+                    <span style="color: #00ffaa; font-weight: 700;"><i class="fas fa-check-circle"></i> Barcha xatoliklar bartaraf etilgan</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 24h Errors -->
+        <div class="monitor-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div class="monitor-card-value" id="cardTodayCount" style="color: #00f2fe;">
+                        {{ today_count }}
+                    </div>
+                    <div class="monitor-card-label">Bugungi xatoliklar (Jami)</div>
+                </div>
+                <div class="monitor-card-icon" style="background: rgba(0, 242, 254, 0.12); color: #00f2fe;">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+            </div>
+            <div style="margin-top: 10px; font-size: 12px; color: var(--text-secondary);">
+                <span>Oxirgi 24 soatda: <strong>{{ last_24h_count }} ta</strong></span>
+            </div>
+        </div>
+
+        <!-- Total Resolved -->
+        <div class="monitor-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div class="monitor-card-value" id="cardResolvedCount" style="color: #a855f7;">
+                        {{ resolved_count }}
+                    </div>
+                    <div class="monitor-card-label">Hal etilgan xatoliklar jami</div>
+                </div>
+                <div class="monitor-card-icon" style="background: rgba(168, 85, 247, 0.12); color: #a855f7;">
+                    <i class="fas fa-clipboard-check"></i>
+                </div>
+            </div>
+            <div style="margin-top: 10px; font-size: 12px; color: var(--text-secondary);">
+                <span>Muvaffaqiyatli bartaraf etilgan jurnallar</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🛠️ Server Environment & Diagnostics Mini-Strip -->
+    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-card); border-radius: 12px; padding: 10px 18px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 12.5px; color: var(--text-secondary);">
+        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <span><i class="fab fa-python" style="color: #00f2fe; margin-right: 5px;"></i> Python <strong>{{ server_info.python_version }}</strong></span>
+            <span><i class="fas fa-layer-group" style="color: #00ffaa; margin-right: 5px;"></i> Django <strong>{{ server_info.django_version }}</strong></span>
+            <span><i class="fas fa-code-branch" style="color: #ff9f43; margin-right: 5px;"></i> DEBUG: <strong>{% if server_info.debug_mode %}ON (Ishlab chiqish){% else %}OFF (Production){% endif %}</strong></span>
+            <span><i class="fas fa-server" style="color: #a855f7; margin-right: 5px;"></i> Server Vaqti: <strong>{{ server_info.server_time }}</strong></span>
+        </div>
+        <div>
+            <a href="{% url 'api_monitoring_overview' %}" target="_blank" style="color: #00f2fe; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                <i class="fas fa-terminal"></i> REST API JSON <i class="fas fa-external-link-alt" style="font-size: 10px;"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- 🔍 Filter and Search Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+        <!-- Status Tabs -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <a href="?status=unresolved{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid {% if current_status == 'unresolved' %}#ff0055; background: rgba(255,0,85,0.12); color: #ff0055;{% else %}var(--border-card); background: rgba(255,255,255,0.02); color: var(--text-secondary);{% endif %} transition: 0.2s;">
+                <i class="fas fa-fire-alt" style="margin-right: 4px;"></i> Faol ({{ unresolved_count }})
+            </a>
+            <a href="?status=resolved{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid {% if current_status == 'resolved' %}#00ffaa; background: rgba(0, 255, 170, 0.12); color: #00ffaa;{% else %}var(--border-card); background: rgba(255,255,255,0.02); color: var(--text-secondary);{% endif %} transition: 0.2s;">
+                <i class="fas fa-check" style="margin-right: 4px;"></i> Hal qilinganlar ({{ resolved_count }})
+            </a>
+            <a href="?status=all{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid {% if current_status == 'all' %}#00f2fe; background: rgba(0, 242, 254, 0.12); color: #00f2fe;{% else %}var(--border-card); background: rgba(255,255,255,0.02); color: var(--text-secondary);{% endif %} transition: 0.2s;">
+                Barchasi
+            </a>
+        </div>
+
+        <!-- Method & Role & Search Form -->
+        <form method="GET" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0;">
+            <input type="hidden" name="status" value="{{ current_status }}">
+
+            <!-- Metod filtri -->
+            <select name="method" onchange="this.form.submit()" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-card); border-radius: 10px; padding: 7px 12px; color: var(--text-primary); font-size: 13px; font-weight: 600; outline: none;">
+                <option value="" style="background: #0c101d;">Metod (Barchasi)</option>
+                <option value="GET" {% if method == 'GET' %}selected{% endif %} style="background: #0c101d;">GET</option>
+                <option value="POST" {% if method == 'POST' %}selected{% endif %} style="background: #0c101d;">POST</option>
+            </select>
+
+            <!-- Rol filtri -->
+            <select name="role" onchange="this.form.submit()" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-card); border-radius: 10px; padding: 7px 12px; color: var(--text-primary); font-size: 13px; font-weight: 600; outline: none;">
+                <option value="" style="background: #0c101d;">Rol (Barchasi)</option>
+                <option value="admin" {% if role == 'admin' %}selected{% endif %} style="background: #0c101d;">Admin</option>
+                <option value="teacher" {% if role == 'teacher' %}selected{% endif %} style="background: #0c101d;">O'qituvchi</option>
+                <option value="student" {% if role == 'student' %}selected{% endif %} style="background: #0c101d;">O'quvchi</option>
+                <option value="anonymous" {% if role == 'anonymous' %}selected{% endif %} style="background: #0c101d;">Anonim / Mehmon</option>
+            </select>
+
+            <!-- Qidiruv input -->
+            <div style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-card); border-radius: 10px; padding: 3px 12px; width: 240px;">
+                <input type="text" name="query" value="{{ query }}" placeholder="Qidirish (URL, xabar, IP...)" style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 5px 0;">
+                <button type="submit" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 0 4px;"><i class="fas fa-search"></i></button>
+            </div>
+
+            {% if query or role or method or current_status != 'unresolved' %}
+                <a href="{% url 'admin_monitoring_dashboard' %}" style="padding: 7px 14px; border-radius: 10px; background: rgba(255,0,85,0.08); border: 1px solid rgba(255,0,85,0.25); color: #ff0055; text-decoration: none; font-size: 13px; font-weight: 700;">
+                    Tozalash
+                </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- 📑 Errors Table Container -->
+    <div style="flex-grow: 1; overflow-y: auto; background: rgba(11, 15, 25, 0.5); border: 1px solid var(--border-card); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); margin-bottom: 20px;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;" id="errorsTable">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border-card); background: #080d1a; position: sticky; top: 0; z-index: 10;">
+                    <th style="padding: 14px 18px; color: #00f2fe; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 14%;">VAQT</th>
+                    <th style="padding: 14px 18px; color: #00f2fe; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 18%;">XATOLIK VA METOD</th>
+                    <th style="padding: 14px 18px; color: #00f2fe; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 22%;">URL MANZILI</th>
+                    <th style="padding: 14px 18px; color: #00f2fe; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 20%;">KIMDAN (FOYDALANUVCHI)</th>
+                    <th style="padding: 14px 18px; color: #00f2fe; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 14%;">IP VA QURILMA</th>
+                    <th style="padding: 14px 18px; color: #00f2fe; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.8px; width: 12%; text-align: center;">AMAL</th>
+                </tr>
+            </thead>
+            <tbody id="errorRowsContainer">
+                {% if logs %}
+                    {% for log in logs %}
+                        <tr id="error-row-{{ log.id }}" style="border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)';" onmouseout="this.style.background='none';">
+                            <!-- Vaqt -->
+                            <td style="padding: 14px 18px; font-size: 12.5px; font-family: monospace; color: var(--text-secondary); font-weight: 600;">
+                                <div style="color: var(--text-primary); font-weight: 700;">{{ log.timestamp|date:"d.m.Y" }}</div>
+                                <div style="color: #00f2fe; font-size: 11.5px;">{{ log.timestamp|date:"H:i:s" }}</div>
+                            </td>
+
+                            <!-- Xatolik turi va Metod -->
+                            <td style="padding: 14px 18px;">
+                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                    <span class="badge-method badge-method-{{ log.http_method|lower }}">
+                                        {{ log.http_method }}
+                                    </span>
+                                    <span style="font-weight: 800; color: #ff0055; font-size: 13px; font-family: monospace;">
+                                        {{ log.exception_type|default:"Exception" }}
+                                    </span>
+                                </div>
+                                <div style="font-size: 12.5px; color: var(--text-secondary); max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ log.error_message }}">
+                                    {{ log.error_message }}
+                                </div>
+                            </td>
+
+                            <!-- URL Manzili -->
+                            <td style="padding: 14px 18px; font-size: 13px; font-family: monospace; font-weight: 600; word-break: break-all;">
+                                <span style="color: #ff9f43;">{{ log.url_path }}</span>
+                            </td>
+
+                            <!-- Foydalanuvchi & Rol -->
+                            <td style="padding: 14px 18px;">
+                                <div style="font-weight: 700; color: var(--text-primary); font-size: 13.5px; margin-bottom: 2px;">
+                                    {% if log.user %}
+                                        {{ log.user.get_full_name|default:log.user.username }}
+                                    {% else %}
+                                        <span style="color: var(--text-secondary); font-style: italic;">Anonim tashrif</span>
+                                    {% endif %}
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                    {% if log.user_role == 'admin' %}
+                                        <span class="badge-role badge-role-admin">Admin</span>
+                                    {% elif log.user_role == 'teacher' %}
+                                        <span class="badge-role badge-role-teacher">O'qituvchi</span>
+                                    {% elif log.user_role == 'student' %}
+                                        <span class="badge-role badge-role-student">O'quvchi</span>
+                                    {% else %}
+                                        <span class="badge-role badge-role-anon">{{ log.user_role|default:"Mehmon" }}</span>
+                                    {% endif %}
+
+                                    {% if log.user_phone %}
+                                        <span style="font-size: 11.5px; color: var(--text-secondary); font-family: monospace;">{{ log.user_phone }}</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <!-- IP va Qurilma -->
+                            <td style="padding: 14px 18px; font-size: 12px; color: var(--text-secondary);">
+                                <div style="font-family: monospace; color: #00f2fe; font-weight: 700;">
+                                    {{ log.ip_address|default:"127.0.0.1" }}
+                                </div>
+                                <div style="font-size: 11px; max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ log.user_agent }}">
+                                    {{ log.user_agent|default:"Noma'lum brauzer" }}
+                                </div>
+                            </td>
+
+                            <!-- Amal -->
+                            <td style="padding: 14px 18px; text-align: center;">
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                    <!-- Inspect Button -->
+                                    <button onclick="openDiagnosticsModal('{{ log.id }}')" style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; font-weight: 700; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: 0.2s;" title="Tashxis qo'yish (Traceback & Parametrlar)">
+                                        <i class="fas fa-search-plus"></i> Tashxis
+                                    </button>
+
+                                    <!-- Quick Resolve Button -->
+                                    {% if not log.is_resolved %}
+                                        <button onclick="resolveErrorAjax('{{ log.id }}', this)" style="background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.3); color: #00ffaa; font-weight: 700; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: 0.2s;" title="Hal etildi deb belgilash">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    {% else %}
+                                        <span style="color: #00ffaa; font-weight: 700; font-size: 12px;" title="Hal etilgan"><i class="fas fa-check-double"></i></span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Hidden Raw Data For Diagnostics -->
+                                <div id="raw_data_{{ log.id }}" style="display: none;"
+                                     data-id="{{ log.id }}"
+                                     data-exception="{{ log.exception_type|default:'UnhandledException' }}"
+                                     data-message="{{ log.error_message }}"
+                                     data-url="{{ log.url_path }}"
+                                     data-method="{{ log.http_method }}"
+                                     data-time="{{ log.timestamp|date:'d.m.Y H:i:s' }}"
+                                     data-user="{% if log.user %}{{ log.user.get_full_name|default:log.user.username }}{% else %}Anonim{% endif %}"
+                                     data-role="{{ log.user_role|default:'anonim' }}"
+                                     data-phone="{{ log.user_phone|default:'' }}"
+                                     data-ip="{{ log.ip_address|default:'127.0.0.1' }}"
+                                     data-agent="{{ log.user_agent|default:'' }}"
+                                     data-resolved="{{ log.is_resolved|yesno:'1,0' }}"
+                                     data-resolved-at="{% if log.resolved_at %}{{ log.resolved_at|date:'d.m.Y H:i:s' }}{% endif %}"
+                                     data-resolved-by="{% if log.resolved_by %}{{ log.resolved_by.get_full_name|default:log.resolved_by.username }}{% endif %}"
+                                     data-payload="{{ log.request_data|default:'{}' }}">{{ log.traceback }}</div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 50px 20px;">
+                            <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-card); border-radius: 16px; padding: 40px 20px; text-align: center; max-width: 480px; margin: 0 auto;">
+                                <i class="fas fa-shield-alt" style="font-size: 40px; color: #00ffaa; margin-bottom: 14px; display: inline-block;"></i>
+                                <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Hech qanday xatolik topilmadi</h4>
+                                <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">Tanlangan filtrlar bo'yicha tizimda hech qanday xatolik qayd etilmagan.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 📄 Pagination -->
+    {% if logs.has_other_pages %}
+    <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px;">
+        {% if logs.has_previous %}
+            <a href="?page={{ logs.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 6px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); border-radius: 8px; color: var(--text-primary); text-decoration: none; font-size: 13px; font-weight: 700;">
+                <i class="fas fa-chevron-left"></i> Oldingi
+            </a>
+        {% endif %}
+
+        <span style="color: var(--text-secondary); font-size: 13px; font-weight: 600; padding: 0 10px;">
+            Sahifa {{ logs.number }} / {{ logs.paginator.num_pages }}
+        </span>
+
+        {% if logs.has_next %}
+            <a href="?page={{ logs.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if query %}&query={{ query }}{% endif %}{% if role %}&role={{ role }}{% endif %}{% if method %}&method={{ method }}{% endif %}" style="padding: 6px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); border-radius: 8px; color: var(--text-primary); text-decoration: none; font-size: 13px; font-weight: 700;">
+                Keyingi <i class="fas fa-chevron-right"></i>
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- 🔬 Diagnostic Modal -->
+<div class="diag-modal-backdrop" id="diagModalBackdrop" onclick="handleBackdropClick(event)">
+    <div class="diag-modal-content" onclick="event.stopPropagation()">
+        <!-- Modal Header -->
+        <div style="padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="modalMethodBadge" class="badge-method badge-method-post">POST</span>
+                <h3 id="modalTitle" style="color: #ffffff; font-size: 17px; font-weight: 800; margin: 0; font-family: monospace;">
+                    TypeError: cannot unpack non-iterable
+                </h3>
+            </div>
+            <button onclick="closeDiagnosticsModal()" style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 20px; cursor: pointer; padding: 4px 8px; border-radius: 6px;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Modal Tabs Navigation -->
+        <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2); padding: 0 16px;">
+            <button class="diag-tab-btn active" id="tabBtnOverview" onclick="switchDiagTab('overview')">
+                <i class="fas fa-info-circle"></i> Umumiy Tashxis
+            </button>
+            <button class="diag-tab-btn" id="tabBtnPayload" onclick="switchDiagTab('payload')">
+                <i class="fas fa-code"></i> So'rov Parametrlari (Payload)
+            </button>
+            <button class="diag-tab-btn" id="tabBtnTraceback" onclick="switchDiagTab('traceback')">
+                <i class="fas fa-terminal"></i> Python Traceback
+            </button>
+        </div>
+
+        <!-- Modal Body Content -->
+        <div style="padding: 24px; overflow-y: auto; flex-grow: 1;">
+            <!-- Tab 1: Overview -->
+            <div id="diagTabOverview">
+                <div style="background: rgba(255, 0, 85, 0.08); border: 1px solid rgba(255, 0, 85, 0.3); border-radius: 12px; padding: 14px 18px; margin-bottom: 18px;">
+                    <div style="font-size: 11px; font-weight: 800; color: #ff0055; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">Xatolik Xabari:</div>
+                    <div id="modalErrorMessage" style="color: #ffffff; font-weight: 700; font-size: 14px; word-break: break-word;"></div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4 style="font-size: 13px; font-weight: 700; color: #00f2fe; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">So'rov Tafsilotlari</h4>
+                        <div class="diag-info-row">
+                            <span class="diag-info-label">URL Manzili:</span>
+                            <span class="diag-info-value" id="modalUrl" style="color: #ff9f43; font-family: monospace;"></span>
+                        </div>
+                        <div class="diag-info-row">
+                            <span class="diag-info-label">HTTP Metod:</span>
+                            <span class="diag-info-value" id="modalMethod"></span>
+                        </div>
+                        <div class="diag-info-row">
+                            <span class="diag-info-label">Vaqti:</span>
+                            <span class="diag-info-value" id="modalTime"></span>
+                        </div>
+                        <div class="diag-info-row">
+                            <span class="diag-info-label">Holati:</span>
+                            <span class="diag-info-value" id="modalResolvedStatus"></span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style="font-size: 13px; font-weight: 700; color: #00f2fe; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Foydalanuvchi va Tarmoq</h4>
+                        <div class="diag-info-row">
+                            <span class="diag-info-label">Foydalanuvchi:</span>
+                            <span class="diag-info-value" id="modalUser"></span>
+                        </div>
+                        <div class="diag-info-row">
+                            <span class="diag-info-label">Roli:</span>
+                            <span class="diag-info-value" id="modalRole"></span>
+                        </div>
+                        <div class="diag-info-row">
+                            <span class="diag-info-label">Telefon:</span>
+                            <span class="diag-info-value" id="modalPhone"></span>
+                        </div>
+                        <div class="diag-info-row">
+                            <span class="diag-info-label">IP Manzil:</span>
+                            <span class="diag-info-value" id="modalIp" style="color: #00ffaa; font-family: monospace;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600;">User-Agent (Brauzer / Qurilma):</div>
+                    <div id="modalUserAgent" style="font-size: 12px; font-family: monospace; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 8px 12px; border-radius: 8px; word-break: break-all;"></div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Payload -->
+            <div id="diagTabPayload" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="font-size: 12.5px; color: var(--text-secondary);">Ushbu so'rov yuborilganda uzatilgan xavfsizlangan parametrlar (JSON):</span>
+                    <button onclick="copyToClipboard('modalPayloadBox')" style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; font-weight: 700; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11.5px;">
+                        <i class="fas fa-copy"></i> Nusxa olish
+                    </button>
+                </div>
+                <pre class="diag-code-box" id="modalPayloadBox"></pre>
+            </div>
+
+            <!-- Tab 3: Traceback -->
+            <div id="diagTabTraceback" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="font-size: 12.5px; color: var(--text-secondary);">Python Stack Trace (To'liq xatolik ketma-ketligi):</span>
+                    <button onclick="copyToClipboard('modalTracebackBox')" style="background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.3); color: #ff0055; font-weight: 700; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11.5px;">
+                        <i class="fas fa-copy"></i> Traceback nusxasi
+                    </button>
+                </div>
+                <pre class="diag-code-box" id="modalTracebackBox" style="color: #ff0055;"></pre>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div style="padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);">
+            <div id="modalResolveContainer">
+                <button id="modalResolveBtn" onclick="resolveFromModal()" style="background: rgba(0, 255, 170, 0.12); border: 1px solid rgba(0, 255, 170, 0.4); color: #00ffaa; font-weight: 700; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-check-circle"></i> Hal etildi deb belgilash
+                </button>
+            </div>
+            <button onclick="closeDiagnosticsModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ffffff; font-weight: 700; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 13px;">
+                Yopish
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 🔔 Toast Notification -->
+<div id="monitorToast">
+    <i class="fas fa-check-circle" style="color: #00ffaa; font-size: 18px;"></i>
+    <span id="toastMsg">Amal muvaffaqiyatli bajarildi!</span>
+</div>
+
+<script>
+let currentOpenErrorId = null;
+let autoRefreshTimer = null;
+
+// ==============================================================================
+// 🔄 Auto-refresh Logic
+// ==============================================================================
+function changeAutoRefresh(seconds) {
+    if (autoRefreshTimer) {
+        clearInterval(autoRefreshTimer);
+        autoRefreshTimer = null;
+    }
+    const sec = parseInt(seconds, 10);
+    if (sec > 0) {
+        autoRefreshTimer = setInterval(() => {
+            refreshDashboard(false);
+        }, sec * 1000);
+    }
+}
+
+// Start default auto-refresh (10 seconds)
+changeAutoRefresh(10);
+
+function refreshDashboard(showSpinner = true) {
+    const icon = document.getElementById('refreshIcon');
+    if (showSpinner && icon) {
+        icon.classList.add('fa-spin');
+    }
+
+    fetch("{% url 'api_monitoring_overview' %}", { credentials: 'same-origin' })
+        .then(res => res.json())
+        .then(data => {
+            if (showSpinner && icon) {
+                setTimeout(() => icon.classList.remove('fa-spin'), 400);
+            }
+            if (data && data.metrics) {
+                // Update Top Cards
+                const cardLatency = document.getElementById('cardDbLatency');
+                if (cardLatency && data.database) {
+                    cardLatency.textContent = data.database.latency_ms + " ms";
+                }
+                const cardUnresolved = document.getElementById('cardUnresolvedCount');
+                if (cardUnresolved) {
+                    cardUnresolved.textContent = data.metrics.unresolved_errors;
+                    cardUnresolved.style.color = data.metrics.unresolved_errors > 0 ? '#ff0055' : '#00ffaa';
+                }
+                const cardToday = document.getElementById('cardTodayCount');
+                if (cardToday) {
+                    cardToday.textContent = data.metrics.today_errors;
+                }
+                const cardResolved = document.getElementById('cardResolvedCount');
+                if (cardResolved) {
+                    cardResolved.textContent = data.metrics.resolved_errors;
+                }
+
+                // Live status badge update
+                const badge = document.getElementById('liveBadge');
+                const dot = document.getElementById('livePulseDot');
+                if (data.status === 'healthy') {
+                    if (dot) dot.className = 'live-pulse';
+                } else if (data.status === 'critical') {
+                    if (dot) dot.className = 'live-pulse critical';
+                } else {
+                    if (dot) dot.className = 'live-pulse warning';
+                }
+            }
+        })
+        .catch(err => {
+            if (showSpinner && icon) icon.classList.remove('fa-spin');
+            console.error('Monitoring refresh error:', err);
+        });
+}
+
+// ==============================================================================
+// 🔬 Diagnostics Modal
+// ==============================================================================
+function openDiagnosticsModal(errorId) {
+    currentOpenErrorId = errorId;
+    const rawEl = document.getElementById('raw_data_' + errorId);
+    if (!rawEl) return;
+
+    const dataset = rawEl.dataset;
+    const tracebackText = rawEl.textContent || '';
+
+    document.getElementById('modalTitle').textContent = dataset.exception + ' #' + errorId;
+    document.getElementById('modalMethodBadge').textContent = dataset.method;
+    document.getElementById('modalMethodBadge').className = 'badge-method badge-method-' + dataset.method.toLowerCase();
+    document.getElementById('modalErrorMessage').textContent = dataset.message;
+    document.getElementById('modalUrl').textContent = dataset.url;
+    document.getElementById('modalMethod').textContent = dataset.method;
+    document.getElementById('modalTime').textContent = dataset.time;
+    document.getElementById('modalUser').textContent = dataset.user;
+    document.getElementById('modalRole').textContent = dataset.role;
+    document.getElementById('modalPhone').textContent = dataset.phone || "Kiritilmagan";
+    document.getElementById('modalIp').textContent = dataset.ip;
+    document.getElementById('modalUserAgent').textContent = dataset.agent || "Noma'lum";
+
+    // Resolved status
+    const isResolved = dataset.resolved === '1';
+    const statusEl = document.getElementById('modalResolvedStatus');
+    const resolveBtn = document.getElementById('modalResolveBtn');
+    if (isResolved) {
+        statusEl.innerHTML = '<span style="color: #00ffaa; font-weight: 700;"><i class="fas fa-check-double"></i> Hal qilingan (' + dataset.resolvedAt + ')</span>';
+        if (resolveBtn) resolveBtn.style.display = 'none';
+    } else {
+        statusEl.innerHTML = '<span style="color: #ff0055; font-weight: 700;"><i class="fas fa-clock"></i> Hal etilmagan</span>';
+        if (resolveBtn) resolveBtn.style.display = 'inline-flex';
+    }
+
+    // Payload formatted JSON
+    let formattedPayload = dataset.payload;
+    try {
+        const obj = JSON.parse(dataset.payload);
+        formattedPayload = JSON.stringify(obj, null, 2);
+    } catch(e) {}
+    document.getElementById('modalPayloadBox').textContent = formattedPayload || "Parametrlar mavjud emas.";
+
+    // Traceback
+    document.getElementById('modalTracebackBox').textContent = tracebackText || "Traceback ma'lumoti topilmadi.";
+
+    // Switch to first tab
+    switchDiagTab('overview');
+
+    // Show modal
+    document.getElementById('diagModalBackdrop').style.display = 'flex';
+}
+
+function closeDiagnosticsModal() {
+    document.getElementById('diagModalBackdrop').style.display = 'none';
+    currentOpenErrorId = null;
+}
+
+function handleBackdropClick(e) {
+    if (e.target.id === 'diagModalBackdrop') {
+        closeDiagnosticsModal();
+    }
+}
+
+function switchDiagTab(tabName) {
+    document.getElementById('tabBtnOverview').classList.remove('active');
+    document.getElementById('tabBtnPayload').classList.remove('active');
+    document.getElementById('tabBtnTraceback').classList.remove('active');
+
+    document.getElementById('diagTabOverview').style.display = 'none';
+    document.getElementById('diagTabPayload').style.display = 'none';
+    document.getElementById('diagTabTraceback').style.display = 'none';
+
+    if (tabName === 'overview') {
+        document.getElementById('tabBtnOverview').classList.add('active');
+        document.getElementById('diagTabOverview').style.display = 'block';
+    } else if (tabName === 'payload') {
+        document.getElementById('tabBtnPayload').classList.add('active');
+        document.getElementById('diagTabPayload').style.display = 'block';
+    } else if (tabName === 'traceback') {
+        document.getElementById('tabBtnTraceback').classList.add('active');
+        document.getElementById('diagTabTraceback').style.display = 'block';
+    }
+}
+
+// ==============================================================================
+// 📋 Copy to Clipboard
+// ==============================================================================
+function copyToClipboard(elementId) {
+    const text = document.getElementById(elementId).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        showToast("Nusxa olindi!");
+    }).catch(err => {
+        console.error('Nusxa olishda xatolik:', err);
+    });
+}
+
+// ==============================================================================
+// ✅ AJAX Resolve Logic
+// ==============================================================================
+function resolveErrorAjax(errorId, btnElement) {
+    if (!confirm("Ushbu xatolikni hal etildi deb belgilamoqchimisiz?")) return;
+
+    fetch("/api/monitoring/errors/" + errorId + "/resolve/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie('csrftoken') || "",
+            "Content-Type": "application/json"
+        },
+        credentials: "same-origin"
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast("Xatolik #" + errorId + " hal etildi deb belgilandi!");
+            if (btnElement) {
+                const parent = btnElement.parentElement;
+                parent.innerHTML = '<span style="color: #00ffaa; font-weight: 700; font-size: 12px;"><i class="fas fa-check-double"></i></span>';
+            }
+            // Update raw data
+            const rawEl = document.getElementById('raw_data_' + errorId);
+            if (rawEl) {
+                rawEl.dataset.resolved = '1';
+                rawEl.dataset.resolvedAt = data.resolved_at || '';
+            }
+            refreshDashboard(false);
+        } else {
+            alert(data.error || "Xatolik yuz berdi");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Server bilan bog'lanishda xatolik!");
+    });
+}
+
+function resolveFromModal() {
+    if (!currentOpenErrorId) return;
+    resolveErrorAjax(currentOpenErrorId, null);
+    closeDiagnosticsModal();
+    const rowBtn = document.querySelector('#error-row-' + currentOpenErrorId + ' button[title="Hal etildi deb belgilash"]');
+    if (rowBtn) {
+        const parent = rowBtn.parentElement;
+        parent.innerHTML = '<span style="color: #00ffaa; font-weight: 700; font-size: 12px;"><i class="fas fa-check-double"></i></span>';
+    }
+}
+
+function bulkResolveAll() {
+    if (!confirm("Barcha hal etilmagan faol xatoliklarni 'Hal etildi' deb belgilashni tasdiqlaysizmi?")) return;
+
+    fetch("/api/monitoring/errors/bulk-resolve/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie('csrftoken') || "",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ all_unresolved: true }),
+        credentials: "same-origin"
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message);
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            alert(data.error || "Xatolik yuz berdi");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Server bilan bog'lanishda xatolik!");
+    });
+}
+
+// ==============================================================================
+// 🍞 Toast Helper
+// ==============================================================================
+function showToast(msg) {
+    const toast = document.getElementById('monitorToast');
+    const msgEl = document.getElementById('toastMsg');
+    if (toast && msgEl) {
+        msgEl.textContent = msg;
+        toast.style.display = 'flex';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
