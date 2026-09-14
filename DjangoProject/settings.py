@@ -24,6 +24,8 @@ CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[
     'https://api.upcode.uz',
     'https://lms.upcode.uz',
     'http://lms.upcode.uz',
+    'https://*.upcode.uz',
+    'http://*.upcode.uz',
     'https://*.railway.app',
     'https://*.up.railway.app',
     'https://*.netlify.app',
