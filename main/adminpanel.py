@@ -4456,11 +4456,25 @@ def delete_subadmin(request, subadmin_id):
 
 @admin_required
 def admin_sessions_view(request):
-
     sessions = UserSession.objects.select_related('user').order_by('-last_activity')
+    
+    total_count = sessions.count()
+    active_count = sessions.filter(is_active=True).count()
+    admin_count = sessions.filter(Q(user__role='admin') | Q(user__is_superuser=True)).count()
+    subadmin_count = sessions.filter(user__role='reception').count()
+    teacher_count = sessions.filter(user__role='teacher').count()
+    student_count = sessions.filter(user__role='student').count()
+
     return render(request, 'admin_sessions.html', {
-        'sessions': sessions
+        'sessions': sessions,
+        'total_count': total_count,
+        'active_count': active_count,
+        'admin_count': admin_count,
+        'subadmin_count': subadmin_count,
+        'teacher_count': teacher_count,
+        'student_count': student_count,
     })
+
 
 
 @admin_required

@@ -168,10 +168,22 @@ class TelegramBotContactAdmin(ModelAdmin):
 
 @admin.register(UserSession)
 class UserSessionAdmin(ModelAdmin):
-    list_display = ('user', 'ip_address', 'location', 'device_type', 'browser', 'os', 'last_activity', 'is_active')
-    list_filter = ('device_type', 'browser', 'os', 'is_active')
+    list_display = ('user', 'user_role', 'ip_address', 'location', 'device_type', 'browser', 'os', 'last_activity', 'is_active')
+    list_filter = ('user__role', 'is_active', 'device_type', 'browser', 'os')
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'ip_address', 'location')
     readonly_fields = ('session_key', 'user', 'ip_address', 'location', 'user_agent', 'device_type', 'browser', 'os', 'created_at', 'last_activity')
+
+    def user_role(self, obj):
+        if not obj.user:
+            return '-'
+        if obj.user.is_superuser or obj.user.role == 'admin':
+            return format_html('<span style="color: #ff0055; font-weight: bold;">ADMIN</span>')
+        elif obj.user.role == 'reception':
+            return format_html('<span style="color: #f59e0b; font-weight: bold;">SUB-ADMIN</span>')
+        elif obj.user.role == 'teacher':
+            return format_html('<span style="color: #9b51e0; font-weight: bold;">O‘QITUVCHI</span>')
+        return format_html('<span style="color: #00f2fe; font-weight: bold;">O‘QUVCHI</span>')
+    user_role.short_description = "Roli"
 
     def has_add_permission(self, request):
         return False
