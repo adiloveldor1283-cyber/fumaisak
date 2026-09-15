@@ -5,14 +5,16 @@
 
 {% block extra_css %}
 <style>
-    .sessions-table-container {
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        border-radius: 20px;
-        background: rgba(255, 255, 255, 0.01);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        padding: 12px;
+    /* Table Container */
+    .sessions-table-container,
+    .jadval-container {
+        border: 1px solid var(--border-card, rgba(255, 255, 255, 0.05));
+        border-radius: 18px;
+        background: var(--bg-card, rgba(255, 255, 255, 0.01));
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: var(--shadow-panel, 0 20px 40px rgba(0,0,0,0.3));
+        padding: 0;
         width: 100%;
         overflow-x: auto;
         margin-bottom: 25px;
@@ -29,38 +31,41 @@
         font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.4);
+        color: var(--text-secondary, rgba(255, 255, 255, 0.45));
         letter-spacing: 0.5px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        background: #080d1a;
+        border-bottom: 1px solid var(--border-card, rgba(255, 255, 255, 0.08));
+        background: var(--table-header-bg, #080d1a);
+        white-space: nowrap;
     }
 
     .sessions-table td {
         padding: 16px 20px;
         font-size: 14px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-        color: rgba(255, 255, 255, 0.85);
+        border-bottom: 1px solid var(--border-card, rgba(255, 255, 255, 0.03));
+        color: var(--text-primary, rgba(255, 255, 255, 0.9));
         vertical-align: middle;
     }
 
     .sessions-table tr:hover td {
-        background: rgba(255, 255, 255, 0.01);
+        background: var(--table-row-hover, rgba(255, 255, 255, 0.015));
     }
 
+    /* Device Icon */
     .device-icon {
-        font-size: 18px;
-        width: 34px;
-        height: 34px;
+        font-size: 17px;
+        width: 36px;
+        height: 36px;
         border-radius: 10px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         background: rgba(255, 255, 255, 0.03);
         margin-right: 10px;
-        color: rgba(255, 255, 255, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+        border: 1px solid var(--border-card, rgba(255, 255, 255, 0.06));
     }
 
+    /* Action Buttons */
     .btn-terminate {
         background: rgba(255, 0, 85, 0.08);
         border: 1px solid rgba(255, 0, 85, 0.25);
@@ -70,7 +75,7 @@
         font-weight: 700;
         font-size: 12.5px;
         cursor: pointer;
-        transition: 0.3s;
+        transition: 0.25s;
         display: inline-flex;
         align-items: center;
         gap: 6px;
@@ -78,10 +83,11 @@
 
     .btn-terminate:hover {
         background: #ff0055;
-        color: #070a12;
+        color: #ffffff;
         box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
     }
 
+    /* Status Badges */
     .status-active-badge {
         padding: 4px 10px;
         border-radius: 6px;
@@ -90,7 +96,8 @@
         text-transform: uppercase;
         background: rgba(0, 255, 170, 0.08);
         color: #00ffaa;
-        border: 1px solid rgba(0, 255, 170, 0.2);
+        border: 1px solid rgba(0, 255, 170, 0.25);
+        display: inline-block;
     }
 
     .status-inactive-badge {
@@ -100,11 +107,12 @@
         font-size: 11px;
         text-transform: uppercase;
         background: rgba(255, 255, 255, 0.05);
-        color: rgba(255, 255, 255, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--text-muted, rgba(255, 255, 255, 0.4));
+        border: 1px solid var(--border-card, rgba(255, 255, 255, 0.08));
+        display: inline-block;
     }
 
-    /* Role Badges */
+    /* Role Badges - Dark Theme Defaults */
     .role-badge-admin {
         display: inline-flex;
         align-items: center;
@@ -167,10 +175,10 @@
 
     /* Filter Tabs */
     .filter-tab-btn {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        color: rgba(255, 255, 255, 0.7);
-        padding: 7px 14px;
+        background: var(--bg-card, rgba(255, 255, 255, 0.03));
+        border: 1px solid var(--border-card, rgba(255, 255, 255, 0.08));
+        color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+        padding: 8px 16px;
         border-radius: 10px;
         font-size: 12.5px;
         font-weight: 600;
@@ -182,8 +190,8 @@
     }
 
     .filter-tab-btn:hover {
-        background: rgba(255, 255, 255, 0.08);
-        color: #ffffff;
+        background: var(--menu-item-hover, rgba(255, 255, 255, 0.08));
+        color: var(--text-primary, #ffffff);
     }
 
     .filter-tab-btn.active {
@@ -191,22 +199,291 @@
         color: #00f2fe;
         border-color: rgba(0, 242, 254, 0.4);
         box-shadow: 0 0 12px rgba(0, 242, 254, 0.15);
+        font-weight: 700;
+    }
+
+    /* Active Count Pill */
+    .active-pill-box {
+        font-size: 13.5px;
+        color: #00ffaa;
+        font-weight: 700;
+        background: rgba(0, 255, 170, 0.05);
+        border: 1px solid rgba(0, 255, 170, 0.2);
+        padding: 8px 16px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .user-avatar-placeholder {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(0, 242, 254, 0.06);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #00f2fe;
+        font-size: 13px;
+        flex-shrink: 0;
+    }
+
+    .session-user-name {
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--text-primary, #ffffff);
+    }
+
+    .session-user-sub {
+        display: block;
+        font-size: 11.5px;
+        font-family: monospace;
+        color: var(--text-muted, rgba(255,255,255,0.45));
+        margin-top: 2px;
+    }
+
+    .current-session-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #00ffaa;
+        font-style: italic;
+    }
+
+    /* ==========================================================================
+       🌞 KUNDUZGI REJIM (LIGHT THEME) SOZLAMALARI
+       ========================================================================== */
+    html.light-theme .sessions-table-container,
+    body.light-theme .sessions-table-container,
+    body.light-mode .sessions-table-container,
+    html.light-theme .jadval-container,
+    body.light-theme .jadval-container,
+    body.light-mode .jadval-container {
+        background: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05) !important;
+    }
+
+    html.light-theme .sessions-table th,
+    body.light-theme .sessions-table th,
+    body.light-mode .sessions-table th {
+        background: #f8fafc !important;
+        color: #64748b !important;
+        border-bottom-color: #e2e8f0 !important;
+    }
+
+    html.light-theme .sessions-table td,
+    body.light-theme .sessions-table td,
+    body.light-mode .sessions-table td {
+        color: #0f172a !important;
+        border-bottom-color: #f1f5f9 !important;
+    }
+
+    html.light-theme .sessions-table tr:hover td,
+    body.light-theme .sessions-table tr:hover td,
+    body.light-mode .sessions-table tr:hover td {
+        background: #f8fafc !important;
+    }
+
+    html.light-theme .sarlavha,
+    body.light-theme .sarlavha,
+    body.light-mode .sarlavha {
+        color: #0f172a !important;
+    }
+
+    html.light-theme .search-form,
+    body.light-theme .search-form,
+    body.light-mode .search-form {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03) !important;
+    }
+
+    html.light-theme .search-input,
+    body.light-theme .search-input,
+    body.light-mode .search-input {
+        color: #0f172a !important;
+    }
+
+    html.light-theme .search-input::placeholder,
+    body.light-theme .search-input::placeholder,
+    body.light-mode .search-input::placeholder {
+        color: #94a3b8 !important;
+    }
+
+    html.light-theme .search-btn,
+    body.light-theme .search-btn,
+    body.light-mode .search-btn {
+        color: #64748b !important;
+    }
+
+    html.light-theme .active-pill-box,
+    body.light-theme .active-pill-box,
+    body.light-mode .active-pill-box {
+        background: #ecfdf5 !important;
+        color: #059669 !important;
+        border-color: #a7f3d0 !important;
+    }
+
+    html.light-theme .filter-tab-btn,
+    body.light-theme .filter-tab-btn,
+    body.light-mode .filter-tab-btn {
+        background: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        color: #475569 !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;
+    }
+
+    html.light-theme .filter-tab-btn:hover,
+    body.light-theme .filter-tab-btn:hover,
+    body.light-mode .filter-tab-btn:hover {
+        background: #f8fafc !important;
+        color: #0f172a !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    html.light-theme .filter-tab-btn.active,
+    body.light-theme .filter-tab-btn.active,
+    body.light-mode .filter-tab-btn.active {
+        background: #e0f2fe !important;
+        color: #0284c7 !important;
+        border-color: #38bdf8 !important;
+        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15) !important;
+    }
+
+    html.light-theme .session-user-name,
+    body.light-theme .session-user-name,
+    body.light-mode .session-user-name {
+        color: #0f172a !important;
+    }
+
+    html.light-theme .session-user-sub,
+    body.light-theme .session-user-sub,
+    body.light-mode .session-user-sub {
+        color: #64748b !important;
+    }
+
+    html.light-theme .user-avatar-placeholder,
+    body.light-theme .user-avatar-placeholder,
+    body.light-mode .user-avatar-placeholder {
+        background: #e0f2fe !important;
+        border-color: #bae6fd !important;
+        color: #0284c7 !important;
+    }
+
+    /* Role Badges - Light Theme */
+    html.light-theme .role-badge-admin,
+    body.light-theme .role-badge-admin,
+    body.light-mode .role-badge-admin {
+        background: #fee2e2 !important;
+        color: #dc2626 !important;
+        border-color: #fca5a5 !important;
+    }
+
+    html.light-theme .role-badge-subadmin,
+    body.light-theme .role-badge-subadmin,
+    body.light-mode .role-badge-subadmin {
+        background: #fef3c7 !important;
+        color: #d97706 !important;
+        border-color: #fcd34d !important;
+    }
+
+    html.light-theme .role-badge-teacher,
+    body.light-theme .role-badge-teacher,
+    body.light-mode .role-badge-teacher {
+        background: #f3e8ff !important;
+        color: #7e22ce !important;
+        border-color: #d8b4fe !important;
+    }
+
+    html.light-theme .role-badge-student,
+    body.light-theme .role-badge-student,
+    body.light-mode .role-badge-student {
+        background: #e0f2fe !important;
+        color: #0284c7 !important;
+        border-color: #bae6fd !important;
+    }
+
+    html.light-theme .device-icon,
+    body.light-theme .device-icon,
+    body.light-mode .device-icon {
+        background: #f1f5f9 !important;
+        color: #475569 !important;
+        border-color: #e2e8f0 !important;
+    }
+
+    html.light-theme .status-active-badge,
+    body.light-theme .status-active-badge,
+    body.light-mode .status-active-badge {
+        background: #ecfdf5 !important;
+        color: #059669 !important;
+        border-color: #a7f3d0 !important;
+    }
+
+    html.light-theme .status-inactive-badge,
+    body.light-theme .status-inactive-badge,
+    body.light-mode .status-inactive-badge {
+        background: #f1f5f9 !important;
+        color: #64748b !important;
+        border-color: #e2e8f0 !important;
+    }
+
+    html.light-theme .btn-terminate,
+    body.light-theme .btn-terminate,
+    body.light-mode .btn-terminate {
+        background: #fff1f2 !important;
+        border-color: #fecdd3 !important;
+        color: #e11d48 !important;
+    }
+
+    html.light-theme .btn-terminate:hover,
+    body.light-theme .btn-terminate:hover,
+    body.light-mode .btn-terminate:hover {
+        background: #e11d48 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25) !important;
+    }
+
+    html.light-theme .current-session-label,
+    body.light-theme .current-session-label,
+    body.light-mode .current-session-label {
+        color: #059669 !important;
+    }
+
+    html.light-theme .empty-sessions-card,
+    body.light-theme .empty-sessions-card,
+    body.light-mode .empty-sessions-card {
+        background: #ffffff !important;
+        border-color: #e2e8f0 !important;
+    }
+
+    html.light-theme .empty-sessions-card h4,
+    body.light-theme .empty-sessions-card h4,
+    body.light-mode .empty-sessions-card h4 {
+        color: #0f172a !important;
+    }
+
+    html.light-theme .empty-sessions-card p,
+    body.light-theme .empty-sessions-card p,
+    body.light-mode .empty-sessions-card p {
+        color: #64748b !important;
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="sarlavha-qatori" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
-    <h2 class="sarlavha" style="font-size: 24px; font-weight: 800; color: #ffffff; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Faol foydalanuvchi seanslari</h2>
+    <h2 class="sarlavha" style="font-size: 24px; font-weight: 800; border-left: 4px solid #00f2fe; padding-left: 12px; letter-spacing: -0.5px; margin-bottom: 0;">Faol foydalanuvchi seanslari</h2>
     <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
         <!-- QIDIRUV FORMASI -->
-        <form class="search-form" onsubmit="event.preventDefault();" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 300px; margin: 0;">
-            <input type="text" class="search-input" id="session-search" placeholder="Ism, login, rol yoki IP qidirish..." style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; width: 100%; padding: 6px 0;">
-            <button type="submit" class="search-btn" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
+        <form class="search-form" onsubmit="event.preventDefault();" style="display: flex; align-items: center; border-radius: 12px; padding: 4px 14px; transition: 0.3s; width: 300px; margin: 0;">
+            <input type="text" class="search-input" id="session-search" placeholder="Ism, login, rol yoki IP qidirish..." style="background: transparent; border: none; outline: none; font-size: 13px; width: 100%; padding: 6px 0;">
+            <button type="submit" class="search-btn" style="background: none; border: none; cursor: pointer; font-size: 13px; transition: 0.3s; padding-left: 8px;"><i class="fas fa-search"></i></button>
         </form>
 
-        <div style="font-size: 13.5px; color: #00ffaa; font-weight: 700; background: rgba(0, 255, 170, 0.05); border: 1px solid rgba(0, 255, 170, 0.2); padding: 8px 16px; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-bolt" style="color: #00ffaa;"></i> <span>Faol: {{ active_count|default:"0" }} ta</span>
+        <div class="active-pill-box">
+            <i class="fas fa-bolt"></i> <span>Faol: {{ active_count|default:"0" }} ta</span>
         </div>
     </div>
 </div>
@@ -218,7 +495,7 @@
             <i class="fas fa-list"></i> Barchasi ({{ total_count|default:sessions.count }})
         </button>
         <button type="button" class="filter-tab-btn" data-filter="active_only">
-            <i class="fas fa-check-circle" style="color: #00ffaa;"></i> Faollar ({{ active_count|default:"0" }})
+            <i class="fas fa-check-circle" style="color: #059669;"></i> Faollar ({{ active_count|default:"0" }})
         </button>
         <button type="button" class="filter-tab-btn" data-filter="admin">
             <i class="fas fa-user-shield" style="color: #ff0055;"></i> Admin ({{ admin_count|default:"0" }})
@@ -247,10 +524,10 @@
 {% endif %}
 
 {% if sessions %}
-<div class="jadval-container" style="flex-grow: 1; overflow-y: auto; overflow-x: auto; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
-    <table class="sessions-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+<div class="jadval-container">
+    <table class="sessions-table">
         <thead>
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); background: #080d1a; position: sticky; top: 0; z-index: 10;">
+            <tr>
                 <th>FOYDALANUVCHI</th>
                 <th>ROL</th>
                 <th>QURILMA / OS</th>
@@ -264,24 +541,24 @@
         <tbody id="sessions-tbody">
             {% for s in sessions %}
             <tr data-role="{% if s.user.is_superuser or s.user.role == 'admin' %}admin{% elif s.user.role == 'reception' %}reception{% elif s.user.role == 'teacher' %}teacher{% elif s.user.role == 'student' %}student{% else %}{{ s.user.role }}{% endif %}" data-active="{% if s.is_active %}1{% else %}0{% endif %}">
-                <td data-label="FOYDALANUVCHI" style="font-weight: 700; color: #ffffff;">
+                <td data-label="FOYDALANUVCHI" style="font-weight: 700;">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         {% if s.user.profile_image %}
-                            <img src="{{ s.user.profile_image.url }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.1);">
+                            <img src="{{ s.user.profile_image.url }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;">
                         {% else %}
-                            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(0, 242, 254, 0.06); border: 1px solid rgba(0, 242, 254, 0.2); display: flex; align-items: center; justify-content: center; color: #00f2fe; font-size: 13px;">
+                            <div class="user-avatar-placeholder">
                                 <i class="fas fa-user"></i>
                             </div>
                         {% endif %}
                         <div>
-                            <div style="font-size: 13.5px; font-weight: 700; color: #ffffff;">
+                            <div class="session-user-name">
                                 {% if s.user.first_name or s.user.last_name %}
                                     {{ s.user.get_full_name }}
                                 {% else %}
                                     {{ s.user.username }}
                                 {% endif %}
                             </div>
-                            <div style="display: block; font-size: 11px; font-family: monospace; color: rgba(255,255,255,0.45); margin-top: 2px;">
+                            <div class="session-user-sub">
                                 @{{ s.user.username }}{% if s.user.phone_number %} &bull; {{ s.user.phone_number }}{% endif %}
                             </div>
                         </div>
@@ -310,16 +587,18 @@
                             <i class="fas fa-desktop"></i>
                         {% endif %}
                     </span>
-                    <span>{{ s.os }}</span>
+                    <span style="font-weight: 600;">{{ s.os }}</span>
                 </td>
                 <td data-label="BRAUZER">
                     <span>{{ s.browser }}</span>
                 </td>
                 <td data-label="IP / JOYLASHUV">
                     <span style="font-family: monospace; font-weight: 600;">{{ s.ip_address }}</span>
-                    <span style="display: block; font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 3px;"><i class="fas fa-map-marker-alt" style="color: #ff0055; margin-right: 4px;"></i> {{ s.location }}</span>
+                    <span style="display: block; font-size: 11.5px; color: var(--text-muted, rgba(255,255,255,0.45)); margin-top: 3px;">
+                        <i class="fas fa-map-marker-alt" style="color: #ff0055; margin-right: 4px;"></i> {{ s.location }}
+                    </span>
                 </td>
-                <td data-label="OXIRGI FAOLLIK" style="font-family: monospace; color: rgba(255,255,255,0.6);">
+                <td data-label="OXIRGI FAOLLIK" style="font-family: monospace; color: var(--text-secondary, rgba(255,255,255,0.65)); font-size: 13px;">
                     {{ s.last_activity|date:"d.m.Y H:i" }}
                 </td>
                 <td data-label="HOLAT">
@@ -331,7 +610,7 @@
                 </td>
                 <td data-label="AMAL">
                     {% if request.session.session_key == s.session_key %}
-                        <span style="font-size: 12px; font-weight: 700; color: #00ffaa; font-style: italic;"><i class="fas fa-check-double"></i> Joriy seans</span>
+                        <span class="current-session-label"><i class="fas fa-check-double"></i> Joriy seans</span>
                     {% else %}
                         <form method="POST" action="{% url 'terminate_session' s.session_key %}" style="margin:0; display: inline;" onsubmit="return confirm('Haqiqatan ham ushbu foydalanuvchi seansini majburiy yopmoqchimisiz? Foydalanuvchi tizimdan chiqarib yuboriladi.')">
                             {% csrf_token %}
@@ -347,10 +626,10 @@
     </table>
 </div>
 {% else %}
-    <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 40px 20px; text-align: center; margin-top: 20px;">
-        <i class="fas fa-user-clock" style="font-size: 36px; color: rgba(255,255,255,0.2); margin-bottom: 15px; display: inline-block;"></i>
-        <h4 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Seanslar topilmadi</h4>
-        <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin: 0;">Hozircha hech qanday faol seans qayd etilmagan.</p>
+    <div class="empty-sessions-card" style="background: var(--bg-card, rgba(255, 255, 255, 0.01)); border: 1px solid var(--border-card, rgba(255, 255, 255, 0.05)); border-radius: 16px; padding: 40px 20px; text-align: center; margin-top: 20px;">
+        <i class="fas fa-user-clock" style="font-size: 36px; color: var(--text-muted, rgba(255,255,255,0.2)); margin-bottom: 15px; display: inline-block;"></i>
+        <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary, #ffffff); margin-bottom: 8px;">Seanslar topilmadi</h4>
+        <p style="font-size: 13px; color: var(--text-muted, rgba(255,255,255,0.4)); margin: 0;">Hozircha hech qanday faol seans qayd etilmagan.</p>
     </div>
 {% endif %}
 {% endblock %}
@@ -410,4 +689,5 @@
     });
 </script>
 {% endblock %}
+
 
